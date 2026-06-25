@@ -1,3 +1,11 @@
+## Project Configuration
+
+- **Language**: TypeScript
+- **Package Manager**: npm
+- **Add-ons**: none
+
+---
+
 # AGENTS.md — Life OS
 
 Verbindliche Anweisungen für alle KI-Agenten (Gemini CLI, Claude Code, Codex, etc.), die in
@@ -90,6 +98,13 @@ offene Punkte.
    zu vermuten und später zu korrigieren — das kostet mehr Tokens als ein gezielter Read.
 8. **Verlinken statt duplizieren.** Wissen aus `docs/` referenzieren statt es in
    Code-Kommentaren, PRs oder neuen Dateien zu wiederholen.
+
+## .gitignore — verbindlich aktuell halten
+
+Bei jeder Änderung, die neue Build-Artefakte, Tool-Configs, lokale Caches, Secrets/`.env`-Dateien,
+IDE-/OS-Dateien oder generierte Verzeichnisse einführt (z. B. durch `npm install`, neue Tools,
+Supabase-CLI, n8n, Editor-Configs): sofort prüfen, ob `.gitignore` diese abdeckt, und falls nicht
+ergänzen — **bevor** committet wird. Nicht warten, bis versehentlich etwas getrackt wird.
 
 ## Was NICHT tun
 
