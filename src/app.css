@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --breakpoint-xs: 360px;
+  --breakpoint-md: 768px;
+
+  /* Semantic Theme-Farben */
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border-color: var(--border-color);
+  --color-primary-active: var(--primary-active);
+  --color-primary-active-bg: var(--primary-active-bg);
+
+  /* ── Violet-Deep Primärfarbe #390099 ──────────────────────────── */
+  --color-primary-50:  hsl(262 100% 97%);
+  --color-primary-100: hsl(262 100% 93%);
+  --color-primary-200: hsl(262 100% 85%);
+  --color-primary-300: hsl(262 95% 73%);
+  --color-primary-400: hsl(262 95% 58%);
+  --color-primary-500: hsl(262 100% 45%);
+  --color-primary-600: hsl(262 100% 37%);
+  --color-primary-700: hsl(262 100% 30%);
+  --color-primary-800: hsl(262 100% 22%);
+  --color-primary-900: hsl(262 100% 15%);
+  --color-primary-950: hsl(262 100% 8%);
+}
+
+@layer base {
+  :root {
+    --surface-0: #ffffff;
+    --surface-1: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --border-color: #e2e8f0;
+    --accent-glow: rgba(57, 0, 153, 0.08);
+    --primary-active: hsl(262 100% 37%);
+    --primary-active-bg: hsl(262 100% 97%);
+  }
+
+  html.dark {
+    --surface-0: #120924;
+    --surface-1: #0a0416;
+    --surface-2: #1e113a;
+    --surface-3: #2d1d52;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #64748b;
+    --border-color: #2d1d52;
+    --accent-glow: rgba(167, 139, 250, 0.12);
+    --primary-active: hsl(262 95% 73%);
+    --primary-active-bg: rgba(45, 29, 82, 0.4);
+  }
+
+  body {
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  html.dark .glass-card {
+    background: rgba(18, 9, 36, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(45, 29, 82, 0.5);
+  }
+
+  .premium-shadow {
+    box-shadow: 0 4px 20px -2px rgba(57, 0, 153, 0.05), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+  }
+
+  html.dark .premium-shadow {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .interactive-card {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .interactive-card:active {
+    transform: scale(0.98);
+  }
+
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s infinite ease-in-out;
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.01); }
+}
