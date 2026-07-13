@@ -9,7 +9,7 @@ export function estimateOneRepMax(weightKg: number, reps: number): number {
 
 export interface SetSample {
 	exercise_name: string;
-	reps: number;
+	reps: number | null;
 	weight_kg: number | null;
 	completed: boolean;
 }
@@ -25,7 +25,8 @@ export interface ExerciseBest {
 export function bestPerExercise(sets: SetSample[]): ExerciseBest[] {
 	const best = new Map<string, ExerciseBest>();
 	for (const s of sets) {
-		if (!s.completed || s.weight_kg === null || s.weight_kg <= 0 || s.reps <= 0) continue;
+		if (!s.completed || s.weight_kg === null || s.weight_kg <= 0) continue;
+		if (s.reps === null || s.reps <= 0) continue;
 		const e1rm = estimateOneRepMax(s.weight_kg, s.reps);
 		const prev = best.get(s.exercise_name);
 		if (!prev || e1rm > prev.est_1rm) {

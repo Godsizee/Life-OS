@@ -2,8 +2,23 @@ import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import * as fitnessApi from './api';
-import { workoutPlanInputSchema, workoutExerciseInputSchema, type WorkoutPlanInput, type WorkoutExerciseInput } from './schema';
-import type { WorkoutPlan, WorkoutExercise, WorkoutLog, WorkoutSetLog, PersonalRecord } from './types';
+import {
+	workoutPlanInputSchema,
+	workoutExerciseInputSchema,
+	customExerciseInputSchema,
+	type WorkoutPlanInput,
+	type WorkoutExerciseInput,
+	type CustomExerciseInput
+} from './schema';
+import type {
+	WorkoutPlan,
+	WorkoutExercise,
+	WorkoutLog,
+	WorkoutSetLog,
+	PersonalRecord,
+	ExerciseCatalogEntry,
+	PickedExercise
+} from './types';
 import { bestPerExercise, type ExerciseBest } from './utils/1rm';
 import { autoLogTrainingHabit, applyPRsToGoals, announcePRs } from './integration';
 
@@ -12,10 +27,16 @@ class FitnessState {
 	exercises = $state<Record<string, WorkoutExercise[]>>({}); // plan_id -> exercises
 	logs = $state<WorkoutLog[]>([]);
 	records = $state<PersonalRecord[]>([]);
+	catalog = $state<ExerciseCatalogEntry[]>([]);
+	recentExercises = $state<PickedExercise[]>([]);
 	loading = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribePlans: (() => void) | null = null;
 	private unsubscribeLogs: (() => void) | null = null;
+
+	availableMuscleGroups = $derived(
+		[...new Set(this.catalog.map((e) => e.muscle_group).filter((v): v is string => !!v))].sort()
+	);
 
 	constructor() {
 		outbox.registerExecutor('workout_plans', {
@@ -30,6 +51,10 @@ class FitnessState {
 		outbox.registerExecutor('workout_logs', {
 			insert: (payload) => fitnessApi.insertLogRaw(payload as WorkoutLog)
 		});
+		outbox.registerExecutor('exercise_catalog', {
+			insert: (payload) => fitnessApi.insertCustomExerciseRaw(payload as ExerciseCatalogEntry),
+			delete: (payload) => fitnessApi.deleteCustomExercise((payload as { id: string }).id)
+		});
 	}
 
 	async load(workspaceId: string) {
@@ -39,6 +64,7 @@ class FitnessState {
 		try {
 			this.plans = await fitnessApi.listPlans(workspaceId);
 			this.logs = await fitnessApi.listLogs(workspaceId);
+			this.catalog = await fitnessApi.listCatalog(workspaceId);
 			const uid = authState.user?.id;
 			if (uid) this.records = await fitnessApi.listPersonalRecords(workspaceId, uid);
 
@@ -91,7 +117,61 @@ class FitnessState {
 		this.exercises = {};
 		this.logs = [];
 		this.records = [];
+		this.catalog = [];
+		this.recentExercises = [];
 		this.workspaceId = null;
+	}
+
+	/** Lazy beim Öffnen des ExercisePicker geladen — zuletzt geloggte Übungen, dedupliziert. */
+	async loadRecentExercises() {
+		const recentLogIds = this.logs.slice(0, 15).map((l) => l.id);
+		const sets = await fitnessApi.listSetLogsForLogs(recentLogIds);
+		const seen = new Set<string>();
+		const result: PickedExercise[] = [];
+		for (const s of sets) {
+			const key = s.exercise_id ?? s.exercise_name.toLowerCase();
+			if (seen.has(key)) continue;
+			seen.add(key);
+			const catalogEntry = s.exercise_id ? this.catalog.find((e) => e.id === s.exercise_id) : undefined;
+			result.push(
+				catalogEntry
+					? { exercise_id: catalogEntry.id, name: catalogEntry.name_de, exercise_type: catalogEntry.exercise_type }
+					: { exercise_id: null, name: s.exercise_name, exercise_type: 'strength' }
+			);
+			if (result.length >= 8) break;
+		}
+		this.recentExercises = result;
+	}
+
+	async addCustomExercise(input: CustomExerciseInput): Promise<PickedExercise> {
+		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
+		const parsed = customExerciseInputSchema.parse(input);
+		const now = new Date().toISOString();
+		const entry: ExerciseCatalogEntry = {
+			id: crypto.randomUUID(),
+			workspace_id: this.workspaceId,
+			name_de: parsed.name_de,
+			name_en: parsed.name_en,
+			exercise_type: parsed.exercise_type,
+			muscle_group: parsed.muscle_group,
+			equipment: parsed.equipment,
+			source: 'custom',
+			external_id: null,
+			created_at: now,
+			updated_at: now
+		};
+		this.catalog = [...this.catalog, entry];
+		await outbox.runOrQueue('exercise_catalog', 'insert', entry, () =>
+			fitnessApi.insertCustomExerciseRaw(entry)
+		);
+		return { exercise_id: entry.id, name: entry.name_de, exercise_type: entry.exercise_type };
+	}
+
+	async removeCustomExercise(id: string) {
+		this.catalog = this.catalog.filter((e) => e.id !== id);
+		await outbox.runOrQueue('exercise_catalog', 'delete', { id }, () =>
+			fitnessApi.deleteCustomExercise(id)
+		);
 	}
 
 	prFor(exerciseName: string): PersonalRecord | undefined {
@@ -135,7 +215,11 @@ class FitnessState {
 			default_sets: parsed.default_sets,
 			default_reps: parsed.default_reps,
 			default_weight: parsed.default_weight,
-			order_index: parsed.order_index
+			order_index: parsed.order_index,
+			exercise_id: parsed.exercise_id,
+			exercise_type: parsed.exercise_type,
+			default_duration_min: parsed.default_duration_min,
+			default_distance_km: parsed.default_distance_km
 		};
 		
 		const list = this.exercises[planId] ?? [];
@@ -181,7 +265,12 @@ class FitnessState {
 			set_index: s.set_index,
 			reps: s.reps,
 			weight_kg: s.weight_kg,
-			completed: s.completed
+			completed: s.completed,
+			exercise_id: s.exercise_id,
+			exercise_type: s.exercise_type,
+			duration_min: s.duration_min,
+			distance_km: s.distance_km,
+			rpe: s.rpe
 		}));
 
 		this.logs = [log, ...this.logs];

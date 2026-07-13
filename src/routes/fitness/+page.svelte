@@ -3,7 +3,10 @@
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { Dumbbell, Plus, Trash2, CheckCircle2, Calendar, Clock, Edit3, Save, Zap, Check, X } from 'lucide-svelte';
+	import ExercisePicker from '$lib/features/fitness/components/ExercisePicker.svelte';
+	import ExerciseLibrary from '$lib/features/fitness/components/ExerciseLibrary.svelte';
+	import type { PickedExercise } from '$lib/features/fitness/types';
+	import { Dumbbell, Plus, Trash2, CheckCircle2, Calendar, Clock, Edit3, Save, Zap, Check, X, ListPlus } from 'lucide-svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -16,7 +19,7 @@
 		fitnessState.unload();
 	});
 
-	let activeTab = $state<'log' | 'plans' | 'history'>('log');
+	let activeTab = $state<'log' | 'plans' | 'library' | 'history'>('log');
 
 	// Plan Creation
 	let newPlanName = $state('');
@@ -31,10 +34,17 @@
 	// Exercise Creation
 	let selectedPlanId = $state<string>('');
 	let newExName = $state('');
+	let newExExerciseId = $state<string | null>(null);
 	let newExCategory = $state('Kraft');
 	let newExSets = $state(3);
 	let newExReps = $state(10);
 	let newExWeight = $state<number | null>(null);
+	let showPlanPicker = $state(false);
+
+	function handlePlanExercisePicked(picked: PickedExercise) {
+		newExName = picked.name;
+		newExExerciseId = picked.exercise_id;
+	}
 
 	async function handleAddExercise(planId: string) {
 		if (!newExName.trim()) return;
@@ -44,9 +54,14 @@
 			default_sets: newExSets,
 			default_reps: newExReps,
 			default_weight: newExWeight,
-			order_index: (fitnessState.exercises[planId]?.length ?? 0) + 1
+			order_index: (fitnessState.exercises[planId]?.length ?? 0) + 1,
+			exercise_id: newExExerciseId,
+			exercise_type: 'strength',
+			default_duration_min: null,
+			default_distance_km: null
 		});
 		newExName = '';
+		newExExerciseId = null;
 		newExWeight = null;
 	}
 
@@ -55,13 +70,33 @@
 	let activeLogPlanId = $state<string>('');
 	let durationMinutes = $state<number | null>(null);
 	let workoutNotes = $state('');
-	let activeSetLogs = $state<{ exercise_name: string; set_index: number; reps: number; weight_kg: number | null; completed: boolean }[]>([]);
+	let activeSetLogs = $state<
+		{
+			exercise_name: string;
+			set_index: number;
+			reps: number | null;
+			weight_kg: number | null;
+			completed: boolean;
+			exercise_id: string | null;
+			exercise_type: 'strength' | 'cardio' | 'duration';
+			duration_min: number | null;
+			distance_km: number | null;
+			rpe: number | null;
+		}[]
+	>([]);
 
 	// Freestyle inline add-exercise state
 	let freeExName = $state('');
+	let freeExExerciseId = $state<string | null>(null);
 	let freeExSets = $state(3);
 	let freeExReps = $state(10);
 	let freeExWeight = $state<number | null>(null);
+	let showFreestylePicker = $state(false);
+
+	function handleFreestyleExercisePicked(picked: PickedExercise) {
+		freeExName = picked.name;
+		freeExExerciseId = picked.exercise_id;
+	}
 
 	function selectPlanForLogging(planId: string) {
 		activeLogPlanId = planId;
@@ -74,7 +109,12 @@
 					set_index: i + 1,
 					reps: e.default_reps,
 					weight_kg: e.default_weight,
-					completed: false
+					completed: false,
+					exercise_id: e.exercise_id,
+					exercise_type: e.exercise_type,
+					duration_min: null,
+					distance_km: null,
+					rpe: null
 				});
 			}
 		});
@@ -85,6 +125,7 @@
 		activeLogPlanId = 'freestyle';
 		activeSetLogs = [];
 		freeExName = '';
+		freeExExerciseId = null;
 		freeExSets = 3;
 		freeExReps = 10;
 		freeExWeight = null;
@@ -101,11 +142,17 @@
 					set_index: i + 1,
 					reps: freeExReps,
 					weight_kg: freeExWeight,
-					completed: false
+					completed: false,
+					exercise_id: freeExExerciseId,
+					exercise_type: 'strength',
+					duration_min: null,
+					distance_km: null,
+					rpe: null
 				}
 			];
 		}
 		freeExName = '';
+		freeExExerciseId = null;
 		freeExSets = 3;
 		freeExReps = 10;
 		freeExWeight = null;
@@ -165,6 +212,13 @@
 				{activeTab === 'plans' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
 		>
 			Pläne
+		</button>
+		<button
+			onclick={() => activeTab = 'library'}
+			class="flex-1 py-3 text-center text-sm font-bold border-b-2 transition-all
+				{activeTab === 'library' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
+		>
+			Bibliothek
 		</button>
 		<button
 			onclick={() => activeTab = 'history'}
@@ -290,11 +344,14 @@
 					<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
 						<h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider">Übung hinzufügen</h4>
 						<div class="grid grid-cols-2 gap-2">
-							<input
-								placeholder="Übungsname..."
-								bind:value={freeExName}
-								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary col-span-2"
-							/>
+							<button
+								onclick={() => (showFreestylePicker = true)}
+								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-left col-span-2 flex items-center gap-2
+									{freeExName ? 'text-text-primary' : 'text-text-tertiary'}"
+							>
+								<ListPlus size={13} class="shrink-0 text-text-tertiary" />
+								<span class="truncate">{freeExName || 'Übung auswählen…'}</span>
+							</button>
 							<input
 								type="number"
 								placeholder="Sätze"
@@ -323,6 +380,11 @@
 							<span>Übung hinzufügen</span>
 						</button>
 					</div>
+					<ExercisePicker
+						bind:open={showFreestylePicker}
+						filterType="strength"
+						onSelect={handleFreestyleExercisePicked}
+					/>
 				{/if}
 
 				<!-- Stats inputs -->
@@ -357,10 +419,8 @@
 				</button>
 			</div>
 		{/if}
-	{:else}
-		{@const showPlans = activeTab === 'plans'}
-		{#if showPlans}
-			<div class="space-y-6">
+	{:else if activeTab === 'plans'}
+		<div class="space-y-6">
 				<!-- Create Plan Form -->
 				<form onsubmit={(e) => { e.preventDefault(); handleCreatePlan(); }} class="glass-card rounded-2xl p-5 premium-shadow space-y-4">
 					<h3 class="text-sm font-bold uppercase tracking-wider text-text-tertiary">Neuen Plan erstellen</h3>
@@ -425,11 +485,14 @@
 
 								<!-- Add Exercise Inline Form -->
 								<div class="grid grid-cols-2 gap-2 mt-2">
-									<input
-										placeholder="Übungsname..."
-										bind:value={newExName}
-										class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary col-span-2"
-									/>
+									<button
+										onclick={() => (showPlanPicker = true)}
+										class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-left col-span-2 flex items-center gap-2
+											{newExName ? 'text-text-primary' : 'text-text-tertiary'}"
+									>
+										<ListPlus size={13} class="shrink-0 text-text-tertiary" />
+										<span class="truncate">{newExName || 'Übung auswählen…'}</span>
+									</button>
 									<input
 										type="number"
 										placeholder="Sätze"
@@ -454,7 +517,14 @@
 						</div>
 					{/each}
 				</div>
+				<ExercisePicker
+					bind:open={showPlanPicker}
+					filterType="strength"
+					onSelect={handlePlanExercisePicked}
+				/>
 			</div>
+		{:else if activeTab === 'library'}
+			<ExerciseLibrary />
 		{:else}
 			<!-- History View -->
 			<div class="space-y-4">
@@ -496,5 +566,4 @@
 				{/each}
 			</div>
 		{/if}
-	{/if}
 </div>

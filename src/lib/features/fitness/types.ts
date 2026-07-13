@@ -7,6 +7,23 @@ export interface WorkoutPlan {
 	updated_at: string;
 }
 
+export type ExerciseType = 'strength' | 'cardio' | 'duration';
+
+// Baustein 1 (Welle F1) — globaler (workspace_id null) oder Custom-Übungskatalog.
+export interface ExerciseCatalogEntry {
+	id: string;
+	workspace_id: string | null;
+	name_de: string;
+	name_en: string | null;
+	exercise_type: ExerciseType;
+	muscle_group: string | null;
+	equipment: string | null;
+	source: 'wger' | 'custom';
+	external_id: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
 export interface WorkoutExercise {
 	id: string;
 	plan_id: string;
@@ -16,6 +33,10 @@ export interface WorkoutExercise {
 	default_reps: number;
 	default_weight: number | null;
 	order_index: number;
+	exercise_id: string | null;
+	exercise_type: ExerciseType;
+	default_duration_min: number | null;
+	default_distance_km: number | null;
 }
 
 export interface WorkoutLog {
@@ -34,9 +55,23 @@ export interface WorkoutSetLog {
 	log_id: string;
 	exercise_name: string;
 	set_index: number;
-	reps: number;
+	reps: number | null;
 	weight_kg: number | null;
 	completed: boolean;
+	exercise_id: string | null;
+	exercise_type: ExerciseType;
+	duration_min: number | null;
+	distance_km: number | null;
+	rpe: number | null;
+}
+
+// Normalisierte Auswahl aus dem ExercisePicker — genug für Plan-/Log-Formulare,
+// unabhängig davon ob die Quelle ein Katalog-Treffer, eine neue Custom-Übung
+// oder ein unaufgelöster Alteintrag (exercise_id null) war.
+export interface PickedExercise {
+	exercise_id: string | null;
+	name: string;
+	exercise_type: ExerciseType;
 }
 
 // Ein Datensatz pro Übung — das aktuell beste geschätzte 1RM (Welle 5.3).

@@ -1,5 +1,12 @@
 import { supabase } from '$lib/core/supabase';
-import type { WorkoutPlan, WorkoutExercise, WorkoutLog, WorkoutSetLog, PersonalRecord } from './types';
+import type {
+	WorkoutPlan,
+	WorkoutExercise,
+	WorkoutLog,
+	WorkoutSetLog,
+	PersonalRecord,
+	ExerciseCatalogEntry
+} from './types';
 
 export async function listPlans(workspaceId: string): Promise<WorkoutPlan[]> {
 	const { data, error } = await supabase
@@ -108,4 +115,43 @@ export async function upsertPersonalRecord(record: PersonalRecord): Promise<Pers
 		.single();
 	if (error) throw error;
 	return data;
+}
+
+// ── Welle F1: Übungskatalog ────────────────────────────────────────────────
+
+/** Globaler Katalog (workspace_id null) + Custom-Übungen dieses Workspace. */
+export async function listCatalog(workspaceId: string): Promise<ExerciseCatalogEntry[]> {
+	const { data, error } = await supabase
+		.from('exercise_catalog')
+		.select('*')
+		.or(`workspace_id.is.null,workspace_id.eq.${workspaceId}`)
+		.order('name_de');
+	if (error) throw error;
+	return data ?? [];
+}
+
+export async function insertCustomExerciseRaw(
+	entry: ExerciseCatalogEntry
+): Promise<ExerciseCatalogEntry> {
+	const { data, error } = await supabase.from('exercise_catalog').insert(entry).select().single();
+	if (error) throw error;
+	return data;
+}
+
+export async function deleteCustomExercise(id: string): Promise<void> {
+	const { error } = await supabase.from('exercise_catalog').delete().eq('id', id);
+	if (error) throw error;
+}
+
+/** Sätze mehrerer Logs auf einmal — Basis für „zuletzt verwendet" im ExercisePicker. */
+export async function listSetLogsForLogs(
+	logIds: string[]
+): Promise<Pick<WorkoutSetLog, 'exercise_id' | 'exercise_name'>[]> {
+	if (logIds.length === 0) return [];
+	const { data, error } = await supabase
+		.from('workout_set_logs')
+		.select('exercise_id, exercise_name')
+		.in('log_id', logIds);
+	if (error) throw error;
+	return data ?? [];
 }

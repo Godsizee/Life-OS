@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "gemini-bridge": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "C:\\Users\\bades\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\xampp\\htdocs\\files\\Brettspiel_Partner\\.claude\\delegate_to_gemini.py"
+      ]
+    },
+    "Perplexity": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\Users\\bades\\.perplexity-mcp\\start.mjs"
+      ],
+      "env": {}
+    }
+  }
+}

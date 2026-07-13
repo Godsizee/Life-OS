@@ -126,4 +126,8 @@
 			Abmelden
 		{/snippet}
 	</Button>
+
+	<p class="text-center text-xs text-text-tertiary">
+		Übungsdatenbank basiert auf <a href="https://wger.de" class="underline hover:text-text-secondary">wger.de</a> (CC-BY-SA).
+	</p>
 </section>
