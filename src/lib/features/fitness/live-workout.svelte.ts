@@ -5,7 +5,7 @@
 import { fitnessState } from './store.svelte';
 import { estimateOneRepMax } from './utils/1rm';
 import { announcePRs } from './integration';
-import type { ActiveSetLog, ExerciseType, PickedExercise, WorkoutSetLog } from './types';
+import type { ActiveSetLog, ExerciseType, PickedExercise, SetType, WorkoutSetLog } from './types';
 
 const DRAFT_KEY = 'lifeos:fitness:draft';
 const DRAFT_VERSION = 1;
@@ -18,7 +18,12 @@ interface DraftPayload {
 	sets: ActiveSetLog[];
 	notes: string;
 	durationOverrideMin: number | null;
+	/** Welle F6 — Endzeitpunkt (epoch ms) des laufenden Pausen-Timers, überlebt Reload. */
+	restEndsAt?: number | null;
 }
+
+// Welle F6 — Reihenfolge für das Durch-Tippen des Satz-Typ-Labels (Hevy-Muster).
+const SET_TYPE_CYCLE: SetType[] = ['normal', 'warmup', 'dropset', 'failure'];
 
 function defaultReps(type: ExerciseType): number | null {
 	return type === 'strength' ? 10 : null;
@@ -37,6 +42,8 @@ class LiveWorkoutState {
 	sets = $state<ActiveSetLog[]>([]);
 	notes = $state('');
 	durationOverrideMin = $state<number | null>(null);
+	/** Welle F6 — Pausen-Timer lebt im Store (statt Komponenten-State), überlebt so Navigation + Reload. */
+	restEndsAt = $state<number | null>(null);
 	/** letzte abgeschlossene Sätze je Übung (aus fitnessState.lastSetsFor), Basis für Input-Placeholder. */
 	lastValues = $state<Record<string, WorkoutSetLog[]>>({});
 
@@ -65,8 +72,38 @@ class LiveWorkoutState {
 	private resetSession() {
 		this.notes = '';
 		this.durationOverrideMin = null;
+		this.restEndsAt = null;
 		this.lastValues = {};
 		this.announcedPRs = new Set();
+	}
+
+	// ── Welle F6: Pausen-Timer ────────────────────────────────────────────────
+	startRest(durationSec: number) {
+		this.restEndsAt = Date.now() + durationSec * 1000;
+	}
+
+	/** ±15s-Anpassung am laufenden Timer; unter 1s Rest wird gestoppt. */
+	adjustRest(deltaSec: number) {
+		if (this.restEndsAt === null) return;
+		const next = this.restEndsAt + deltaSec * 1000;
+		this.restEndsAt = next - Date.now() < 1000 ? null : next;
+	}
+
+	stopRest() {
+		this.restEndsAt = null;
+	}
+
+	restRemainingSec(): number | null {
+		if (this.restEndsAt === null) return null;
+		return Math.max(0, Math.ceil((this.restEndsAt - Date.now()) / 1000));
+	}
+
+	/** Welle F6 — Satz-Typ durch-tippen: Normal → Warmup → Dropset → Failure. */
+	cycleSetType(id: string) {
+		const set = this.sets.find((s) => s.id === id);
+		if (!set) return;
+		const i = SET_TYPE_CYCLE.indexOf(set.set_type);
+		set.set_type = SET_TYPE_CYCLE[(i + 1) % SET_TYPE_CYCLE.length];
 	}
 
 	startFromPlan(planId: string) {
@@ -86,6 +123,7 @@ class LiveWorkoutState {
 					duration_min: e.exercise_type !== 'strength' ? e.default_duration_min : null,
 					distance_km: e.exercise_type === 'cardio' ? e.default_distance_km : null,
 					rpe: null,
+					set_type: 'normal',
 					completed: false
 				});
 			}
@@ -121,6 +159,7 @@ class LiveWorkoutState {
 				duration_min: defaultDuration(picked.exercise_type),
 				distance_km: null,
 				rpe: null,
+				set_type: 'normal',
 				completed: false
 			});
 		}
@@ -146,6 +185,7 @@ class LiveWorkoutState {
 				duration_min: template.duration_min,
 				distance_km: template.distance_km,
 				rpe: null,
+				set_type: 'normal',
 				completed: false
 			}
 		];
@@ -173,6 +213,7 @@ class LiveWorkoutState {
 		if (
 			!set.completed ||
 			set.exercise_type !== 'strength' ||
+			set.set_type === 'warmup' ||
 			!set.weight_kg ||
 			set.weight_kg <= 0 ||
 			!set.reps ||
@@ -222,7 +263,8 @@ class LiveWorkoutState {
 				startedAt: this.startedAt,
 				sets: this.sets,
 				notes: this.notes,
-				durationOverrideMin: this.durationOverrideMin
+				durationOverrideMin: this.durationOverrideMin,
+				restEndsAt: this.restEndsAt
 			};
 			localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
 		} catch {}
@@ -237,9 +279,12 @@ class LiveWorkoutState {
 			if (!raw) return;
 			const payload = JSON.parse(raw) as DraftPayload;
 			if (payload.v !== DRAFT_VERSION || !payload.active) return;
-			this.sets = payload.sets ?? [];
+			// Drafts von vor F6 haben kein set_type — auf 'normal' normalisieren.
+			this.sets = (payload.sets ?? []).map((s) => ({ ...s, set_type: s.set_type ?? 'normal' }));
 			this.notes = payload.notes ?? '';
 			this.durationOverrideMin = payload.durationOverrideMin ?? null;
+			const restEndsAt = payload.restEndsAt ?? null;
+			this.restEndsAt = restEndsAt !== null && restEndsAt > Date.now() ? restEndsAt : null;
 			this.active = true;
 			this.planId = payload.planId;
 			this.startedAt = payload.startedAt;

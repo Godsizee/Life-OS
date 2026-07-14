@@ -12,6 +12,8 @@ export interface SetSample {
 	reps: number | null;
 	weight_kg: number | null;
 	completed: boolean;
+	/** Welle F6 — 'warmup' zählt nicht ins 1RM; fehlend (Alt-Daten) = Arbeitssatz. */
+	set_type?: string;
 }
 
 export interface ExerciseBest {
@@ -21,10 +23,11 @@ export interface ExerciseBest {
 	est_1rm: number;
 }
 
-/** Bestes geschätztes 1RM pro Übung aus einer Menge von Sets (nur erledigte, gewichtete Sets). */
+/** Bestes geschätztes 1RM pro Übung aus einer Menge von Sets (nur erledigte, gewichtete Arbeitssätze). */
 export function bestPerExercise(sets: SetSample[]): ExerciseBest[] {
 	const best = new Map<string, ExerciseBest>();
 	for (const s of sets) {
+		if (s.set_type === 'warmup') continue;
 		if (!s.completed || s.weight_kg === null || s.weight_kg <= 0) continue;
 		if (s.reps === null || s.reps <= 0) continue;
 		const e1rm = estimateOneRepMax(s.weight_kg, s.reps);

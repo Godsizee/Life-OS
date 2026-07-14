@@ -27,6 +27,8 @@ export function currentWeekVolumeByMuscleGroup(
 	const totals = new Map<string, number>();
 
 	for (const s of sets) {
+		// Warmup-Sätze (F6) zählen nicht ins Arbeitsvolumen.
+		if (s.set_type === 'warmup') continue;
 		if (s.date < weekStart || !s.weight_kg || !s.reps || !s.exercise_id) continue;
 		const entry = catalogById.get(s.exercise_id);
 		if (!entry?.muscle_group) continue;

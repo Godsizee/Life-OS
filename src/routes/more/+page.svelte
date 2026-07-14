@@ -77,6 +77,20 @@
 			/>
 		</label>
 
+		<!-- F6 — Pausen-Timer-Dauer im Live-Workout -->
+		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
+			<span>⏱️ Pausen-Timer (Sekunden)</span>
+			<input
+				type="number"
+				min="15"
+				max="600"
+				step="15"
+				value={profileState.restTimerSeconds}
+				onchange={(e) => profileState.setRestTimerSeconds(Number(e.currentTarget.value))}
+				class="w-16 min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+			/>
+		</label>
+
 		<!-- Dark-Mode-Toggle -->
 		<button
 			onclick={() => themeState.toggle()}

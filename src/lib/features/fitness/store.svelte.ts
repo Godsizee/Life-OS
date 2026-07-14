@@ -297,7 +297,8 @@ class FitnessState {
 			exercise_type: s.exercise_type,
 			duration_min: s.duration_min,
 			distance_km: s.distance_km,
-			rpe: s.rpe
+			rpe: s.rpe,
+			set_type: s.set_type
 		}));
 
 		this.logs = [log, ...this.logs];

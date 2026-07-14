@@ -35,7 +35,8 @@ export function exerciseProgression(
 		let hasDistance = false;
 
 		for (const s of daySets) {
-			if (s.weight_kg && s.reps) {
+			// Warmup-Sätze (F6) fließen nicht in Volumen/1RM ein (Dauer/Distanz bleiben unberührt).
+			if (s.weight_kg && s.reps && s.set_type !== 'warmup') {
 				hasStrength = true;
 				volumeKg += s.weight_kg * s.reps;
 				const e1rm = estimateOneRepMax(s.weight_kg, s.reps);

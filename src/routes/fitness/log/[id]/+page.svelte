@@ -44,11 +44,23 @@
 		return sets.find((s) => s.exercise_name === name)?.exercise_id ?? null;
 	}
 
+	// F6 — Warmup-Sätze zählen nicht ins Arbeitsvolumen.
 	const totalVolumeKg = $derived(
 		Math.round(
-			sets.reduce((sum, s) => sum + (s.completed && s.weight_kg && s.reps ? s.weight_kg * s.reps : 0), 0)
+			sets.reduce(
+				(sum, s) =>
+					sum + (s.completed && s.set_type !== 'warmup' && s.weight_kg && s.reps ? s.weight_kg * s.reps : 0),
+				0
+			)
 		)
 	);
+
+	// F6 — Satz-Typ-Kennzeichnung (W/D/F) in der Satzliste.
+	const setTypeBadge: Record<string, { label: string; cls: string }> = {
+		warmup: { label: 'W', cls: 'text-amber-600 dark:text-amber-400' },
+		dropset: { label: 'D', cls: 'text-purple-600 dark:text-purple-400' },
+		failure: { label: 'F', cls: 'text-red-600 dark:text-red-400' }
+	};
 	const totalDistanceKm = $derived(
 		Math.round(sets.reduce((sum, s) => sum + (s.completed && s.distance_km ? s.distance_km : 0), 0) * 10) / 10
 	);
@@ -157,8 +169,11 @@
 
 						<div class="space-y-1.5">
 							{#each setsFor(exName) as set (set.id)}
+								{@const badge = setTypeBadge[set.set_type]}
 								<div class="flex items-center justify-between text-xs">
-									<span class="text-text-tertiary font-bold w-6 shrink-0">#{set.set_index}</span>
+									<span class="font-bold w-6 shrink-0 {badge ? badge.cls : 'text-text-tertiary'}">
+										{badge ? badge.label : `#${set.set_index}`}
+									</span>
 									<span class="flex-1 text-text-secondary">
 										{#if set.exercise_type === 'strength'}
 											{set.reps ?? '–'} Reps {#if set.weight_kg}× {set.weight_kg} kg{/if}

@@ -9,6 +9,9 @@ export interface WorkoutPlan {
 
 export type ExerciseType = 'strength' | 'cardio' | 'duration';
 
+// Welle F6 — Satz-Typ (Hevy-Muster): Warmup-Sätze zählen nicht ins Volumen/1RM.
+export type SetType = 'warmup' | 'normal' | 'dropset' | 'failure';
+
 // Baustein 1 (Welle F1) — globaler (workspace_id null) oder Custom-Übungskatalog.
 export interface ExerciseCatalogEntry {
 	id: string;
@@ -63,6 +66,7 @@ export interface WorkoutSetLog {
 	duration_min: number | null;
 	distance_km: number | null;
 	rpe: number | null;
+	set_type: SetType;
 }
 
 // Normalisierte Auswahl aus dem ExercisePicker — genug für Plan-/Log-Formulare,
@@ -87,6 +91,7 @@ export interface ActiveSetLog {
 	duration_min: number | null;
 	distance_km: number | null;
 	rpe: number | null;
+	set_type: SetType;
 	completed: boolean;
 }
 

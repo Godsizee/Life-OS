@@ -10,11 +10,20 @@ import type { WorkoutLog } from './types';
 const TRAINING_KEYWORDS =
 	/(training|workout|sport|gym|fitness|kraft|übung|uebung|laufen|joggen|cardio|bewegung)/i;
 
-/** Hakt per Namens-Konvention eine passende Trainings-Routine automatisch ab (nur hinzufügen). */
+/**
+ * Hakt eine passende Trainings-Routine automatisch ab (nur hinzufügen).
+ * F6 — bevorzugt die explizite Verknüpfung: eine Routine, deren `goal_id` auf ein
+ * Fitness-Frequenz-Ziel zeigt. Namens-Regex bleibt als Fallback für unverknüpfte Routinen.
+ */
 export function autoLogTrainingHabit(): string | null {
-	const habit = habitsState.habits.find(
-		(h) => !h.archived && TRAINING_KEYWORDS.test(h.name)
+	const linked = habitsState.habits.find(
+		(h) =>
+			!h.archived &&
+			h.goal_id &&
+			goalsState.goals.some((g) => g.id === h.goal_id && g.goal_type === 'fitness_frequency')
 	);
+	const habit =
+		linked ?? habitsState.habits.find((h) => !h.archived && TRAINING_KEYWORDS.test(h.name));
 	if (habit && !habitsState.isLoggedToday(habit.id)) {
 		void habitsState.toggleToday(habit.id);
 		toastState.success(`Routine „${habit.name}" automatisch abgehakt`);

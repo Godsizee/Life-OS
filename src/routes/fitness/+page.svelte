@@ -6,7 +6,10 @@
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
+	import { toastState } from '$lib/core/toast.svelte';
 	import ExercisePicker from '$lib/features/fitness/components/ExercisePicker.svelte';
+	import PlateCalculator from '$lib/features/fitness/components/PlateCalculator.svelte';
 	import ExerciseLibrary from '$lib/features/fitness/components/ExerciseLibrary.svelte';
 	import WorkoutFrequencyHeatmap from '$lib/features/fitness/components/WorkoutFrequencyHeatmap.svelte';
 	import MuscleGroupVolumeChart from '$lib/features/fitness/components/MuscleGroupVolumeChart.svelte';
@@ -16,8 +19,9 @@
 	import { swipe } from '$lib/ui/actions/swipe';
 	import { formatPace } from '$lib/features/fitness/utils/pace';
 	import { currentWeekVolumeByMuscleGroup, weeklyCardioStats } from '$lib/features/fitness/utils/volume';
-	import type { PickedExercise, ExerciseType } from '$lib/features/fitness/types';
+	import type { ActiveSetLog, PickedExercise, ExerciseType } from '$lib/features/fitness/types';
 	import {
+		Calculator,
 		Dumbbell,
 		Plus,
 		Trash2,
@@ -71,38 +75,69 @@
 		return liveWorkoutState.elapsedMinutes();
 	});
 
-	// Optionaler Pausen-Timer nach einem Satz-Häkchen — rein lokaler UI-State, nicht persistiert.
-	let restTimerSeconds = $state<number | null>(null);
-	let restTimerInterval: ReturnType<typeof setInterval> | null = null;
-	function startRestTimer(seconds = 90) {
-		stopRestTimer();
-		restTimerSeconds = seconds;
-		restTimerInterval = setInterval(() => {
-			if (restTimerSeconds === null) return;
-			if (restTimerSeconds <= 1) {
-				stopRestTimer();
-				return;
+	// F6 — Pausen-Timer lebt im liveWorkoutState (Endzeitpunkt), überlebt so Navigation + Reload.
+	// Hier nur die tickende Anzeige + Ende-Feedback (Vibration/Toast), solange die Seite offen ist.
+	let restTick = $state(0);
+	$effect(() => {
+		if (liveWorkoutState.restEndsAt === null) return;
+		const interval = setInterval(() => {
+			restTick += 1;
+			if ((liveWorkoutState.restRemainingSec() ?? 0) <= 0) {
+				liveWorkoutState.stopRest();
+				if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+				toastState.info('⏱️ Pause vorbei — weiter geht\'s!');
 			}
-			restTimerSeconds -= 1;
 		}, 1000);
-	}
-	function stopRestTimer() {
-		if (restTimerInterval) clearInterval(restTimerInterval);
-		restTimerInterval = null;
-		restTimerSeconds = null;
-	}
+		return () => clearInterval(interval);
+	});
+	const restRemaining = $derived.by(() => {
+		restTick;
+		return liveWorkoutState.restEndsAt !== null ? liveWorkoutState.restRemainingSec() : null;
+	});
 	function handleToggleSet(set: { id: string; completed: boolean }) {
 		const wasCompleted = set.completed;
 		liveWorkoutState.toggleComplete(set.id);
-		if (!wasCompleted) startRestTimer();
+		if (!wasCompleted) liveWorkoutState.startRest(profileState.restTimerSeconds);
 	}
 	function lastValueFor(set: (typeof liveWorkoutState.sets)[number]) {
 		const hist = liveWorkoutState.lastValuesFor(set.exercise_id, set.exercise_name);
 		return hist[set.set_index - 1] ?? null;
 	}
 
+	// F6 — Satz-Typ-Label (W/N/D/F) am Satz; Tippen wechselt den Typ.
+	const setTypeStyle: Record<string, string> = {
+		warmup: 'text-amber-600 dark:text-amber-400',
+		dropset: 'text-purple-600 dark:text-purple-400',
+		failure: 'text-red-600 dark:text-red-400',
+		normal: 'text-text-tertiary'
+	};
+	function setTypeLabel(set: ActiveSetLog): string {
+		if (set.set_type === 'warmup') return 'W';
+		if (set.set_type === 'dropset') return 'D';
+		if (set.set_type === 'failure') return 'F';
+		return `#${set.set_index}`;
+	}
+
+	// F6 — RPE (1–10, optional) nur für Kraft-Sätze.
+	function clampRpe(set: ActiveSetLog) {
+		if (set.rpe === null || (set.rpe as unknown) === '') {
+			set.rpe = null;
+			return;
+		}
+		set.rpe = Math.max(1, Math.min(10, Math.round(Number(set.rpe))));
+	}
+
+	// F6 — Platten-Rechner: pro Kraft-Übung, vorbelegt mit dem nächsten offenen Satz-Gewicht.
+	let showPlateCalc = $state(false);
+	let plateCalcWeight = $state<number | null>(null);
+	function openPlateCalc(exName: string) {
+		const sets = liveWorkoutState.setsFor(exName);
+		const next = sets.find((s) => !s.completed && s.weight_kg) ?? sets.find((s) => s.weight_kg);
+		plateCalcWeight = next?.weight_kg ?? null;
+		showPlateCalc = true;
+	}
+
 	onDestroy(() => {
-		stopRestTimer();
 		fitnessState.unload();
 	});
 
@@ -209,7 +244,6 @@
 
 	function handleCancelWorkout() {
 		liveWorkoutState.cancel();
-		stopRestTimer();
 	}
 
 	async function handleSaveWorkoutLog() {
@@ -223,7 +257,6 @@
 			liveWorkoutState.announcedPRs
 		);
 		liveWorkoutState.finish();
-		stopRestTimer();
 		activeTab = 'history';
 
 		// Trigger recalculation of today's life score
@@ -340,14 +373,28 @@
 						</div>
 					</div>
 
-					<!-- Pausen-Timer -->
-					{#if restTimerSeconds !== null}
-						<div class="glass-card rounded-xl p-3 premium-shadow flex items-center justify-between">
+					<!-- Pausen-Timer (F6 — im Store, ±15s anpassbar) -->
+					{#if restRemaining !== null}
+						<div class="glass-card rounded-xl p-3 premium-shadow flex items-center justify-between gap-2">
 							<span class="flex items-center gap-2 text-sm font-bold text-text-primary">
 								<Timer size={15} class="text-primary-active" />
-								<span>Pause: {Math.floor(restTimerSeconds / 60)}:{String(restTimerSeconds % 60).padStart(2, '0')}</span>
+								<span>Pause: {Math.floor(restRemaining / 60)}:{String(restRemaining % 60).padStart(2, '0')}</span>
 							</span>
-							<button onclick={stopRestTimer} class="min-h-9 px-2 text-xs font-semibold text-text-tertiary hover:text-text-primary">Überspringen</button>
+							<div class="flex items-center gap-1">
+								<button
+									onclick={() => liveWorkoutState.adjustRest(-15)}
+									class="min-h-9 rounded-lg border border-border-color px-2 text-xs font-bold text-text-secondary active:bg-surface-2"
+								>
+									−15s
+								</button>
+								<button
+									onclick={() => liveWorkoutState.adjustRest(15)}
+									class="min-h-9 rounded-lg border border-border-color px-2 text-xs font-bold text-text-secondary active:bg-surface-2"
+								>
+									+15s
+								</button>
+								<button onclick={() => liveWorkoutState.stopRest()} class="min-h-9 px-2 text-xs font-semibold text-text-tertiary hover:text-text-primary">Überspringen</button>
+							</div>
 						</div>
 					{/if}
 
@@ -361,19 +408,31 @@
 									<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
 										<div class="flex items-center justify-between border-b border-border-color pb-2">
 											<h4 class="font-bold text-sm text-text-primary min-w-0 truncate">{exName}</h4>
-											<button
-												onclick={() => liveWorkoutState.removeExercise(exName)}
-												aria-label="Übung entfernen"
-												class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-tertiary hover:text-red-500 active:scale-90 transition-all"
-											>
-												<X size={16} />
-											</button>
+											<div class="flex shrink-0 items-center">
+												{#if exType === 'strength'}
+													<button
+														onclick={() => openPlateCalc(exName)}
+														aria-label="Platten-Rechner öffnen"
+														title="Platten-Rechner"
+														class="flex h-11 w-11 items-center justify-center rounded-lg text-text-tertiary hover:text-primary-active active:scale-90 transition-all"
+													>
+														<Calculator size={16} />
+													</button>
+												{/if}
+												<button
+													onclick={() => liveWorkoutState.removeExercise(exName)}
+													aria-label="Übung entfernen"
+													class="flex h-11 w-11 items-center justify-center rounded-lg text-text-tertiary hover:text-red-500 active:scale-90 transition-all"
+												>
+													<X size={16} />
+												</button>
+											</div>
 										</div>
 
 										<!-- Spalten-Beschriftung -->
-										<div class="flex items-center gap-2 pl-8 text-[10px] font-bold uppercase tracking-wider text-text-tertiary">
+										<div class="flex items-center gap-2 pl-10 text-[10px] font-bold uppercase tracking-wider text-text-tertiary">
 											{#if exType === 'strength'}
-												<span class="w-[104px]">Reps</span><span>kg</span>
+												<span class="w-[104px]">Reps</span><span class="w-[104px]">kg</span><span>RPE</span>
 											{:else if exType === 'cardio'}
 												<span class="w-[104px]">Min</span><span>km</span>
 											{:else}
@@ -385,7 +444,15 @@
 											{#each exSets as set (set.id)}
 												{@const last = lastValueFor(set)}
 												<div class="flex flex-wrap items-center gap-2">
-													<span class="w-6 shrink-0 text-[11px] font-bold text-text-tertiary">#{set.set_index}</span>
+													<!-- F6 — Satz-Typ: Tippen wechselt Normal → Warmup → Dropset → Failure -->
+													<button
+														onclick={() => liveWorkoutState.cycleSetType(set.id)}
+														aria-label="Satz-Typ wechseln (aktuell: {set.set_type})"
+														title="Satz-Typ wechseln"
+														class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold active:scale-90 transition-all hover:bg-surface-2 {setTypeStyle[set.set_type]}"
+													>
+														{setTypeLabel(set)}
+													</button>
 
 													<div class="flex items-center gap-2 min-w-0">
 														{#if set.exercise_type === 'strength'}
@@ -400,6 +467,18 @@
 																step={2.5}
 																placeholder={last?.weight_kg != null ? String(last.weight_kg) : 'kg'}
 																label="Gewicht"
+															/>
+															<!-- F6 — optionaler RPE-Input (1–10), Hevy-Muster: schlichtes Feld -->
+															<input
+																type="number"
+																inputmode="numeric"
+																min="1"
+																max="10"
+																bind:value={set.rpe}
+																onchange={() => clampRpe(set)}
+																placeholder={last?.rpe != null ? String(last.rpe) : 'RPE'}
+																aria-label="RPE (gefühlte Anstrengung, 1–10)"
+																class="h-11 w-11 shrink-0 rounded-lg border border-border-color bg-surface-0 text-center text-sm text-text-primary focus:outline-none focus:border-primary-500"
 															/>
 														{:else if set.exercise_type === 'cardio'}
 															<StepperInput
@@ -483,6 +562,7 @@
 						filterType={null}
 						onSelect={handleWorkoutExercisePicked}
 					/>
+					<PlateCalculator bind:open={showPlateCalc} initialWeightKg={plateCalcWeight} />
 				</div>
 
 				<!-- RECHTS (Desktop) / unten (Mobil): Zusammenfassung + Speichern -->
