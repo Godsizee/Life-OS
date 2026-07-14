@@ -6,7 +6,8 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
-	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook } from 'lucide-svelte';
+	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell } from 'lucide-svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -17,6 +18,7 @@
 			goalsState.load(id);
 			healthState.load();
 			calendarState.load(id);
+			fitnessState.load(id);
 		}
 	});
 
@@ -98,6 +100,21 @@
 			}
 		});
 
+		// 6. Fitness Logs (Welle F4)
+		fitnessState.logs.forEach((log) => {
+			const planName = fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training';
+			items.push({
+				id: `fitness_${log.id}`,
+				date: log.date,
+				title: `Workout absolviert: "${planName}"`,
+				description: log.duration_minutes ? `${log.duration_minutes} Min.` : undefined,
+				icon: Dumbbell,
+				color: 'text-orange-500',
+				bg: 'bg-orange-50 dark:bg-orange-950/20',
+				module: 'Fitness'
+			});
+		});
+
 		// 5. Health Logs
 		healthState.entries.forEach((h) => {
 			const details: string[] = [];
@@ -163,7 +180,7 @@
 			>
 				Alle
 			</button>
-			{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health'] as mod}
+			{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness'] as mod}
 				<button
 					onclick={() => filterModule = mod}
 					class="rounded-xl px-3 py-1.5 text-xs font-bold border transition-all

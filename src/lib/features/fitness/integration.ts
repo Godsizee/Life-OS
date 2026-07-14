@@ -4,6 +4,8 @@ import { habitsState } from '$lib/features/habits/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { toastState } from '$lib/core/toast.svelte';
 import type { ExerciseBest } from './utils/1rm';
+import { fitnessFrequencyScore } from './utils/frequency';
+import type { WorkoutLog } from './types';
 
 const TRAINING_KEYWORDS =
 	/(training|workout|sport|gym|fitness|kraft|übung|uebung|laufen|joggen|cardio|bewegung)/i;
@@ -38,6 +40,20 @@ export function applyPRsToGoals(prs: ExerciseBest[]): void {
 				void goalsState.updateProgress(g.id, progress);
 				if (progress >= 100) toastState.success(`🎯 Ziel „${g.title}" erreicht!`);
 			}
+		}
+	}
+}
+
+/** Aktualisiert Frequenz-Ziele (goal_type = 'fitness_frequency') aus den aktuellen Workout-Logs. */
+export function applyFrequencyToGoals(logs: WorkoutLog[]): void {
+	const matching = goalsState.goals.filter(
+		(g) => g.goal_type === 'fitness_frequency' && g.status !== 'done' && g.target_value
+	);
+	for (const g of matching) {
+		const progress = fitnessFrequencyScore(logs, g.target_value!);
+		if (progress > g.progress) {
+			void goalsState.updateProgress(g.id, progress);
+			if (progress >= 100) toastState.success(`🎯 Ziel „${g.title}" erreicht!`);
 		}
 	}
 }

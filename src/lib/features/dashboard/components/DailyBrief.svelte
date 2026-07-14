@@ -3,10 +3,13 @@
 	import { calendarState } from '$lib/features/calendar/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { linksState } from '$lib/features/links/store.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
 	import { isDueOn } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
+	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
 	import { toISODate } from '$lib/core/date';
-	import { X, Sun } from 'lucide-svelte';
+	import { X, Sun, Dumbbell } from 'lucide-svelte';
 
 	const today = toISODate(new Date());
 	const LS_KEY = `lifeos:brief:${today}`;
@@ -48,8 +51,31 @@
 		return new Date(lastWorkout) < four;
 	});
 
+	// Welle F4 — Wochenfortschritt + heutiges geplantes Workout (aus Kalender-Verknüpfung).
+	const weeklyDone = $derived(workoutsThisWeek(fitnessState.logs));
+	const weeklyGoal = $derived(profileState.weeklyWorkoutGoal);
+	const plannedTodayPlanId = $derived.by(() => {
+		for (const e of todayEvents) {
+			const planId = linksState
+				.linksFor('event', e.id)
+				.map((l) =>
+					l.source_type === 'workout_plan' ? l.source_id : l.target_type === 'workout_plan' ? l.target_id : null
+				)
+				.find((id): id is string => id !== null);
+			if (planId) return planId;
+		}
+		return null;
+	});
+	const plannedTodayPlanName = $derived(
+		plannedTodayPlanId ? (fitnessState.plans.find((p) => p.id === plannedTodayPlanId)?.name ?? null) : null
+	);
+
 	const hasContent = $derived(
-		todayEvents.length > 0 || topTasks.length > 0 || dueHabits.length > 0 || workoutStale
+		todayEvents.length > 0 ||
+			topTasks.length > 0 ||
+			dueHabits.length > 0 ||
+			workoutStale ||
+			fitnessState.plans.length > 0
 	);
 </script>
 
@@ -104,11 +130,21 @@
 					🔁 {dueHabits.length} Routine{dueHabits.length !== 1 ? 'n' : ''} offen
 				</span>
 			{/if}
-			{#if workoutStale}
+			{#if plannedTodayPlanId}
+				<a
+					href="/fitness?startPlan={plannedTodayPlanId}"
+					class="inline-flex items-center gap-1 rounded-full bg-primary-700 px-2.5 py-1 font-bold text-white hover:bg-primary-800"
+				>
+					<Dumbbell size={12} /> {plannedTodayPlanName} starten
+				</a>
+			{:else if workoutStale}
 				<a href="/fitness" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
 					🏋️ Training fällig
 				</a>
 			{/if}
+			<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
+				📅 {weeklyDone}/{weeklyGoal} diese Woche
+			</span>
 		</div>
 	</section>
 {/if}

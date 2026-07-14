@@ -5,6 +5,7 @@
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
 	import { modules } from '$lib/config/modules';
 	import InviteForm from '$lib/features/workspace/components/InviteForm.svelte';
 	import MemberList from '$lib/features/workspace/components/MemberList.svelte';
@@ -62,6 +63,19 @@
 
 	<div class="flex flex-col gap-3 rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<h2 class="font-semibold text-text-primary">App & Einstellungen</h2>
+
+		<!-- Trainingsziel/Woche -->
+		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
+			<span>🏋️ Trainingsziel pro Woche</span>
+			<input
+				type="number"
+				min="1"
+				max="14"
+				value={profileState.weeklyWorkoutGoal}
+				onchange={(e) => profileState.setWeeklyWorkoutGoal(Number(e.currentTarget.value))}
+				class="w-16 min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+			/>
+		</label>
 
 		<!-- Dark-Mode-Toggle -->
 		<button

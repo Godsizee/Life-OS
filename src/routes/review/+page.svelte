@@ -5,6 +5,7 @@
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { isDueOn, calculateStreak } from '$lib/features/habits/streak';
 
 	$effect(() => {
@@ -13,7 +14,9 @@
 			tasksState.load(id);
 			habitsState.load(id);
 			goalsState.load(id);
+			fitnessState.load(id);
 		}
+		void fitnessState.loadAllSetLogs();
 	});
 
 	// ── Wochen-Statistiken ────────────────────────────────────────────
@@ -56,6 +59,21 @@
 	);
 
 	const goalsInProgress = $derived(goalsState.goals.filter((g) => g.status !== 'done'));
+
+	// Trainings-Block (Welle F4)
+	const weekWorkouts = $derived(
+		fitnessState.logs.filter((l) => l.date >= isoDate(weekStart))
+	);
+	const weekVolumeKg = $derived(
+		Math.round(
+			fitnessState.allSetLogs
+				.filter((s) => s.date >= isoDate(weekStart) && s.weight_kg && s.reps)
+				.reduce((sum, s) => sum + (s.weight_kg ?? 0) * (s.reps ?? 0), 0)
+		)
+	);
+	const weekPRs = $derived(
+		fitnessState.records.filter((r) => r.achieved_at.split('T')[0] >= isoDate(weekStart))
+	);
 
 	// Nächste Woche Top-3 (aus offenen Tasks wählen)
 	const openTasks = $derived(tasksState.tasks.filter((t) => t.status !== 'done'));
@@ -180,6 +198,20 @@
 						</div>
 					{/each}
 				</div>
+			{/if}
+		</div>
+
+		<!-- Training (Welle F4) -->
+		<div class="rounded-xl border border-border-color bg-surface-0 p-4">
+			<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Training</p>
+			{#if weekWorkouts.length === 0}
+				<p class="mt-2 text-sm text-text-secondary">Kein Workout diese Woche geloggt.</p>
+			{:else}
+				<p class="mt-1 text-2xl font-bold text-emerald-600">{weekWorkouts.length}</p>
+				<p class="text-xs text-text-secondary">
+					Workout{weekWorkouts.length !== 1 ? 's' : ''} · {weekVolumeKg.toLocaleString('de-DE')} kg Volumen
+					{#if weekPRs.length > 0}· 🏆 {weekPRs.length} PR{weekPRs.length !== 1 ? 's' : ''}{/if}
+				</p>
 			{/if}
 		</div>
 

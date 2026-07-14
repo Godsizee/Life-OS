@@ -5,7 +5,7 @@
 
 	let title = $state('');
 	let targetDate = $state('');
-	let goalType = $state<'standard' | 'pr'>('standard');
+	let goalType = $state<'standard' | 'pr' | 'fitness_frequency'>('standard');
 	let targetExercise = $state('');
 	let targetValue = $state<number | null>(null);
 
@@ -17,7 +17,7 @@
 			target_date: targetDate || null,
 			goal_type: goalType,
 			target_exercise: goalType === 'pr' ? targetExercise.trim() || null : null,
-			target_value: goalType === 'pr' ? targetValue : null
+			target_value: goalType === 'pr' || goalType === 'fitness_frequency' ? targetValue : null
 		});
 		title = '';
 		targetDate = '';
@@ -51,6 +51,16 @@
 		>
 			🏋️ Kraft-Ziel (PR)
 		</button>
+		<button
+			type="button"
+			onclick={() => (goalType = 'fitness_frequency')}
+			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
+			'fitness_frequency'
+				? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+				: 'border-border-color bg-surface-1 text-text-secondary'}"
+		>
+			📅 Trainings-Frequenz
+		</button>
 	</div>
 
 	{#if goalType === 'pr'}
@@ -65,6 +75,15 @@
 				class="min-h-12 w-32 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary focus:border-emerald-500 focus:outline-none"
 			/>
 		</div>
+	{:else if goalType === 'fitness_frequency'}
+		<input
+			type="number"
+			min="1"
+			max="14"
+			placeholder="Trainings/Woche"
+			bind:value={targetValue}
+			class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none"
+		/>
 	{/if}
 
 	<input

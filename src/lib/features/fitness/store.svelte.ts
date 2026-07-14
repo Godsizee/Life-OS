@@ -20,7 +20,7 @@ import type {
 	PickedExercise
 } from './types';
 import { bestPerExercise, type ExerciseBest } from './utils/1rm';
-import { autoLogTrainingHabit, applyPRsToGoals, announcePRs } from './integration';
+import { autoLogTrainingHabit, applyPRsToGoals, applyFrequencyToGoals, announcePRs } from './integration';
 
 class FitnessState {
 	plans = $state<WorkoutPlan[]>([]);
@@ -29,10 +29,14 @@ class FitnessState {
 	records = $state<PersonalRecord[]>([]);
 	catalog = $state<ExerciseCatalogEntry[]>([]);
 	recentExercises = $state<PickedExercise[]>([]);
+	/** Welle F3 — alle erledigten Sätze des Workspace (mit Datum), lazy geladen für Verlauf/Statistik. */
+	allSetLogs = $state<fitnessApi.DatedSetLog[]>([]);
 	loading = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribePlans: (() => void) | null = null;
 	private unsubscribeLogs: (() => void) | null = null;
+	private lastSetsCache = new Map<string, WorkoutSetLog[]>();
+	private allSetLogsLoaded = false;
 
 	availableMuscleGroups = $derived(
 		[...new Set(this.catalog.map((e) => e.muscle_group).filter((v): v is string => !!v))].sort()
@@ -119,7 +123,28 @@ class FitnessState {
 		this.records = [];
 		this.catalog = [];
 		this.recentExercises = [];
+		this.allSetLogs = [];
+		this.allSetLogsLoaded = false;
 		this.workspaceId = null;
+		this.lastSetsCache.clear();
+	}
+
+	/** Welle F3 — einmalig lazy geladen (Verlauf-Tab/Übungs-Detail), workspace-weit daher nicht in load(). */
+	async loadAllSetLogs() {
+		if (this.allSetLogsLoaded || !this.workspaceId) return;
+		this.allSetLogsLoaded = true;
+		this.allSetLogs = await fitnessApi.listAllSetLogs(this.workspaceId);
+	}
+
+	/** Welle F2 — letzte abgeschlossene Sätze dieser Übung, für Placeholder im Live-Workout. Pro Session gecacht. */
+	async lastSetsFor(exerciseId: string | null, exerciseName: string): Promise<WorkoutSetLog[]> {
+		if (!this.workspaceId) return [];
+		const key = exerciseId ?? `name:${exerciseName.toLowerCase()}`;
+		const cached = this.lastSetsCache.get(key);
+		if (cached) return cached;
+		const sets = await fitnessApi.lastSetsForExercise(this.workspaceId, exerciseId, exerciseName);
+		this.lastSetsCache.set(key, sets);
+		return sets;
 	}
 
 	/** Lazy beim Öffnen des ExercisePicker geladen — zuletzt geloggte Übungen, dedupliziert. */
@@ -240,7 +265,9 @@ class FitnessState {
 		planId: string | null,
 		duration: number | null,
 		notes: string | null,
-		sets: Omit<WorkoutSetLog, 'id' | 'log_id'>[]
+		sets: Omit<WorkoutSetLog, 'id' | 'log_id'>[],
+		/** Welle F2 — Übungsnamen (lowercase), die während des Live-Workouts bereits per Toast angekündigt wurden. */
+		alreadyAnnounced: Set<string> = new Set()
 	) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const logId = crypto.randomUUID();
@@ -279,11 +306,20 @@ class FitnessState {
 		await outbox.runOrQueue('workout_logs', 'insert', log, () => fitnessApi.insertLogRaw(log));
 		await fitnessApi.insertSetLogsRaw(setLogs);
 
+		// Welle F3 — Statistik-Cache (falls bereits geladen) sofort um erledigte Sätze ergänzen,
+		// statt komplett neu zu laden.
+		if (this.allSetLogsLoaded) {
+			const completed = setLogs.filter((s) => s.completed).map((s) => ({ ...s, date: todayStr }));
+			this.allSetLogs = [...this.allSetLogs, ...completed];
+		}
+
 		// ── Welle 5.3: PR-Erkennung + Cross-Modul-Integration ────────────────
 		const newPRs = await this.detectAndPersistPRs(setLogs, now);
 		autoLogTrainingHabit();
+		applyFrequencyToGoals(this.logs);
 		if (newPRs.length > 0) {
-			announcePRs(newPRs);
+			const toAnnounce = newPRs.filter((pr) => !alreadyAnnounced.has(pr.exercise_name.toLowerCase()));
+			if (toAnnounce.length > 0) announcePRs(toAnnounce);
 			applyPRsToGoals(newPRs);
 		}
 	}

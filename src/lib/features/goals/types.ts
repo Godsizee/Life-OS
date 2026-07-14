@@ -1,5 +1,5 @@
 export type GoalStatus = 'open' | 'in_progress' | 'done';
-export type GoalType = 'standard' | 'pr';
+export type GoalType = 'standard' | 'pr' | 'fitness_frequency';
 
 export interface Goal {
 	id: string;
@@ -11,6 +11,7 @@ export interface Goal {
 	progress: number;
 	status: GoalStatus;
 	// Welle 5.2 — PR-Ziele koppeln an eine Fitness-Übung (target_value = Ziel-1RM in kg).
+	// Welle F4 — 'fitness_frequency' nutzt target_value als Trainings-Wochenziel (target_exercise bleibt null).
 	goal_type: GoalType;
 	target_exercise: string | null;
 	target_value: number | null;

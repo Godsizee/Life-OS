@@ -1,25 +1,154 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
 	import ExercisePicker from '$lib/features/fitness/components/ExercisePicker.svelte';
 	import ExerciseLibrary from '$lib/features/fitness/components/ExerciseLibrary.svelte';
-	import type { PickedExercise } from '$lib/features/fitness/types';
-	import { Dumbbell, Plus, Trash2, CheckCircle2, Calendar, Clock, Edit3, Save, Zap, Check, X, ListPlus } from 'lucide-svelte';
+	import WorkoutFrequencyHeatmap from '$lib/features/fitness/components/WorkoutFrequencyHeatmap.svelte';
+	import MuscleGroupVolumeChart from '$lib/features/fitness/components/MuscleGroupVolumeChart.svelte';
+	import TrendChart from '$lib/features/fitness/components/TrendChart.svelte';
+	import StepperInput from '$lib/features/fitness/components/StepperInput.svelte';
+	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
+	import { swipe } from '$lib/ui/actions/swipe';
+	import { formatPace } from '$lib/features/fitness/utils/pace';
+	import { currentWeekVolumeByMuscleGroup, weeklyCardioStats } from '$lib/features/fitness/utils/volume';
+	import type { PickedExercise, ExerciseType } from '$lib/features/fitness/types';
+	import {
+		Dumbbell,
+		Plus,
+		Trash2,
+		Calendar,
+		Clock,
+		Edit3,
+		Save,
+		Zap,
+		Check,
+		X,
+		ListPlus,
+		Minus,
+		Timer,
+		Gauge,
+		ChevronRight
+	} from 'lucide-svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
 		if (id) {
 			fitnessState.load(id);
 		}
+		liveWorkoutState.restore();
 	});
 
+	// Welle F4 — Kalender-Planung: „Workout starten" aus einem verknüpften Termin (?startPlan=<id>).
+	$effect(() => {
+		const startPlanId = page.url.searchParams.get('startPlan');
+		if (!startPlanId || liveWorkoutState.active) return;
+		if (!fitnessState.plans.some((p) => p.id === startPlanId)) return;
+		liveWorkoutState.startFromPlan(startPlanId);
+		goto('/fitness', { replaceState: true });
+	});
+
+	// Persistiert jede Änderung an der laufenden Session (Sätze, Notizen, Dauer) in localStorage —
+	// überlebt Reload/App-Wechsel. persist() liest alle relevanten Felder, dadurch trackt dieser
+	// Effect automatisch jede Mutation (Vorbild: Svelte-5-„Deep Watch"-Muster).
+	$effect(() => {
+		liveWorkoutState.persist();
+	});
+
+	// Ticking Uhr für die Live-Timer-Anzeige — alle 20s, reicht für eine Minuten-Auflösung.
+	let tick = $state(0);
+	$effect(() => {
+		if (!liveWorkoutState.active) return;
+		const interval = setInterval(() => (tick += 1), 20000);
+		return () => clearInterval(interval);
+	});
+	let elapsedDisplay = $derived.by(() => {
+		tick;
+		return liveWorkoutState.elapsedMinutes();
+	});
+
+	// Optionaler Pausen-Timer nach einem Satz-Häkchen — rein lokaler UI-State, nicht persistiert.
+	let restTimerSeconds = $state<number | null>(null);
+	let restTimerInterval: ReturnType<typeof setInterval> | null = null;
+	function startRestTimer(seconds = 90) {
+		stopRestTimer();
+		restTimerSeconds = seconds;
+		restTimerInterval = setInterval(() => {
+			if (restTimerSeconds === null) return;
+			if (restTimerSeconds <= 1) {
+				stopRestTimer();
+				return;
+			}
+			restTimerSeconds -= 1;
+		}, 1000);
+	}
+	function stopRestTimer() {
+		if (restTimerInterval) clearInterval(restTimerInterval);
+		restTimerInterval = null;
+		restTimerSeconds = null;
+	}
+	function handleToggleSet(set: { id: string; completed: boolean }) {
+		const wasCompleted = set.completed;
+		liveWorkoutState.toggleComplete(set.id);
+		if (!wasCompleted) startRestTimer();
+	}
+	function lastValueFor(set: (typeof liveWorkoutState.sets)[number]) {
+		const hist = liveWorkoutState.lastValuesFor(set.exercise_id, set.exercise_name);
+		return hist[set.set_index - 1] ?? null;
+	}
+
 	onDestroy(() => {
+		stopRestTimer();
 		fitnessState.unload();
 	});
 
-	let activeTab = $state<'log' | 'plans' | 'library' | 'history'>('log');
+	type FitnessTab = 'log' | 'plans' | 'library' | 'history';
+	let activeTab = $state<FitnessTab>('log');
+	const tabs: { id: FitnessTab; label: string }[] = [
+		{ id: 'log', label: 'Workout' },
+		{ id: 'plans', label: 'Pläne' },
+		{ id: 'library', label: 'Bibliothek' },
+		{ id: 'history', label: 'Verlauf' }
+	];
+	// F5 — Gesten: horizontal wischen wechselt zum Nachbar-Tab (Segmented-Control).
+	function shiftTab(dir: 1 | -1) {
+		const i = tabs.findIndex((t) => t.id === activeTab);
+		const next = tabs[i + dir];
+		if (next) activeTab = next.id;
+	}
+
+	// Welle F3 — Statistik-Daten (Sätze workspace-weit) erst laden, wenn der Verlauf-Tab
+	// tatsächlich geöffnet wird (vermeidet unnötigen Vollimport bei jedem Seitenaufruf).
+	$effect(() => {
+		if (activeTab === 'history') void fitnessState.loadAllSetLogs();
+	});
+	const muscleGroupVolume = $derived(
+		currentWeekVolumeByMuscleGroup(fitnessState.allSetLogs, fitnessState.catalog)
+	);
+	const cardioWeekly = $derived(weeklyCardioStats(fitnessState.allSetLogs));
+	const cardioPacePoints = $derived(
+		cardioWeekly
+			.filter((w) => w.avgPaceMinPerKm !== null)
+			.map((w) => ({
+				label: new Date(w.weekStart).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+				value: Math.round((w.avgPaceMinPerKm as number) * 100) / 100
+			}))
+	);
+	const cardioDistancePoints = $derived(
+		cardioWeekly.map((w) => ({
+			label: new Date(w.weekStart).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+			value: w.distanceKm
+		}))
+	);
+	function formatPaceValue(v: number): string {
+		const wholeMin = Math.floor(v);
+		const seconds = Math.round((v - wholeMin) * 60);
+		return `${wholeMin}:${String(seconds).padStart(2, '0')} /km`;
+	}
 
 	// Plan Creation
 	let newPlanName = $state('');
@@ -31,19 +160,23 @@
 		newPlanDesc = '';
 	}
 
-	// Exercise Creation
-	let selectedPlanId = $state<string>('');
+	// Exercise Creation (Pläne — Vorlage, keine Session-Sätze)
 	let newExName = $state('');
 	let newExExerciseId = $state<string | null>(null);
+	let newExType = $state<ExerciseType>('strength');
 	let newExCategory = $state('Kraft');
 	let newExSets = $state(3);
 	let newExReps = $state(10);
 	let newExWeight = $state<number | null>(null);
+	let newExDuration = $state<number | null>(null);
+	let newExDistance = $state<number | null>(null);
 	let showPlanPicker = $state(false);
 
 	function handlePlanExercisePicked(picked: PickedExercise) {
 		newExName = picked.name;
 		newExExerciseId = picked.exercise_id;
+		newExType = picked.exercise_type;
+		newExCategory = picked.exercise_type === 'cardio' ? 'Cardio' : picked.exercise_type === 'duration' ? 'Mobility' : 'Kraft';
 	}
 
 	async function handleAddExercise(planId: string) {
@@ -53,127 +186,44 @@
 			category: newExCategory,
 			default_sets: newExSets,
 			default_reps: newExReps,
-			default_weight: newExWeight,
+			default_weight: newExType === 'strength' ? newExWeight : null,
 			order_index: (fitnessState.exercises[planId]?.length ?? 0) + 1,
 			exercise_id: newExExerciseId,
-			exercise_type: 'strength',
-			default_duration_min: null,
-			default_distance_km: null
+			exercise_type: newExType,
+			default_duration_min: newExType !== 'strength' ? newExDuration : null,
+			default_distance_km: newExType === 'cardio' ? newExDistance : null
 		});
 		newExName = '';
 		newExExerciseId = null;
+		newExType = 'strength';
 		newExWeight = null;
+		newExDuration = null;
+		newExDistance = null;
 	}
 
-	// Logging Flow
-	// 'freestyle' is a sentinel value meaning "no plan selected"
-	let activeLogPlanId = $state<string>('');
-	let durationMinutes = $state<number | null>(null);
-	let workoutNotes = $state('');
-	let activeSetLogs = $state<
-		{
-			exercise_name: string;
-			set_index: number;
-			reps: number | null;
-			weight_kg: number | null;
-			completed: boolean;
-			exercise_id: string | null;
-			exercise_type: 'strength' | 'cardio' | 'duration';
-			duration_min: number | null;
-			distance_km: number | null;
-			rpe: number | null;
-		}[]
-	>([]);
-
-	// Freestyle inline add-exercise state
-	let freeExName = $state('');
-	let freeExExerciseId = $state<string | null>(null);
-	let freeExSets = $state(3);
-	let freeExReps = $state(10);
-	let freeExWeight = $state<number | null>(null);
-	let showFreestylePicker = $state(false);
-
-	function handleFreestyleExercisePicked(picked: PickedExercise) {
-		freeExName = picked.name;
-		freeExExerciseId = picked.exercise_id;
+	// Live-Workout: Übung mitten im Training (oder beim Aufbau eines Freestyle-Workouts) hinzufügen.
+	let showExercisePicker = $state(false);
+	function handleWorkoutExercisePicked(picked: PickedExercise) {
+		liveWorkoutState.addExercise(picked, 1);
 	}
 
-	function selectPlanForLogging(planId: string) {
-		activeLogPlanId = planId;
-		const exs = fitnessState.exercises[planId] ?? [];
-		const logsList: typeof activeSetLogs = [];
-		exs.forEach((e) => {
-			for (let i = 0; i < e.default_sets; i++) {
-				logsList.push({
-					exercise_name: e.name,
-					set_index: i + 1,
-					reps: e.default_reps,
-					weight_kg: e.default_weight,
-					completed: false,
-					exercise_id: e.exercise_id,
-					exercise_type: e.exercise_type,
-					duration_min: null,
-					distance_km: null,
-					rpe: null
-				});
-			}
-		});
-		activeSetLogs = logsList;
-	}
-
-	function startFreestyleWorkout() {
-		activeLogPlanId = 'freestyle';
-		activeSetLogs = [];
-		freeExName = '';
-		freeExExerciseId = null;
-		freeExSets = 3;
-		freeExReps = 10;
-		freeExWeight = null;
-	}
-
-	function addFreestyleExercise() {
-		if (!freeExName.trim()) return;
-		const sets = freeExSets > 0 ? freeExSets : 1;
-		for (let i = 0; i < sets; i++) {
-			activeSetLogs = [
-				...activeSetLogs,
-				{
-					exercise_name: freeExName.trim(),
-					set_index: i + 1,
-					reps: freeExReps,
-					weight_kg: freeExWeight,
-					completed: false,
-					exercise_id: freeExExerciseId,
-					exercise_type: 'strength',
-					duration_min: null,
-					distance_km: null,
-					rpe: null
-				}
-			];
-		}
-		freeExName = '';
-		freeExExerciseId = null;
-		freeExSets = 3;
-		freeExReps = 10;
-		freeExWeight = null;
+	function handleCancelWorkout() {
+		liveWorkoutState.cancel();
+		stopRestTimer();
 	}
 
 	async function handleSaveWorkoutLog() {
-		if (!activeLogPlanId) return;
-		// For freestyle workouts pass null as planId so the store creates a log without plan reference
-		const planId = activeLogPlanId === 'freestyle' ? null : activeLogPlanId;
+		if (!liveWorkoutState.active) return;
+		const duration = liveWorkoutState.durationOverrideMin ?? liveWorkoutState.elapsedMinutes();
 		await fitnessState.logWorkout(
-			planId,
-			durationMinutes,
-			workoutNotes,
-			activeSetLogs
+			liveWorkoutState.planId,
+			duration,
+			liveWorkoutState.notes || null,
+			liveWorkoutState.sets,
+			liveWorkoutState.announcedPRs
 		);
-
-		// Reset
-		activeLogPlanId = '';
-		durationMinutes = null;
-		workoutNotes = '';
-		activeSetLogs = [];
+		liveWorkoutState.finish();
+		stopRestTimer();
 		activeTab = 'history';
 
 		// Trigger recalculation of today's life score
@@ -197,48 +247,37 @@
 		</div>
 	</div>
 
-	<!-- Navigation Tabs -->
-	<div class="flex border-b border-border-color">
-		<button
-			onclick={() => activeTab = 'log'}
-			class="flex-1 py-3 text-center text-sm font-bold border-b-2 transition-all
-				{activeTab === 'log' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
-		>
-			Workout starten
-		</button>
-		<button
-			onclick={() => activeTab = 'plans'}
-			class="flex-1 py-3 text-center text-sm font-bold border-b-2 transition-all
-				{activeTab === 'plans' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
-		>
-			Pläne
-		</button>
-		<button
-			onclick={() => activeTab = 'library'}
-			class="flex-1 py-3 text-center text-sm font-bold border-b-2 transition-all
-				{activeTab === 'library' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
-		>
-			Bibliothek
-		</button>
-		<button
-			onclick={() => activeTab = 'history'}
-			class="flex-1 py-3 text-center text-sm font-bold border-b-2 transition-all
-				{activeTab === 'history' ? 'border-primary-600 text-primary-600 dark:border-primary-450 dark:text-primary-400' : 'border-transparent text-text-secondary hover:text-text-primary'}"
-		>
-			Verlauf
-		</button>
+	<!-- Navigation — Touch-taugliche Segmented-Control (F5, min. 44px Tap-Ziel) -->
+	<div
+		role="tablist"
+		class="flex gap-1 rounded-2xl border border-border-color bg-surface-2/60 p-1"
+	>
+		{#each tabs as tab (tab.id)}
+			<button
+				role="tab"
+				aria-selected={activeTab === tab.id}
+				onclick={() => (activeTab = tab.id)}
+				class="min-h-11 flex-1 rounded-xl px-2 text-center text-xs font-bold transition-all active:scale-95 xs:text-sm
+					{activeTab === tab.id
+						? 'bg-surface-0 text-primary-600 shadow-sm dark:text-primary-400'
+						: 'text-text-secondary hover:text-text-primary'}"
+			>
+				{tab.label}
+			</button>
+		{/each}
 	</div>
 
-	<!-- Content Zones -->
+	<!-- Content Zones (F5 — horizontal wischen wechselt den Tab) -->
+	<div use:swipe={{ onLeft: () => shiftTab(1), onRight: () => shiftTab(-1) }}>
 	{#if activeTab === 'log'}
-		{#if !activeLogPlanId}
+		{#if !liveWorkoutState.active}
 			<!-- Plan Selection -->
 			<div class="space-y-4">
 				<h3 class="text-sm font-bold uppercase tracking-wider text-text-tertiary">Wähle einen Trainingsplan aus:</h3>
-				<div class="grid gap-4 sm:grid-cols-2">
+				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{#each fitnessState.plans as plan (plan.id)}
 						<button
-							onclick={() => selectPlanForLogging(plan.id)}
+							onclick={() => liveWorkoutState.startFromPlan(plan.id)}
 							class="glass-card text-left p-5 rounded-2xl hover:border-primary-400 dark:hover:border-primary-900 active:scale-[0.98] transition-all premium-shadow flex flex-col justify-between"
 						>
 							<div>
@@ -258,7 +297,7 @@
 				<!-- Freestyle / empty workout CTA -->
 				<div class="pt-2">
 					<button
-						onclick={startFreestyleWorkout}
+						onclick={() => liveWorkoutState.startFreestyle()}
 						class="w-full glass-card rounded-2xl p-4 premium-shadow border-2 border-dashed border-border-color hover:border-primary-400 dark:hover:border-primary-700 active:scale-[0.99] transition-all flex items-center justify-center gap-3 text-text-secondary hover:text-text-primary"
 					>
 						<Zap size={18} class="text-primary-active shrink-0" />
@@ -275,141 +314,224 @@
 			</div>
 		{:else}
 			<!-- Interactive Log Form -->
-			{@const isFreeStyle = activeLogPlanId === 'freestyle'}
-			{@const planName = isFreeStyle ? 'Freies Workout' : (fitnessState.plans.find((p) => p.id === activeLogPlanId)?.name ?? 'Training')}
-			<div class="space-y-6">
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-bold text-text-primary flex items-center gap-2">
-						{#if isFreeStyle}<Zap size={18} class="text-primary-active" />{/if}
-						<span>Logging: {planName}</span>
-					</h3>
-					<button onclick={() => { activeLogPlanId = ''; activeSetLogs = []; }} class="text-xs font-semibold text-text-tertiary hover:text-text-primary flex items-center gap-1 transition-colors">
-						<X size={13} />
-						<span>Abbrechen</span>
-					</button>
-				</div>
+			{@const isFreeStyle = liveWorkoutState.isFreestyle}
+			{@const planName = isFreeStyle ? 'Freies Workout' : (fitnessState.plans.find((p) => p.id === liveWorkoutState.planId)?.name ?? 'Training')}
+			{@const completedSets = liveWorkoutState.sets.filter((s) => s.completed).length}
+			<!-- F5 — Desktop-Zwei-Spalten: Übungen links, Zusammenfassung/Speichern rechts (sticky). -->
+			<div class="lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:items-start">
+				<!-- LINKS: laufendes Workout -->
+				<div class="space-y-6 min-w-0">
+					<div class="flex items-center justify-between">
+						<h3 class="text-lg font-bold text-text-primary flex items-center gap-2 min-w-0">
+							{#if isFreeStyle}<Zap size={18} class="text-primary-active shrink-0" />{/if}
+							<span class="truncate">Logging: {planName}</span>
+						</h3>
+						<div class="flex items-center gap-3 shrink-0">
+							{#if elapsedDisplay !== null}
+								<span class="flex items-center gap-1 text-xs font-bold text-text-tertiary" title="Laufende Trainingszeit">
+									<Timer size={13} />
+									<span>{elapsedDisplay} Min.</span>
+								</span>
+							{/if}
+							<button onclick={handleCancelWorkout} class="min-h-9 text-xs font-semibold text-text-tertiary hover:text-text-primary flex items-center gap-1 transition-colors">
+								<X size={13} />
+								<span>Abbrechen</span>
+							</button>
+						</div>
+					</div>
 
-				<!-- Set Grid -->
-				{#if activeSetLogs.length > 0}
-					<div class="space-y-4">
-						{#each [...new Set(activeSetLogs.map(s => s.exercise_name))] as exName}
-							<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
-								<h4 class="font-bold text-sm text-text-primary border-b border-border-color pb-2">{exName}</h4>
+					<!-- Pausen-Timer -->
+					{#if restTimerSeconds !== null}
+						<div class="glass-card rounded-xl p-3 premium-shadow flex items-center justify-between">
+							<span class="flex items-center gap-2 text-sm font-bold text-text-primary">
+								<Timer size={15} class="text-primary-active" />
+								<span>Pause: {Math.floor(restTimerSeconds / 60)}:{String(restTimerSeconds % 60).padStart(2, '0')}</span>
+							</span>
+							<button onclick={stopRestTimer} class="min-h-9 px-2 text-xs font-semibold text-text-tertiary hover:text-text-primary">Überspringen</button>
+						</div>
+					{/if}
 
-								<div class="space-y-2">
-									{#each activeSetLogs.filter(s => s.exercise_name === exName) as set}
-										<div class="flex items-center gap-3">
-											<span class="text-xs font-bold text-text-tertiary w-12">Satz {set.set_index}</span>
-
-											<!-- Reps input -->
-											<input
-												type="number"
-												bind:value={set.reps}
-												class="w-16 min-h-8 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-center text-text-primary"
-												placeholder="Reps"
-											/>
-
-											<!-- Weight input -->
-											<input
-												type="number"
-												step="0.5"
-												bind:value={set.weight_kg}
-												class="w-16 min-h-8 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-center text-text-primary"
-												placeholder="kg"
-											/>
-
-											<!-- Complete toggle -->
+					<!-- Set Grid (F5 — Stepper + Swipe-to-Delete) -->
+					{#if liveWorkoutState.sets.length > 0}
+						<div class="space-y-4">
+							{#each liveWorkoutState.exerciseNames as exName}
+								{@const exSets = liveWorkoutState.setsFor(exName)}
+								{@const exType = exSets[0]?.exercise_type ?? 'strength'}
+								<SwipeToDelete onDelete={() => liveWorkoutState.removeExercise(exName)} label="Übung entfernen">
+									<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
+										<div class="flex items-center justify-between border-b border-border-color pb-2">
+											<h4 class="font-bold text-sm text-text-primary min-w-0 truncate">{exName}</h4>
 											<button
-												onclick={() => set.completed = !set.completed}
-												aria-label={set.completed ? 'Satz als offen markieren' : 'Satz als erledigt markieren'}
-												class="ml-auto flex h-7 w-7 items-center justify-center rounded-lg border transition-all
-													{set.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-border-color bg-surface-0 text-text-tertiary'}"
+												onclick={() => liveWorkoutState.removeExercise(exName)}
+												aria-label="Übung entfernen"
+												class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-tertiary hover:text-red-500 active:scale-90 transition-all"
 											>
-												<Check size={13} strokeWidth={2.5} />
+												<X size={16} />
 											</button>
 										</div>
-									{/each}
-								</div>
-							</div>
-						{/each}
-					</div>
-				{:else if isFreeStyle}
-					<div class="text-center py-6 text-text-tertiary text-sm border border-dashed border-border-color rounded-2xl">
-						Noch keine Übungen — füge unten deine erste hinzu.
-					</div>
-				{/if}
 
-				<!-- Freestyle: inline add-exercise form -->
-				{#if isFreeStyle}
-					<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
-						<h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider">Übung hinzufügen</h4>
-						<div class="grid grid-cols-2 gap-2">
-							<button
-								onclick={() => (showFreestylePicker = true)}
-								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-left col-span-2 flex items-center gap-2
-									{freeExName ? 'text-text-primary' : 'text-text-tertiary'}"
-							>
-								<ListPlus size={13} class="shrink-0 text-text-tertiary" />
-								<span class="truncate">{freeExName || 'Übung auswählen…'}</span>
-							</button>
-							<input
-								type="number"
-								placeholder="Sätze"
-								bind:value={freeExSets}
-								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-							/>
-							<input
-								type="number"
-								placeholder="Reps"
-								bind:value={freeExReps}
-								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-							/>
-							<input
-								type="number"
-								step="0.5"
-								placeholder="Gewicht (kg)"
-								bind:value={freeExWeight}
-								class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary col-span-2"
-							/>
+										<!-- Spalten-Beschriftung -->
+										<div class="flex items-center gap-2 pl-8 text-[10px] font-bold uppercase tracking-wider text-text-tertiary">
+											{#if exType === 'strength'}
+												<span class="w-[104px]">Reps</span><span>kg</span>
+											{:else if exType === 'cardio'}
+												<span class="w-[104px]">Min</span><span>km</span>
+											{:else}
+												<span>Min</span>
+											{/if}
+										</div>
+
+										<div class="space-y-2">
+											{#each exSets as set (set.id)}
+												{@const last = lastValueFor(set)}
+												<div class="flex flex-wrap items-center gap-2">
+													<span class="w-6 shrink-0 text-[11px] font-bold text-text-tertiary">#{set.set_index}</span>
+
+													<div class="flex items-center gap-2 min-w-0">
+														{#if set.exercise_type === 'strength'}
+															<StepperInput
+																bind:value={set.reps}
+																step={1}
+																placeholder={last?.reps != null ? String(last.reps) : 'Reps'}
+																label="Wiederholungen"
+															/>
+															<StepperInput
+																bind:value={set.weight_kg}
+																step={2.5}
+																placeholder={last?.weight_kg != null ? String(last.weight_kg) : 'kg'}
+																label="Gewicht"
+															/>
+														{:else if set.exercise_type === 'cardio'}
+															<StepperInput
+																bind:value={set.duration_min}
+																step={1}
+																placeholder={last?.duration_min != null ? String(last.duration_min) : 'Min'}
+																label="Dauer"
+															/>
+															<StepperInput
+																bind:value={set.distance_km}
+																step={0.5}
+																placeholder={last?.distance_km != null ? String(last.distance_km) : 'km'}
+																label="Strecke"
+															/>
+															{#if formatPace(set.duration_min, set.distance_km)}
+																<span class="text-[11px] text-text-tertiary flex items-center gap-0.5 shrink-0">
+																	<Gauge size={11} />
+																	{formatPace(set.duration_min, set.distance_km)}
+																</span>
+															{/if}
+														{:else}
+															<StepperInput
+																bind:value={set.duration_min}
+																step={1}
+																placeholder={last?.duration_min != null ? String(last.duration_min) : 'Min'}
+																label="Dauer"
+															/>
+														{/if}
+													</div>
+
+													<div class="flex items-center gap-1.5 ml-auto shrink-0">
+														<!-- Complete toggle -->
+														<button
+															onclick={() => handleToggleSet(set)}
+															aria-label={set.completed ? 'Satz als offen markieren' : 'Satz als erledigt markieren'}
+															class="flex h-11 w-11 items-center justify-center rounded-lg border active:scale-90 transition-all
+																{set.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-border-color bg-surface-0 text-text-tertiary'}"
+														>
+															<Check size={16} strokeWidth={2.5} />
+														</button>
+														<!-- Remove set -->
+														<button
+															onclick={() => liveWorkoutState.removeSet(set.id)}
+															aria-label="Satz entfernen"
+															class="flex h-11 w-11 items-center justify-center rounded-lg text-text-tertiary hover:text-red-500 active:scale-90 transition-all"
+														>
+															<Minus size={16} />
+														</button>
+													</div>
+												</div>
+											{/each}
+										</div>
+
+										<button
+											onclick={() => liveWorkoutState.addSet(exName)}
+											class="min-h-10 text-xs font-bold text-primary-active flex items-center gap-1 hover:underline"
+										>
+											<Plus size={13} />
+											<span>Satz hinzufügen</span>
+										</button>
+									</div>
+								</SwipeToDelete>
+							{/each}
 						</div>
-						<button
-							onclick={addFreestyleExercise}
-							class="w-full min-h-9 bg-surface-2 hover:bg-surface-3 text-text-primary font-bold text-xs rounded-lg flex items-center justify-center gap-2"
-						>
-							<Plus size={14} />
-							<span>Übung hinzufügen</span>
-						</button>
-					</div>
-					<ExercisePicker
-						bind:open={showFreestylePicker}
-						filterType="strength"
-						onSelect={handleFreestyleExercisePicked}
-					/>
-				{/if}
+					{:else}
+						<div class="text-center py-6 text-text-tertiary text-sm border border-dashed border-border-color rounded-2xl">
+							Noch keine Übungen — füge unten deine erste hinzu.
+						</div>
+					{/if}
 
-				<!-- Stats inputs -->
-				<div class="glass-card rounded-2xl p-4 premium-shadow space-y-4">
-					<div class="grid grid-cols-2 gap-4">
-						<label class="block">
-							<span class="text-xs font-bold text-text-tertiary block mb-1">Dauer (Minuten)</span>
-							<input
-								type="number"
-								bind:value={durationMinutes}
-								class="w-full min-h-10 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary"
-							/>
-						</label>
-						<label class="block">
-							<span class="text-xs font-bold text-text-tertiary block mb-1">Notizen / Feedback</span>
-							<input
-								type="text"
-								bind:value={workoutNotes}
-								class="w-full min-h-10 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary"
-								placeholder="z.B. Stark gefühlt"
-							/>
-						</label>
-					</div>
+					<!-- Übung mitten im Workout hinzufügen -->
+					<button
+						onclick={() => (showExercisePicker = true)}
+						class="w-full min-h-12 rounded-xl border-2 border-dashed border-border-color text-text-secondary hover:border-primary-400 hover:text-text-primary dark:hover:border-primary-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm font-bold"
+					>
+						<ListPlus size={16} />
+						<span>Übung hinzufügen</span>
+					</button>
+					<ExercisePicker
+						bind:open={showExercisePicker}
+						filterType={null}
+						onSelect={handleWorkoutExercisePicked}
+					/>
 				</div>
 
+				<!-- RECHTS (Desktop) / unten (Mobil): Zusammenfassung + Speichern -->
+				<aside class="mt-6 space-y-4 lg:mt-0 lg:sticky lg:top-6">
+					<div class="glass-card rounded-2xl p-4 premium-shadow space-y-4">
+						{#if liveWorkoutState.sets.length > 0}
+							<p class="text-xs font-bold text-text-tertiary">
+								{completedSets}/{liveWorkoutState.sets.length} Sätze erledigt
+							</p>
+						{/if}
+						<div class="grid grid-cols-2 gap-4 lg:grid-cols-1">
+							<label class="block">
+								<span class="text-xs font-bold text-text-tertiary block mb-1">Dauer (Minuten)</span>
+								<input
+									type="number"
+									inputmode="numeric"
+									bind:value={liveWorkoutState.durationOverrideMin}
+									placeholder={elapsedDisplay !== null ? `${elapsedDisplay} (auto)` : '—'}
+									class="w-full min-h-11 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary"
+								/>
+							</label>
+							<label class="block">
+								<span class="text-xs font-bold text-text-tertiary block mb-1">Notizen / Feedback</span>
+								<input
+									type="text"
+									bind:value={liveWorkoutState.notes}
+									class="w-full min-h-11 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary"
+									placeholder="z.B. Stark gefühlt"
+								/>
+							</label>
+						</div>
+					</div>
+
+					<!-- Desktop-Speichern (im sticky Sidebar) -->
+					<button
+						onclick={handleSaveWorkoutLog}
+						class="hidden lg:flex w-full min-h-12 bg-primary-750 text-white rounded-xl font-bold items-center justify-center gap-2 hover:bg-primary-850 active:scale-[0.99] transition-all"
+					>
+						<Save size={18} />
+						<span>Workout speichern</span>
+					</button>
+				</aside>
+			</div>
+
+			<!-- Sticky Primäraktion (Mobil/Tablet) — sitzt über der Bottom-Nav, respektiert Safe-Area (F5 #3/#5) -->
+			<div
+				class="lg:hidden sticky bottom-16 z-20 -mx-4 mt-4 border-t border-border-color bg-surface-0/90 px-4 pt-3 backdrop-blur md:bottom-4 md:-mx-8 md:px-8"
+				style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));"
+			>
 				<button
 					onclick={handleSaveWorkoutLog}
 					class="w-full min-h-12 bg-primary-750 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-850 active:scale-[0.99] transition-all"
@@ -445,7 +567,7 @@
 				</form>
 
 				<!-- Plans List -->
-				<div class="space-y-4">
+				<div class="grid gap-4 lg:grid-cols-2 lg:items-start">
 					{#each fitnessState.plans as plan (plan.id)}
 						<div class="glass-card rounded-2xl p-5 premium-shadow space-y-4">
 							<div class="flex items-start justify-between">
@@ -471,7 +593,15 @@
 									{#each fitnessState.exercises[plan.id] ?? [] as ex}
 										<li class="flex items-center justify-between text-xs text-text-secondary bg-surface-1/50 px-3 py-2 rounded-lg border border-border-color">
 											<span>{ex.name} ({ex.category})</span>
-											<span class="font-semibold">{ex.default_sets} Sätze x {ex.default_reps} Reps {#if ex.default_weight} @ {ex.default_weight}kg{/if}</span>
+											<span class="font-semibold">
+												{#if ex.exercise_type === 'strength'}
+													{ex.default_sets} Sätze x {ex.default_reps} Reps {#if ex.default_weight} @ {ex.default_weight}kg{/if}
+												{:else if ex.exercise_type === 'cardio'}
+													{ex.default_sets}x {#if ex.default_duration_min}{ex.default_duration_min} Min{/if} {#if ex.default_distance_km}· {ex.default_distance_km} km{/if}
+												{:else}
+													{ex.default_sets}x {#if ex.default_duration_min}{ex.default_duration_min} Min{/if}
+												{/if}
+											</span>
 											<button
 												onclick={() => fitnessState.removeExercise(plan.id, ex.id)}
 												aria-label="Übung entfernen"
@@ -493,18 +623,50 @@
 										<ListPlus size={13} class="shrink-0 text-text-tertiary" />
 										<span class="truncate">{newExName || 'Übung auswählen…'}</span>
 									</button>
-									<input
-										type="number"
-										placeholder="Sätze"
-										bind:value={newExSets}
-										class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-									/>
-									<input
-										type="number"
-										placeholder="Reps"
-										bind:value={newExReps}
-										class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-									/>
+									{#if newExType === 'strength'}
+										<input
+											type="number"
+											placeholder="Sätze"
+											bind:value={newExSets}
+											class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
+										/>
+										<input
+											type="number"
+											placeholder="Reps"
+											bind:value={newExReps}
+											class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
+										/>
+										<input
+											type="number"
+											step="0.5"
+											placeholder="Gewicht (kg, optional)"
+											bind:value={newExWeight}
+											class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary col-span-2"
+										/>
+									{:else}
+										<input
+											type="number"
+											placeholder="Einheiten"
+											bind:value={newExSets}
+											class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
+										/>
+										<input
+											type="number"
+											step="0.5"
+											placeholder="Dauer (Min)"
+											bind:value={newExDuration}
+											class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
+										/>
+										{#if newExType === 'cardio'}
+											<input
+												type="number"
+												step="0.1"
+												placeholder="Strecke (km, optional)"
+												bind:value={newExDistance}
+												class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary col-span-2"
+											/>
+										{/if}
+									{/if}
 								</div>
 								<button
 									onclick={() => handleAddExercise(plan.id)}
@@ -519,7 +681,7 @@
 				</div>
 				<ExercisePicker
 					bind:open={showPlanPicker}
-					filterType="strength"
+					filterType={null}
 					onSelect={handlePlanExercisePicked}
 				/>
 			</div>
@@ -527,43 +689,79 @@
 			<ExerciseLibrary />
 		{:else}
 			<!-- History View -->
-			<div class="space-y-4">
-				{#each fitnessState.logs as log (log.id)}
-					{@const planName = fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training'}
-					<div class="glass-card rounded-2xl p-5 premium-shadow space-y-3">
-						<div class="flex items-center justify-between">
-							<h4 class="font-bold text-sm text-text-primary flex items-center gap-2">
-								{#if !fitnessState.plans.find((p) => p.id === log.plan_id)}
-									<Zap size={13} class="text-primary-active shrink-0" />
-								{/if}
-								{planName}
-							</h4>
-							<span class="flex items-center gap-1 text-xs text-text-tertiary font-medium">
-								<Calendar size={12} />
-								<span>{new Date(log.date).toLocaleDateString('de-DE')}</span>
-							</span>
-						</div>
+			<div class="space-y-6">
+				<!-- Trainingsfrequenz -->
+				<div class="glass-card rounded-2xl p-4 premium-shadow">
+					<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-3">Trainingsfrequenz</h3>
+					<WorkoutFrequencyHeatmap logDates={fitnessState.logs.map((l) => l.date)} />
+				</div>
 
-						<div class="flex gap-4 text-xs font-semibold text-text-secondary border-b border-border-color pb-2">
-							{#if log.duration_minutes}
-								<span class="flex items-center gap-1">
-									<Clock size={12} />
-									<span>{log.duration_minutes} Min.</span>
-								</span>
-							{/if}
-							{#if log.notes}
-								<span class="flex items-center gap-1">
-									<Edit3 size={12} />
-									<span>"{log.notes}"</span>
-								</span>
-							{/if}
+				<!-- Muskelgruppen-Volumen diese Woche -->
+				<div class="glass-card rounded-2xl p-4 premium-shadow">
+					<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-3">Wochen-Volumen nach Muskelgruppe</h3>
+					<MuscleGroupVolumeChart data={muscleGroupVolume} />
+				</div>
+
+				<!-- Cardio-Statistik -->
+				{#if cardioWeekly.length > 0}
+					<div class="grid gap-4 sm:grid-cols-2">
+						<div class="glass-card rounded-2xl p-4 premium-shadow">
+							<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-3">Strecke pro Woche</h3>
+							<TrendChart points={cardioDistancePoints} formatValue={(v) => `${v} km`} />
 						</div>
+						{#if cardioPacePoints.length > 0}
+							<div class="glass-card rounded-2xl p-4 premium-shadow">
+								<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-3">Pace-Trend</h3>
+								<TrendChart points={cardioPacePoints} formatValue={formatPaceValue} />
+							</div>
+						{/if}
 					</div>
-				{:else}
-					<div class="text-center py-12 text-text-tertiary">
-						Keine aufgezeichneten Workouts vorhanden.
-					</div>
-				{/each}
+				{/if}
+
+				<!-- Workout-Log -->
+				<div class="grid gap-4 lg:grid-cols-2 lg:items-start">
+					{#each fitnessState.logs as log (log.id)}
+						{@const planName = fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training'}
+						<a
+							href="/fitness/log/{log.id}"
+							class="glass-card block rounded-2xl p-5 premium-shadow space-y-3 hover:border-primary-400 dark:hover:border-primary-900 active:scale-[0.99] transition-all"
+						>
+							<div class="flex items-center justify-between">
+								<h4 class="font-bold text-sm text-text-primary flex items-center gap-2">
+									{#if !fitnessState.plans.find((p) => p.id === log.plan_id)}
+										<Zap size={13} class="text-primary-active shrink-0" />
+									{/if}
+									{planName}
+								</h4>
+								<span class="flex items-center gap-1 text-xs text-text-tertiary font-medium">
+									<Calendar size={12} />
+									<span>{new Date(log.date).toLocaleDateString('de-DE')}</span>
+									<ChevronRight size={14} class="text-text-tertiary" />
+								</span>
+							</div>
+
+							<div class="flex gap-4 text-xs font-semibold text-text-secondary border-b border-border-color pb-2">
+								{#if log.duration_minutes}
+									<span class="flex items-center gap-1">
+										<Clock size={12} />
+										<span>{log.duration_minutes} Min.</span>
+									</span>
+								{/if}
+								{#if log.notes}
+									<span class="flex items-center gap-1">
+										<Edit3 size={12} />
+										<span>"{log.notes}"</span>
+									</span>
+								{/if}
+							</div>
+						</a>
+					{:else}
+						<div class="text-center py-12 text-text-tertiary lg:col-span-2">
+							Keine aufgezeichneten Workouts vorhanden.
+						</div>
+					{/each}
+				</div>
 			</div>
 		{/if}
+	</div>
 </div>

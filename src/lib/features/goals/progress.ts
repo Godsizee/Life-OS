@@ -2,6 +2,7 @@ import { tasksState } from '$lib/features/tasks/store.svelte';
 import { habitsState } from '$lib/features/habits/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
+import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
 import type { Goal } from './types';
 
 export function getGoalProgress(goal: Goal): number {
@@ -11,6 +12,12 @@ export function getGoalProgress(goal: Goal): number {
 		const pr = fitnessState.prFor(goal.target_exercise);
 		if (pr) return Math.min(100, Math.round((pr.est_1rm / goal.target_value) * 100));
 		return goal.progress;
+	}
+
+	// Frequenz-Ziel (Welle F4): Fortschritt aus tatsächlichen Workout-Logs dieser Woche.
+	if (goal.goal_type === 'fitness_frequency' && goal.target_value) {
+		if (fitnessState.logs.length === 0 && goal.progress > 0) return goal.progress;
+		return fitnessFrequencyScore(fitnessState.logs, goal.target_value);
 	}
 
 	const linkedTasks = tasksState.tasks.filter((t) => t.goal_id === goal.id);

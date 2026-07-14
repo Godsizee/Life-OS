@@ -110,7 +110,10 @@
 	<!-- Ergebnisliste -->
 	<div class="space-y-2">
 		{#each filtered as entry (entry.id)}
-			<div class="glass-card rounded-2xl p-4 premium-shadow flex items-center justify-between gap-3">
+			<a
+				href="/fitness/exercise/{entry.id}"
+				class="glass-card flex items-center justify-between gap-3 rounded-2xl p-4 premium-shadow hover:border-primary-400 dark:hover:border-primary-900 transition-all"
+			>
 				<div class="min-w-0">
 					<h4 class="font-bold text-sm text-text-primary truncate">{entry.name_de}</h4>
 					{#if entry.name_en && entry.name_en !== entry.name_de}
@@ -127,7 +130,7 @@
 						{TYPE_LABELS[entry.exercise_type]}
 					</span>
 				</div>
-			</div>
+			</a>
 		{:else}
 			<div class="text-center py-8 text-text-tertiary border border-dashed border-border-color rounded-2xl text-sm">
 				Keine Übungen gefunden.

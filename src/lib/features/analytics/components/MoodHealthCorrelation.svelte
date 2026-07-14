@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
+	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { toISODate } from '$lib/core/date';
 
 	/**
@@ -36,6 +37,7 @@
 		sleep: number | null;
 		energy: 1 | 2 | 3 | 4 | 5 | null;
 		water: number | null;
+		trained: 0 | 1;
 	}
 
 	const points = $derived((): CorrelationPoint[] => {
@@ -49,7 +51,8 @@
 					mood: mood.score,
 					sleep: health?.sleep_h ?? null,
 					energy: health?.energy ?? null,
-					water: health?.water_glasses ?? null
+					water: health?.water_glasses ?? null,
+					trained: fitnessState.logs.some((l) => l.date === date) ? (1 as const) : (0 as const)
 				};
 			})
 			.filter((p): p is CorrelationPoint => p !== null);
@@ -66,6 +69,7 @@
 		const rSleep = pearson(sleepPts.map((p) => p.sleep!), sleepPts.map((p) => p.mood));
 		const rEnergy = pearson(energyPts.map((p) => p.energy!), energyPts.map((p) => p.mood));
 		const rWater = pearson(waterPts.map((p) => p.water!), waterPts.map((p) => p.mood));
+		const rTraining = fitnessState.logs.length > 0 ? pearson(ps.map((p) => p.trained), moodVals) : null;
 
 		function color(r: number | null) {
 			if (r === null) return 'text-text-tertiary';
@@ -86,7 +90,8 @@
 		return [
 			{ label: 'Schlaf', r: rSleep, color: color(rSleep), hint: hint('Schlaf', rSleep) },
 			{ label: 'Energie', r: rEnergy, color: color(rEnergy), hint: hint('Energie', rEnergy) },
-			{ label: 'Wasser', r: rWater, color: color(rWater), hint: hint('Wasser', rWater) }
+			{ label: 'Wasser', r: rWater, color: color(rWater), hint: hint('Wasser', rWater) },
+			{ label: 'Training', r: rTraining, color: color(rTraining), hint: hint('Training', rTraining) }
 		];
 	});
 
@@ -102,7 +107,7 @@
 			<span>Logg mindestens 3 Tage Stimmung + Gesundheit, um Korrelationen zu sehen.</span>
 		</div>
 	{:else}
-		<div class="grid gap-3 sm:grid-cols-3">
+		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 			{#each correlations() as corr}
 				<div class="glass-card rounded-2xl p-4 premium-shadow flex flex-col gap-1">
 					<span class="text-xs font-bold uppercase tracking-wider text-text-tertiary">{corr.label}</span>

@@ -86,6 +86,7 @@
 	<div class="fixed inset-0 z-40 bg-black/45 dark:bg-black/60 backdrop-blur-sm" onclick={close}></div>
 
 	<div
+		data-noswipe
 		class="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] rounded-t-2xl border-t border-border-color bg-surface-0 shadow-2xl flex flex-col"
 		role="dialog"
 		aria-label="Übung auswählen"

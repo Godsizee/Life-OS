@@ -74,6 +74,22 @@ export interface PickedExercise {
 	exercise_type: ExerciseType;
 }
 
+// Welle F2 — ein Satz/eine Einheit im laufenden (noch ungespeicherten) Workout.
+// Eigene `id` (statt Index) macht Sätze mitten im Grid einzeln entfernbar/erweiterbar.
+export interface ActiveSetLog {
+	id: string;
+	exercise_name: string;
+	exercise_id: string | null;
+	exercise_type: ExerciseType;
+	set_index: number;
+	reps: number | null;
+	weight_kg: number | null;
+	duration_min: number | null;
+	distance_km: number | null;
+	rpe: number | null;
+	completed: boolean;
+}
+
 // Ein Datensatz pro Übung — das aktuell beste geschätzte 1RM (Welle 5.3).
 export interface PersonalRecord {
 	id: string;

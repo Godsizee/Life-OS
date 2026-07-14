@@ -1,5 +1,6 @@
 // Welle 5.1 — Universal-Links: polymorphe Verknüpfung beliebiger Objekte.
-export type LinkEntityType = 'task' | 'note' | 'event' | 'goal' | 'habit';
+// Welle F4 — 'workout_plan' ergänzt (Kalender ↔ Trainingsplan).
+export type LinkEntityType = 'task' | 'note' | 'event' | 'goal' | 'habit' | 'workout_plan';
 
 export interface EntityLink {
 	id: string;

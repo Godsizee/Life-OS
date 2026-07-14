@@ -3,15 +3,19 @@ import { habitsState } from '$lib/features/habits/store.svelte';
 import { healthState } from '$lib/features/health/store.svelte';
 import { moodState } from '$lib/features/mood/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
+import { fitnessState } from '$lib/features/fitness/store.svelte';
+import { profileState } from '$lib/features/profile/store.svelte';
 import { isDueOn } from '$lib/features/habits/streak';
 import { getPomodorosForDate } from './focus-history';
 import { toISODate } from '$lib/core/date';
 import { getGoalProgress } from '$lib/features/goals/progress';
+import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
 
 export interface ScoreBreakdown {
 	tasks: number;
 	habits: number;
 	health: number;
+	fitness: number;
 	mood: number;
 	goals: number;
 	journal: number;
@@ -84,13 +88,17 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	const poms = getPomodorosForDate(dateStr);
 	const focusScore = poms > 0 ? Math.min(100, poms * 25) : 0;
 
+	// 8. Fitness (10%, Welle F4) — Wochenziel-Score, pro-rata über die laufende Woche.
+	const fitnessScore = fitnessFrequencyScore(fitnessState.logs, profileState.weeklyWorkoutGoal, date);
+
 	const total = Math.round(
-		tasksScore * 0.25 +
-		habitsScore * 0.25 +
-		healthScore * 0.15 +
-		moodScore * 0.1 +
+		tasksScore * 0.22 +
+		habitsScore * 0.22 +
+		healthScore * 0.13 +
+		fitnessScore * 0.1 +
 		goalsScore * 0.1 +
 		journalScore * 0.1 +
+		moodScore * 0.08 +
 		focusScore * 0.05
 	);
 
@@ -100,6 +108,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 			tasks: Math.round(tasksScore),
 			habits: Math.round(habitsScore),
 			health: Math.round(healthScore),
+			fitness: Math.round(fitnessScore),
 			mood: Math.round(moodScore),
 			goals: Math.round(goalsScore),
 			journal: Math.round(journalScore),

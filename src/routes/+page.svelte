@@ -14,6 +14,7 @@
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { linksState } from '$lib/features/links/store.svelte';
 	import { focusState } from '$lib/features/focus/store.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
@@ -38,6 +39,7 @@
 			shoppingState.load(id);
 			goalsState.load(id);
 			fitnessState.load(id);
+			linksState.load(id);
 			healthState.load();
 			moodState.load();
 			analyticsState.load();
@@ -53,6 +55,7 @@
 		shoppingState.unload();
 		goalsState.unload();
 		fitnessState.unload();
+		linksState.unload();
 		healthState.unload();
 		moodState.unload();
 		analyticsState.unload();

@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import { authState } from '$lib/core/auth.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
 	import { outbox } from '$lib/core/outbox.svelte';
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
@@ -44,13 +45,18 @@
 		const isPublic = publicPaths.includes(page.url.pathname);
 		if (!authState.session) {
 			workspaceState.reset();
+			profileState.unload();
 			if (!isPublic) goto('/login');
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
 			workspaceState.load().then(() => outbox.replay());
+			void profileState.load();
 		}
 	});
 
 	const showNav = $derived(!publicPaths.includes(page.url.pathname));
+	// F5 — /fitness bekommt mehr Breite (Desktop-Zwei-Spalten im Live-Workout),
+	// statt den mobilen Ein-Spalten-Fluss nur gestreckt breiter darzustellen.
+	const wideRoute = $derived(page.url.pathname.startsWith('/fitness'));
 	let sidebarCollapsed = $state(false);
 
 	const syncBanner = $derived(
@@ -85,7 +91,7 @@
 				{syncBanner.text}
 			</button>
 		{/if}
-		<main class="mx-auto w-full max-w-4xl flex-1 p-4 md:p-8">
+		<main class="mx-auto w-full flex-1 p-4 md:p-8 {wideRoute ? 'max-w-6xl' : 'max-w-4xl'}">
 			{@render children()}
 		</main>
 		{#if showNav}

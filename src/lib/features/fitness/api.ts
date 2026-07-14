@@ -155,3 +155,52 @@ export async function listSetLogsForLogs(
 	if (error) throw error;
 	return data ?? [];
 }
+
+// ── Welle F2: „letzte Werte" als Placeholder im Live-Workout ─────────────────
+
+// ── Welle F3: Verlauf & Statistik ─────────────────────────────────────────
+
+export interface DatedSetLog extends WorkoutSetLog {
+	date: string;
+}
+
+/** Alle erledigten Sätze eines Workspace (mit Workout-Datum) — Basis für Übungs-Progression,
+ *  Muskelgruppen-Volumen und Cardio-Statistik. Workspace-weit, daher lazy/gecacht im Store. */
+export async function listAllSetLogs(workspaceId: string): Promise<DatedSetLog[]> {
+	const { data, error } = await supabase
+		.from('workout_set_logs')
+		.select('*, workout_logs!inner(workspace_id, date)')
+		.eq('workout_logs.workspace_id', workspaceId)
+		.eq('completed', true);
+	if (error) throw error;
+	return (data ?? []).map((row: any) => {
+		const { workout_logs, ...rest } = row;
+		return { ...rest, date: workout_logs.date } as DatedSetLog;
+	});
+}
+
+/** Erledigte Sätze der letzten Session, in der diese Übung vorkam (sortiert nach Satz-Nr). */
+export async function lastSetsForExercise(
+	workspaceId: string,
+	exerciseId: string | null,
+	exerciseName: string
+): Promise<WorkoutSetLog[]> {
+	let query = supabase
+		.from('workout_set_logs')
+		.select('*, workout_logs!inner(workspace_id, date, created_at)')
+		.eq('workout_logs.workspace_id', workspaceId)
+		.eq('completed', true)
+		.order('date', { foreignTable: 'workout_logs', ascending: false })
+		.order('created_at', { foreignTable: 'workout_logs', ascending: false })
+		.limit(60);
+	query = exerciseId
+		? query.eq('exercise_id', exerciseId)
+		: query.eq('exercise_name', exerciseName).is('exercise_id', null);
+	const { data, error } = await query;
+	if (error) throw error;
+	if (!data || data.length === 0) return [];
+	const latestLogId = (data[0] as WorkoutSetLog).log_id;
+	return (data as WorkoutSetLog[])
+		.filter((s) => s.log_id === latestLogId)
+		.sort((a, b) => a.set_index - b.set_index);
+}

@@ -4,6 +4,8 @@
 	import { calendarState } from '$lib/features/calendar/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
+	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { linksState } from '$lib/features/links/store.svelte';
 	import { isDueOn } from '$lib/features/habits/streak';
 	import { toISODate } from '$lib/core/date';
 	import EventForm from '$lib/features/calendar/components/EventForm.svelte';
@@ -16,6 +18,8 @@
 			calendarState.load(id);
 			tasksState.load(id);
 			habitsState.load(id);
+			fitnessState.load(id);
+			linksState.load(id);
 		}
 	});
 
@@ -23,6 +27,8 @@
 		calendarState.unload();
 		tasksState.unload();
 		habitsState.unload();
+		fitnessState.unload();
+		linksState.unload();
 	});
 
 	// ── Welle 5.4: Layer-Toggles (persistiert in localStorage) ────────────────

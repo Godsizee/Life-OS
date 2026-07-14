@@ -10,8 +10,9 @@
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { getGoalProgress } from '$lib/features/goals/progress';
 	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
+	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
-	import { ArrowLeft, Trash2, X, Dumbbell } from 'lucide-svelte';
+	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck } from 'lucide-svelte';
 	import type { GoalStatus } from '$lib/features/goals/types';
 
 	const goalId = $derived(page.params.id);
@@ -53,6 +54,7 @@
 			? fitnessState.prFor(goal.target_exercise)
 			: undefined
 	);
+	const weeklyCount = $derived(goal?.goal_type === 'fitness_frequency' ? workoutsThisWeek(fitnessState.logs) : 0);
 
 	const statusLabel: Record<GoalStatus, string> = {
 		open: 'Offen',
@@ -151,6 +153,19 @@
 						? `Aktuelles geschätztes 1RM: ${pr.est_1rm} kg (${pr.weight_kg} kg × ${pr.reps})`
 						: 'Noch kein Workout mit dieser Übung geloggt.'}
 				</p>
+			</section>
+		{/if}
+
+		<!-- Frequenz-Ziel -->
+		{#if goal.goal_type === 'fitness_frequency' && goal.target_value}
+			<section class="rounded-2xl border border-border-color bg-surface-0 p-4">
+				<h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-text-primary">
+					<CalendarCheck size={16} /> Trainings-Frequenz
+				</h2>
+				<div class="flex items-baseline justify-between text-sm">
+					<span class="text-text-secondary">Diese Woche</span>
+					<span class="font-mono text-text-primary">{weeklyCount} / {goal.target_value}×</span>
+				</div>
 			</section>
 		{/if}
 

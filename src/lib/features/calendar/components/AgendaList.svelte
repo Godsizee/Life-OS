@@ -1,9 +1,25 @@
 <script lang="ts">
-	import { Trash2, CheckCircle2, Circle } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell } from 'lucide-svelte';
 	import { calendarState } from '../store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { formatRrule } from '../recurrence';
 	import { toastState } from '$lib/core/toast.svelte';
+	import { linksState } from '$lib/features/links/store.svelte';
+	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
+
+	function linkedPlanIdFor(eventId: string): string | null {
+		return (
+			linksState
+				.linksFor('event', eventId)
+				.map((l) =>
+					l.source_type === 'workout_plan' ? l.source_id : l.target_type === 'workout_plan' ? l.target_id : null
+				)
+				.find((id): id is string => id !== null) ?? null
+		);
+	}
+
+	let expandedEventId = $state<string | null>(null);
 
 	export interface AgendaItem {
 		id: string;
@@ -53,23 +69,47 @@
 							: `${new Date(item.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} – ${new Date(
 									item.end
 								).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`}
-						<li class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3 shadow-sm transition-colors duration-200">
-							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium text-text-primary">{item.title}</p>
-								<p class="truncate text-xs text-text-secondary">
-									{timeLabel}{#if item.location} · {item.location}{/if}{#if item.rrule} · {formatRrule(item.rrule)}{/if}
-								</p>
+						{@const linkedPlanId = linkedPlanIdFor(item.id)}
+						<li class="flex flex-col gap-2 rounded-xl border border-border-color bg-surface-0 p-3 shadow-sm transition-colors duration-200">
+							<div class="flex items-center gap-3">
+								<div class="min-w-0 flex-1">
+									<p class="truncate text-sm font-medium text-text-primary">{item.title}</p>
+									<p class="truncate text-xs text-text-secondary">
+										{timeLabel}{#if item.location} · {item.location}{/if}{#if item.rrule} · {formatRrule(item.rrule)}{/if}
+									</p>
+								</div>
+								{#if linkedPlanId}
+									<button
+										onclick={() => goto(`/fitness?startPlan=${linkedPlanId}`)}
+										class="shrink-0 inline-flex items-center gap-1 rounded-lg bg-primary-700 px-2 py-1 text-xs font-bold text-white hover:bg-primary-800"
+									>
+										<Dumbbell size={12} /> Start
+									</button>
+								{/if}
+								<button
+									onclick={() => (expandedEventId = expandedEventId === item.id ? null : item.id)}
+									aria-label="Verknüpfungen"
+									aria-expanded={expandedEventId === item.id}
+									class="shrink-0 text-text-tertiary hover:text-text-primary transition-colors"
+								>
+									<Link2 size={16} />
+								</button>
+								<button
+									onclick={() => {
+										calendarState.removeEvent(item.id);
+										toastState.success('Termin gelöscht');
+									}}
+									aria-label="Termin löschen"
+									class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
+								>
+									<Trash2 size={16} />
+								</button>
 							</div>
-							<button
-								onclick={() => {
-									calendarState.removeEvent(item.id);
-									toastState.success('Termin gelöscht');
-								}}
-								aria-label="Termin löschen"
-								class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
-							>
-								<Trash2 size={16} />
-							</button>
+							{#if expandedEventId === item.id}
+								<div class="border-t border-border-color pt-2">
+									<LinkedItems type="event" id={item.id} />
+								</div>
+							{/if}
 						</li>
 					{:else}
 						{@const isCompleted = item.status === 'done'}

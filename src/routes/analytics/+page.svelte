@@ -12,7 +12,7 @@
 	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
 	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
 	import MonthlyReport from '$lib/features/analytics/components/MonthlyReport.svelte';
-	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
+	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
 	import { APP_LOCALE } from '$lib/core/locale';
 
 	$effect(() => {
@@ -46,6 +46,7 @@
 		tasks: 0,
 		habits: 0,
 		health: 0,
+		fitness: 0,
 		mood: 0,
 		goals: 0,
 		journal: 0,
@@ -74,12 +75,13 @@
 	}
 
 	const categories = $derived([
-		{ name: 'Aufgaben',    key: 'tasks',   icon: Target,    color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-950/20',    weight: '25%' },
-		{ name: 'Routinen',   key: 'habits',  icon: Repeat,    color: 'text-pink-500',    bg: 'bg-pink-50 dark:bg-pink-950/20',    weight: '25%' },
-		{ name: 'Gesundheit', key: 'health',  icon: Heart,     color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', weight: '15%' },
-		{ name: 'Stimmung',   key: 'mood',    icon: SmilePlus, color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-950/20',  weight: '10%' },
+		{ name: 'Aufgaben',    key: 'tasks',   icon: Target,    color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-950/20',    weight: '22%' },
+		{ name: 'Routinen',   key: 'habits',  icon: Repeat,    color: 'text-pink-500',    bg: 'bg-pink-50 dark:bg-pink-950/20',    weight: '22%' },
+		{ name: 'Gesundheit', key: 'health',  icon: Heart,     color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', weight: '13%' },
+		{ name: 'Fitness',    key: 'fitness', icon: Dumbbell,  color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-950/20', weight: '10%' },
 		{ name: 'Ziele',      key: 'goals',   icon: Activity,  color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-950/20', weight: '10%' },
 		{ name: 'Tagebuch',   key: 'journal', icon: BookOpen,  color: 'text-purple-500',  bg: 'bg-purple-50 dark:bg-purple-950/20', weight: '10%' },
+		{ name: 'Stimmung',   key: 'mood',    icon: SmilePlus, color: 'text-amber-500',   bg: 'bg-amber-50 dark:bg-amber-950/20',  weight: '8%' },
 		{ name: 'Fokus',      key: 'focus',   icon: Zap,       color: 'text-yellow-500',  bg: 'bg-yellow-50 dark:bg-yellow-950/20', weight: '5%'  }
 	]);
 </script>
