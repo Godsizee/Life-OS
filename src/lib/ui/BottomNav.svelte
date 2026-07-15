@@ -21,6 +21,7 @@
 
 <nav
 	class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] pl-safe pr-safe md:hidden select-none-native transition-colors duration-300"
+	style="view-transition-name: bottom-nav"
 >
 	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1 xs:px-3">
 		{#each leftItems as item}

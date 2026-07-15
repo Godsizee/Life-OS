@@ -34,6 +34,7 @@
 <aside
 	class="fixed bottom-0 top-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 transition-all duration-300 ease-in-out md:flex md:flex-col
 		{collapsed ? 'w-20' : 'w-64'}"
+	style="view-transition-name: sidebar"
 >
 	<!-- Header / Logo -->
 	<div class="flex h-16 items-center justify-between border-b border-border-color px-4">

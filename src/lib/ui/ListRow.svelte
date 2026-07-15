@@ -16,7 +16,7 @@
 	} = $props();
 </script>
 
-<li
+<div
 	class="flex min-h-12 gap-3 rounded-xl border border-border-color bg-surface-0 p-3 {align === 'start'
 		? 'items-start'
 		: 'items-center'} {className}"
@@ -30,4 +30,4 @@
 	{#if trailing}
 		<div class="shrink-0">{@render trailing()}</div>
 	{/if}
-</li>
+</div>

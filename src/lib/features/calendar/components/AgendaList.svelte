@@ -9,6 +9,8 @@
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 	import ListRow from '$lib/ui/ListRow.svelte';
 	import EmptyState from '$lib/ui/EmptyState.svelte';
+	import { fade } from 'svelte/transition';
+	import { DURATION, motionDuration } from '$lib/ui/motion';
 
 	function linkedPlanIdFor(eventId: string): string | null {
 		return (
@@ -72,6 +74,7 @@
 									item.end
 								).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`}
 						{@const linkedPlanId = linkedPlanIdFor(item.id)}
+						<li class="contents" transition:fade={{ duration: motionDuration(DURATION.fast) }}>
 						<ListRow align="start" class="shadow-sm">
 							<div class="flex w-full items-center gap-3">
 								<div class="min-w-0 flex-1">
@@ -113,8 +116,10 @@
 								</div>
 							{/if}
 						</ListRow>
+						</li>
 					{:else}
 						{@const isCompleted = item.status === 'done'}
+						<li class="contents" transition:fade={{ duration: motionDuration(DURATION.fast) }}>
 						<ListRow class="shadow-sm">
 							{#snippet leading()}
 								<button
@@ -156,6 +161,7 @@
 								</button>
 							{/snippet}
 						</ListRow>
+						</li>
 					{/if}
 				{/each}
 			</ul>

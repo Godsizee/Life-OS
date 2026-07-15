@@ -1,8 +1,9 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { prefersReducedMotion } from '$lib/ui/motion';
 	import { authState } from '$lib/core/auth.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
@@ -53,6 +54,16 @@
 		}
 	});
 
+	onNavigate((navigation) => {
+		if (!document.startViewTransition || prefersReducedMotion()) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
+
 	const showNav = $derived(!publicPaths.includes(page.url.pathname));
 	// F5 — /fitness bekommt mehr Breite (Desktop-Zwei-Spalten im Live-Workout),
 	// statt den mobilen Ein-Spalten-Fluss nur gestreckt breiter darzustellen.
@@ -86,6 +97,7 @@
 		{#if syncBanner}
 			<button
 				onclick={() => outbox.replay()}
+				style="view-transition-name: sync-banner"
 				class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium text-white {syncBanner.class}"
 			>
 				{syncBanner.text}
