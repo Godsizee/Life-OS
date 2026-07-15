@@ -40,7 +40,7 @@
 			type="button"
 			onclick={() => (frequency = 'daily')}
 			class="rounded-full px-3 py-1 text-xs font-medium {frequency === 'daily'
-				? 'bg-emerald-600 text-white'
+				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 		>
 			Täglich
@@ -49,7 +49,7 @@
 			type="button"
 			onclick={() => (frequency = 'weekly')}
 			class="rounded-full px-3 py-1 text-xs font-medium {frequency === 'weekly'
-				? 'bg-emerald-600 text-white'
+				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 		>
 			Wochentage
@@ -63,7 +63,7 @@
 					type="button"
 					onclick={() => toggleDay(day)}
 					class="min-h-12 min-w-12 rounded-xl text-sm font-medium {days.includes(day)
-						? 'bg-emerald-600 text-white'
+						? 'bg-primary-600 text-white'
 						: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 				>
 					{label}

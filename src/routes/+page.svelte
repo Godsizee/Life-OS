@@ -95,7 +95,7 @@
 			case 'task': return { text: 'Aufgabe', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900', icon: CheckSquare };
 			case 'shopping': return { text: 'Einkauf', color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900', icon: ShoppingCart };
 			case 'event': return { text: 'Kalender', color: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900', icon: Calendar };
-			case 'health': return { text: 'Gesundheit', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900', icon: Activity };
+			case 'health': return { text: 'Gesundheit', color: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/30 dark:text-cyan-400 dark:border-cyan-900', icon: Activity };
 			case 'habit': return { text: 'Routine', color: 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900', icon: Flame };
 			case 'note': return { text: 'Notiz', color: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-900', icon: Notebook };
 			case 'goal': return { text: 'Ziel', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900', icon: Target };

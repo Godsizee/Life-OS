@@ -191,7 +191,7 @@
 											<span class="text-text-tertiary">· RPE {set.rpe}</span>
 										{/if}
 									</span>
-									<span class={set.completed ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-text-tertiary'}>
+									<span class={set.completed ? 'text-primary-600 dark:text-primary-400 font-bold' : 'text-text-tertiary'}>
 										{set.completed ? '✓' : '–'}
 									</span>
 								</div>

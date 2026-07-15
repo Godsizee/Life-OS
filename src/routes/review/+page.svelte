@@ -146,7 +146,7 @@
 	</div>
 	<div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
 		<div
-			class="h-full bg-emerald-500 transition-all duration-500"
+			class="h-full bg-primary-500 transition-all duration-500"
 			style="width: {(step / TOTAL_STEPS) * 100}%"
 		></div>
 	</div>
@@ -163,11 +163,11 @@
 			{#if doneTasks.length === 0}
 				<p class="mt-2 text-sm text-text-secondary">Keine Aufgaben als erledigt markiert diese Woche.</p>
 			{:else}
-				<p class="mt-1 text-2xl font-bold text-emerald-600">{doneTasks.length}</p>
+				<p class="mt-1 text-2xl font-bold text-primary-600">{doneTasks.length}</p>
 				<ul class="mt-2 flex flex-col gap-1">
 					{#each doneTasks.slice(0, 5) as task (task.id)}
 						<li class="flex items-center gap-2 text-sm text-text-secondary">
-							<span class="text-emerald-500">✓</span>
+							<span class="text-primary-500">✓</span>
 							<span class="truncate">{task.title}</span>
 						</li>
 					{/each}
@@ -181,7 +181,7 @@
 		<!-- Habit-Adherence -->
 		<div class="rounded-xl border border-border-color bg-surface-0 p-4">
 			<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Gewohnheiten</p>
-			<p class="mt-1 text-2xl font-bold {avgAdherence >= 70 ? 'text-emerald-600' : avgAdherence >= 40 ? 'text-amber-600' : 'text-red-500'}">{avgAdherence}%</p>
+			<p class="mt-1 text-2xl font-bold {avgAdherence >= 70 ? 'text-primary-600' : avgAdherence >= 40 ? 'text-amber-600' : 'text-red-500'}">{avgAdherence}%</p>
 			<p class="text-xs text-text-secondary">Durchschnittliche Einhaltung</p>
 			{#if habitStats.length > 0}
 				<div class="mt-3 flex flex-col gap-2">
@@ -189,7 +189,7 @@
 						<div class="flex items-center gap-2">
 							<span class="w-32 truncate text-xs text-text-secondary">{habit.name}</span>
 							<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
-								<div class="h-full bg-emerald-500" style="width: {pct}%"></div>
+								<div class="h-full bg-primary-500" style="width: {pct}%"></div>
 							</div>
 							<span class="w-12 text-right text-xs text-text-secondary">{loggedDays}/{dueDays}</span>
 							{#if streak >= 3}
@@ -207,7 +207,7 @@
 			{#if weekWorkouts.length === 0}
 				<p class="mt-2 text-sm text-text-secondary">Kein Workout diese Woche geloggt.</p>
 			{:else}
-				<p class="mt-1 text-2xl font-bold text-emerald-600">{weekWorkouts.length}</p>
+				<p class="mt-1 text-2xl font-bold text-primary-600">{weekWorkouts.length}</p>
 				<p class="text-xs text-text-secondary">
 					Workout{weekWorkouts.length !== 1 ? 's' : ''} · {weekVolumeKg.toLocaleString('de-DE')} kg Volumen
 					{#if weekPRs.length > 0}· 🏆 {weekPRs.length} PR{weekPRs.length !== 1 ? 's' : ''}{/if}
@@ -225,7 +225,7 @@
 							<span class="min-w-0 flex-1 truncate text-sm text-text-secondary">{goal.title}</span>
 							<div class="w-16 flex-shrink-0">
 								<div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-									<div class="h-full bg-emerald-500" style="width: {goal.progress}%"></div>
+									<div class="h-full bg-primary-500" style="width: {goal.progress}%"></div>
 								</div>
 							</div>
 							<span class="w-8 text-right text-xs text-text-secondary">{goal.progress}%</span>
@@ -237,7 +237,7 @@
 
 		<button
 			onclick={() => step++}
-			class="mt-2 min-h-12 rounded-xl bg-emerald-600 text-sm font-medium text-white active:bg-emerald-700"
+			class="mt-2 min-h-12 rounded-xl bg-primary-600 text-sm font-medium text-white active:bg-primary-700"
 		>
 			Weiter →
 		</button>
@@ -265,13 +265,13 @@
 							disabled={!isSelected && selectedNextTasks.length >= 3}
 							class="flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors
 								{isSelected
-								? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20'
+								? 'border-primary-400 bg-primary-50 dark:bg-primary-950/20'
 								: 'border-border-color bg-surface-0'}
 								disabled:opacity-40"
 						>
 							<span
 								class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors
-									{isSelected ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-border-color'}"
+									{isSelected ? 'border-primary-500 bg-primary-500 text-white' : 'border-border-color'}"
 							>
 								{#if isSelected}✓{/if}
 							</span>
@@ -301,7 +301,7 @@
 			</button>
 			<button
 				onclick={() => step++}
-				class="min-h-12 flex-1 rounded-xl bg-emerald-600 text-sm font-medium text-white active:bg-emerald-700"
+				class="min-h-12 flex-1 rounded-xl bg-primary-600 text-sm font-medium text-white active:bg-primary-700"
 			>
 				Weiter →
 			</button>
@@ -322,7 +322,7 @@
 				bind:value={reflGood}
 				rows="3"
 				placeholder="z.B. Alle Habits eingehalten, ein schwieriges Gespräch geführt…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-emerald-500 focus:outline-none"
+				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
 			></textarea>
 		</label>
 
@@ -332,7 +332,7 @@
 				bind:value={reflHard}
 				rows="3"
 				placeholder="z.B. Ablenkungen, zu viele Aufgaben auf einmal…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-emerald-500 focus:outline-none"
+				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
 			></textarea>
 		</label>
 
@@ -342,7 +342,7 @@
 				bind:value={reflChange}
 				rows="3"
 				placeholder="z.B. Früher schlafen, täglich 1 Priorität setzen…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-emerald-500 focus:outline-none"
+				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
 			></textarea>
 		</label>
 
@@ -356,7 +356,7 @@
 			<button
 				onclick={finish}
 				disabled={saving}
-				class="min-h-12 flex-1 rounded-xl bg-emerald-600 text-sm font-medium text-white active:bg-emerald-700 disabled:opacity-60"
+				class="min-h-12 flex-1 rounded-xl bg-primary-600 text-sm font-medium text-white active:bg-primary-700 disabled:opacity-60"
 			>
 				{saving ? 'Speichere…' : '✓ Abschließen'}
 			</button>

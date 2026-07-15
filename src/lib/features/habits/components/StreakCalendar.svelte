@@ -62,17 +62,17 @@
 	// ── Farb-Mapping ──────────────────────────────────────────────────
 	function cellColor(data: DayData): string {
 		const isDark = themeState.isDark;
-		if (data.pct < 0) return isDark ? '#1e113a' : '#f1f5f9'; // kein Habit fällig → neutral
+		if (data.pct < 0) return isDark ? '#1F1F27' : '#ECECF1'; // kein Habit fällig → neutral
 		if (data.pct === 0) return isDark ? '#4c1d24' : '#fee2e2'; // 0% → rot-hint
-		if (data.pct < 50) return isDark ? '#064e3b' : '#bbf7d0'; // < 50% → schwaches grün
-		if (data.pct < 80) return isDark ? '#047857' : '#4ade80'; // < 80% → mittleres grün
-		return isDark ? '#10b981' : '#059669'; // 80%+ → sattes emerald
+		if (data.pct < 50) return isDark ? '#3730A3' : '#C7D2FE'; // < 50% → schwaches Indigo
+		if (data.pct < 80) return isDark ? '#4F46E5' : '#818CF8'; // < 80% → mittleres Indigo
+		return isDark ? '#818CF8' : '#4F46E5'; // 80%+ → sattes Indigo
 	}
 
 	const legendColors = $derived(
 		themeState.isDark
-			? ['#1e113a', '#4c1d24', '#064e3b', '#047857', '#10b981']
-			: ['#f1f5f9', '#fee2e2', '#bbf7d0', '#4ade80', '#059669']
+			? ['#1F1F27', '#4c1d24', '#3730A3', '#4F46E5', '#818CF8']
+			: ['#ECECF1', '#fee2e2', '#C7D2FE', '#818CF8', '#4F46E5']
 	);
 
 	// ── Monats-Label (erste Woche des Monats) ────────────────────────

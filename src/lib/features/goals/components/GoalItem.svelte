@@ -43,7 +43,7 @@
 	<!-- Fortschritts-Balken -->
 	<div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
 		<div
-			class="h-full bg-emerald-600 dark:bg-emerald-500 transition-all duration-500"
+			class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500"
 			style="width: {displayProgress}%"
 		></div>
 	</div>
@@ -57,7 +57,7 @@
 						<span
 							class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium {task.status ===
 							'done'
-								? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-450 line-through'
+								? 'bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-400 line-through'
 								: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 						>
 							{task.status === 'done' ? '✓' : '○'}
@@ -110,7 +110,7 @@
 				step="10"
 				value={goal.progress}
 				onchange={(e) => goalsState.updateProgress(goal.id, Number(e.currentTarget.value))}
-				class="h-8 w-full accent-emerald-600 dark:accent-emerald-500"
+				class="h-8 w-full accent-primary-600 dark:accent-primary-500"
 				aria-label="Fortschritt"
 			/>
 		</div>
@@ -121,7 +121,7 @@
 		<select
 			value={goal.status}
 			onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}
-			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-2 text-xs text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-2 text-xs text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 		>
 			{#each Object.entries(statusLabel) as [value, label] (value)}
 				<option {value}>{label}</option>

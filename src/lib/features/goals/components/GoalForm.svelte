@@ -36,7 +36,7 @@
 			onclick={() => (goalType = 'standard')}
 			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
 			'standard'
-				? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
 				: 'border-border-color bg-surface-1 text-text-secondary'}"
 		>
 			Standard
@@ -46,7 +46,7 @@
 			onclick={() => (goalType = 'pr')}
 			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
 			'pr'
-				? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
 				: 'border-border-color bg-surface-1 text-text-secondary'}"
 		>
 			🏋️ Kraft-Ziel (PR)
@@ -56,7 +56,7 @@
 			onclick={() => (goalType = 'fitness_frequency')}
 			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
 			'fitness_frequency'
-				? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
 				: 'border-border-color bg-surface-1 text-text-secondary'}"
 		>
 			📅 Trainings-Frequenz
@@ -72,7 +72,7 @@
 				step="0.5"
 				placeholder="Ziel-1RM kg"
 				bind:value={targetValue}
-				class="min-h-12 w-32 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary focus:border-emerald-500 focus:outline-none"
+				class="min-h-12 w-32 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary focus:border-primary-500 focus:outline-none"
 			/>
 		</div>
 	{:else if goalType === 'fitness_frequency'}
@@ -82,14 +82,14 @@
 			max="14"
 			placeholder="Trainings/Woche"
 			bind:value={targetValue}
-			class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none"
+			class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none"
 		/>
 	{/if}
 
 	<input
 		type="date"
 		bind:value={targetDate}
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 	/>
 	<Button type="submit">
 		{#snippet children()}

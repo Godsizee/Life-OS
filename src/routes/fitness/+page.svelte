@@ -515,7 +515,7 @@
 															onclick={() => handleToggleSet(set)}
 															aria-label={set.completed ? 'Satz als offen markieren' : 'Satz als erledigt markieren'}
 															class="flex h-11 w-11 items-center justify-center rounded-lg border active:scale-90 transition-all
-																{set.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-border-color bg-surface-0 text-text-tertiary'}"
+																{set.completed ? 'bg-primary-500 border-primary-500 text-white' : 'border-border-color bg-surface-0 text-text-tertiary'}"
 														>
 															<Check size={16} strokeWidth={2.5} />
 														</button>

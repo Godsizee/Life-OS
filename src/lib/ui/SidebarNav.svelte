@@ -69,7 +69,7 @@
 	</div>
 
 	<!-- Module Links -->
-	<nav class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
+	<nav class="flex-1 overflow-y-auto p-3 space-y-1">
 		{#each modules as item (item.id)}
 			{@const Icon = item.icon}
 			{@const active = currentPath === item.route}
@@ -91,7 +91,7 @@
 					<span class="truncate">{item.label}</span>
 				{:else}
 					<!-- Tooltip on Collapse -->
-					<div class="absolute left-16 z-50 hidden rounded-md bg-slate-850 px-2 py-1 text-xs text-white group-hover:block dark:bg-slate-800">
+					<div class="absolute left-16 z-50 hidden rounded-md bg-slate-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-slate-800">
 						{item.label}
 					</div>
 				{/if}

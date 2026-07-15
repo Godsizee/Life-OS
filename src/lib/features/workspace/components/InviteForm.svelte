@@ -30,7 +30,7 @@
 		{/snippet}
 	</Button>
 	{#if status === 'sent'}
-		<p class="text-sm text-emerald-600">Einladung erstellt.</p>
+		<p class="text-sm text-primary-600">Einladung erstellt.</p>
 	{:else if status === 'error'}
 		<p class="text-sm text-red-600">Einladung fehlgeschlagen.</p>
 	{/if}

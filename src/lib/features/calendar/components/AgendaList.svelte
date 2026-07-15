@@ -119,11 +119,11 @@
 									tasksState.setStatus(item.id, isCompleted ? 'todo' : 'done');
 									toastState.success(isCompleted ? 'Aufgabe als offen markiert' : 'Aufgabe erledigt ✓');
 								}}
-								class="shrink-0 text-text-tertiary hover:text-emerald-500 active:scale-90 transition-all"
+								class="shrink-0 text-text-tertiary hover:text-primary-500 active:scale-90 transition-all"
 								aria-label={isCompleted ? 'Als offen markieren' : 'Als erledigt markieren'}
 							>
 								{#if isCompleted}
-									<CheckCircle2 size={18} class="text-emerald-500" />
+									<CheckCircle2 size={18} class="text-primary-500" />
 								{:else}
 									<Circle size={18} />
 								{/if}

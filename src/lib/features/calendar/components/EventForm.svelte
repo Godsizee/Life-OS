@@ -45,12 +45,12 @@
 		type="datetime-local"
 		bind:value={start}
 		required
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 	/>
 	<input
 		type="datetime-local"
 		bind:value={end}
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 	/>
 	<Input placeholder="Ort (optional)…" bind:value={location} />
 	<label class="flex min-h-12 items-center gap-2 text-sm text-text-secondary">
@@ -59,7 +59,7 @@
 	</label>
 	<select
 		bind:value={recurrence}
-		class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+		class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 	>
 		<option value="none">Einmalig</option>
 		<option value="daily">Täglich</option>

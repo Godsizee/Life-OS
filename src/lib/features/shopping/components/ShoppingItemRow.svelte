@@ -11,7 +11,7 @@
 		onclick={() => shoppingState.toggleChecked(item.id)}
 		aria-label="Abhaken"
 		class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 active:scale-95 transition-transform {item.checked
-			? 'border-emerald-600 bg-emerald-600'
+			? 'border-primary-600 bg-primary-600'
 			: 'border-border-color bg-surface-1'}"
 	>
 		{#if item.checked}<span class="text-xs text-white">✓</span>{/if}

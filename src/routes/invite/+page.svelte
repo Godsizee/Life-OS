@@ -32,11 +32,11 @@
 	{#if status === 'pending'}
 		<p class="text-slate-500">Einladung wird geprüft…</p>
 	{:else if status === 'accepted'}
-		<p class="text-emerald-600">Einladung angenommen. Du wirst weitergeleitet…</p>
+		<p class="text-primary-600">Einladung angenommen. Du wirst weitergeleitet…</p>
 	{:else if status === 'needs-login'}
 		<div class="flex flex-col gap-3">
 			<p class="text-slate-700">Bitte zuerst anmelden, um die Einladung anzunehmen.</p>
-			<a href="/login" class="text-emerald-600 underline">Zur Anmeldung</a>
+			<a href="/login" class="text-primary-600 underline">Zur Anmeldung</a>
 		</div>
 	{:else}
 		<p class="text-red-600">Einladung ungültig oder abgelaufen.</p>

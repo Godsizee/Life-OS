@@ -28,7 +28,7 @@
 	{#if tasksState.projects.length > 0}
 		<select
 			bind:value={projectId}
-			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 		>
 			<option value="">Kein Projekt</option>
 			{#each tasksState.projects as project (project.id)}
@@ -39,7 +39,7 @@
 	{#if activeGoals.length > 0}
 		<select
 			bind:value={goalId}
-			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 		>
 			<option value="">Kein Ziel</option>
 			{#each activeGoals as goal (goal.id)}

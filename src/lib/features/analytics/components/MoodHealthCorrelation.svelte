@@ -73,7 +73,7 @@
 
 		function color(r: number | null) {
 			if (r === null) return 'text-text-tertiary';
-			if (r >= 0.4) return 'text-emerald-500';
+			if (r >= 0.4) return 'text-primary-500';
 			if (r <= -0.4) return 'text-red-500';
 			return 'text-amber-500';
 		}

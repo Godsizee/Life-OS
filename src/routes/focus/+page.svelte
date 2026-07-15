@@ -153,7 +153,7 @@
 			<p class="text-text-secondary">Keine offenen Aufgaben mehr. Gönne dir eine Pause.</p>
 			<a
 				href="/"
-				class="mt-2 rounded-xl bg-emerald-600 px-6 py-3 font-medium text-white active:bg-emerald-700"
+				class="mt-2 rounded-xl bg-primary-600 px-6 py-3 font-medium text-white active:bg-primary-700"
 			>
 				Zum Dashboard
 			</a>
@@ -166,7 +166,7 @@
 					>☕ Pause</span
 				>
 			{:else}
-				<span class="rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700"
+				<span class="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700"
 					>🎯 Fokus</span
 				>
 			{/if}
@@ -185,7 +185,7 @@
 					cy="72"
 					r={RADIUS}
 					fill="none"
-					stroke={onBreak ? '#3b82f6' : '#059669'}
+					stroke={onBreak ? '#3b82f6' : '#4F46E5'}
 					stroke-width="8"
 					stroke-linecap="round"
 					stroke-dasharray={CIRCUMFERENCE}
@@ -204,7 +204,7 @@
 		<!-- Task-Karte -->
 		<div class="mb-8 w-full max-w-sm rounded-2xl border border-border-color bg-surface-0 p-5 shadow-sm">
 			{#if linkedGoal}
-				<p class="mb-2 text-xs font-medium text-emerald-600">🎯 {linkedGoal.title}</p>
+				<p class="mb-2 text-xs font-medium text-primary-600">🎯 {linkedGoal.title}</p>
 			{/if}
 			<h2 class="text-xl font-semibold leading-snug text-text-primary">{currentTask.title}</h2>
 			<div class="mt-3 flex items-center gap-3">
@@ -227,7 +227,7 @@
 			<!-- Play/Pause -->
 			<button
 				onclick={() => (running ? stopTimer() : startTimer())}
-				class="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-lg font-medium text-white active:bg-emerald-700"
+				class="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-primary-600 text-lg font-medium text-white active:bg-primary-700"
 			>
 				{#if running}
 					<span>⏸</span><span>Pause</span>
@@ -240,7 +240,7 @@
 				<!-- Erledigt -->
 				<button
 					onclick={markDone}
-					class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium text-emerald-700 active:bg-emerald-100"
+					class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-primary-200 bg-primary-50 text-sm font-medium text-primary-700 active:bg-primary-100"
 				>
 					✓ Erledigt
 				</button>

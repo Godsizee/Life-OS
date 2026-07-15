@@ -19,7 +19,7 @@
 		onclick={toggle}
 		aria-label="Heute erledigt"
 		class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 active:scale-95 transition-transform {doneToday
-			? 'border-emerald-600 bg-emerald-600'
+			? 'border-primary-600 bg-primary-600'
 			: 'border-border-color bg-surface-1'}"
 	>
 		{#if doneToday}<span class="text-xs text-white">✓</span>{/if}
@@ -27,7 +27,7 @@
 	<div class="min-w-0 flex-1">
 		<p class="truncate text-text-primary">{habit.name}</p>
 		{#if streak > 0}
-			<p class="text-xs text-emerald-600 dark:text-emerald-400">{streak} {streak === 1 ? 'Tag' : 'Tage'} Streak</p>
+			<p class="text-xs text-accent-600 dark:text-accent-400">{streak} {streak === 1 ? 'Tag' : 'Tage'} Streak</p>
 		{/if}
 	</div>
 	<button

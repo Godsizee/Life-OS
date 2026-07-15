@@ -119,7 +119,7 @@
 					{/if}
 				</div>
 				<div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
-					<div class="h-full bg-emerald-600 dark:bg-emerald-500 transition-all duration-500" style="width: {progress}%"></div>
+					<div class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500" style="width: {progress}%"></div>
 				</div>
 			</div>
 
@@ -127,7 +127,7 @@
 				<select
 					value={goal.status}
 					onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}
-					class="min-h-11 rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-primary focus:border-emerald-500 focus:outline-none"
+					class="min-h-11 rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-primary focus:border-primary-500 focus:outline-none"
 				>
 					{#each Object.entries(statusLabel) as [value, label] (value)}
 						<option {value}>{label}</option>
@@ -186,7 +186,7 @@
 				</ul>
 			{/if}
 			{#if unlinkedTasks.length > 0}
-				<select onchange={linkTask} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-emerald-500 focus:outline-none">
+				<select onchange={linkTask} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-primary-500 focus:outline-none">
 					<option value="">+ Aufgabe verknüpfen…</option>
 					{#each unlinkedTasks as task (task.id)}
 						<option value={task.id}>{task.title}</option>
@@ -214,7 +214,7 @@
 				</ul>
 			{/if}
 			{#if unlinkedHabits.length > 0}
-				<select onchange={linkHabit} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-emerald-500 focus:outline-none">
+				<select onchange={linkHabit} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-primary-500 focus:outline-none">
 					<option value="">+ Routine verknüpfen…</option>
 					{#each unlinkedHabits as habit (habit.id)}
 						<option value={habit.id}>{habit.name}</option>

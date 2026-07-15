@@ -20,7 +20,7 @@
 		onclick={toggle}
 		aria-label="Status umschalten"
 		class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 active:scale-95 transition-transform {isDone
-			? 'border-emerald-600 bg-emerald-600'
+			? 'border-primary-600 bg-primary-600'
 			: 'border-border-color bg-surface-1'}"
 	>
 		{#if isDone}<span class="text-xs text-white">✓</span>{/if}
@@ -34,7 +34,7 @@
 				</p>
 			{/if}
 			{#if recurrenceLabel}
-				<span class="inline-flex items-center gap-1 rounded bg-indigo-50 dark:bg-indigo-950 px-1.5 py-0.5 text-[10px] font-medium text-indigo-750 dark:text-indigo-300">
+				<span class="inline-flex items-center gap-1 rounded bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:text-primary-300">
 					<Repeat size={10} />
 					{recurrenceLabel}
 				</span>

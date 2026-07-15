@@ -77,7 +77,7 @@
 	const categories = $derived([
 		{ name: 'Aufgaben',    key: 'tasks',   icon: Target,    color: 'text-blue-500',    bg: 'bg-blue-50 dark:bg-blue-950/20',    weight: '22%' },
 		{ name: 'Routinen',   key: 'habits',  icon: Repeat,    color: 'text-pink-500',    bg: 'bg-pink-50 dark:bg-pink-950/20',    weight: '22%' },
-		{ name: 'Gesundheit', key: 'health',  icon: Heart,     color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20', weight: '13%' },
+		{ name: 'Gesundheit', key: 'health',  icon: Heart,     color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-950/20', weight: '13%' },
 		{ name: 'Fitness',    key: 'fitness', icon: Dumbbell,  color: 'text-orange-500',  bg: 'bg-orange-50 dark:bg-orange-950/20', weight: '10%' },
 		{ name: 'Ziele',      key: 'goals',   icon: Activity,  color: 'text-indigo-500',  bg: 'bg-indigo-50 dark:bg-indigo-950/20', weight: '10%' },
 		{ name: 'Tagebuch',   key: 'journal', icon: BookOpen,  color: 'text-purple-500',  bg: 'bg-purple-50 dark:bg-purple-950/20', weight: '10%' },
@@ -150,7 +150,7 @@
 							<div class="flex items-center gap-1">
 								<span class="text-lg font-extrabold text-text-primary tabular-nums">{val}%</span>
 								{#if t === 'up'}
-									<TrendingUp size={13} class="text-emerald-500" />
+									<TrendingUp size={13} class="text-primary-500" />
 								{:else if t === 'down'}
 									<TrendingDown size={13} class="text-red-500" />
 								{:else}

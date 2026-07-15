@@ -22,7 +22,7 @@
 			<button
 				onclick={() => notesState.togglePin(note.id)}
 				aria-label="Anpinnen"
-				class={note.pinned ? 'text-emerald-600 dark:text-emerald-400' : 'text-text-tertiary'}
+				class={note.pinned ? 'text-accent-600 dark:text-accent-400' : 'text-text-tertiary'}
 			>
 				<Pin size={18} />
 			</button>
@@ -40,7 +40,7 @@
 			bind:value={body}
 			onblur={saveBody}
 			rows={3}
-			class="mt-2 w-full rounded-lg border border-border-color bg-surface-1 p-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+			class="mt-2 w-full rounded-lg border border-border-color bg-surface-1 p-2 text-sm text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 		></textarea>
 	{:else}
 		<button type="button" onclick={() => (editing = true)} class="mt-1 block w-full text-left">

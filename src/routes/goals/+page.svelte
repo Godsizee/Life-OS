@@ -53,7 +53,7 @@
 	<button
 		onclick={() => (section = 'goals')}
 		class="rounded-full px-3 py-1 text-xs font-medium {section === 'goals'
-			? 'bg-emerald-600 text-white'
+			? 'bg-primary-600 text-white'
 			: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 	>
 		Ziele
@@ -61,7 +61,7 @@
 	<button
 		onclick={() => (section = 'journal')}
 		class="rounded-full px-3 py-1 text-xs font-medium {section === 'journal'
-			? 'bg-emerald-600 text-white'
+			? 'bg-primary-600 text-white'
 			: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 	>
 		Tagebuch

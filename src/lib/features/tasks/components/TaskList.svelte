@@ -9,6 +9,6 @@
 	{#each tasks as task (task.id)}
 		<TaskItem {task} />
 	{:else}
-		<p class="text-sm text-slate-500">Keine Aufgaben.</p>
+		<p class="text-sm text-text-tertiary">Keine Aufgaben.</p>
 	{/each}
 </ul>

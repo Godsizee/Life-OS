@@ -180,7 +180,7 @@
 	});
 
 	const typeColor: Record<string, string> = {
-		action: 'text-emerald-600 dark:text-emerald-400',
+		action: 'text-accent-600 dark:text-accent-400',
 		task: 'text-blue-600 dark:text-blue-400',
 		note: 'text-amber-600 dark:text-amber-400',
 		event: 'text-purple-600 dark:text-purple-400',

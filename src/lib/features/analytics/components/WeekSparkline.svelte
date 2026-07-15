@@ -60,7 +60,7 @@
 	<!-- Trend Indicator -->
 	<div class="flex items-center gap-1">
 		{#if trend() === 'up'}
-			<span class="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-xs font-bold text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
+			<span class="flex h-6 w-6 items-center justify-center rounded-lg bg-primary-50 text-xs font-bold text-primary-600 dark:bg-primary-950/30 dark:text-primary-400">
 				↑
 			</span>
 		{:else}

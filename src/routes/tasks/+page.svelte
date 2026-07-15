@@ -40,7 +40,7 @@
 		<button
 			onclick={() => (selectedProject = null)}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedProject === null
-				? 'bg-emerald-600 text-white'
+				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 		>
 			Alle
@@ -49,7 +49,7 @@
 			<button
 				onclick={() => (selectedProject = project.id)}
 				class="rounded-full px-3 py-1 text-xs font-medium {selectedProject === project.id
-					? 'bg-emerald-600 text-white'
+					? 'bg-primary-600 text-white'
 					: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
 			>
 				{project.name}

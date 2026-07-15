@@ -55,7 +55,7 @@
 				aria-label={m.value}
 				class="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl text-xl xs:text-2xl transition-all {mood ===
 				m.value
-					? 'bg-emerald-100 dark:bg-emerald-950/40 ring-2 ring-emerald-600 dark:ring-emerald-400'
+					? 'bg-primary-100 dark:bg-primary-950/40 ring-2 ring-primary-600 dark:ring-primary-400'
 					: 'bg-surface-2 hover:bg-surface-3 text-text-primary'}"
 			>
 				{m.label}
@@ -67,7 +67,7 @@
 		onblur={save}
 		rows={4}
 		placeholder="Wie war dein Tag?"
-		class="w-full rounded-xl border border-border-color bg-surface-1 p-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-emerald-500 focus:outline-none transition-colors duration-200"
+		class="w-full rounded-xl border border-border-color bg-surface-1 p-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
 	></textarea>
 	<Button onclick={save}>
 		{#snippet children()}

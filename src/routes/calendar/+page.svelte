@@ -115,7 +115,7 @@
 			class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors {layers[
 				def.key
 			]
-				? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
 				: 'border-border-color bg-surface-1 text-text-tertiary'}"
 			aria-pressed={layers[def.key]}
 		>
@@ -140,7 +140,7 @@
 					<button
 						onclick={() => habitsState.toggleToday(habit.id)}
 						class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 {logged
-							? 'border-emerald-500 bg-emerald-500 text-white'
+							? 'border-primary-500 bg-primary-500 text-white'
 							: 'border-border-color text-transparent'}"
 						aria-label={logged ? 'Als offen markieren' : 'Als erledigt markieren'}
 					>

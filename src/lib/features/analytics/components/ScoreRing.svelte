@@ -10,7 +10,7 @@
 	// Select color theme based on score level
 	const colorClass = $derived(
 		score >= 80
-			? 'stroke-emerald-500'
+			? 'stroke-primary-500'
 			: score >= 50
 				? 'stroke-primary-500 dark:stroke-primary-400'
 				: score >= 20
@@ -20,7 +20,7 @@
 	
 	const textClass = $derived(
 		score >= 80
-			? 'text-emerald-600 dark:text-emerald-400'
+			? 'text-primary-600 dark:text-primary-400'
 			: score >= 50
 				? 'text-primary-active'
 				: score >= 20
