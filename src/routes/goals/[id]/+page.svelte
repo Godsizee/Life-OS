@@ -13,6 +13,7 @@
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck } from 'lucide-svelte';
+	import Select from '$lib/ui/Select.svelte';
 	import type { GoalStatus } from '$lib/features/goals/types';
 
 	const goalId = $derived(page.params.id);
@@ -124,15 +125,11 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<select
-					value={goal.status}
-					onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}
-					class="min-h-11 rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-primary focus:border-primary-500 focus:outline-none"
-				>
+				<Select value={goal.status} onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}>
 					{#each Object.entries(statusLabel) as [value, label] (value)}
 						<option {value}>{label}</option>
 					{/each}
-				</select>
+				</Select>
 			</div>
 		</header>
 
@@ -186,12 +183,12 @@
 				</ul>
 			{/if}
 			{#if unlinkedTasks.length > 0}
-				<select onchange={linkTask} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-primary-500 focus:outline-none">
+				<Select onchange={linkTask}>
 					<option value="">+ Aufgabe verknüpfen…</option>
 					{#each unlinkedTasks as task (task.id)}
 						<option value={task.id}>{task.title}</option>
 					{/each}
-				</select>
+				</Select>
 			{/if}
 		</section>
 
@@ -214,12 +211,12 @@
 				</ul>
 			{/if}
 			{#if unlinkedHabits.length > 0}
-				<select onchange={linkHabit} class="min-h-11 w-full rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-text-secondary focus:border-primary-500 focus:outline-none">
+				<Select onchange={linkHabit}>
 					<option value="">+ Routine verknüpfen…</option>
 					{#each unlinkedHabits as habit (habit.id)}
 						<option value={habit.id}>{habit.name}</option>
 					{/each}
-				</select>
+				</Select>
 			{/if}
 		</section>
 

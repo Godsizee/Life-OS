@@ -7,6 +7,7 @@
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { isDueOn, calculateStreak } from '$lib/features/habits/streak';
+	import Textarea from '$lib/ui/Textarea.svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -318,32 +319,17 @@
 
 		<label class="flex flex-col gap-1.5">
 			<span class="text-sm font-medium text-text-secondary">🌟 Was lief diese Woche gut?</span>
-			<textarea
-				bind:value={reflGood}
-				rows="3"
-				placeholder="z.B. Alle Habits eingehalten, ein schwieriges Gespräch geführt…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
-			></textarea>
+			<Textarea bind:value={reflGood} rows={3} placeholder="z.B. Alle Habits eingehalten, ein schwieriges Gespräch geführt…" />
 		</label>
 
 		<label class="flex flex-col gap-1.5">
 			<span class="text-sm font-medium text-text-secondary">💪 Was war schwer oder hat nicht geklappt?</span>
-			<textarea
-				bind:value={reflHard}
-				rows="3"
-				placeholder="z.B. Ablenkungen, zu viele Aufgaben auf einmal…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
-			></textarea>
+			<Textarea bind:value={reflHard} rows={3} placeholder="z.B. Ablenkungen, zu viele Aufgaben auf einmal…" />
 		</label>
 
 		<label class="flex flex-col gap-1.5">
 			<span class="text-sm font-medium text-text-secondary">🔄 Was ändere ich nächste Woche?</span>
-			<textarea
-				bind:value={reflChange}
-				rows="3"
-				placeholder="z.B. Früher schlafen, täglich 1 Priorität setzen…"
-				class="rounded-xl border border-border-color bg-surface-0 px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
-			></textarea>
+			<Textarea bind:value={reflChange} rows={3} placeholder="z.B. Früher schlafen, täglich 1 Priorität setzen…" />
 		</label>
 
 		<div class="flex gap-3">

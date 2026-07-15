@@ -22,6 +22,7 @@
 
 	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Card from '$lib/ui/Card.svelte';
 	import SuggestionCarousel from '$lib/features/suggestions/components/SuggestionCarousel.svelte';
 	import DailyBrief from '$lib/features/dashboard/components/DailyBrief.svelte';
 	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
@@ -260,7 +261,7 @@
 				id="quick-add-input"
 				bind:value={quickAdd}
 				placeholder="Schnelleingabe… (z.B. 3x Eier, Morgen 10:00 Meeting, 75kg, Laufen) (Taste n)"
-				class="min-h-12 w-full rounded-2xl border border-border-color bg-surface-0 pl-4 pr-12 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
+				class="min-h-12 w-full rounded-2xl border border-border-color bg-surface-0 pl-4 pr-12 text-base text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
 			/>
 			<button
 				type="submit"
@@ -328,7 +329,7 @@
 	<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		<!-- Today Events Card -->
 		<svelte:boundary onerror={(err) => console.error('Error in Calendar card:', err)}>
-			<div class="glass-card rounded-2xl p-5 premium-shadow flex flex-col justify-between min-h-[220px]">
+			<Card shadow class="p-5 flex flex-col justify-between min-h-[220px]">
 				<div>
 					<h3 class="font-bold text-text-primary text-sm tracking-tight mb-3">Kalender heute</h3>
 					{#if calendarState.loading}
@@ -352,9 +353,9 @@
 					{/if}
 				</div>
 				<a href="/calendar" class="mt-4 text-xs font-bold text-primary-active hover:underline inline-block">Kalender öffnen →</a>
-			</div>
+			</Card>
 			{#snippet failed(error, reset)}
-				<div class="glass-card rounded-2xl p-5 premium-shadow border border-red-500/20 text-center flex flex-col justify-center items-center min-h-[220px]">
+				<div class="bg-surface-0 rounded-2xl border border-red-500/20 premium-shadow text-center flex flex-col justify-center items-center min-h-[220px]">
 					<p class="text-sm font-bold text-red-600 dark:text-red-400">Kalender Fehler</p>
 					<button onclick={reset} class="mt-2 text-xs font-bold text-primary-active underline">Erneut versuchen</button>
 				</div>
@@ -363,7 +364,7 @@
 
 		<!-- Habits Card -->
 		<svelte:boundary onerror={(err) => console.error('Error in Habits card:', err)}>
-			<div class="glass-card rounded-2xl p-5 premium-shadow flex flex-col justify-between min-h-[220px]">
+			<Card shadow class="p-5 flex flex-col justify-between min-h-[220px]">
 				<div>
 					<h3 class="font-bold text-text-primary text-sm tracking-tight mb-3">Gewohnheiten heute</h3>
 					{#if habitsState.loading}
@@ -384,9 +385,9 @@
 					{/if}
 				</div>
 				<a href="/habits" class="mt-4 text-xs font-bold text-primary-active hover:underline inline-block">Routinen öffnen →</a>
-			</div>
+			</Card>
 			{#snippet failed(error, reset)}
-				<div class="glass-card rounded-2xl p-5 premium-shadow border border-red-500/20 text-center flex flex-col justify-center items-center min-h-[220px]">
+				<div class="bg-surface-0 rounded-2xl border border-red-500/20 premium-shadow text-center flex flex-col justify-center items-center min-h-[220px]">
 					<p class="text-sm font-bold text-red-600 dark:text-red-400">Habits Fehler</p>
 					<button onclick={reset} class="mt-2 text-xs font-bold text-primary-active underline">Erneut versuchen</button>
 				</div>
@@ -395,7 +396,7 @@
 
 		<!-- Shopping Card -->
 		<svelte:boundary onerror={(err) => console.error('Error in Shopping card:', err)}>
-			<div class="glass-card rounded-2xl p-5 premium-shadow flex flex-col justify-between min-h-[220px]">
+			<Card shadow class="p-5 flex flex-col justify-between min-h-[220px]">
 				<div>
 					<h3 class="font-bold text-text-primary text-sm tracking-tight mb-3">Einkaufshighlights</h3>
 					{#if shoppingState.loading}
@@ -415,9 +416,9 @@
 					{/if}
 				</div>
 				<a href="/shopping" class="mt-4 text-xs font-bold text-primary-active hover:underline inline-block">Alle Einkäufe →</a>
-			</div>
+			</Card>
 			{#snippet failed(error, reset)}
-				<div class="glass-card rounded-2xl p-5 premium-shadow border border-red-500/20 text-center flex flex-col justify-center items-center min-h-[220px]">
+				<div class="bg-surface-0 rounded-2xl border border-red-500/20 premium-shadow text-center flex flex-col justify-center items-center min-h-[220px]">
 					<p class="text-sm font-bold text-red-600 dark:text-red-400">Einkauf Fehler</p>
 					<button onclick={reset} class="mt-2 text-xs font-bold text-primary-active underline">Erneut versuchen</button>
 				</div>
@@ -426,7 +427,7 @@
 
 		<!-- Health Quick Log Panel -->
 		<svelte:boundary onerror={(err) => console.error('Error in Health card:', err)}>
-			<div class="glass-card rounded-2xl p-5 premium-shadow flex flex-col justify-between min-h-[220px]">
+			<Card shadow class="p-5 flex flex-col justify-between min-h-[220px]">
 				<div class="space-y-4">
 					<h3 class="font-bold text-text-primary text-sm tracking-tight">Gesundheitstracker</h3>
 					{#if healthState.loading}
@@ -456,9 +457,9 @@
 					{/if}
 				</div>
 				<a href="/health" class="text-xs font-bold text-primary-active hover:underline inline-block mt-4">Gesundheit öffnen →</a>
-			</div>
+			</Card>
 			{#snippet failed(error, reset)}
-				<div class="glass-card rounded-2xl p-5 premium-shadow border border-red-500/20 text-center flex flex-col justify-center items-center min-h-[220px]">
+				<div class="bg-surface-0 rounded-2xl border border-red-500/20 premium-shadow text-center flex flex-col justify-center items-center min-h-[220px]">
 					<p class="text-sm font-bold text-red-600 dark:text-red-400">Gesundheit Fehler</p>
 					<button onclick={reset} class="mt-2 text-xs font-bold text-primary-active underline">Erneut versuchen</button>
 				</div>
@@ -467,7 +468,7 @@
 
 		<!-- Pinned Notes Card -->
 		<svelte:boundary onerror={(err) => console.error('Error in Notes card:', err)}>
-			<div class="glass-card rounded-2xl p-5 premium-shadow flex flex-col justify-between min-h-[220px]">
+			<Card shadow class="p-5 flex flex-col justify-between min-h-[220px]">
 				<div>
 					<h3 class="font-bold text-text-primary text-sm tracking-tight mb-3">Angepinnte Notizen</h3>
 					{#if notesState.loading}
@@ -493,9 +494,9 @@
 					{/if}
 				</div>
 				<a href="/notes" class="mt-4 text-xs font-bold text-primary-active hover:underline inline-block">Notizen öffnen →</a>
-			</div>
+			</Card>
 			{#snippet failed(error, reset)}
-				<div class="glass-card rounded-2xl p-5 premium-shadow border border-red-500/20 text-center flex flex-col justify-center items-center min-h-[220px]">
+				<div class="bg-surface-0 rounded-2xl border border-red-500/20 premium-shadow text-center flex flex-col justify-center items-center min-h-[220px]">
 					<p class="text-sm font-bold text-red-600 dark:text-red-400">Notizen Fehler</p>
 					<button onclick={reset} class="mt-2 text-xs font-bold text-primary-active underline">Erneut versuchen</button>
 				</div>

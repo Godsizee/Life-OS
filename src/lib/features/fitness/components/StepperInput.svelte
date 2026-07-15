@@ -53,7 +53,7 @@
 		{placeholder}
 		{step}
 		aria-label={label}
-		class="h-11 w-12 min-w-0 border-x border-border-color bg-transparent text-center text-sm text-text-primary focus:outline-none"
+		class="h-11 w-12 min-w-0 border-x border-border-color bg-transparent text-center text-base text-text-primary focus:outline-none"
 	/>
 	<button
 		type="button"
