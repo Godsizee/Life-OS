@@ -29,7 +29,7 @@
 	</div>
 
 	<!-- Carousel Container -->
-	<div class="flex w-full gap-4 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
+	<div class="flex w-full min-w-0 gap-4 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory">
 		{#each suggestions as item (item.id)}
 			<div class="glass-card snap-start flex w-full shrink-0 flex-col justify-between rounded-2xl p-5 premium-shadow transition-all md:w-[calc(50%-8px)] lg:w-[calc(33.33%-11px)]">
 				<div class="flex items-start gap-4">

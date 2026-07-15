@@ -79,7 +79,7 @@
 	{/if}
 
 	<div
-		class="flex flex-1 flex-col transition-all duration-300 ease-in-out pt-safe pl-safe pr-safe
+		class="flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out pt-safe pl-safe pr-safe
 			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
 			{showNav ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 	>
