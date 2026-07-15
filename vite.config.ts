@@ -31,8 +31,8 @@ export default defineConfig({
 				name: 'Life OS',
 				short_name: 'Life',
 				description: 'Midweight Life OS',
-				theme_color: '#f8fafc',
-				background_color: '#f8fafc',
+				theme_color: '#F6F6F8',
+				background_color: '#F6F6F8',
 				display: 'standalone',
 				icons: [
 					{

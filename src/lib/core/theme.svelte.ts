@@ -14,6 +14,13 @@ function createThemeState() {
 			isDark = stored === 'dark';
 		} else {
 			isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			// Ohne gespeicherte Präferenz folgt die App live dem OS-Theme.
+			const mql = window.matchMedia('(prefers-color-scheme: dark)');
+			mql.addEventListener('change', (e) => {
+				if (localStorage.getItem('theme')) return;
+				isDark = e.matches;
+				apply();
+			});
 		}
 		apply();
 	}
@@ -27,7 +34,7 @@ function createThemeState() {
 		}
 		// Status-Bar-Farbe der installierten PWA synchron zum Theme halten.
 		const meta = document.getElementById('theme-color-meta');
-		if (meta) meta.setAttribute('content', isDark ? '#0a0416' : '#f8fafc');
+		if (meta) meta.setAttribute('content', isDark ? '#0E0E12' : '#F6F6F8');
 	}
 
 	function toggle() {
