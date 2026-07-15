@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { Plus } from 'lucide-svelte';
+	import Input from '$lib/ui/Input.svelte';
+	import Select from '$lib/ui/Select.svelte';
+	import Button from '$lib/ui/Button.svelte';
 	import { fitnessState } from '../store.svelte';
 	import type { ExerciseType, PickedExercise } from '../types';
 
@@ -42,43 +45,27 @@
 	}}
 	class="space-y-2"
 >
-	<input
-		bind:value={nameDe}
-		placeholder="Übungsname..."
-		class="min-h-9 w-full rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-	/>
+	<Input bind:value={nameDe} placeholder="Übungsname..." />
 	<div class="grid grid-cols-2 gap-2">
-		<input
-			bind:value={muscleGroup}
-			list="fitness-muscle-groups"
-			placeholder="Muskelgruppe (optional)"
-			class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-		/>
+		<Input bind:value={muscleGroup} list="fitness-muscle-groups" placeholder="Muskelgruppe (optional)" />
 		<datalist id="fitness-muscle-groups">
 			{#each fitnessState.availableMuscleGroups as group}
 				<option value={group}></option>
 			{/each}
 		</datalist>
-		<input
-			bind:value={equipment}
-			placeholder="Equipment (optional)"
-			class="min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-		/>
+		<Input bind:value={equipment} placeholder="Equipment (optional)" />
 	</div>
-	<select
-		bind:value={exerciseType}
-		class="min-h-9 w-full rounded-lg border border-border-color bg-surface-0 px-2 text-xs text-text-primary"
-	>
+	<Select bind:value={exerciseType}>
 		<option value="strength">Kraft (Sätze × Reps × Gewicht)</option>
 		<option value="cardio">Cardio (Zeit + Strecke)</option>
 		<option value="duration">Zeitbasiert (nur Dauer)</option>
-	</select>
-	<button
-		type="submit"
-		disabled={!nameDe.trim() || submitting}
-		class="w-full min-h-9 bg-surface-2 hover:bg-surface-3 text-text-primary font-bold text-xs rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
-	>
-		<Plus size={13} />
-		<span>Eigene Übung anlegen</span>
-	</button>
+	</Select>
+	<Button type="submit" variant="secondary" disabled={!nameDe.trim() || submitting}>
+		{#snippet children()}
+			<span class="flex items-center justify-center gap-2">
+				<Plus size={13} />
+				<span>Eigene Übung anlegen</span>
+			</span>
+		{/snippet}
+	</Button>
 </form>

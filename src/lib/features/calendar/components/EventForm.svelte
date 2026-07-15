@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import Select from '$lib/ui/Select.svelte';
 	import { calendarState } from '../store.svelte';
 
 	type Recurrence = 'none' | 'daily' | 'weekly';
@@ -41,30 +42,18 @@
 
 <form onsubmit={submit} class="flex flex-col gap-2">
 	<Input placeholder="Titel…" bind:value={title} required />
-	<input
-		type="datetime-local"
-		bind:value={start}
-		required
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-	/>
-	<input
-		type="datetime-local"
-		bind:value={end}
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-	/>
+	<Input type="datetime-local" bind:value={start} required />
+	<Input type="datetime-local" bind:value={end} />
 	<Input placeholder="Ort (optional)…" bind:value={location} />
 	<label class="flex min-h-12 items-center gap-2 text-sm text-text-secondary">
 		<input type="checkbox" bind:checked={allDay} class="h-5 w-5" />
 		Ganztägig
 	</label>
-	<select
-		bind:value={recurrence}
-		class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-	>
+	<Select bind:value={recurrence}>
 		<option value="none">Einmalig</option>
 		<option value="daily">Täglich</option>
 		<option value="weekly">Wöchentlich</option>
-	</select>
+	</Select>
 	<Button type="submit">
 		{#snippet children()}
 			Hinzufügen

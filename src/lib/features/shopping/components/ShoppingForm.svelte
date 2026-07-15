@@ -27,19 +27,11 @@
 		</Button>
 	</div>
 	<div class="flex gap-2">
-		<input
-			type="number"
-			min="0"
-			step="0.5"
-			placeholder="Menge"
-			bind:value={qty}
-			class="min-h-12 w-20 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-		/>
-		<input
-			type="text"
-			placeholder="Einheit (optional)"
-			bind:value={unit}
-			class="min-h-12 flex-1 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-		/>
+		<div class="w-20">
+			<Input type="number" min="0" step="0.5" placeholder="Menge" bind:value={qty} />
+		</div>
+		<div class="flex-1">
+			<Input type="text" placeholder="Einheit (optional)" bind:value={unit} />
+		</div>
 	</div>
 </form>

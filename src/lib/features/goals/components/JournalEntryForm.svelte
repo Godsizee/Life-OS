@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
+	import Textarea from '$lib/ui/Textarea.svelte';
 	import { goalsState } from '../store.svelte';
 	import { buildDayContext } from '../day-context';
 	import DayContextStrip from './DayContextStrip.svelte';
@@ -62,13 +63,7 @@
 			</button>
 		{/each}
 	</div>
-	<textarea
-		bind:value={body}
-		onblur={save}
-		rows={4}
-		placeholder="Wie war dein Tag?"
-		class="w-full rounded-xl border border-border-color bg-surface-1 p-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-	></textarea>
+	<Textarea bind:value={body} onblur={save} rows={4} placeholder="Wie war dein Tag?" surface="1" />
 	<Button onclick={save}>
 		{#snippet children()}
 			Speichern

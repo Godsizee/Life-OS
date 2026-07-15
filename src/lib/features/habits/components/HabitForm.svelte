@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import Select from '$lib/ui/Select.svelte';
 	import { habitsState } from '../store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 
@@ -74,15 +75,12 @@
 
 	<!-- Ziel-Verknüpfung (#10) -->
 	{#if openGoals.length > 0}
-		<select
-			bind:value={goalId}
-			class="rounded-xl border border-border-color bg-surface-0 px-3 py-2 text-sm text-text-primary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
-		>
+		<Select bind:value={goalId}>
 			<option value="">🎯 Kein Ziel verknüpft</option>
 			{#each openGoals as goal (goal.id)}
 				<option value={goal.id}>{goal.title}</option>
 			{/each}
-		</select>
+		</Select>
 	{/if}
 
 	<Button type="submit">

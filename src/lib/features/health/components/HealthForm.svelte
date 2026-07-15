@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { healthState } from '../store.svelte';
+	import Field from '$lib/ui/Field.svelte';
+	import Input from '$lib/ui/Input.svelte';
+	import Button from '$lib/ui/Button.svelte';
 
 	let weight = $state('');
 	let sleep = $state('');
@@ -76,34 +79,18 @@
 	</div>
 
 	<!-- Schlaf -->
-	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-primary">😴 Schlaf (Stunden)</span>
-		<input
-			type="number"
-			bind:value={sleep}
-			min="0" max="24" step="0.5"
-			placeholder="z.B. 7.5"
-			class="min-h-11 rounded-xl border border-border-color bg-surface-0 px-4 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-		/>
-	</label>
+	<Field label="😴 Schlaf (Stunden)">
+		<Input type="number" bind:value={sleep} min="0" max="24" step="0.5" placeholder="z.B. 7.5" />
+	</Field>
 
 	<!-- Gewicht (optional) -->
-	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-primary">⚖️ Gewicht (kg, optional)</span>
-		<input
-			type="number"
-			bind:value={weight}
-			min="0" max="500" step="0.1"
-			placeholder="z.B. 72.5"
-			class="min-h-11 rounded-xl border border-border-color bg-surface-0 px-4 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-		/>
-	</label>
+	<Field label="⚖️ Gewicht (kg, optional)">
+		<Input type="number" bind:value={weight} min="0" max="500" step="0.1" placeholder="z.B. 72.5" />
+	</Field>
 
-	<button
-		onclick={save}
-		disabled={saving}
-		class="min-h-12 rounded-xl bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 text-sm font-medium text-white active:scale-95 disabled:opacity-60 transition-all"
-	>
-		{saving ? 'Speichere…' : '✓ Speichern'}
-	</button>
+	<Button onclick={save} disabled={saving}>
+		{#snippet children()}
+			{saving ? 'Speichere…' : '✓ Speichern'}
+		{/snippet}
+	</Button>
 </div>

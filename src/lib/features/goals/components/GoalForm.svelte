@@ -66,31 +66,15 @@
 	{#if goalType === 'pr'}
 		<div class="flex gap-2">
 			<Input placeholder="Übung (z. B. Kreuzheben)" bind:value={targetExercise} />
-			<input
-				type="number"
-				min="1"
-				step="0.5"
-				placeholder="Ziel-1RM kg"
-				bind:value={targetValue}
-				class="min-h-12 w-32 rounded-xl border border-border-color bg-surface-0 px-3 text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
+			<div class="w-32">
+				<Input type="number" min="1" step="0.5" placeholder="Ziel-1RM kg" bind:value={targetValue} />
+			</div>
 		</div>
 	{:else if goalType === 'fitness_frequency'}
-		<input
-			type="number"
-			min="1"
-			max="14"
-			placeholder="Trainings/Woche"
-			bind:value={targetValue}
-			class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none"
-		/>
+		<Input type="number" min="1" max="14" placeholder="Trainings/Woche" bind:value={targetValue} />
 	{/if}
 
-	<input
-		type="date"
-		bind:value={targetDate}
-		class="min-h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-	/>
+	<Input type="date" bind:value={targetDate} />
 	<Button type="submit">
 		{#snippet children()}
 			Hinzufügen
