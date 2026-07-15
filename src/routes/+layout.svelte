@@ -73,15 +73,15 @@
 <CommandPalette bind:open={paletteOpen} />
 <Toaster />
 
-<div class="flex min-h-screen bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
+<div class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
 	{#if showNav}
 		<SidebarNav currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 	{/if}
 
 	<div
-		class="flex flex-1 flex-col transition-all duration-300 ease-in-out
+		class="flex flex-1 flex-col transition-all duration-300 ease-in-out pt-safe pl-safe pr-safe
 			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
-			{showNav ? 'pb-16 md:pb-0' : ''}"
+			{showNav ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 	>
 		{#if syncBanner}
 			<button

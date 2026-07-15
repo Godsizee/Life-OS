@@ -19,20 +19,22 @@
 	}
 </script>
 
-<nav class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] md:hidden transition-colors duration-300">
-	<div class="relative flex h-16 items-center justify-around px-2 xs:px-4">
+<nav
+	class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] pl-safe pr-safe md:hidden select-none-native transition-colors duration-300"
+>
+	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1 xs:px-3">
 		{#each leftItems as item}
 			{@const Icon = item.icon}
 			{@const active = currentPath === item.path}
 			<a
 				href={item.path}
 				onclick={triggerVibration}
-				class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-2 xs:px-3 relative
+				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
 					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
 					active:scale-95 transition-transform"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="text-[10px] font-medium xs:text-xs">{item.name}</span>
+				<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">{item.name}</span>
 				{#if active}
 					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
 				{/if}
@@ -43,9 +45,9 @@
 		<a
 			href="/focus"
 			onclick={triggerVibration}
-			class="relative -top-5 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all active:scale-90 premium-shadow
-				{currentPath === '/focus' 
-					? 'bg-primary-800 text-white dark:bg-primary-600' 
+			class="relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full shadow-lg transition-all active:scale-90 premium-shadow
+				{currentPath === '/focus'
+					? 'bg-primary-800 text-white dark:bg-primary-600'
 					: 'bg-primary-700 text-white dark:bg-primary-500'}"
 			aria-label="Fokus-Modus"
 		>
@@ -58,12 +60,12 @@
 			<a
 				href={item.path}
 				onclick={triggerVibration}
-				class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-2 xs:px-3 relative
+				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
 					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
 					active:scale-95 transition-transform"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="text-[10px] font-medium xs:text-xs">{item.name}</span>
+				<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">{item.name}</span>
 				{#if active}
 					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
 				{/if}
@@ -73,12 +75,12 @@
 		<a
 			href="/more"
 			onclick={triggerVibration}
-			class="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-2 xs:px-3 relative
+			class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
 				{currentPath === '/more' ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
 				active:scale-95 transition-transform"
 		>
 			<Settings size={20} strokeWidth={currentPath === '/more' ? 2.5 : 2} />
-			<span class="text-[10px] font-medium xs:text-xs">Mehr</span>
+			<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">Mehr</span>
 			{#if currentPath === '/more'}
 				<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
 			{/if}

@@ -25,6 +25,9 @@ function createThemeState() {
 		} else {
 			document.documentElement.classList.remove('dark');
 		}
+		// Status-Bar-Farbe der installierten PWA synchron zum Theme halten.
+		const meta = document.getElementById('theme-color-meta');
+		if (meta) meta.setAttribute('content', isDark ? '#0a0416' : '#f8fafc');
 	}
 
 	function toggle() {
