@@ -7,6 +7,7 @@
 	import { toastState } from '$lib/core/toast.svelte';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
+	import ListRow from '$lib/ui/ListRow.svelte';
 
 	function linkedPlanIdFor(eventId: string): string | null {
 		return (
@@ -70,8 +71,8 @@
 									item.end
 								).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`}
 						{@const linkedPlanId = linkedPlanIdFor(item.id)}
-						<li class="flex flex-col gap-2 rounded-xl border border-border-color bg-surface-0 p-3 shadow-sm transition-colors duration-200">
-							<div class="flex items-center gap-3">
+						<ListRow align="start" class="shadow-sm">
+							<div class="flex w-full items-center gap-3">
 								<div class="min-w-0 flex-1">
 									<p class="truncate text-sm font-medium text-text-primary">{item.title}</p>
 									<p class="truncate text-xs text-text-secondary">
@@ -106,53 +107,54 @@
 								</button>
 							</div>
 							{#if expandedEventId === item.id}
-								<div class="border-t border-border-color pt-2">
+								<div class="w-full border-t border-border-color pt-2">
 									<LinkedItems type="event" id={item.id} />
 								</div>
 							{/if}
-						</li>
+						</ListRow>
 					{:else}
 						{@const isCompleted = item.status === 'done'}
-						<li class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3 shadow-sm transition-colors duration-200">
-							<button
-								onclick={() => {
-									tasksState.setStatus(item.id, isCompleted ? 'todo' : 'done');
-									toastState.success(isCompleted ? 'Aufgabe als offen markiert' : 'Aufgabe erledigt ✓');
-								}}
-								class="shrink-0 text-text-tertiary hover:text-primary-500 active:scale-90 transition-all"
-								aria-label={isCompleted ? 'Als offen markieren' : 'Als erledigt markieren'}
-							>
-								{#if isCompleted}
-									<CheckCircle2 size={18} class="text-primary-500" />
-								{:else}
-									<Circle size={18} />
-								{/if}
-							</button>
-
-							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium text-text-primary {isCompleted ? 'line-through text-text-tertiary' : ''}">
-									{item.title}
-								</p>
-								<p class="truncate text-[10px] text-text-secondary flex items-center gap-1.5 mt-0.5">
-									<span>Fällig: {new Date(item.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
-									{#if item.priority}
-										<span class="rounded-full border px-1.5 py-0.2 font-semibold uppercase tracking-wider {priorityColors[item.priority]}">
-											{item.priority === 'high' ? 'Prio 1' : item.priority === 'medium' ? 'Prio 2' : 'Prio 3'}
-										</span>
+						<ListRow class="shadow-sm">
+							{#snippet leading()}
+								<button
+									onclick={() => {
+										tasksState.setStatus(item.id, isCompleted ? 'todo' : 'done');
+										toastState.success(isCompleted ? 'Aufgabe als offen markiert' : 'Aufgabe erledigt ✓');
+									}}
+									class="shrink-0 text-text-tertiary hover:text-primary-500 active:scale-90 transition-all"
+									aria-label={isCompleted ? 'Als offen markieren' : 'Als erledigt markieren'}
+								>
+									{#if isCompleted}
+										<CheckCircle2 size={18} class="text-primary-500" />
+									{:else}
+										<Circle size={18} />
 									{/if}
-								</p>
-							</div>
-							<button
-								onclick={() => {
-									tasksState.removeTask(item.id);
-									toastState.success('Aufgabe gelöscht');
-								}}
-								aria-label="Aufgabe löschen"
-								class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
-							>
-								<Trash2 size={16} />
-							</button>
-						</li>
+								</button>
+							{/snippet}
+							<p class="truncate text-sm font-medium text-text-primary {isCompleted ? 'line-through text-text-tertiary' : ''}">
+								{item.title}
+							</p>
+							<p class="truncate text-[10px] text-text-secondary flex items-center gap-1.5 mt-0.5">
+								<span>Fällig: {new Date(item.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
+								{#if item.priority}
+									<span class="rounded-full border px-1.5 py-0.2 font-semibold uppercase tracking-wider {priorityColors[item.priority]}">
+										{item.priority === 'high' ? 'Prio 1' : item.priority === 'medium' ? 'Prio 2' : 'Prio 3'}
+									</span>
+								{/if}
+							</p>
+							{#snippet trailing()}
+								<button
+									onclick={() => {
+										tasksState.removeTask(item.id);
+										toastState.success('Aufgabe gelöscht');
+									}}
+									aria-label="Aufgabe löschen"
+									class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
+								>
+									<Trash2 size={16} />
+								</button>
+							{/snippet}
+						</ListRow>
 					{/if}
 				{/each}
 			</ul>

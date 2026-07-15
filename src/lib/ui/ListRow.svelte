@@ -5,16 +5,22 @@
 		leading,
 		trailing,
 		children,
+		align = 'center',
 		class: className = ''
 	}: {
 		leading?: Snippet;
 		trailing?: Snippet;
 		children?: Snippet;
+		align?: 'center' | 'start';
 		class?: string;
 	} = $props();
 </script>
 
-<li class="flex min-h-12 items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3 {className}">
+<li
+	class="flex min-h-12 gap-3 rounded-xl border border-border-color bg-surface-0 p-3 {align === 'start'
+		? 'items-start'
+		: 'items-center'} {className}"
+>
 	{#if leading}
 		<div class="shrink-0">{@render leading()}</div>
 	{/if}

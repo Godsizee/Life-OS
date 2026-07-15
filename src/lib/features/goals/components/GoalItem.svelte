@@ -6,6 +6,7 @@
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
 	import { getGoalProgress } from '../progress';
+	import ListRow from '$lib/ui/ListRow.svelte';
 
 	let { goal }: { goal: Goal } = $props();
 
@@ -25,12 +26,12 @@
 	const displayProgress = $derived(getGoalProgress(goal));
 </script>
 
-<li class="rounded-xl border border-border-color bg-surface-0 p-3">
-	<div class="flex items-start justify-between gap-2">
-		<a href="/goals/{goal.id}" class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline">
-			{goal.title}
-			{#if goal.goal_type === 'pr'}<span class="ml-1 text-xs">🏋️</span>{/if}
-		</a>
+<ListRow align="start">
+	<a href="/goals/{goal.id}" class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline">
+		{goal.title}
+		{#if goal.goal_type === 'pr'}<span class="ml-1 text-xs">🏋️</span>{/if}
+	</a>
+	{#snippet trailing()}
 		<button
 			onclick={() => goalsState.removeGoal(goal.id)}
 			aria-label="Löschen"
@@ -38,7 +39,7 @@
 		>
 			<Trash2 size={18} />
 		</button>
-	</div>
+	{/snippet}
 
 	<!-- Fortschritts-Balken -->
 	<div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
@@ -128,4 +129,4 @@
 			{/each}
 		</select>
 	</div>
-</li>
+</ListRow>
