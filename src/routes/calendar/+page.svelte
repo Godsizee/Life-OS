@@ -8,9 +8,11 @@
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { isDueOn } from '$lib/features/habits/streak';
 	import { toISODate } from '$lib/core/date';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import EventForm from '$lib/features/calendar/components/EventForm.svelte';
 	import AgendaList from '$lib/features/calendar/components/AgendaList.svelte';
 	import { Calendar, CheckSquare, Repeat } from 'lucide-svelte';
+	import Chip from '$lib/ui/Chip.svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -102,26 +104,16 @@
 	<title>Kalender - Life OS</title>
 </svelte:head>
 
-<header class="mb-4">
-	<h1 class="text-2xl font-bold tracking-tight">Kalender & Termine</h1>
-</header>
+<PageHeader title="Kalender & Termine" />
 
 <!-- Layer-Umschalter -->
 <div class="mb-4 flex flex-wrap gap-2">
 	{#each layerDefs as def (def.key)}
 		{@const Icon = def.icon}
-		<button
-			onclick={() => toggleLayer(def.key)}
-			class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors {layers[
-				def.key
-			]
-				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
-				: 'border-border-color bg-surface-1 text-text-tertiary'}"
-			aria-pressed={layers[def.key]}
-		>
+		<Chip selected={layers[def.key]} onclick={() => toggleLayer(def.key)}>
 			<Icon size={13} />
 			{def.label}
-		</button>
+		</Chip>
 	{/each}
 </div>
 

@@ -5,6 +5,7 @@
 	import NoteForm from '$lib/features/notes/components/NoteForm.svelte';
 	import NoteList from '$lib/features/notes/components/NoteList.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	let search = $state('');
 
@@ -32,9 +33,7 @@
 	<title>Notizen - Life OS</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-2xl font-bold tracking-tight">Notizen</h1>
-</header>
+<PageHeader title="Notizen" />
 
 <section class="mb-4">
 	<NoteForm />

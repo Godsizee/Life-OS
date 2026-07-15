@@ -8,6 +8,8 @@
 	import { calendarState } from '$lib/features/calendar/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell } from 'lucide-svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Chip from '$lib/ui/Chip.svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -163,36 +165,17 @@
 
 <div class="space-y-6">
 	<!-- Header -->
-	<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-		<div>
-			<h1 class="text-3xl font-extrabold tracking-tight text-text-primary">Timeline</h1>
-			<p class="text-sm font-medium text-text-secondary">Verfolge all deine Aktivitäten und Fortschritte chronologisch.</p>
-		</div>
-
-		<!-- Filter Chip-row -->
-		<div class="flex gap-2 overflow-x-auto pb-1">
-			<button
-				onclick={() => filterModule = 'all'}
-				class="rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
-					{filterModule === 'all' 
-						? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600' 
-						: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
-			>
-				Alle
-			</button>
-			{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness'] as mod}
-				<button
-					onclick={() => filterModule = mod}
-					class="rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
-						{filterModule === mod 
-							? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600' 
-							: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
-				>
-					{mod}
-				</button>
-			{/each}
-		</div>
-	</div>
+	<PageHeader title="Timeline" subtitle="Verfolge all deine Aktivitäten und Fortschritte chronologisch.">
+		{#snippet trailing()}
+			<!-- Filter Chip-row -->
+			<div class="flex gap-2 overflow-x-auto pb-1">
+				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alle</Chip>
+				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness'] as mod}
+					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
+				{/each}
+			</div>
+		{/snippet}
+	</PageHeader>
 
 	<!-- Timeline List -->
 	<div class="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-color">

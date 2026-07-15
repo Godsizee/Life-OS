@@ -272,7 +272,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-3xl font-extrabold tracking-tight text-text-primary flex items-center gap-2">
+			<h1 class="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2">
 				<Dumbbell size={28} class="text-primary-600 dark:text-primary-400" />
 				<span>Fitness</span>
 			</h1>

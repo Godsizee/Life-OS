@@ -6,6 +6,7 @@
 	import HabitForm from '$lib/features/habits/components/HabitForm.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
 	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -27,9 +28,7 @@
 	<title>Gewohnheiten - Life OS</title>
 </svelte:head>
 
-<header class="mb-4">
-	<h1 class="text-2xl font-bold tracking-tight">Gewohnheiten</h1>
-</header>
+<PageHeader title="Gewohnheiten" />
 
 <!-- Heatmap -->
 {#if habitsState.habits.length > 0}

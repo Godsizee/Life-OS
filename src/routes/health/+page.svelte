@@ -2,6 +2,7 @@
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import HealthForm from '$lib/features/health/components/HealthForm.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	$effect(() => {
 		if (workspaceState.workspace?.id) healthState.load();
@@ -20,10 +21,7 @@
 	<title>Gesundheit - Life OS</title>
 </svelte:head>
 
-<header class="mb-4">
-	<h1 class="text-2xl font-bold tracking-tight">Körper & Gesundheit</h1>
-	<p class="text-sm text-text-secondary">Täglicher Check-in</p>
-</header>
+<PageHeader title="Körper & Gesundheit" subtitle="Täglicher Check-in" />
 
 <!-- Tages-Form -->
 <div class="mb-4 rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">

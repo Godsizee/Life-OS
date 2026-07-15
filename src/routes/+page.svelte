@@ -21,6 +21,7 @@
 	import { parseNLPInput } from '$lib/core/nlp-parse';
 
 	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import SuggestionCarousel from '$lib/features/suggestions/components/SuggestionCarousel.svelte';
 	import DailyBrief from '$lib/features/dashboard/components/DailyBrief.svelte';
 	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
@@ -217,17 +218,14 @@
 
 <div class="space-y-6">
 	<!-- Header Zone -->
-	<header class="flex items-center justify-between">
-		<div>
-			<h1 class="text-3xl font-extrabold tracking-tight text-text-primary">{greeting} 👋</h1>
-			<p class="text-sm font-medium text-text-secondary">{todayLabel}</p>
-		</div>
-
-		<!-- Clickable Score Ring linked to Analytics Page -->
-		<a href="/analytics" class="transition-transform duration-300 hover:scale-105" aria-label="Details zum Score">
-			<ScoreRing score={analyticsState.todayScore()} size={90} />
-		</a>
-	</header>
+	<PageHeader title="{greeting} 👋" subtitle={todayLabel}>
+		{#snippet trailing()}
+			<!-- Clickable Score Ring linked to Analytics Page -->
+			<a href="/analytics" class="transition-transform duration-300 hover:scale-105" aria-label="Details zum Score">
+				<ScoreRing score={analyticsState.todayScore()} size={90} />
+			</a>
+		{/snippet}
+	</PageHeader>
 
 	<!-- Daily Brief (Welle 5.6) -->
 	<DailyBrief />

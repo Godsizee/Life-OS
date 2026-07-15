@@ -5,6 +5,7 @@
 	import MoodPicker from '$lib/features/mood/components/MoodPicker.svelte';
 	import { MOOD_LABELS } from '$lib/features/mood/types';
 	import { Angry, Frown, Meh, Smile, SmilePlus } from 'lucide-svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	$effect(() => {
 		if (workspaceState.workspace?.id) moodState.load();
@@ -65,10 +66,10 @@
 	<title>Stimmung - Life OS</title>
 </svelte:head>
 
-<header class="mb-4">
-	<h1 class="text-2xl font-bold tracking-tight">Wie geht's dir?</h1>
-	<p class="text-sm text-text-secondary">{new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-</header>
+<PageHeader
+	title="Wie geht's dir?"
+	subtitle={new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
+/>
 
 <!-- Heute-Picker -->
 <div class="mb-4 rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">

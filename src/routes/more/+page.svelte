@@ -11,6 +11,7 @@
 	import MemberList from '$lib/features/workspace/components/MemberList.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import Button from '$lib/ui/Button.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	const moreLinks = modules.filter((m) =>
 		['habits', 'shopping', 'goals', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
@@ -28,10 +29,7 @@
 	<title>Mehr - Life OS</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-2xl font-bold tracking-tight">Mehr</h1>
-	<p class="text-text-secondary">{workspaceState.workspace?.name ?? ''}</p>
-</header>
+<PageHeader title="Mehr" subtitle={workspaceState.workspace?.name ?? ''} />
 
 <section class="flex flex-col gap-6">
 	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">

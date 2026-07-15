@@ -141,7 +141,7 @@
 <!-- Progress-Bar -->
 <div class="mb-6">
 	<div class="mb-2 flex items-center justify-between">
-		<h1 class="text-xl font-bold text-text-primary">📋 Weekly Review</h1>
+		<h1 class="text-2xl font-bold tracking-tight text-text-primary">📋 Weekly Review</h1>
 		<span class="text-sm text-text-secondary">{step}/{TOTAL_STEPS}</span>
 	</div>
 	<div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">

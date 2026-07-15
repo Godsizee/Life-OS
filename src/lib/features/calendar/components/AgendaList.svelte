@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell } from 'lucide-svelte';
+	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar } from 'lucide-svelte';
 	import { calendarState } from '../store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { formatRrule } from '../recurrence';
@@ -8,6 +8,7 @@
 	import { linksState } from '$lib/features/links/store.svelte';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 	import ListRow from '$lib/ui/ListRow.svelte';
+	import EmptyState from '$lib/ui/EmptyState.svelte';
 
 	function linkedPlanIdFor(eventId: string): string | null {
 		return (
@@ -160,6 +161,6 @@
 			</ul>
 		</div>
 	{:else}
-		<p class="text-sm text-text-secondary">Keine Termine oder Aufgabenfälligkeiten.</p>
+		<EmptyState icon={Calendar} title="Keine Termine oder Aufgabenfälligkeiten" />
 	{/each}
 </div>

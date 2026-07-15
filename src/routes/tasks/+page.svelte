@@ -5,6 +5,8 @@
 	import TaskForm from '$lib/features/tasks/components/TaskForm.svelte';
 	import TaskList from '$lib/features/tasks/components/TaskList.svelte';
 	import ProjectForm from '$lib/features/tasks/components/ProjectForm.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Chip from '$lib/ui/Chip.svelte';
 
 	let selectedProject = $state<string | null>(null);
 
@@ -27,9 +29,7 @@
 	<title>Aufgaben - Life OS</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-2xl font-bold tracking-tight">Aufgaben</h1>
-</header>
+<PageHeader title="Aufgaben" />
 
 <section class="mb-4">
 	<TaskForm />
@@ -37,23 +37,11 @@
 
 {#if tasksState.projects.length > 0}
 	<section class="mb-4 flex flex-wrap gap-2">
-		<button
-			onclick={() => (selectedProject = null)}
-			class="rounded-full px-3 py-1 text-xs font-medium {selectedProject === null
-				? 'bg-primary-600 text-white'
-				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
-		>
-			Alle
-		</button>
+		<Chip selected={selectedProject === null} onclick={() => (selectedProject = null)}>Alle</Chip>
 		{#each tasksState.projects as project (project.id)}
-			<button
-				onclick={() => (selectedProject = project.id)}
-				class="rounded-full px-3 py-1 text-xs font-medium {selectedProject === project.id
-					? 'bg-primary-600 text-white'
-					: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
-			>
+			<Chip selected={selectedProject === project.id} onclick={() => (selectedProject = project.id)}>
 				{project.name}
-			</button>
+			</Chip>
 		{/each}
 	</section>
 {/if}

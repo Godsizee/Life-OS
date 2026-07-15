@@ -13,6 +13,7 @@
 	import GoalList from '$lib/features/goals/components/GoalList.svelte';
 	import JournalEntryForm from '$lib/features/goals/components/JournalEntryForm.svelte';
 	import JournalList from '$lib/features/goals/components/JournalList.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	let section = $state<'goals' | 'journal'>(
 		page.url.searchParams.get('tab') === 'journal' ? 'journal' : 'goals'
@@ -45,9 +46,7 @@
 	<title>Ziele & Tagebuch - Life OS</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-2xl font-bold tracking-tight">Ziele & Tagebuch</h1>
-</header>
+<PageHeader title="Ziele & Tagebuch" />
 
 <section class="mb-4 flex gap-2">
 	<button

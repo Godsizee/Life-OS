@@ -12,6 +12,7 @@
 	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
 	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
 	import MonthlyReport from '$lib/features/analytics/components/MonthlyReport.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
 	import { APP_LOCALE } from '$lib/core/locale';
 
@@ -92,10 +93,7 @@
 
 <div class="space-y-6">
 	<!-- Header -->
-	<div>
-		<h1 class="text-3xl font-extrabold tracking-tight text-text-primary">Life Score</h1>
-		<p class="text-sm font-medium text-text-secondary">Analysiere dein tägliches Wohlbefinden und Produktivität.</p>
-	</div>
+	<PageHeader title="Life Score" subtitle="Analysiere dein tägliches Wohlbefinden und Produktivität." />
 
 	<!-- Core Dashboard -->
 	<div class="grid gap-6 md:grid-cols-3">

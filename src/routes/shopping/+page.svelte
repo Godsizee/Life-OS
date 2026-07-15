@@ -5,6 +5,7 @@
 	import ShoppingForm from '$lib/features/shopping/components/ShoppingForm.svelte';
 	import ShoppingList from '$lib/features/shopping/components/ShoppingList.svelte';
 	import Button from '$lib/ui/Button.svelte';
+	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -19,9 +20,7 @@
 	<title>Einkauf - Life OS</title>
 </svelte:head>
 
-<header class="mb-6">
-	<h1 class="text-2xl font-bold tracking-tight">Einkauf</h1>
-</header>
+<PageHeader title="Einkauf" />
 
 <section class="mb-4">
 	<ShoppingForm />
