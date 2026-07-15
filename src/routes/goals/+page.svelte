@@ -15,6 +15,7 @@
 	import JournalList from '$lib/features/goals/components/JournalList.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { Plus } from 'lucide-svelte';
 
 	let section = $state<'goals' | 'journal'>(
@@ -92,7 +93,15 @@
 
 {#if section === 'goals'}
 	<section>
-		<GoalList goals={goalsState.goals} />
+		{#if goalsState.loading}
+			<div class="flex flex-col gap-2">
+				<Skeleton height="5rem" />
+				<Skeleton height="5rem" />
+				<Skeleton height="5rem" />
+			</div>
+		{:else}
+			<GoalList goals={goalsState.goals} />
+		{/if}
 	</section>
 {:else}
 	<section class="mb-4">

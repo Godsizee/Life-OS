@@ -14,6 +14,7 @@
 	import { Calendar, CheckSquare, Repeat, Plus } from 'lucide-svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 
 	let createOpen = $state(false);
 
@@ -165,5 +166,13 @@
 {/if}
 
 <section>
-	<AgendaList items={upcoming} />
+	{#if calendarState.loading}
+		<div class="flex flex-col gap-2">
+			<Skeleton height="4rem" />
+			<Skeleton height="4rem" />
+			<Skeleton height="4rem" />
+		</div>
+	{:else}
+		<AgendaList items={upcoming} />
+	{/if}
 </section>

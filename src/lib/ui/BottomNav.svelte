@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { Settings, Zap } from 'lucide-svelte';
 	import { modules } from '$lib/config/modules';
+	import { keyboardState } from '$lib/core/keyboard.svelte';
+	import { haptic } from '$lib/core/haptics';
 
 	let { currentPath = '/' }: { currentPath?: string } = $props();
 
@@ -13,14 +15,13 @@
 		.map((m) => ({ name: m.label, path: m.route, icon: m.icon }));
 
 	function triggerVibration() {
-		if (typeof navigator !== 'undefined' && navigator.vibrate) {
-			navigator.vibrate(10);
-		}
+		haptic(10);
 	}
 </script>
 
 <nav
-	class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] pl-safe pr-safe md:hidden select-none-native transition-colors duration-300"
+	class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] pl-safe pr-safe md:hidden select-none-native transition duration-300
+		{keyboardState.open ? 'translate-y-full' : 'translate-y-0'}"
 	style="view-transition-name: bottom-nav"
 >
 	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1 xs:px-3">

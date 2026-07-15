@@ -8,6 +8,7 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { Plus, FolderPlus } from 'lucide-svelte';
 
 	let selectedProject = $state<string | null>(null);
@@ -73,14 +74,22 @@
 {/if}
 
 <section class="flex flex-col gap-6">
-	<TaskList tasks={openTasks} />
-	{#if doneTasks.length > 0}
-		<details>
-			<summary class="cursor-pointer text-sm text-text-secondary font-medium">Erledigt ({doneTasks.length})</summary>
-			<div class="mt-2">
-				<TaskList tasks={doneTasks} />
-			</div>
-		</details>
+	{#if tasksState.loading}
+		<div class="flex flex-col gap-2">
+			<Skeleton height="3.5rem" />
+			<Skeleton height="3.5rem" />
+			<Skeleton height="3.5rem" />
+		</div>
+	{:else}
+		<TaskList tasks={openTasks} />
+		{#if doneTasks.length > 0}
+			<details>
+				<summary class="cursor-pointer text-sm text-text-secondary font-medium">Erledigt ({doneTasks.length})</summary>
+				<div class="mt-2">
+					<TaskList tasks={doneTasks} />
+				</div>
+			</details>
+		{/if}
 	{/if}
 	<button
 		onclick={() => (projectSheetOpen = true)}

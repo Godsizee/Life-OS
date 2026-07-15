@@ -6,6 +6,7 @@
 	// erst der Tap löscht (verhindert versehentliches Löschen). Der Papierkorb-Button
 	// im Inhalt bleibt zusätzlich erhalten — für Maus/Desktop ohne Wischgeste.
 	import { Trash2 } from 'lucide-svelte';
+	import { haptic } from '$lib/core/haptics';
 
 	let {
 		onDelete,
@@ -20,6 +21,7 @@
 	const ACTION_WIDTH = 76; // px — Breite der freigelegten Löschfläche
 	let offset = $state(0);
 	let dragging = $state(false);
+	let pastThreshold = false;
 	let startX = 0;
 	let startOffset = 0;
 
@@ -29,6 +31,7 @@
 		dragging = true;
 		startX = e.clientX;
 		startOffset = offset;
+		pastThreshold = offset <= -ACTION_WIDTH / 2;
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 	}
 
@@ -36,6 +39,11 @@
 		if (!dragging) return;
 		const dx = e.clientX - startX + startOffset;
 		offset = Math.max(-ACTION_WIDTH, Math.min(0, dx));
+		const nowPast = offset <= -ACTION_WIDTH / 2;
+		if (nowPast !== pastThreshold) {
+			pastThreshold = nowPast;
+			haptic(10);
+		}
 	}
 
 	function onPointerUp() {

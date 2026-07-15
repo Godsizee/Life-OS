@@ -7,6 +7,7 @@
 	import Input from '$lib/ui/Input.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { Plus } from 'lucide-svelte';
 
 	let search = $state('');
@@ -61,5 +62,13 @@
 </section>
 
 <section>
-	<NoteList notes={filtered} />
+	{#if notesState.loading}
+		<div class="flex flex-col gap-2">
+			<Skeleton height="4rem" />
+			<Skeleton height="4rem" />
+			<Skeleton height="4rem" />
+		</div>
+	{:else}
+		<NoteList notes={filtered} />
+	{/if}
 </section>

@@ -2,6 +2,7 @@
 	import { Check } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 	import { DURATION, motionDuration } from './motion';
+	import { haptic } from '$lib/core/haptics';
 
 	let {
 		checked = false,
@@ -10,11 +11,16 @@
 		checked?: boolean;
 		ontoggle?: () => void;
 	} = $props();
+
+	function handleClick() {
+		haptic(10);
+		ontoggle?.();
+	}
 </script>
 
 <button
 	type="button"
-	onclick={ontoggle}
+	onclick={handleClick}
 	aria-label={checked ? 'Als offen markieren' : 'Als erledigt markieren'}
 	aria-pressed={checked}
 	class="flex h-12 w-12 shrink-0 items-center justify-center transition-transform active:scale-95"

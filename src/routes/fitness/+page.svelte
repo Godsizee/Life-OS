@@ -8,6 +8,7 @@
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
 	import { toastState } from '$lib/core/toast.svelte';
+	import { haptic } from '$lib/core/haptics';
 	import ExercisePicker from '$lib/features/fitness/components/ExercisePicker.svelte';
 	import PlateCalculator from '$lib/features/fitness/components/PlateCalculator.svelte';
 	import ExerciseLibrary from '$lib/features/fitness/components/ExerciseLibrary.svelte';
@@ -84,7 +85,7 @@
 			restTick += 1;
 			if ((liveWorkoutState.restRemainingSec() ?? 0) <= 0) {
 				liveWorkoutState.stopRest();
-				if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+				haptic([200, 100, 200]);
 				toastState.info('⏱️ Pause vorbei — weiter geht\'s!');
 			}
 		}, 1000);

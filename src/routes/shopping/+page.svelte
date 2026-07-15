@@ -7,6 +7,7 @@
 	import Button from '$lib/ui/Button.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { Plus } from 'lucide-svelte';
 
 	let createOpen = $state(false);
@@ -45,7 +46,15 @@
 </Sheet>
 
 <section class="flex flex-col gap-4">
-	<ShoppingList items={shoppingState.items} />
+	{#if shoppingState.loading}
+		<div class="flex flex-col gap-2">
+			<Skeleton height="3.5rem" />
+			<Skeleton height="3.5rem" />
+			<Skeleton height="3.5rem" />
+		</div>
+	{:else}
+		<ShoppingList items={shoppingState.items} />
+	{/if}
 	{#if hasChecked}
 		<Button variant="secondary" onclick={() => shoppingState.clearChecked()}>
 			{#snippet children()}

@@ -11,6 +11,7 @@
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
+	import { keyboardState } from '$lib/core/keyboard.svelte';
 	import BottomNav from '$lib/ui/BottomNav.svelte';
 	import SidebarNav from '$lib/ui/SidebarNav.svelte';
 	import CommandPalette from '$lib/ui/CommandPalette.svelte';
@@ -27,6 +28,7 @@
 		installState.init();
 		pushState.init();
 		themeState.init();
+		keyboardState.init();
 		online = navigator.onLine;
 		window.addEventListener('online', () => {
 			online = true;
@@ -92,7 +94,7 @@
 	<div
 		class="flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out pt-safe pl-safe pr-safe
 			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
-			{showNav ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
+			{showNav && !keyboardState.open ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 	>
 		{#if syncBanner}
 			<button
