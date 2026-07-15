@@ -1,7 +1,8 @@
 <script lang="ts">
 	// Welle F6 — Platten-Rechner (Hevy/Strong-Muster): Zielgewicht → Scheiben pro Seite.
 	// Bottom-Sheet wie ExercisePicker; Stangengewicht wird in localStorage gemerkt.
-	import { X, Calculator } from 'lucide-svelte';
+	import { Calculator } from 'lucide-svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
 	import StepperInput from './StepperInput.svelte';
 	import { calculatePlates, BAR_WEIGHTS_KG } from '../utils/plates';
 
@@ -44,39 +45,16 @@
 	const breakdown = $derived(
 		targetKg !== null && targetKg > 0 ? calculatePlates(targetKg, barKg) : null
 	);
-
-	function close() {
-		open = false;
-	}
 </script>
 
-{#if open}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="fixed inset-0 z-40 bg-black/45 dark:bg-black/60 backdrop-blur-sm" onclick={close}></div>
-
-	<div
-		data-noswipe
-		class="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-border-color bg-surface-0 shadow-2xl"
-		role="dialog"
-		aria-label="Platten-Rechner"
-		aria-modal="true"
-		style="padding-bottom: env(safe-area-inset-bottom);"
-	>
-		<div class="flex items-center justify-between px-4 pt-3 pb-2">
-			<h3 class="flex items-center gap-2 text-sm font-bold text-text-primary">
-				<Calculator size={15} class="text-primary-active" />
-				<span>Platten-Rechner</span>
-			</h3>
-			<button
-				onclick={close}
-				aria-label="Schließen"
-				class="flex h-11 w-11 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
-			>
-				<X size={16} />
-			</button>
-		</div>
-
+<Sheet bind:open title="Platten-Rechner">
+	{#snippet header()}
+		<h3 class="flex items-center gap-2 text-sm font-bold text-text-primary">
+			<Calculator size={15} class="text-primary-active" />
+			<span>Platten-Rechner</span>
+		</h3>
+	{/snippet}
+	{#snippet children()}
 		<div class="space-y-4 px-4 pb-5">
 			<div class="flex flex-wrap items-center gap-3">
 				<div>
@@ -134,5 +112,5 @@
 				<p class="text-sm text-text-tertiary">Gib ein Zielgewicht ein.</p>
 			{/if}
 		</div>
-	</div>
-{/if}
+	{/snippet}
+</Sheet>

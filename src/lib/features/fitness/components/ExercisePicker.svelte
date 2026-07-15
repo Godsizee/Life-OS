@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Search, X, Clock, Plus } from 'lucide-svelte';
+	import { Search, Clock, Plus } from 'lucide-svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
 	import { fitnessState } from '../store.svelte';
 	import CustomExerciseForm from './CustomExerciseForm.svelte';
 	import type { ExerciseCatalogEntry, ExerciseType, PickedExercise } from '../types';
@@ -52,63 +53,37 @@
 
 	function pick(entry: ExerciseCatalogEntry) {
 		onSelect({ exercise_id: entry.id, name: entry.name_de, exercise_type: entry.exercise_type });
-		close();
+		open = false;
 	}
 
 	function pickRecent(r: PickedExercise) {
 		onSelect(r);
-		close();
+		open = false;
 	}
 
 	function handleCreated(picked: PickedExercise) {
 		onSelect(picked);
-		close();
-	}
-
-	function close() {
 		open = false;
-		query = '';
-		activeMuscleGroup = null;
-		showCustomForm = false;
 	}
 
 	$effect(() => {
 		if (open) {
+			query = '';
+			activeMuscleGroup = null;
+			showCustomForm = false;
 			void fitnessState.loadRecentExercises();
 			setTimeout(() => inputEl?.focus(), 10);
 		}
 	});
 </script>
 
-{#if open}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="fixed inset-0 z-40 bg-black/45 dark:bg-black/60 backdrop-blur-sm" onclick={close}></div>
-
-	<div
-		data-noswipe
-		class="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] rounded-t-2xl border-t border-border-color bg-surface-0 shadow-2xl flex flex-col"
-		role="dialog"
-		aria-label="Übung auswählen"
-		aria-modal="true"
-	>
-		<div class="flex items-center justify-between px-4 pt-3 pb-2">
-			<h3 class="text-sm font-bold text-text-primary">Übung auswählen</h3>
-			<button
-				onclick={close}
-				aria-label="Schließen"
-				class="flex h-9 w-9 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
-			>
-				<X size={16} />
-			</button>
-		</div>
-
-		<div class="flex items-center gap-2 border-b border-border-color px-4 pb-3">
+<Sheet bind:open title="Übung auswählen">
+	{#snippet children()}
+		<div class="sticky top-0 z-10 flex items-center gap-2 border-b border-border-color bg-surface-0 px-4 pb-3">
 			<Search size={16} class="shrink-0 text-text-tertiary" />
 			<input
 				bind:this={inputEl}
 				bind:value={query}
-				onkeydown={(e) => e.key === 'Escape' && close()}
 				type="text"
 				placeholder="Übung suchen…"
 				class="min-h-9 flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none"
@@ -117,7 +92,7 @@
 		</div>
 
 		{#if muscleGroups.length > 0}
-			<div class="flex gap-2 overflow-x-auto px-4 py-2">
+			<div class="sticky top-11.25 z-10 flex gap-2 overflow-x-auto bg-surface-0 px-4 py-2">
 				<button
 					onclick={() => (activeMuscleGroup = null)}
 					class="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
@@ -141,7 +116,7 @@
 			</div>
 		{/if}
 
-		<div class="flex-1 overflow-y-auto px-2 pb-2">
+		<div class="px-2 pb-2">
 			{#if showRecent && recentFiltered.length > 0}
 				<div class="px-2 pt-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-text-tertiary flex items-center gap-1">
 					<Clock size={11} />
@@ -201,5 +176,5 @@
 				</button>
 			{/if}
 		</div>
-	</div>
-{/if}
+	{/snippet}
+</Sheet>

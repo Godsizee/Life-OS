@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Modal from './Modal.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
@@ -190,22 +191,7 @@
 	};
 </script>
 
-{#if open}
-	<!-- Backdrop -->
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div
-		class="fixed inset-0 z-40 bg-black/45 dark:bg-black/60 backdrop-blur-sm"
-		onclick={close}
-	></div>
-
-	<!-- Palette -->
-	<div
-		class="fixed inset-x-4 top-[10%] z-50 mx-auto max-w-lg rounded-2xl border border-border-color bg-surface-0 shadow-2xl"
-		role="dialog"
-		aria-label="Command Palette"
-		aria-modal="true"
-	>
+<Modal bind:open label="Command Palette">
 		<!-- Suchfeld -->
 		<div class="flex items-center gap-3 border-b border-border-color px-4 py-3">
 			<span class="text-text-secondary">🔍</span>
@@ -251,5 +237,4 @@
 			<span><kbd class="rounded bg-surface-2 px-1 py-0.5 font-mono border border-border-color/30">↵</kbd> auswählen</span>
 			<span><kbd class="rounded bg-surface-2 px-1 py-0.5 font-mono border border-border-color/30">Esc</kbd> schließen</span>
 		</div>
-	</div>
-{/if}
+</Modal>
