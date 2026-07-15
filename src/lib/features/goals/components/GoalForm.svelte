@@ -3,6 +3,8 @@
 	import Input from '$lib/ui/Input.svelte';
 	import { goalsState } from '../store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let title = $state('');
 	let targetDate = $state('');
 	let goalType = $state<'standard' | 'pr' | 'fitness_frequency'>('standard');
@@ -24,6 +26,7 @@
 		targetExercise = '';
 		targetValue = null;
 		goalType = 'standard';
+		onsubmitted?.();
 	}
 </script>
 

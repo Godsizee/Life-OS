@@ -6,6 +6,10 @@
 	import ShoppingList from '$lib/features/shopping/components/ShoppingList.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { Plus } from 'lucide-svelte';
+
+	let createOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -20,11 +24,25 @@
 	<title>Einkauf - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Einkauf" />
+<PageHeader title="Einkauf">
+	{#snippet trailing()}
+		<button
+			onclick={() => (createOpen = true)}
+			aria-label="Neuer Artikel"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+		>
+			<Plus size={22} />
+		</button>
+	{/snippet}
+</PageHeader>
 
-<section class="mb-4">
-	<ShoppingForm />
-</section>
+<Sheet bind:open={createOpen} title="Neuer Artikel">
+	{#snippet children()}
+		<div class="p-4">
+			<ShoppingForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 <section class="flex flex-col gap-4">
 	<ShoppingList items={shoppingState.items} />

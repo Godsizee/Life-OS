@@ -3,6 +3,8 @@
 	import Input from '$lib/ui/Input.svelte';
 	import { notesState } from '../store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let title = $state('');
 
 	async function submit(event: SubmitEvent) {
@@ -10,6 +12,7 @@
 		if (!title.trim()) return;
 		await notesState.addNote({ title });
 		title = '';
+		onsubmitted?.();
 	}
 </script>
 

@@ -4,6 +4,8 @@
 	import Select from '$lib/ui/Select.svelte';
 	import { calendarState } from '../store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	type Recurrence = 'none' | 'daily' | 'weekly';
 	const rruleByRecurrence: Record<Recurrence, string | null> = {
 		none: null,
@@ -37,6 +39,7 @@
 		allDay = false;
 		location = '';
 		recurrence = 'none';
+		onsubmitted?.();
 	}
 </script>
 

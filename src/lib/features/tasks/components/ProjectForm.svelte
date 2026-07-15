@@ -3,6 +3,8 @@
 	import Input from '$lib/ui/Input.svelte';
 	import { tasksState } from '../store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let name = $state('');
 
 	async function submit(event: SubmitEvent) {
@@ -10,6 +12,7 @@
 		if (!name.trim()) return;
 		await tasksState.addProject(name);
 		name = '';
+		onsubmitted?.();
 	}
 </script>
 

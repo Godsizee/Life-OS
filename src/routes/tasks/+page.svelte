@@ -7,8 +7,12 @@
 	import ProjectForm from '$lib/features/tasks/components/ProjectForm.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { Plus, FolderPlus } from 'lucide-svelte';
 
 	let selectedProject = $state<string | null>(null);
+	let createOpen = $state(false);
+	let projectSheetOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -29,11 +33,33 @@
 	<title>Aufgaben - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Aufgaben" />
+<PageHeader title="Aufgaben">
+	{#snippet trailing()}
+		<button
+			onclick={() => (createOpen = true)}
+			aria-label="Neue Aufgabe"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+		>
+			<Plus size={22} />
+		</button>
+	{/snippet}
+</PageHeader>
 
-<section class="mb-4">
-	<TaskForm />
-</section>
+<Sheet bind:open={createOpen} title="Neue Aufgabe">
+	{#snippet children()}
+		<div class="p-4">
+			<TaskForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
+
+<Sheet bind:open={projectSheetOpen} title="Neues Projekt">
+	{#snippet children()}
+		<div class="p-4">
+			<ProjectForm onsubmitted={() => (projectSheetOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 {#if tasksState.projects.length > 0}
 	<section class="mb-4 flex flex-wrap gap-2">
@@ -56,10 +82,11 @@
 			</div>
 		</details>
 	{/if}
-	<details>
-		<summary class="cursor-pointer text-sm text-text-secondary font-medium">Projekt anlegen</summary>
-		<div class="mt-2">
-			<ProjectForm />
-		</div>
-	</details>
+	<button
+		onclick={() => (projectSheetOpen = true)}
+		class="flex min-h-12 items-center gap-2 self-start text-sm font-medium text-text-secondary hover:text-text-primary"
+	>
+		<FolderPlus size={16} />
+		Projekt anlegen
+	</button>
 </section>

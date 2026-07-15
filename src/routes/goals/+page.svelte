@@ -14,10 +14,13 @@
 	import JournalEntryForm from '$lib/features/goals/components/JournalEntryForm.svelte';
 	import JournalList from '$lib/features/goals/components/JournalList.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { Plus } from 'lucide-svelte';
 
 	let section = $state<'goals' | 'journal'>(
 		page.url.searchParams.get('tab') === 'journal' ? 'journal' : 'goals'
 	);
+	let createOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -46,7 +49,27 @@
 	<title>Ziele & Tagebuch - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Ziele & Tagebuch" />
+<PageHeader title="Ziele & Tagebuch">
+	{#snippet trailing()}
+		{#if section === 'goals'}
+			<button
+				onclick={() => (createOpen = true)}
+				aria-label="Neues Ziel"
+				class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+			>
+				<Plus size={22} />
+			</button>
+		{/if}
+	{/snippet}
+</PageHeader>
+
+<Sheet bind:open={createOpen} title="Neues Ziel">
+	{#snippet children()}
+		<div class="p-4">
+			<GoalForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 <section class="mb-4 flex gap-2">
 	<button
@@ -68,9 +91,6 @@
 </section>
 
 {#if section === 'goals'}
-	<section class="mb-4">
-		<GoalForm />
-	</section>
 	<section>
 		<GoalList goals={goalsState.goals} />
 	</section>

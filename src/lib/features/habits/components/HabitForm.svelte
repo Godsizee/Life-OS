@@ -7,6 +7,8 @@
 
 	const weekdayLabels = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let name = $state('');
 	let frequency = $state<'daily' | 'weekly'>('daily');
 	let days = $state<number[]>([1, 2, 3, 4, 5]);
@@ -29,6 +31,7 @@
 		});
 		name = '';
 		goalId = '';
+		onsubmitted?.();
 	}
 </script>
 

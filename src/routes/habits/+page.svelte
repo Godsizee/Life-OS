@@ -7,6 +7,10 @@
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
 	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { Plus } from 'lucide-svelte';
+
+	let createOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -28,7 +32,25 @@
 	<title>Gewohnheiten - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Gewohnheiten" />
+<PageHeader title="Gewohnheiten">
+	{#snippet trailing()}
+		<button
+			onclick={() => (createOpen = true)}
+			aria-label="Neue Gewohnheit"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+		>
+			<Plus size={22} />
+		</button>
+	{/snippet}
+</PageHeader>
+
+<Sheet bind:open={createOpen} title="Neue Gewohnheit">
+	{#snippet children()}
+		<div class="p-4">
+			<HabitForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 <!-- Heatmap -->
 {#if habitsState.habits.length > 0}
@@ -56,10 +78,6 @@
 		{/if}
 	</section>
 {/if}
-
-<section class="mb-4">
-	<HabitForm />
-</section>
 
 <section>
 	<HabitList habits={habitsState.habits} />

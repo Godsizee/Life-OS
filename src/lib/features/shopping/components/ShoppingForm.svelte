@@ -3,6 +3,8 @@
 	import Input from '$lib/ui/Input.svelte';
 	import { shoppingState } from '../store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let name = $state('');
 	let qty = $state('1');
 	let unit = $state('');
@@ -14,6 +16,7 @@
 		name = '';
 		qty = '1';
 		unit = '';
+		onsubmitted?.();
 	}
 </script>
 

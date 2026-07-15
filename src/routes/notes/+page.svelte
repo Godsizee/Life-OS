@@ -6,8 +6,11 @@
 	import NoteList from '$lib/features/notes/components/NoteList.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { Plus } from 'lucide-svelte';
 
 	let search = $state('');
+	let createOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -33,11 +36,25 @@
 	<title>Notizen - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Notizen" />
+<PageHeader title="Notizen">
+	{#snippet trailing()}
+		<button
+			onclick={() => (createOpen = true)}
+			aria-label="Neue Notiz"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+		>
+			<Plus size={22} />
+		</button>
+	{/snippet}
+</PageHeader>
 
-<section class="mb-4">
-	<NoteForm />
-</section>
+<Sheet bind:open={createOpen} title="Neue Notiz">
+	{#snippet children()}
+		<div class="p-4">
+			<NoteForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 <section class="mb-4">
 	<Input placeholder="Notizen durchsuchen…" bind:value={search} />

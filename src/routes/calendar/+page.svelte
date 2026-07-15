@@ -11,8 +11,11 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import EventForm from '$lib/features/calendar/components/EventForm.svelte';
 	import AgendaList from '$lib/features/calendar/components/AgendaList.svelte';
-	import { Calendar, CheckSquare, Repeat } from 'lucide-svelte';
+	import { Calendar, CheckSquare, Repeat, Plus } from 'lucide-svelte';
 	import Chip from '$lib/ui/Chip.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+
+	let createOpen = $state(false);
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -104,7 +107,25 @@
 	<title>Kalender - Life OS</title>
 </svelte:head>
 
-<PageHeader title="Kalender & Termine" />
+<PageHeader title="Kalender & Termine">
+	{#snippet trailing()}
+		<button
+			onclick={() => (createOpen = true)}
+			aria-label="Neuer Termin"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+		>
+			<Plus size={22} />
+		</button>
+	{/snippet}
+</PageHeader>
+
+<Sheet bind:open={createOpen} title="Neuer Termin">
+	{#snippet children()}
+		<div class="p-4">
+			<EventForm onsubmitted={() => (createOpen = false)} />
+		</div>
+	{/snippet}
+</Sheet>
 
 <!-- Layer-Umschalter -->
 <div class="mb-4 flex flex-wrap gap-2">
@@ -116,10 +137,6 @@
 		</Chip>
 	{/each}
 </div>
-
-<section class="mb-4">
-	<EventForm />
-</section>
 
 <!-- Routinen-Layer -->
 {#if dueHabitsToday.length > 0}

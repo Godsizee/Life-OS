@@ -5,6 +5,8 @@
 	import { tasksState } from '../store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 
+	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+
 	let title = $state('');
 	let projectId = $state('');
 	let goalId = $state('');
@@ -21,6 +23,7 @@
 		});
 		title = '';
 		goalId = '';
+		onsubmitted?.();
 	}
 </script>
 
