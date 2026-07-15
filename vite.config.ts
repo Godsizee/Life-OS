@@ -28,6 +28,9 @@ export default defineConfig({
 			srcDir: 'src',
 			filename: 'service-worker.ts',
 			manifest: {
+				id: '/',
+				lang: 'de',
+				start_url: '/',
 				name: 'Life OS',
 				short_name: 'Life',
 				description: 'Midweight Life OS',
@@ -38,18 +41,37 @@ export default defineConfig({
 					{
 						src: 'pwa-192x192.png',
 						sizes: '192x192',
-						type: 'image/png'
-					},
-					{
-						src: 'pwa-512x512.png',
-						sizes: '512x512',
-						type: 'image/png'
+						type: 'image/png',
+						purpose: 'any'
 					},
 					{
 						src: 'pwa-512x512.png',
 						sizes: '512x512',
 						type: 'image/png',
-						purpose: 'any maskable'
+						purpose: 'any'
+					},
+					{
+						src: 'pwa-maskable-512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'maskable'
+					}
+				],
+				shortcuts: [
+					{
+						name: 'Fokus',
+						url: '/focus',
+						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
+					},
+					{
+						name: 'Aufgaben',
+						url: '/tasks',
+						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
+					},
+					{
+						name: 'Kalender',
+						url: '/calendar',
+						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
 					}
 				]
 			}
