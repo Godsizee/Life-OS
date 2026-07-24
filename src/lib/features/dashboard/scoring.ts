@@ -42,6 +42,6 @@ export function scoreTask(task: Task, now: Date = new Date()): number {
 export function rankTasks(tasks: Task[]): Task[] {
 	const now = new Date();
 	return [...tasks]
-		.filter((t) => t.status !== 'done')
+		.filter((t) => t.status !== 'done' && !t.parent_id)
 		.sort((a, b) => scoreTask(b, now) - scoreTask(a, now));
 }

@@ -6,6 +6,9 @@ export const taskInputSchema = z.object({
 	due_at: z.string().nullable().default(null),
 	project_id: z.string().uuid().nullable().default(null),
 	goal_id: z.string().uuid().nullable().default(null),
+	description: z.string().max(20000).nullable().default(null),
+	parent_id: z.string().uuid().nullable().default(null),
+	labels: z.array(z.string()).default([]),
 	rrule: z.string().nullable().default(null)
 });
 

@@ -46,6 +46,8 @@ npm-debug.log*
 AGENTS.md
 CLAUDE.md
 EXPANSION_PLAN.md
+.claude/
+.mcp.json
 
 # Lokale Arbeitsdateien
 Recent.md

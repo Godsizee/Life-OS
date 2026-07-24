@@ -28,7 +28,7 @@ function nextWeekday(target: number, weekOffset: number = 0): Date {
 	return d;
 }
 
-function parseRelativeDate(lower: string): Date | null {
+export function parseRelativeDate(lower: string): Date | null {
 	const now = new Date();
 
 	if (/\b(\u00fcber\u00fcbermorgen|in 3 tagen)\b/.test(lower)) {

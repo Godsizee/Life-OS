@@ -16,6 +16,9 @@ export interface Task {
 	project_id: string | null;
 	goal_id: string | null;
 	title: string;
+	description: string | null;
+	labels: string[];
+	parent_id: string | null;
 	status: TaskStatus;
 	priority: TaskPriority;
 	due_at: string | null;

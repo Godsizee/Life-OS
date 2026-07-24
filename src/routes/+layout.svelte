@@ -69,7 +69,9 @@
 	const showNav = $derived(!publicPaths.includes(page.url.pathname));
 	// F5 — /fitness bekommt mehr Breite (Desktop-Zwei-Spalten im Live-Workout),
 	// statt den mobilen Ein-Spalten-Fluss nur gestreckt breiter darzustellen.
-	const wideRoute = $derived(page.url.pathname.startsWith('/fitness'));
+	const wideRoute = $derived(
+		page.url.pathname.startsWith('/fitness') || page.url.pathname.startsWith('/tasks')
+	);
 	let sidebarCollapsed = $state(false);
 
 	const syncBanner = $derived(

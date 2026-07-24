@@ -5,6 +5,7 @@
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
+	import { shoppingState } from '$lib/features/shopping/store.svelte';
 	import { isDueOn } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
@@ -70,12 +71,15 @@
 		plannedTodayPlanId ? (fitnessState.plans.find((p) => p.id === plannedTodayPlanId)?.name ?? null) : null
 	);
 
+	const openShopping = $derived(shoppingState.items.filter((i) => !i.checked).length);
+
 	const hasContent = $derived(
 		todayEvents.length > 0 ||
 			topTasks.length > 0 ||
 			dueHabits.length > 0 ||
 			workoutStale ||
-			fitnessState.plans.length > 0
+			fitnessState.plans.length > 0 ||
+			openShopping > 0
 	);
 </script>
 
@@ -125,6 +129,11 @@
 		</div>
 
 		<div class="mt-3 flex flex-wrap gap-2 border-t border-border-color/40 pt-3 text-xs">
+			{#if openShopping > 0}
+				<a href="/shopping" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+					🛒 {openShopping} Artikel
+				</a>
+			{/if}
 			{#if dueHabits.length > 0}
 				<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
 					🔁 {dueHabits.length} Routine{dueHabits.length !== 1 ? 'n' : ''} offen

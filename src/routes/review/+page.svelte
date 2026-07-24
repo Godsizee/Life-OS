@@ -77,7 +77,7 @@
 	);
 
 	// Nächste Woche Top-3 (aus offenen Tasks wählen)
-	const openTasks = $derived(tasksState.tasks.filter((t) => t.status !== 'done'));
+	const openTasks = $derived(tasksState.tasks.filter((t) => t.status !== 'done' && !t.parent_id));
 
 	// ── Wizard-State ──────────────────────────────────────────────────
 	let step = $state(1); // 1 = Rückblick, 2 = Ausblick, 3 = Reflexion

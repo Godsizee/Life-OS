@@ -71,6 +71,9 @@ class TasksState {
 			project_id: parsed.project_id,
 			goal_id: parsed.goal_id,
 			title: parsed.title,
+			description: parsed.description,
+			labels: parsed.labels,
+			parent_id: parsed.parent_id,
 			status: 'todo',
 			priority: parsed.priority,
 			due_at: parsed.due_at,
@@ -124,6 +127,25 @@ class TasksState {
 				}
 			}
 		}
+	}
+
+	async updateTask(
+		id: string,
+		patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id'>>
+	) {
+		const updated_at = new Date().toISOString();
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
+			tasksApi.updateRaw({ id, ...patch, updated_at })
+		);
+	}
+
+	async moveTask(id: string, patch: { status?: TaskStatus; position?: number }) {
+		const updated_at = new Date().toISOString();
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
+			tasksApi.updateRaw({ id, ...patch, updated_at })
+		);
 	}
 
 	async removeTask(id: string) {
