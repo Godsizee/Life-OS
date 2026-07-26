@@ -24,7 +24,7 @@
 		weekly: 'RRULE:FREQ=WEEKLY'
 	};
 
-	function toDatetimeLocal(iso?: string): string {
+	function toDatetimeLocal(iso: string | undefined): string {
 		if (!iso) return '';
 		const d = new Date(iso);
 		if (isNaN(d.getTime())) return '';
