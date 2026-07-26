@@ -6,6 +6,8 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
+	import { expandEvents } from '$lib/features/calendar/occurrences';
+	import { isCompleted, type HabitDay } from '$lib/features/habits/streak';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
@@ -58,7 +60,7 @@
 		// 2. Logged Habits
 		habitsState.logs.forEach((log) => {
 			const habit = habitsState.habits.find((h) => h.id === log.habit_id);
-			if (habit) {
+			if (habit && isCompleted(habit, log as unknown as HabitDay)) {
 				items.push({
 					id: `habit_${log.id}`,
 					date: log.date,
@@ -137,6 +139,20 @@
 			}
 		});
 
+		// 7. Events
+		const pastEvents = expandEvents(calendarState.events, calendarState.overrides, new Date('2020-01-01'), new Date());
+		pastEvents.forEach((o) => {
+			items.push({
+				id: `event_${o.key}`,
+				date: o.occurrenceDate,
+				title: `Termin: "${o.title}"`,
+				icon: Calendar,
+				color: 'text-purple-500',
+				bg: 'bg-purple-50 dark:bg-purple-950/20',
+				module: 'Calendar'
+			});
+		});
+
 		// Sort by Date descending
 		return items.sort((a, b) => b.date.localeCompare(a.date));
 	});
@@ -170,7 +186,7 @@
 			<!-- Filter Chip-row -->
 			<div class="flex gap-2 overflow-x-auto pb-1">
 				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alle</Chip>
-				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness'] as mod}
+				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod}
 					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
 				{/each}
 			</div>

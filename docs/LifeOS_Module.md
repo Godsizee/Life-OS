@@ -19,7 +19,7 @@ für Navigation und Plan-Gating registriert (OCP).
 | **Heute** | Aggregiert fällige Aufgaben, heutige Termine, offene Gewohnheiten, Einkaufs-Highlights | abgeleitet |
 | **Aufgaben & Projekte** | CRUD, Status, Priorität, Fälligkeit, Zuweisung, Wiederholung (rrule), Sortierung | geteilt |
 | **Notizen** | Schnellerfassung, Tags, Pinnen, Markdown-Body, Volltextsuche | geteilt |
-| **Gewohnheiten** | Tages-/Wochen-Routinen, Häkchen, **Streaks**, Verlauf | geteilt (Logs je Person) |
+| **Gewohnheiten** | Tages-/Wochen-Routinen, Ziel-Mengen, Skips, **Streaks**, Verlauf | geteilt (Logs je Person) |
 | **Kalender** | Termine, All-Day/Recurrence, **ICS-Abo** (read), Erinnerungen | geteilt |
 | **Einkauf & Haushalt** | Gemeinsame Liste in Echtzeit, Mengen, Abhaken, Auto-Aufräumen | geteilt |
 | **Ziele & Tagebuch** | Ziele/OKRs mit Fortschritt + persönliches Journal & Stimmungs-Check-in | Ziele geteilt, Tagebuch **persönlich** |

@@ -6,7 +6,7 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { isDueOn, calculateStreak } from '$lib/features/habits/streak';
+	import { isDueOn, calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
 	import Textarea from '$lib/ui/Textarea.svelte';
 
 	$effect(() => {
@@ -45,11 +45,20 @@
 	// Habit-Adherence: wie viele Due-Tage wurden geloggt
 	const habitStats = $derived(
 		habitsState.habits.map((h) => {
-			const dueDays = weekDates.filter((d) => isDueOn(h.schedule, new Date(d)));
-			const loggedDays = habitsState.logsFor(h.id).filter((d) => weekDates.includes(d));
-			const pct = dueDays.length > 0 ? Math.round((loggedDays.length / dueDays.length) * 100) : 0;
-			const streak = calculateStreak(h.schedule, habitsState.logsFor(h.id));
-			return { habit: h, dueDays: dueDays.length, loggedDays: loggedDays.length, pct, streak };
+			const days = habitsState.entriesFor(h.id);
+			let dueDays = 0;
+			let loggedDays = 0;
+			for (const dStr of weekDates) {
+				const day = days.find((d) => d.date === dStr);
+				if (isSkipped(day)) continue;
+				if (h.schedule.type === 'weekly_count' || isDueOn(h.schedule, new Date(dStr))) {
+					dueDays++;
+					if (isCompleted(h, day)) loggedDays++;
+				}
+			}
+			const pct = dueDays > 0 ? Math.round((loggedDays / dueDays) * 100) : 100;
+			const streak = calculateStreak(h, days);
+			return { habit: h, dueDays, loggedDays, pct, streak };
 		})
 	);
 

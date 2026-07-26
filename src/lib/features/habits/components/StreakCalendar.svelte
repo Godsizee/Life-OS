@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { toISODate } from '$lib/core/date';
-	import { isDueOn } from '$lib/features/habits/streak';
-	import type { Habit, HabitSchedule } from '$lib/features/habits/types';
+	import { isDueOn, isSkipped, isCompleted, type HabitDay } from '$lib/features/habits/streak';
+	import type { Habit } from '$lib/features/habits/types';
 	import { themeState } from '$lib/core/theme.svelte';
 
 	let {
 		habits,
-		logsFor
+		entriesFor
 	}: {
 		habits: Habit[];
-		logsFor: (habitId: string) => string[];
+		entriesFor: (habitId: string) => HabitDay[];
 	} = $props();
 
 	// ── Datums-Grid (12 Wochen = 84 Tage rückwärts) ──────────────────
@@ -49,9 +49,11 @@
 			let due = 0;
 			let logged = 0;
 			for (const h of habits) {
-				if (isDueOn(h.schedule as HabitSchedule, dateObj)) {
+				const day = entriesFor(h.id).find((d) => d.date === dateStr);
+				if (isSkipped(day)) continue;
+				if (h.schedule.type === 'weekly_count' || isDueOn(h.schedule, dateObj)) {
 					due++;
-					if (logsFor(h.id).includes(dateStr)) logged++;
+					if (isCompleted(h, day)) logged++;
 				}
 			}
 			acc[dateStr] = { date: dateStr, due, logged, pct: due > 0 ? Math.round((logged / due) * 100) : -1 };

@@ -6,7 +6,7 @@ import { healthState } from '$lib/features/health/store.svelte';
 import { moodState } from '$lib/features/mood/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { focusState } from '$lib/features/focus/store.svelte';
-import { isDueOn } from '$lib/features/habits/streak';
+import { isDueOn, isCompleted, isSkipped, type HabitCore } from '$lib/features/habits/streak';
 import { toISODate } from '$lib/core/date';
 import type { DayContext } from './types';
 
@@ -21,8 +21,10 @@ export function buildDayContext(dateStr: string): DayContext {
 	});
 	const tasksDone = todaysTasks.filter((t) => t.status === 'done').length;
 
-	const dueHabits = habitsState.habits.filter((h) => !h.archived && isDueOn(h.schedule, date));
-	const habitsLogged = dueHabits.filter((h) => habitsState.logsFor(h.id).includes(dateStr)).length;
+	const active = habitsState.habits.filter((h) => !h.archived);
+	const entryOf = (h: HabitCore & { id: string }, dStr: string) => habitsState.entriesFor(h.id).find((d) => d.date === dStr);
+	const dueHabits = active.filter((h) => isDueOn(h.schedule, date) && !isSkipped(entryOf(h, dateStr)));
+	const habitsLogged = dueHabits.filter((h) => isCompleted(h, entryOf(h, dateStr))).length;
 
 	const workout = fitnessState.logs.some((l) => l.date === dateStr);
 	const moodEntry = moodState.entries.find((e) => e.date === dateStr);

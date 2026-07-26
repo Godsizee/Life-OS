@@ -24,7 +24,7 @@ export function autoLogTrainingHabit(): string | null {
 	);
 	const habit =
 		linked ?? habitsState.habits.find((h) => !h.archived && TRAINING_KEYWORDS.test(h.name));
-	if (habit && !habitsState.isLoggedToday(habit.id)) {
+	if (habit && !habitsState.isDoneToday(habit.id)) {
 		void habitsState.toggleToday(habit.id);
 		toastState.success(`Routine „${habit.name}" automatisch abgehakt`);
 		return habit.name;

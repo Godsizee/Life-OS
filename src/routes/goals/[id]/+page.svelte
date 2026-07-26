@@ -198,7 +198,7 @@
 			{#if linkedHabits.length > 0}
 				<ul class="flex flex-col gap-1.5">
 					{#each linkedHabits as habit (habit.id)}
-						{@const hp = calculateHabitProgress30Days(habit.schedule, habitsState.logsFor(habit.id))}
+						{@const hp = calculateHabitProgress30Days(habit, habitsState.entriesFor(habit.id))}
 						<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
 							<span class="text-xs">🔁</span>
 							<span class="min-w-0 flex-1 truncate text-sm text-text-primary">{habit.name}</span>

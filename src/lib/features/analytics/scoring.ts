@@ -5,7 +5,7 @@ import { moodState } from '$lib/features/mood/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { profileState } from '$lib/features/profile/store.svelte';
-import { isDueOn } from '$lib/features/habits/streak';
+import { isDueOn, isCompleted, isSkipped } from '$lib/features/habits/streak';
 import { getPomodorosForDate } from './focus-history';
 import { toISODate } from '$lib/core/date';
 import { getGoalProgress } from '$lib/features/goals/progress';
@@ -42,13 +42,18 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 
 	// 2. Habits (25%)
 	const activeHabits = habitsState.habits.filter((h) => !h.archived);
-	const dueHabits = activeHabits.filter((h) => isDueOn(h.schedule, date));
-	const loggedDueHabits = dueHabits.filter((h) => {
-		const logs = habitsState.logsFor(h.id);
-		return logs.includes(dateStr);
-	});
-	const habitsScore =
-		dueHabits.length > 0 ? (loggedDueHabits.length / dueHabits.length) * 100 : 100;
+	const relevant = activeHabits.map((h) => ({ h, days: habitsState.entriesFor(h.id) }));
+	let dueCount = 0;
+	let doneCount = 0;
+	for (const { h, days } of relevant) {
+		const day = days.find((d) => d.date === dateStr);
+		if (isSkipped(day)) continue; // übersprungene fallen komplett aus Zähler und Nenner
+		if (h.schedule.type === 'weekly_count' || isDueOn(h.schedule, date)) {
+			dueCount++;
+			if (isCompleted(h, day)) doneCount++;
+		}
+	}
+	const habitsScore = dueCount > 0 ? (doneCount / dueCount) * 100 : 100;
 
 	// 3. Health (15%)
 	const healthEntry = healthState.entries.find((e) => e.date === dateStr);

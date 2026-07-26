@@ -8,7 +8,7 @@
 		onclick,
 		children
 	}: {
-		variant?: 'primary' | 'secondary' | 'ghost';
+		variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
 		type?: 'button' | 'submit';
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
@@ -18,7 +18,8 @@
 	const variants = {
 		primary: 'bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 text-white',
 		secondary: 'bg-surface-2 text-text-primary active:bg-surface-3 border border-border-color',
-		ghost: 'text-text-secondary hover:text-text-primary hover:bg-surface-2 active:bg-surface-3'
+		ghost: 'text-text-secondary hover:text-text-primary hover:bg-surface-2 active:bg-surface-3',
+		danger: 'bg-red-500 hover:bg-red-600 text-white'
 	};
 </script>
 

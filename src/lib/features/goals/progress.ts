@@ -30,8 +30,7 @@ export function getGoalProgress(goal: Goal): number {
 	}
 	if (linkedHabits.length > 0) {
 		const habitScores = linkedHabits.map((h) => {
-			const logs = habitsState.logsFor(h.id);
-			return calculateHabitProgress30Days(h.schedule, logs);
+			return calculateHabitProgress30Days(h, habitsState.entriesFor(h.id));
 		});
 		const avgHabits = habitScores.reduce((a, b) => a + b, 0) / habitScores.length;
 		items.push(avgHabits);

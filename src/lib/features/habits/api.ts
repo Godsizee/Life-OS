@@ -49,3 +49,27 @@ export async function deleteLog(id: string): Promise<void> {
 	const { error } = await supabase.from('habit_logs').delete().eq('id', id);
 	if (error) throw error;
 }
+
+export async function updateLog(patch: Partial<HabitLog> & { id: string }): Promise<HabitLog> {
+	const { id, ...rest } = patch;
+	const { data, error } = await supabase
+		.from('habit_logs')
+		.update(rest)
+		.eq('id', id)
+		.select()
+		.single();
+	if (error) throw error;
+	return data;
+}
+
+/** Logs einer einzelnen Routine — für die Detailseite, wenn der Store noch leer ist. */
+export async function listLogsForHabit(workspaceId: string, habitId: string): Promise<HabitLog[]> {
+	const { data, error } = await supabase
+		.from('habit_logs')
+		.select('*')
+		.eq('workspace_id', workspaceId)
+		.eq('habit_id', habitId)
+		.order('date', { ascending: false });
+	if (error) throw error;
+	return data ?? [];
+}

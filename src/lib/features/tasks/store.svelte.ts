@@ -100,7 +100,7 @@ class TasksState {
 			const matchedHabit = habitsState.habits.find(
 				(h) => !h.archived && h.name.toLowerCase() === task.title.toLowerCase()
 			);
-			if (matchedHabit && !habitsState.isLoggedToday(matchedHabit.id)) {
+			if (matchedHabit && !habitsState.isDoneToday(matchedHabit.id)) {
 				await habitsState.toggleToday(matchedHabit.id);
 			}
 		}

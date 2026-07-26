@@ -4,7 +4,7 @@ import { habitsState } from '$lib/features/habits/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { analyticsState } from './store.svelte';
-import { calculateStreak } from '$lib/features/habits/streak';
+import { calculateStreak, streakUnit } from '$lib/features/habits/streak';
 import { toISODate } from '$lib/core/date';
 
 export interface PeriodReport {
@@ -15,7 +15,7 @@ export interface PeriodReport {
 	workouts: number;
 	journalDays: number;
 	goalsDone: number;
-	longestStreak: { name: string; days: number };
+	longestStreak: { name: string; days: number; unit: 'day' | 'week' };
 	newPRs: number;
 }
 
@@ -40,10 +40,10 @@ export function buildPeriodReport(days = 30): PeriodReport {
 		(g) => g.status === 'done' && g.updated_at >= sinceStr
 	).length;
 
-	let longestStreak = { name: '—', days: 0 };
+	let longestStreak: PeriodReport['longestStreak'] = { name: '—', days: 0, unit: 'day' };
 	for (const h of habitsState.habits.filter((h) => !h.archived)) {
-		const streak = calculateStreak(h.schedule, habitsState.logsFor(h.id));
-		if (streak > longestStreak.days) longestStreak = { name: h.name, days: streak };
+		const streak = calculateStreak(h, habitsState.entriesFor(h.id));
+		if (streak > longestStreak.days) longestStreak = { name: h.name, days: streak, unit: streakUnit(h.schedule) };
 	}
 
 	const newPRs = fitnessState.records.filter((r) => r.achieved_at.slice(0, 10) >= sinceStr).length;

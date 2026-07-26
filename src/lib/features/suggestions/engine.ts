@@ -5,7 +5,7 @@ import { moodState } from '$lib/features/mood/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { getGoalProgress } from '$lib/features/goals/progress';
-import { calculateStreak, toISODate } from '$lib/features/habits/streak';
+import { calculateStreak, toISODate, isOpenToday, streakLabel } from '$lib/features/habits/streak';
 import { shoppingState } from '$lib/features/shopping/store.svelte';
 
 export interface Suggestion {
@@ -25,14 +25,14 @@ export function getSuggestions(): Suggestion[] {
 
 	// 1. Streak in Gefahr (Streak >= 3 + heute ungeloggt)
 	for (const habit of habitsState.habits.filter((h) => !h.archived)) {
-		const loggedDates = habitsState.logsFor(habit.id);
-		const streak = calculateStreak(habit.schedule, loggedDates);
-		const loggedToday = habitsState.isLoggedToday(habit.id);
-		if (streak >= 3 && !loggedToday) {
+		const days = habitsState.entriesFor(habit.id);
+		const streak = calculateStreak(habit, days);
+		const openToday = isOpenToday(habit, days);
+		if (streak > 0 && openToday) {
 			list.push({
 				id: `streak_${habit.id}`,
 				title: '🔥 Streak in Gefahr!',
-				description: `Logge "${habit.name}" heute, um deine Streak von ${streak} Tagen zu halten!`,
+				description: `Logge "${habit.name}" heute, um deine Serie von ${streakLabel(habit.schedule, streak)} zu halten!`,
 				icon: '🔥',
 				type: 'warning',
 				actionText: 'Erledigt',

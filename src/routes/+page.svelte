@@ -7,7 +7,7 @@
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { isDueOn, calculateStreak } from '$lib/features/habits/streak';
+	import { isOpenToday, calculateStreak } from '$lib/features/habits/streak';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
 	import { shoppingState } from '$lib/features/shopping/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
@@ -68,7 +68,7 @@
 	// ── Streak-Banner ─────────────────────────────────────────────────
 	const longestStreak = $derived(
 		habitsState.habits.reduce((max, h) => {
-			const streak = calculateStreak(h.schedule, habitsState.logsFor(h.id));
+			const streak = calculateStreak(h, habitsState.entriesFor(h.id));
 			return streak > max.streak ? { streak, name: h.name } : max;
 		}, { streak: 0, name: '' })
 	);
@@ -76,7 +76,7 @@
 	// ── Sonstige Sektionen ────────────────────────────────────────────
 	const dueHabitsToday = $derived(
 		habitsState.habits.filter(
-			(h) => isDueOn(h.schedule, new Date()) && !habitsState.isLoggedToday(h.id)
+			(h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id))
 		)
 	);
 	const todayEvents = $derived(

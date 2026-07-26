@@ -24,8 +24,8 @@ profiles          (user_id, display_name, avatar_url, settings jsonb)
 tasks      (id, workspace_id, project_id, title, status, priority, due_at, assignee_id, rrule, position, created_by)
 projects   (id, workspace_id, name, color, archived)
 notes      (id, workspace_id, title, body, tags[], pinned, updated_by)
-habits     (id, workspace_id, name, schedule jsonb, color, archived)
-habit_logs (id, workspace_id, habit_id, user_id, date, value)        -- Streaks
+habits     (id, workspace_id, name, schedule jsonb, target_value, unit, color, archived)
+habit_logs (id, workspace_id, habit_id, user_id, date, value, status)        -- Streaks
 calendars  (id, workspace_id, name, color, ics_url)
 events     (id, workspace_id, calendar_id, title, start, "end", all_day, location, rrule)
 shopping_items (id, workspace_id, name, qty, unit, checked, position, added_by)

@@ -76,7 +76,7 @@
 			{#if linkedHabits.length > 0}
 				<div class="flex flex-wrap gap-1">
 					{#each linkedHabits.slice(0, 4) as habit (habit.id)}
-						{@const progress = calculateHabitProgress30Days(habit.schedule, habitsState.logsFor(habit.id))}
+						{@const progress = calculateHabitProgress30Days(habit, habitsState.entriesFor(habit.id))}
 						<span
 							class="inline-flex items-center gap-1 rounded-full bg-pink-50 dark:bg-pink-950/20 text-pink-700 dark:text-pink-400 border border-pink-100 dark:border-pink-900/30 px-2 py-0.5 text-[10px] font-medium"
 						>

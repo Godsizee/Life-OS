@@ -1,5 +1,5 @@
 import { supabase } from '$lib/core/supabase';
-import type { Calendar, Event } from './types';
+import type { Calendar, Event, EventOverride } from './types';
 
 export async function listCalendars(workspaceId: string): Promise<Calendar[]> {
 	const { data, error } = await supabase
@@ -51,5 +51,29 @@ export async function updateRaw(patch: Partial<Event> & { id: string }): Promise
 
 export async function deleteEvent(id: string): Promise<void> {
 	const { error } = await supabase.from('events').delete().eq('id', id);
+	if (error) throw error;
+}
+
+export async function listOverrides(workspaceId: string): Promise<EventOverride[]> {
+	const { data, error } = await supabase
+		.from('event_overrides')
+		.select('*')
+		.eq('workspace_id', workspaceId);
+	if (error) throw error;
+	return data ?? [];
+}
+
+export async function upsertOverrideRaw(row: EventOverride): Promise<EventOverride> {
+	const { data, error } = await supabase
+		.from('event_overrides')
+		.upsert(row, { onConflict: 'event_id,occurrence_date' })
+		.select()
+		.single();
+	if (error) throw error;
+	return data;
+}
+
+export async function deleteOverride(id: string): Promise<void> {
+	const { error } = await supabase.from('event_overrides').delete().eq('id', id);
 	if (error) throw error;
 }

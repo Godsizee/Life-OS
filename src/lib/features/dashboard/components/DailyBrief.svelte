@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
+	import { expandEvents } from '$lib/features/calendar/occurrences';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
 	import { shoppingState } from '$lib/features/shopping/store.svelte';
-	import { isDueOn } from '$lib/features/habits/streak';
+	import { isOpenToday } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
 	import { toISODate } from '$lib/core/date';
@@ -32,15 +33,15 @@
 		} catch {}
 	}
 
+	const todayStart = $derived(new Date(new Date().toDateString()));
+	const todayEnd = $derived(new Date(todayStart.getTime() + 24 * 3600 * 1000 - 1));
 	const todayEvents = $derived(
-		calendarState.events
-			.filter((e) => toISODate(new Date(e.start)) === today)
-			.sort((a, b) => a.start.localeCompare(b.start))
+		expandEvents(calendarState.events, calendarState.overrides, todayStart, todayEnd)
 	);
 	const topTasks = $derived(rankTasks(tasksState.tasks).slice(0, 3));
 	const dueHabits = $derived(
 		habitsState.habits.filter(
-			(h) => !h.archived && isDueOn(h.schedule, new Date()) && !habitsState.isLoggedToday(h.id)
+			(h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id))
 		)
 	);
 	const lastWorkout = $derived(fitnessState.logs[0]?.date ?? null);
@@ -58,7 +59,7 @@
 	const plannedTodayPlanId = $derived.by(() => {
 		for (const e of todayEvents) {
 			const planId = linksState
-				.linksFor('event', e.id)
+				.linksFor('event', e.event.id)
 				.map((l) =>
 					l.source_type === 'workout_plan' ? l.source_id : l.target_type === 'workout_plan' ? l.target_id : null
 				)
@@ -100,9 +101,9 @@
 				<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Termine</p>
 				{#if todayEvents.length > 0}
 					<ul class="mt-1 space-y-0.5">
-						{#each todayEvents.slice(0, 3) as e (e.id)}
+						{#each todayEvents.slice(0, 3) as e (e.key)}
 							<li class="truncate text-sm text-text-secondary">
-								{e.all_day
+								{e.allDay
 									? 'Ganztägig'
 									: new Date(e.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} · {e.title}
 							</li>

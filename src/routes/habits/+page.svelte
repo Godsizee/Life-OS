@@ -22,7 +22,7 @@
 	const streakStats = $derived(
 		habitsState.habits.map((h) => ({
 			habit: h,
-			streak: calculateStreak(h.schedule, habitsState.logsFor(h.id))
+			streak: calculateStreak(h, habitsState.entriesFor(h.id))
 		})).sort((a, b) => b.streak - a.streak)
 	);
 
@@ -62,7 +62,7 @@
 				<span class="text-xs text-text-secondary">{totalActiveStreaks} aktive Streak{totalActiveStreaks !== 1 ? 's' : ''}</span>
 			{/if}
 		</div>
-		<StreakCalendar habits={habitsState.habits} logsFor={(id) => habitsState.logsFor(id)} />
+		<StreakCalendar habits={habitsState.habits} entriesFor={(id) => habitsState.entriesFor(id)} />
 
 		<!-- Streak-Rangliste -->
 		{#if streakStats.some((s) => s.streak > 0)}
