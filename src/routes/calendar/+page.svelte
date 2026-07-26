@@ -56,11 +56,12 @@
 
 	// ── Layer-Toggles ─────────────────────────────────────────────────
 	const LS_KEY = 'lifeos:calendar-layers';
-	let layers = $state({ events: true, tasks: true, habits: true });
+	const DEFAULT_LAYERS = { events: true, tasks: true, habits: true };
+	let layers = $state({ ...DEFAULT_LAYERS });
 	$effect(() => {
 		try {
 			const raw = localStorage.getItem(LS_KEY);
-			if (raw) layers = { ...layers, ...JSON.parse(raw) };
+			if (raw) layers = { ...DEFAULT_LAYERS, ...JSON.parse(raw) };
 		} catch {}
 	});
 	function toggleLayer(key: 'events' | 'tasks' | 'habits') {
