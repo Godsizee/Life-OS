@@ -7,6 +7,9 @@
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { evaluateTrack } from '$lib/features/goals/checkins';
+	import { getGoalProgress } from '$lib/features/goals/progress';
+	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
 	import { isDueOn, calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
 	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
 	import Textarea from '$lib/ui/Textarea.svelte';
@@ -115,9 +118,6 @@
 	async function finish() {
 		saving = true;
 		try {
-			// Week-key: "week-2026-W28" → keine Kollision mit Daily-Einträgen
-			const weekNum = getWeekNumber(now);
-			const weekKey = `week-${now.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
 			const body = [
 				reflGood ? `## Was lief gut\n${reflGood}` : '',
 				reflHard ? `## Was war schwer\n${reflHard}` : '',
@@ -132,18 +132,11 @@
 				.filter(Boolean)
 				.join('\n\n');
 
-			await goalsState.saveJournalEntry(weekKey, '📋', body || '(Kein Text)');
+			await goalsState.saveJournalEntry(toISODate(now), '📋', body || '(Kein Text)', null, 'weekly');
 			goto('/');
 		} finally {
 			saving = false;
 		}
-	}
-
-	function getWeekNumber(d: Date): number {
-		const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-		date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
-		const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-		return Math.ceil((((date as unknown as number) - (yearStart as unknown as number)) / 86400000 + 1) / 7);
 	}
 </script>
 
@@ -237,14 +230,17 @@
 				<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Ziele</p>
 				<div class="mt-2 flex flex-col gap-2">
 					{#each goalsInProgress as goal (goal.id)}
+						{@const progress = getGoalProgress(goal)}
+						{@const track = evaluateTrack(goal, progress)}
 						<div class="flex items-center gap-2">
 							<span class="min-w-0 flex-1 truncate text-sm text-text-secondary">{goal.title}</span>
+							<OnTrackBadge {track} compact />
 							<div class="w-16 flex-shrink-0">
 								<div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-									<div class="h-full bg-primary-500" style="width: {goal.progress}%"></div>
+									<div class="h-full bg-primary-500" style="width: {progress}%"></div>
 								</div>
 							</div>
-							<span class="w-8 text-right text-xs text-text-secondary">{goal.progress}%</span>
+							<span class="w-8 text-right text-xs text-text-secondary">{progress}%</span>
 						</div>
 					{/each}
 				</div>

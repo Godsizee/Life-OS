@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { buildPeriodReport } from '../report';
-	import { TrendingUp, CheckSquare, Dumbbell, BookOpen, Flame, Target, Trophy } from 'lucide-svelte';
+	import { TrendingUp, CheckSquare, Dumbbell, BookOpen, Flame, Target, Trophy, ClipboardCheck } from 'lucide-svelte';
 
 	let { days = 30 }: { days?: number } = $props();
 
@@ -11,6 +11,7 @@
 		{ icon: CheckSquare, label: 'Aufgaben', value: `${report.tasksCompleted}`, sub: 'erledigt' },
 		{ icon: Dumbbell, label: 'Workouts', value: `${report.workouts}`, sub: 'Sessions' },
 		{ icon: BookOpen, label: 'Tagebuch', value: `${report.journalDays}`, sub: 'Tage' },
+		{ icon: ClipboardCheck, label: 'Reviews', value: `${report.weeklyReviews}`, sub: 'Wochen' },
 		{ icon: Target, label: 'Ziele', value: `${report.goalsDone}`, sub: 'erreicht' },
 		{ icon: Trophy, label: 'Neue PRs', value: `${report.newPRs}`, sub: 'Rekorde' },
 		{

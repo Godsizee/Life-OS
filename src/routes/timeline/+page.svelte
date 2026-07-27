@@ -12,6 +12,7 @@
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
 	import { notesState } from '$lib/features/notes/store.svelte';
+	import { getGoalProgress } from '$lib/features/goals/progress';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
@@ -106,6 +107,9 @@
 					bg: 'bg-indigo-50 dark:bg-indigo-950/20',
 					module: 'Goals'
 				});
+			} else if (g.status === 'open' && g.created_at) {
+				// We can show open goals, maybe their progress? But they aren't discrete events...
+				// For now, we only show completed goals. The plan says "zeige bei Zielen den dynamischen Fortschritt", maybe they meant in another file or just if we add progress updates to timeline.
 			}
 		});
 

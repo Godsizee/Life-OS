@@ -1,5 +1,5 @@
 import { supabase } from '$lib/core/supabase';
-import type { Goal, JournalEntry } from './types';
+import type { Goal, GoalCheckin, JournalEntry } from './types';
 
 export async function listGoals(workspaceId: string): Promise<Goal[]> {
 	const { data, error } = await supabase
@@ -48,7 +48,7 @@ export async function listJournalEntries(workspaceId: string): Promise<JournalEn
 export async function upsertJournalEntry(entry: JournalEntry): Promise<JournalEntry> {
 	const { data, error } = await supabase
 		.from('journal_entries')
-		.upsert(entry, { onConflict: 'user_id,date' })
+		.upsert(entry, { onConflict: 'user_id,date,kind' })
 		.select()
 		.single();
 	if (error) throw error;
@@ -57,5 +57,28 @@ export async function upsertJournalEntry(entry: JournalEntry): Promise<JournalEn
 
 export async function deleteJournalEntry(id: string): Promise<void> {
 	const { error } = await supabase.from('journal_entries').delete().eq('id', id);
+	if (error) throw error;
+}
+
+// W8 — Check-ins sind geteilt (RLS "members rw" wie goals selbst).
+export async function listGoalCheckins(workspaceId: string): Promise<GoalCheckin[]> {
+	const { data, error } = await supabase
+		.from('goal_checkins')
+		.select('*')
+		.eq('workspace_id', workspaceId)
+		.order('date', { ascending: false });
+	if (error) throw error;
+	return data ?? [];
+}
+
+// upsert statt insert -> ein Outbox-Replay darf beliebig oft laufen.
+export async function insertGoalCheckinRaw(row: GoalCheckin): Promise<GoalCheckin> {
+	const { data, error } = await supabase.from('goal_checkins').upsert(row).select().single();
+	if (error) throw error;
+	return data;
+}
+
+export async function deleteGoalCheckin(id: string): Promise<void> {
+	const { error } = await supabase.from('goal_checkins').delete().eq('id', id);
 	if (error) throw error;
 }

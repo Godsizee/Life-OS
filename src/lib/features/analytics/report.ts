@@ -14,6 +14,7 @@ export interface PeriodReport {
 	tasksCompleted: number;
 	workouts: number;
 	journalDays: number;
+	weeklyReviews: number;
 	goalsDone: number;
 	longestStreak: { name: string; days: number; unit: 'day' | 'week' };
 	newPRs: number;
@@ -34,7 +35,9 @@ export function buildPeriodReport(days = 30): PeriodReport {
 
 	const workouts = fitnessState.logs.filter((l) => l.date >= sinceStr).length;
 
-	const journalDays = goalsState.journalEntries.filter((j) => j.date >= sinceStr).length;
+	const journalDays = goalsState.journalEntries.filter((j) => j.kind === 'daily' && j.date >= sinceStr).length;
+
+	const weeklyReviews = goalsState.journalEntries.filter((j) => j.kind === 'weekly' && j.date >= sinceStr).length;
 
 	const goalsDone = goalsState.goals.filter(
 		(g) => g.status === 'done' && g.updated_at >= sinceStr
@@ -55,6 +58,7 @@ export function buildPeriodReport(days = 30): PeriodReport {
 		tasksCompleted,
 		workouts,
 		journalDays,
+		weeklyReviews,
 		goalsDone,
 		longestStreak,
 		newPRs

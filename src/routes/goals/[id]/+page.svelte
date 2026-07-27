@@ -11,7 +11,10 @@
 	import { getGoalProgress } from '$lib/features/goals/progress';
 	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
+	import { evaluateTrack } from '$lib/features/goals/checkins';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
+	import GoalTargetCard from '$lib/features/goals/components/GoalTargetCard.svelte';
+	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
 	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck } from 'lucide-svelte';
 	import Select from '$lib/ui/Select.svelte';
 	import type { GoalStatus } from '$lib/features/goals/types';
@@ -38,6 +41,7 @@
 
 	const goal = $derived(goalsState.goals.find((g) => g.id === goalId) ?? null);
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
+	const track = $derived(goal ? evaluateTrack(goal, progress) : null);
 
 	const linkedTasks = $derived(goal ? tasksState.tasks.filter((t) => t.goal_id === goal.id) : []);
 	const linkedHabits = $derived(
@@ -122,6 +126,11 @@
 				<div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
 					<div class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500" style="width: {progress}%"></div>
 				</div>
+				{#if track}
+					<div class="mt-2">
+						<OnTrackBadge {track} />
+					</div>
+				{/if}
 			</div>
 
 			<div class="flex items-center gap-2">
@@ -132,6 +141,11 @@
 				</Select>
 			</div>
 		</header>
+
+		<!-- Zielwert (W8) -->
+		{#if goal.goal_type === 'target'}
+			<GoalTargetCard {goal} />
+		{/if}
 
 		<!-- PR-Ziel -->
 		{#if goal.goal_type === 'pr' && goal.target_exercise}

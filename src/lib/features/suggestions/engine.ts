@@ -102,12 +102,12 @@ export function getSuggestions(): Suggestion[] {
 	}
 
 	// 5. Kein Journal (3+ Tage kein Eintrag)
-	const recentJournalDates = goalsState.journalEntries.map((j) => j.date);
+	const recentJournalEntries = goalsState.journalEntries.filter(j => j.kind !== 'weekly').map(j => j.date);
 	let journalMissingDays = 0;
 	for (let i = 1; i <= 3; i++) {
 		const d = new Date();
 		d.setDate(d.getDate() - i);
-		if (!recentJournalDates.includes(toISODate(d))) {
+		if (!recentJournalEntries.includes(toISODate(d))) {
 			journalMissingDays++;
 		}
 	}
@@ -204,15 +204,15 @@ export function getSuggestions(): Suggestion[] {
 		}
 	}
 
-	// 10. Abend-Journal (Welle 5.5/5.9): ab 20 Uhr, heute noch kein Eintrag
-	if (now.getHours() >= 20 && !goalsState.todayEntry) {
+	// 10. Tagebuch (W8)
+	if (!goalsState.todayEntry) {
 		list.push({
-			id: 'evening_journal',
-			title: '✍️ Tag abschließen',
-			description: 'Halte in einem Satz fest, wie dein Tag war — dein „Tag in Zahlen" liegt schon bereit.',
+			id: 'journal_today',
+			title: 'Tagebuch',
+			description: 'Wie war dein Tag?',
 			icon: '✍️',
 			type: 'action',
-			actionText: 'Tagebuch öffnen',
+			actionText: 'Schreiben',
 			actionRoute: '/goals?tab=journal'
 		});
 	}

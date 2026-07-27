@@ -1,15 +1,33 @@
 <script lang="ts">
 	import Button from '$lib/ui/Button.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import Field from '$lib/ui/Field.svelte';
+	import Select from '$lib/ui/Select.svelte';
 	import { goalsState } from '../store.svelte';
+	import type { GoalType } from '../types';
 
-	let { onsubmitted }: { onsubmitted?: () => void } = $props();
+	let { onsubmitted, parentId = null }: { onsubmitted?: () => void; parentId?: string | null } =
+		$props();
 
 	let title = $state('');
 	let targetDate = $state('');
-	let goalType = $state<'standard' | 'pr' | 'fitness_frequency'>('standard');
+	let goalType = $state<GoalType>('standard');
 	let targetExercise = $state('');
 	let targetValue = $state<number | null>(null);
+	let targetUnit = $state('');
+	let parent = $state(parentId ?? '');
+
+	// Genau eine Ebene: nur Wurzelziele dürfen Eltern sein (Plan §5, Regel 6).
+	const parentOptions = $derived(
+		goalsState.goals.filter((g) => g.parent_id === null && g.status !== 'done')
+	);
+
+	const types: { value: GoalType; label: string }[] = [
+		{ value: 'standard', label: 'Standard' },
+		{ value: 'target', label: '🎯 Zielwert' },
+		{ value: 'pr', label: '🏋️ Kraft (PR)' },
+		{ value: 'fitness_frequency', label: '📅 Frequenz' }
+	];
 
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
@@ -17,56 +35,54 @@
 		await goalsState.addGoal({
 			title,
 			target_date: targetDate || null,
+			parent_id: parent || null,
 			goal_type: goalType,
 			target_exercise: goalType === 'pr' ? targetExercise.trim() || null : null,
-			target_value: goalType === 'pr' || goalType === 'fitness_frequency' ? targetValue : null
+			target_value:
+				goalType === 'pr' || goalType === 'fitness_frequency' || goalType === 'target'
+					? targetValue
+					: null,
+			target_unit: goalType === 'target' ? targetUnit.trim() || null : null
 		});
 		title = '';
 		targetDate = '';
 		targetExercise = '';
 		targetValue = null;
+		targetUnit = '';
 		goalType = 'standard';
+		parent = parentId ?? '';
 		onsubmitted?.();
 	}
 </script>
 
-<form onsubmit={submit} class="flex flex-col gap-2">
+<form onsubmit={submit} class="flex flex-col gap-3">
 	<Input placeholder="Neues Ziel…" bind:value={title} required />
 
-	<div class="flex gap-2">
-		<button
-			type="button"
-			onclick={() => (goalType = 'standard')}
-			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
-			'standard'
-				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
-				: 'border-border-color bg-surface-1 text-text-secondary'}"
-		>
-			Standard
-		</button>
-		<button
-			type="button"
-			onclick={() => (goalType = 'pr')}
-			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
-			'pr'
-				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
-				: 'border-border-color bg-surface-1 text-text-secondary'}"
-		>
-			🏋️ Kraft-Ziel (PR)
-		</button>
-		<button
-			type="button"
-			onclick={() => (goalType = 'fitness_frequency')}
-			class="flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-colors {goalType ===
-			'fitness_frequency'
-				? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
-				: 'border-border-color bg-surface-1 text-text-secondary'}"
-		>
-			📅 Trainings-Frequenz
-		</button>
+	<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+		{#each types as t (t.value)}
+			<button
+				type="button"
+				onclick={() => (goalType = t.value)}
+				class="min-h-12 rounded-xl border px-2 text-xs font-medium transition-colors {goalType ===
+				t.value
+					? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400'
+					: 'border-border-color bg-surface-1 text-text-secondary'}"
+			>
+				{t.label}
+			</button>
+		{/each}
 	</div>
 
-	{#if goalType === 'pr'}
+	{#if goalType === 'target'}
+		<div class="flex gap-2">
+			<div class="flex-1">
+				<Input type="number" min="1" step="1" placeholder="Zielmenge" bind:value={targetValue} />
+			</div>
+			<div class="w-32">
+				<Input placeholder="Einheit" maxlength={20} bind:value={targetUnit} />
+			</div>
+		</div>
+	{:else if goalType === 'pr'}
 		<div class="flex gap-2">
 			<Input placeholder="Übung (z. B. Kreuzheben)" bind:value={targetExercise} />
 			<div class="w-32">
@@ -77,7 +93,21 @@
 		<Input type="number" min="1" max="14" placeholder="Trainings/Woche" bind:value={targetValue} />
 	{/if}
 
-	<Input type="date" bind:value={targetDate} />
+	{#if parentOptions.length > 0}
+		<Field label="Unterziel von" hint="Optional — macht dieses Ziel zum Meilenstein">
+			<Select bind:value={parent}>
+				<option value="">Kein Oberziel</option>
+				{#each parentOptions as g (g.id)}
+					<option value={g.id}>{g.title}</option>
+				{/each}
+			</Select>
+		</Field>
+	{/if}
+
+	<Field label="Zieldatum" hint="Optional — Basis für die Auf-Kurs-Anzeige">
+		<Input type="date" bind:value={targetDate} />
+	</Field>
+
 	<Button type="submit">
 		{#snippet children()}
 			Hinzufügen

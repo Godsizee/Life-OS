@@ -11,8 +11,13 @@
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
 	import GoalList from '$lib/features/goals/components/GoalList.svelte';
-	import JournalEntryForm from '$lib/features/goals/components/JournalEntryForm.svelte';
 	import JournalList from '$lib/features/goals/components/JournalList.svelte';
+	import JournalPromptBar from '$lib/features/goals/components/JournalPromptBar.svelte';
+	import JournalStreakBadge from '$lib/features/goals/components/JournalStreakBadge.svelte';
+	import JournalOnThisDay from '$lib/features/goals/components/JournalOnThisDay.svelte';
+	import JournalEntrySheet from '$lib/features/goals/components/JournalEntrySheet.svelte';
+	import { calculateJournalStreak, getOnThisDay } from '$lib/features/goals/journal-stats';
+	import type { JournalKind } from '$lib/features/goals/types';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
@@ -22,6 +27,19 @@
 		page.url.searchParams.get('tab') === 'journal' ? 'journal' : 'goals'
 	);
 	let createOpen = $state(false);
+
+	let journalSheetOpen = $state(false);
+	let journalDate = $state<string | null>(null);
+	let journalKind = $state<JournalKind>('daily');
+
+	const streak = $derived(calculateJournalStreak(goalsState.journalEntries));
+	const onThisDay = $derived(getOnThisDay(goalsState.journalEntries));
+
+	function openJournal(date: string, kind: JournalKind = 'daily') {
+		journalDate = date;
+		journalKind = kind;
+		journalSheetOpen = true;
+	}
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -105,10 +123,23 @@
 		{/if}
 	</section>
 {:else}
-	<section class="mb-4">
-		<JournalEntryForm />
-	</section>
+	<div class="mb-4 flex items-center justify-between">
+		<h2 class="text-sm font-bold text-text-primary">Dein Tagebuch</h2>
+		<JournalStreakBadge {streak} />
+	</div>
+
+	<div class="mb-4 space-y-4">
+		<JournalPromptBar onOpen={(d) => openJournal(d, 'daily')} />
+		<JournalOnThisDay entries={onThisDay} onOpen={(e) => openJournal(e.date, e.kind)} />
+	</div>
+
 	<section>
-		<JournalList entries={goalsState.journalEntries} />
+		<JournalList entries={goalsState.journalEntries} onEdit={openJournal} />
 	</section>
+
+	<JournalEntrySheet
+		bind:open={journalSheetOpen}
+		date={journalDate}
+		kind={journalKind}
+	/>
 {/if}

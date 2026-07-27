@@ -5,7 +5,9 @@
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
-	import { getGoalProgress } from '../progress';
+	import { getGoalProgress, usesManualProgress } from '../progress';
+	import { evaluateTrack, formatTargetProgress, sumCheckins } from '../checkins';
+	import OnTrackBadge from './OnTrackBadge.svelte';
 	import ListRow from '$lib/ui/ListRow.svelte';
 
 	let { goal }: { goal: Goal } = $props();
@@ -21,15 +23,20 @@
 	const linkedDone = $derived(linkedTasks.filter((t) => t.status === 'done'));
 	const linkedHabits = $derived(habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived));
 
-	// Wenn Tasks oder Habits verknüpft: automatischer Fortschritt; sonst: manueller Slider
-	const isAuto = $derived(linkedTasks.length > 0 || linkedHabits.length > 0);
 	const displayProgress = $derived(getGoalProgress(goal));
+	const isManual = $derived(usesManualProgress(goal));
+	const track = $derived(evaluateTrack(goal, displayProgress));
+	const children = $derived(goalsState.goals.filter((g) => g.parent_id === goal.id));
+	const checkinSum = $derived(
+		goal.goal_type === 'target' ? sumCheckins(goalsState.checkinsFor(goal.id)) : 0
+	);
 </script>
 
 <ListRow align="start">
 	<a href="/goals/{goal.id}" class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline">
 		{goal.title}
 		{#if goal.goal_type === 'pr'}<span class="ml-1 text-xs">🏋️</span>{/if}
+		{#if goal.goal_type === 'target'}<span class="ml-1 text-xs">🎯</span>{/if}
 	</a>
 	{#snippet trailing()}
 		<button
@@ -49,8 +56,22 @@
 		></div>
 	</div>
 
+	<div class="mt-2 flex flex-wrap items-center gap-1.5">
+		<OnTrackBadge {track} />
+		{#if goal.goal_type === 'target'}
+			<span class="text-[11px] font-medium tabular-nums text-text-secondary">
+				{formatTargetProgress(checkinSum, goal.target_value, goal.target_unit)}
+			</span>
+		{/if}
+		{#if children.length > 0}
+			<span class="text-[11px] text-text-tertiary">
+				{children.filter((c) => c.status === 'done').length}/{children.length} Meilensteine
+			</span>
+		{/if}
+	</div>
+
 	<!-- Verknüpfte Elemente als Chips -->
-	{#if isAuto}
+	{#if linkedTasks.length > 0 || linkedHabits.length > 0}
 		<div class="mt-2 flex flex-col gap-1.5">
 			{#if linkedTasks.length > 0}
 				<div class="flex flex-wrap gap-1">
@@ -101,7 +122,9 @@
 				{linkedDone.length}/{linkedTasks.length} Aufgaben erledigt · {displayProgress}%
 			{/if}
 		</p>
-	{:else}
+	{/if}
+
+	{#if isManual}
 		<!-- Kein Link: manueller Slider -->
 		<div class="mt-2">
 			<input

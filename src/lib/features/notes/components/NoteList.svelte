@@ -7,16 +7,27 @@
 	import { DURATION, motionDuration } from '$lib/ui/motion';
 	import type { Note } from '../types';
 
-	let { notes }: { notes: Note[] } = $props();
+	let {
+		notes,
+		onopen,
+		emptyHint = 'Erstelle deine erste Notiz oben.'
+	}: {
+		notes: Note[];
+		onopen: (note: Note) => void;
+		emptyHint?: string;
+	} = $props();
 </script>
 
 {#if notes.length === 0}
-	<EmptyState icon={Notebook} title="Keine Notizen" hint="Erstelle deine erste Notiz oben." />
+	<EmptyState icon={Notebook} title="Keine Notizen" hint={emptyHint} />
 {:else}
-	<ul class="flex flex-col gap-2">
+	<ul class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
 		{#each notes as note (note.id)}
-			<li class="contents" transition:fade={{ duration: motionDuration(DURATION.fast) }} animate:flip={{ duration: motionDuration(DURATION.base) }}>
-				<NoteItem {note} />
+			<li
+				transition:fade={{ duration: motionDuration(DURATION.fast) }}
+				animate:flip={{ duration: motionDuration(DURATION.base) }}
+			>
+				<NoteItem {note} {onopen} />
 			</li>
 		{/each}
 	</ul>
