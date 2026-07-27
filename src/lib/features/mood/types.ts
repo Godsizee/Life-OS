@@ -5,6 +5,8 @@ export interface MoodEntry {
 	date: string;
 	score: 1 | 2 | 3 | 4 | 5;
 	note: string | null;
+	/** W9 — Daylio-Aktivitaeten: Katalog-IDs und eigene Tags im selben Array. */
+	activities: string[];
 }
 
 // Emojis kept for legacy tooltip/title fallback only

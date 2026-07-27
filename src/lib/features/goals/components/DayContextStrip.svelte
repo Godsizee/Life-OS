@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DayContext } from '../types';
-	import { CheckSquare, Repeat, Dumbbell, Smile, Moon, Droplet, Zap } from 'lucide-svelte';
+	import { CheckSquare, Repeat, Dumbbell, Smile, Moon, Droplet, Zap, Tag } from 'lucide-svelte';
+	import { activityLabel } from '$lib/features/mood/activities';
 
 	let { context }: { context: DayContext } = $props();
 
@@ -35,7 +36,7 @@
 	const visible = $derived(chips.filter((c) => c.show));
 </script>
 
-{#if visible.length > 0}
+{#if visible.length > 0 || (context.mood_activities?.length ?? 0) > 0}
 	<div class="flex flex-wrap gap-1.5">
 		{#each visible as chip (chip.label)}
 			{@const Icon = chip.icon}
@@ -44,6 +45,14 @@
 			>
 				<Icon size={11} />
 				{chip.label}
+			</span>
+		{/each}
+		{#each context.mood_activities ?? [] as activity (activity)}
+			<span
+				class="inline-flex items-center gap-1 rounded-full border border-border-color bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-text-secondary"
+			>
+				<Tag size={11} />
+				{activityLabel(activity)}
 			</span>
 		{/each}
 	</div>

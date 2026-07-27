@@ -1,34 +1,49 @@
 <script lang="ts">
 	import { healthState } from '../store.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
 	import Field from '$lib/ui/Field.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Button from '$lib/ui/Button.svelte';
+
+	let {
+		date = healthState.todayKey(),
+		onsaved
+	}: {
+		/** W9 — welcher Tag bearbeitet wird ('yyyy-mm-dd'). Default: heute. */
+		date?: string;
+		onsaved?: () => void;
+	} = $props();
 
 	let weight = $state('');
 	let sleep = $state('');
 	let water = $state(0);
 	let energy = $state<number | null>(null);
 	let saving = $state(false);
+	let hydratedFor = $state<string | null>(null);
 
+	// Genau einmal je Eintrag befuellen — sonst ueberschreibt jedes Realtime-Event
+	// die laufende Eingabe.
 	$effect(() => {
-		const e = healthState.todayEntry;
-		if (e) {
-			weight = e.weight_kg != null ? String(e.weight_kg) : '';
-			sleep = e.sleep_h != null ? String(e.sleep_h) : '';
-			water = e.water_glasses ?? 0;
-			energy = e.energy ?? null;
-		}
+		const e = healthState.entryForDate(date);
+		const key = `${date}:${e?.id ?? 'new'}`;
+		if (key === hydratedFor) return;
+		hydratedFor = key;
+		weight = e?.weight_kg != null ? String(e.weight_kg) : '';
+		sleep = e?.sleep_h != null ? String(e.sleep_h) : '';
+		water = e?.water_glasses ?? 0;
+		energy = e?.energy ?? null;
 	});
 
 	async function save() {
 		saving = true;
 		try {
-			await healthState.save({
+			await healthState.saveFor(date, {
 				weight_kg: weight ? parseFloat(weight) : null,
 				sleep_h: sleep ? parseFloat(sleep) : null,
 				water_glasses: water || null,
 				energy
 			});
+			onsaved?.();
 		} finally {
 			saving = false;
 		}
@@ -64,6 +79,7 @@
 			>−</button>
 			<div class="flex-1 text-center">
 				<span class="text-2xl font-bold text-primary-600 dark:text-primary-400">{water}</span>
+				<span class="ml-1 text-xs text-text-tertiary">/ {profileState.waterGoalGlasses}</span>
 				<div class="mt-1 flex gap-0.5 justify-center flex-wrap">
 					{#each Array(Math.min(water, 12)) as _}
 						<span class="text-base">💧</span>
@@ -72,14 +88,14 @@
 			</div>
 			<button
 				type="button"
-				onclick={() => (water = Math.min(20, water + 1))}
+				onclick={() => (water = Math.min(30, water + 1))}
 				class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-color bg-surface-2 text-xl font-bold text-text-primary hover:bg-surface-3 active:scale-95 transition-all"
 			>+</button>
 		</div>
 	</div>
 
 	<!-- Schlaf -->
-	<Field label="😴 Schlaf (Stunden)">
+	<Field label="😴 Schlaf (Stunden)" hint="Ziel: {profileState.sleepGoalH} h">
 		<Input type="number" bind:value={sleep} min="0" max="24" step="0.5" placeholder="z.B. 7.5" />
 	</Field>
 

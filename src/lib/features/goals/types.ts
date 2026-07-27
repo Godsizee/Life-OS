@@ -46,6 +46,8 @@ export interface DayContext {
 	habits_due: number;
 	workout: boolean;
 	mood: number | null;
+	/** W9 — Aktivitäten-Tags des Tages (Daylio). Optional: ältere Snapshots haben es nicht. */
+	mood_activities?: string[];
 	sleep_h: number | null;
 	water_glasses: number | null;
 	focus_minutes: number;

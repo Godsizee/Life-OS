@@ -56,20 +56,21 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	}
 	const habitsScore = dueCount > 0 ? (doneCount / dueCount) * 100 : 100;
 
-	// 3. Health (15%)
+	// 3. Health (13%) — W9: rechnet gegen die Ziele aus profiles.settings
+	//    statt gegen hartkodierte 8 Gläser / 7–9 h.
 	const healthEntry = healthState.entries.find((e) => e.date === dateStr);
+	const waterGoal = profileState.waterGoalGlasses;
+	const sleepGoal = profileState.sleepGoalH;
 	let healthPoints = 0;
 	if (healthEntry) {
 		if (healthEntry.weight_kg !== null && healthEntry.weight_kg > 0) healthPoints += 25;
-		if (healthEntry.sleep_h !== null && healthEntry.sleep_h >= 7 && healthEntry.sleep_h <= 9) {
-			healthPoints += 25;
-		} else if (healthEntry.sleep_h !== null) {
-			healthPoints += 15;
+		if (healthEntry.sleep_h !== null) {
+			// Ziel ± 1 h volle Punkte, sonst Teilpunkte fürs Erfassen.
+			const hit = Math.abs(healthEntry.sleep_h - sleepGoal) <= 1;
+			healthPoints += hit ? 25 : 15;
 		}
-		if (healthEntry.water_glasses !== null && healthEntry.water_glasses >= 8) {
-			healthPoints += 25;
-		} else if (healthEntry.water_glasses !== null && healthEntry.water_glasses > 0) {
-			healthPoints += Math.min(25, (healthEntry.water_glasses / 8) * 25);
+		if (healthEntry.water_glasses !== null && waterGoal > 0) {
+			healthPoints += Math.min(25, (healthEntry.water_glasses / waterGoal) * 25);
 		}
 		if (healthEntry.energy !== null && healthEntry.energy > 0) healthPoints += 25;
 	}

@@ -12,6 +12,8 @@
 	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
 	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
 	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
+	import MoodActivityStats from '$lib/features/mood/components/MoodActivityStats.svelte';
+	import { filterSince } from '$lib/features/mood/stats';
 	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
 	import MonthlyReport from '$lib/features/analytics/components/MonthlyReport.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
@@ -46,6 +48,7 @@
 			? Math.round(scoresArray.reduce((a, b) => a + b, 0) / scoresArray.length)
 			: 0
 	);
+	const moodStatsEntries = $derived(filterSince(moodState.entries, 90));
 
 	const breakdown = $derived(analyticsState.todayBreakdown() ?? {
 		tasks: 0,
@@ -176,6 +179,14 @@
 
 	<!-- Monatsbericht (Welle 5.7) -->
 	<MonthlyReport days={30} />
+
+	<!-- Aktivitäts-Statistik (W9) -->
+	<section class="space-y-3">
+		<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+			Stimmung ↔ Aktivitäten (90 Tage)
+		</h2>
+		<MoodActivityStats entries={moodStatsEntries} />
+	</section>
 
 	<!-- Mood ↔ Health Korrelation (#5) -->
 	<MoodHealthCorrelation />

@@ -1,68 +1,67 @@
 import { supabase } from '$lib/core/supabase';
 import type { MoodEntry } from './types';
 
-export async function getTodayMood(
+/** Nutzlast eines Upserts — bewusst OHNE `id`:
+ *  Der Unique-Key ist (workspace_id, user_id, date). Wuerde der Client eine eigene
+ *  UUID mitschicken, wuerde `on conflict do update` den Primaerschluessel der
+ *  bestehenden Zeile ueberschreiben und Realtime-Events waeren nicht mehr
+ *  zuzuordnen. Die DB vergibt/behaelt die id. */
+export interface MoodUpsert {
+	workspace_id: string;
+	user_id: string;
+	date: string;
+	score: number;
+	note: string | null;
+	activities: string[];
+}
+
+export async function listMoodEntries(
 	workspaceId: string,
 	userId: string,
-	date: string
-): Promise<MoodEntry | null> {
-	const { data } = await supabase
+	sinceDate: string
+): Promise<MoodEntry[]> {
+	const { data, error } = await supabase
 		.from('mood_entries')
 		.select('*')
 		.eq('workspace_id', workspaceId)
 		.eq('user_id', userId)
-		.eq('date', date)
-		.maybeSingle();
-	return data ?? null;
+		.gte('date', sinceDate)
+		.order('date');
+	if (error) throw error;
+	return data ?? [];
 }
 
-export async function upsertMood(
+/** Fuer den Jahres-Umschalter: exakt ein Kalenderjahr nachladen. */
+export async function listMoodEntriesInRange(
 	workspaceId: string,
 	userId: string,
-	date: string,
-	score: number,
-	note: string | null
-): Promise<MoodEntry> {
+	fromDate: string,
+	toDate: string
+): Promise<MoodEntry[]> {
 	const { data, error } = await supabase
 		.from('mood_entries')
-		.upsert(
-			{ workspace_id: workspaceId, user_id: userId, date, score, note },
-			{ onConflict: 'workspace_id,user_id,date' }
-		)
+		.select('*')
+		.eq('workspace_id', workspaceId)
+		.eq('user_id', userId)
+		.gte('date', fromDate)
+		.lte('date', toDate)
+		.order('date');
+	if (error) throw error;
+	return data ?? [];
+}
+
+/** Einziger Schreibpfad. Idempotent -> Outbox-Replay-sicher. */
+export async function upsertMoodRaw(payload: MoodUpsert): Promise<MoodEntry> {
+	const { data, error } = await supabase
+		.from('mood_entries')
+		.upsert(payload, { onConflict: 'workspace_id,user_id,date' })
 		.select()
 		.single();
 	if (error) throw error;
-	return data;
+	return data as MoodEntry;
 }
 
-export async function getWeekMoods(
-	workspaceId: string,
-	userId: string,
-	sinceDate: string
-): Promise<MoodEntry[]> {
-	const { data, error } = await supabase
-		.from('mood_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('date', sinceDate)
-		.order('date');
+export async function deleteMoodEntry(id: string): Promise<void> {
+	const { error } = await supabase.from('mood_entries').delete().eq('id', id);
 	if (error) throw error;
-	return data ?? [];
-}
-
-export async function getMonthMoods(
-	workspaceId: string,
-	userId: string,
-	sinceDate: string
-): Promise<MoodEntry[]> {
-	const { data, error } = await supabase
-		.from('mood_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('date', sinceDate)
-		.order('date');
-	if (error) throw error;
-	return data ?? [];
 }

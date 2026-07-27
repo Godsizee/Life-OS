@@ -151,6 +151,14 @@
 					await habitsState.toggleToday(parsedResult.parsed.habitId);
 					toastState.success(`Routine "${parsedResult.parsed.name}" geloggt`);
 					break;
+				case 'mood':
+					await moodState.save(
+						parsedResult.parsed.score,
+						null,
+						parsedResult.parsed.activities ?? []
+					);
+					toastState.success('Stimmung erfasst');
+					break;
 				case 'note':
 					await notesState.addNote({
 						title: parsedResult.parsed.title,

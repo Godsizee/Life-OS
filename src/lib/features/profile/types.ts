@@ -10,5 +10,11 @@ export interface ProfileSettings {
 	focus_long_break_minutes?: number;
 	/** W6 — Fokus-Runden bis zur langen Pause. */
 	focus_rounds_until_long_break?: number;
+	/** W9 — Wasserziel in Gläsern pro Tag. */
+	water_goal_glasses?: number;
+	/** W9 — Schlafziel in Stunden pro Nacht. */
+	sleep_goal_h?: number;
+	/** W9 — Zielgewicht in kg. null/undefined = kein Zielgewicht gesetzt. */
+	weight_goal_kg?: number | null;
 }
 

@@ -1,132 +1,167 @@
 <script lang="ts">
-	import { toISODate } from '$lib/core/date';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import MoodPicker from '$lib/features/mood/components/MoodPicker.svelte';
+	import ActivityPicker from '$lib/features/mood/components/ActivityPicker.svelte';
+	import YearInPixels from '$lib/features/mood/components/YearInPixels.svelte';
+	import MoodEntrySheet from '$lib/features/mood/components/MoodEntrySheet.svelte';
+	import MoodActivityStats from '$lib/features/mood/components/MoodActivityStats.svelte';
+	import WeekdayAverages from '$lib/features/mood/components/WeekdayAverages.svelte';
 	import { MOOD_LABELS } from '$lib/features/mood/types';
-	import { Angry, Frown, Meh, Smile, SmilePlus } from 'lucide-svelte';
+	import { MOOD_CLASSES } from '$lib/features/mood/colors';
+	import {
+		availableYears,
+		averageScore,
+		entriesInYear,
+		filterSince,
+		formatScore,
+		yearPixels
+	} from '$lib/features/mood/stats';
+	import { formatDate, toISODate } from '$lib/core/date';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import Textarea from '$lib/ui/Textarea.svelte';
+	import Chip from '$lib/ui/Chip.svelte';
 
 	$effect(() => {
 		if (workspaceState.workspace?.id) moodState.load();
 	});
 
+	// ── Heute erfassen ──────────────────────────────────────────────
 	let selectedScore = $state<number | null>(null);
 	let note = $state('');
+	let activities = $state<string[]>([]);
 	let saving = $state(false);
+	let hydratedFor = $state<string | null>(null);
 
+	// Formular genau einmal je Tageseintrag aus dem Store befuellen — sonst
+	// wuerde jede Realtime-Aenderung die Eingabe des Nutzers ueberschreiben.
 	$effect(() => {
-		if (moodState.todayEntry) {
-			selectedScore = moodState.todayEntry.score;
-			note = moodState.todayEntry.note ?? '';
-		}
+		const entry = moodState.todayEntry;
+		const key = entry ? `${entry.id}:${entry.date}` : null;
+		if (key === hydratedFor) return;
+		hydratedFor = key;
+		selectedScore = entry?.score ?? null;
+		note = entry?.note ?? '';
+		activities = [...(entry?.activities ?? [])];
 	});
 
 	async function save() {
 		if (!selectedScore) return;
 		saving = true;
 		try {
-			await moodState.save(selectedScore, note.trim() || null);
+			await moodState.save(selectedScore, note, activities);
 		} finally {
 			saving = false;
 		}
 	}
 
-	// 30-Tage-Grid
-	const gridDays = $derived(() => {
-		const days = [];
-		for (let i = 29; i >= 0; i--) {
-			const d = new Date();
-			d.setDate(d.getDate() - i);
-			const key = toISODate(d);
-			const entry = moodState.entries.find((e) => e.date === key);
-			days.push({ key, day: d.getDate(), entry });
-		}
-		return days;
-	});
+	// ── Year in Pixels ──────────────────────────────────────────────
+	const currentYear = new Date().getFullYear();
+	let year = $state(currentYear);
+	const years = $derived(availableYears(moodState.entries, currentYear));
+	const months = $derived(yearPixels(moodState.entries, year));
+	const yearEntries = $derived(entriesInYear(moodState.entries, year));
+	const yearAverage = $derived(averageScore(yearEntries));
 
-	const scoreColors: Record<number, string> = {
-		1: 'bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50',
-		2: 'bg-orange-100 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900/50',
-		3: 'bg-yellow-100 dark:bg-yellow-950/40 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-900/50',
-		4: 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50',
-		5: 'bg-primary-700 dark:bg-primary-600 text-white border-transparent'
-	};
+	async function pickYear(y: number) {
+		year = y;
+		await moodState.loadYear(y);
+	}
 
-	const moodIcons: Record<number, typeof Frown> = {
-		1: Angry,
-		2: Frown,
-		3: Meh,
-		4: Smile,
-		5: SmilePlus
-	};
+	// ── Tages-Sheet ─────────────────────────────────────────────────
+	let sheetOpen = $state(false);
+	let sheetDate = $state(toISODate(new Date()));
+
+	function openDay(date: string) {
+		sheetDate = date;
+		sheetOpen = true;
+	}
+
+	// ── Statistik-Zeitraum ──────────────────────────────────────────
+	let statsDays = $state(90);
+	const statsEntries = $derived(filterSince(moodState.entries, statsDays));
 </script>
 
 <svelte:head>
 	<title>Stimmung - Life OS</title>
 </svelte:head>
 
-<PageHeader
-	title="Wie geht's dir?"
-	subtitle={new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
-/>
+<PageHeader title="Wie geht's dir?" subtitle={formatDate(new Date())} />
 
-<!-- Heute-Picker -->
-<div class="mb-4 rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-	<h2 class="mb-3 text-sm font-semibold text-text-primary">Stimmung heute</h2>
-	<MoodPicker bind:value={selectedScore} />
-	{#if selectedScore}
-		<div class="mt-3 flex flex-col gap-2">
-			<textarea
-				bind:value={note}
-				rows="2"
-				placeholder="Notiz (optional)…"
-				class="rounded-xl border border-border-color bg-surface-1 px-3 py-2 text-sm text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none transition-colors duration-200"
-			></textarea>
-			<button
-				onclick={save}
-				disabled={saving}
-				class="min-h-11 rounded-xl bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 text-sm font-medium text-white active:scale-95 disabled:opacity-60 transition-all"
-			>
-				{saving ? 'Speichere…' : 'Speichern'}
-			</button>
-		</div>
-	{/if}
-</div>
+<div class="flex flex-col gap-4">
+	<!-- Heute -->
+	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+		<h2 class="mb-3 text-sm font-semibold text-text-primary">Stimmung heute</h2>
+		<MoodPicker bind:value={selectedScore} />
 
-<!-- 30-Tage-Kalender-Grid -->
-<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-	<h2 class="mb-3 text-sm font-semibold text-text-primary">Letzte 30 Tage</h2>
-	<!-- max-w keeps the grid from ballooning on wide viewports; auto-margin centres it -->
-	<div class="mx-auto max-w-xs sm:max-w-sm">
-		<div class="grid grid-cols-7 gap-1.5">
-			{#each gridDays() as { key, day, entry } (key)}
-				{@const Icon = entry ? moodIcons[entry.score] : null}
-				<div
-					title={entry ? `${MOOD_LABELS[entry.score]}` : 'Kein Eintrag'}
-					class="flex h-9 w-full items-center justify-center rounded-lg text-xs font-semibold transition-colors
-						{entry ? scoreColors[entry.score] : 'bg-surface-2 text-text-tertiary border border-border-color/20'}"
-				>
-					{#if Icon}
-						<Icon size={14} strokeWidth={2} />
-					{:else}
-						<span class="tabular-nums">{day}</span>
-					{/if}
+		{#if selectedScore}
+			<div class="mt-4 flex flex-col gap-4">
+				<div>
+					<p class="mb-2 text-sm font-semibold text-text-primary">Was hast du gemacht?</p>
+					<ActivityPicker bind:value={activities} history={moodState.entries} />
 				</div>
-			{/each}
+
+				<Textarea bind:value={note} rows={2} placeholder="Notiz (optional)…" />
+
+				<button
+					onclick={save}
+					disabled={saving}
+					class="min-h-12 rounded-xl bg-primary-700 text-sm font-medium text-white transition-all hover:bg-primary-800 active:scale-95 disabled:opacity-60 dark:bg-primary-600 dark:hover:bg-primary-700"
+				>
+					{saving ? 'Speichere…' : 'Speichern'}
+				</button>
+			</div>
+		{/if}
+	</section>
+
+	<!-- Year in Pixels -->
+	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+		<div class="mb-3 flex items-center justify-between gap-3">
+			<h2 class="text-sm font-semibold text-text-primary">Jahr in Pixeln</h2>
+			<span class="text-xs text-text-secondary">
+				Ø {formatScore(yearAverage)} · {yearEntries.length} Tage
+			</span>
 		</div>
 
-		<!-- Legend -->
-		<div class="mt-3 flex items-center justify-between px-0.5">
-			{#each [1,2,3,4,5] as score}
-				{@const LegendIcon = moodIcons[score]}
-				<span class="flex items-center gap-1 text-xs text-text-tertiary">
-					<span class="inline-flex h-4 w-4 items-center justify-center rounded {scoreColors[score]}">
-						<LegendIcon size={9} strokeWidth={2.5} />
-					</span>
-					<span class="hidden sm:inline">{MOOD_LABELS[score]}</span>
+		{#if years.length > 1}
+			<div class="mb-3 flex gap-2 overflow-x-auto pb-1">
+				{#each years as y (y)}
+					<Chip selected={y === year} onclick={() => pickYear(y)}>{y}</Chip>
+				{/each}
+			</div>
+		{/if}
+
+		<YearInPixels {months} onselect={openDay} />
+
+		<div class="mt-3 flex flex-wrap items-center gap-2">
+			{#each [1, 2, 3, 4, 5] as score}
+				<span class="inline-flex items-center gap-1 text-[11px] text-text-tertiary">
+					<span class="inline-block h-3 w-3 rounded-sm {MOOD_CLASSES[score]}"></span>
+					{MOOD_LABELS[score]}
 				</span>
 			{/each}
 		</div>
-	</div>
+		<p class="mt-2 text-[11px] text-text-tertiary">Tippe auf einen Tag, um ihn nachzutragen oder zu ändern.</p>
+	</section>
+
+	<!-- Aktivitaets-Statistik -->
+	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+		<div class="mb-3 flex items-center justify-between gap-3">
+			<h2 class="text-sm font-semibold text-text-primary">Was beeinflusst deine Stimmung?</h2>
+			<div class="flex gap-1.5">
+				{#each [30, 90, 365] as days}
+					<Chip selected={statsDays === days} onclick={() => (statsDays = days)}>{days} T</Chip>
+				{/each}
+			</div>
+		</div>
+		<MoodActivityStats entries={statsEntries} />
+	</section>
+
+	<!-- Wochentage -->
+	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+		<h2 class="mb-3 text-sm font-semibold text-text-primary">Ø nach Wochentag</h2>
+		<WeekdayAverages entries={statsEntries} />
+	</section>
 </div>
+
+<MoodEntrySheet bind:open={sheetOpen} date={sheetDate} />

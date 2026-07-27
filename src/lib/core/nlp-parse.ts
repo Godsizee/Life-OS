@@ -174,9 +174,10 @@ export function parseNLPInput(text: string): ParsedInput {
 	const moodScoreMatch = lower.match(/\b(?:stimmung|mood|gef\u00fchl|feeling|laune)[:\s]*([1-5])\b/i);
 
 	if (moodTrigger) {
-		if (moodScoreMatch) return { type: 'mood', parsed: { score: parseInt(moodScoreMatch[1]), note: trimmed } };
+		const tags = [...trimmed.matchAll(/#([a-zA-ZäöüÄÖÜß0-9_-]{1,24})/g)].map((m) => m[1]);
+		if (moodScoreMatch) return { type: 'mood', parsed: { score: parseInt(moodScoreMatch[1]), note: trimmed, activities: tags } };
 		for (const [word, score] of Object.entries(MOOD_WORD_MAP)) {
-			if (new RegExp(`\\b${word}\\b`, 'i').test(lower)) return { type: 'mood', parsed: { score, note: trimmed } };
+			if (new RegExp(`\\b${word}\\b`, 'i').test(lower)) return { type: 'mood', parsed: { score, note: trimmed, activities: tags } };
 		}
 	}
 

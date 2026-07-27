@@ -13,6 +13,7 @@
 	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
 	import { notesState } from '$lib/features/notes/store.svelte';
 	import { getGoalProgress } from '$lib/features/goals/progress';
+	import { activityLabel } from '$lib/features/mood/activities';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
@@ -81,11 +82,15 @@
 
 		// 3. Mood Entries
 		moodState.entries.forEach((m) => {
+			const tags = (m.activities ?? []).map((a) => activityLabel(a));
+			const desc = [m.note, tags.length > 0 ? tags.join(' · ') : null]
+				.filter(Boolean)
+				.join(' — ');
 			items.push({
 				id: `mood_${m.id}`,
 				date: m.date,
 				title: `Stimmung eingetragen: ${m.score}/5`,
-				description: m.note ?? undefined,
+				description: desc || undefined,
 				icon: Smile,
 				color: 'text-amber-500',
 				bg: 'bg-amber-50 dark:bg-amber-950/20',
@@ -229,7 +234,7 @@
 		{#snippet trailing()}
 			<!-- Filter Chip-row -->
 			<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-				<Chip selected={filterModule === 'All'} onclick={() => (filterModule = 'All')}>Alles</Chip>
+				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alles</Chip>
 				{#each ['Tasks', 'Habits', 'Notes', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod}
 					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
 				{/each}

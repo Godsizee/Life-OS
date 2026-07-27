@@ -38,6 +38,7 @@ export function buildDayContext(dateStr: string): DayContext {
 		habits_due: dueHabits.length,
 		workout,
 		mood: moodEntry?.score ?? null,
+		mood_activities: moodEntry?.activities ?? [],
 		sleep_h: healthEntry?.sleep_h ?? null,
 		water_glasses: healthEntry?.water_glasses ?? null,
 		focus_minutes: minutesOnDate(timeTrackingState.entries, dateStr)

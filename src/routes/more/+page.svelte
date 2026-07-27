@@ -89,6 +89,50 @@
 			/>
 		</label>
 
+		<!-- W9 — Gesundheitsziele -->
+		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
+			<span>💧 Wasserziel (Gläser/Tag)</span>
+			<input
+				type="number"
+				min="1"
+				max="30"
+				step="1"
+				value={profileState.waterGoalGlasses}
+				onchange={(e) => profileState.setHealthSetting('water_goal_glasses', Number(e.currentTarget.value))}
+				class="min-h-9 w-16 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+			/>
+		</label>
+
+		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
+			<span>😴 Schlafziel (Stunden)</span>
+			<input
+				type="number"
+				min="4"
+				max="12"
+				step="0.5"
+				value={profileState.sleepGoalH}
+				onchange={(e) => profileState.setHealthSetting('sleep_goal_h', Number(e.currentTarget.value))}
+				class="min-h-9 w-16 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+			/>
+		</label>
+
+		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
+			<span>⚖️ Zielgewicht (kg, optional)</span>
+			<input
+				type="number"
+				min="0"
+				max="500"
+				step="0.1"
+				placeholder="—"
+				value={profileState.weightGoalKg ?? ''}
+				onchange={(e) => {
+					const raw = e.currentTarget.value.trim();
+					profileState.setWeightGoal(raw === '' ? null : Number(raw));
+				}}
+				class="min-h-9 w-20 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+			/>
+		</label>
+
 		<!-- Dark-Mode-Toggle -->
 		<button
 			onclick={() => themeState.toggle()}

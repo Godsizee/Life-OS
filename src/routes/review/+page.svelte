@@ -13,6 +13,12 @@
 	import { isDueOn, calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
 	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
 	import Textarea from '$lib/ui/Textarea.svelte';
+	import { profileState } from '$lib/features/profile/store.svelte';
+	import { moodState } from '$lib/features/mood/store.svelte';
+	import { healthState } from '$lib/features/health/store.svelte';
+	import { activityLabel } from '$lib/features/mood/activities';
+	import { averageScore, activityStats, formatScore } from '$lib/features/mood/stats';
+	import { goalHitDays, metricAverage, formatMetric } from '$lib/features/health/stats';
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
@@ -22,6 +28,9 @@
 			goalsState.load(id);
 			fitnessState.load(id);
 			void timeTrackingState.load();
+			moodState.load();
+			healthState.load();
+			void profileState.load();
 		}
 		void fitnessState.loadAllSetLogs();
 	});
@@ -89,6 +98,14 @@
 	);
 	const weekPRs = $derived(
 		fitnessState.records.filter((r) => r.achieved_at.split('T')[0] >= isoDate(weekStart))
+	);
+
+	const weekMoods = $derived(moodState.entries.filter((m) => m.date >= isoDate(weekStart)));
+	const weekMoodAvg = $derived(averageScore(weekMoods));
+	const weekTopActivities = $derived(activityStats(weekMoods, 2).slice(0, 3));
+	const weekSleepAvg = $derived(metricAverage(healthState.entries, 'sleep_h', 7));
+	const weekWaterHit = $derived(
+		goalHitDays(healthState.entries, 'water_glasses', profileState.waterGoalGlasses, 7)
 	);
 
 	// Nächste Woche Top-3 (aus offenen Tasks wählen)
@@ -219,6 +236,32 @@
 					{#if weekPRs.length > 0}· 🏆 {weekPRs.length} PR{weekPRs.length !== 1 ? 's' : ''}{/if}
 				</p>
 			{/if}
+		</div>
+
+		<!-- Stimmung & Gesundheit (W9) -->
+		<div class="rounded-xl border border-border-color bg-surface-0 p-4">
+			<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Stimmung & Gesundheit</p>
+			{#if weekMoods.length === 0}
+				<p class="mt-2 text-sm text-text-secondary">Keine Stimmung erfasst diese Woche.</p>
+			{:else}
+				<p class="mt-1 text-2xl font-bold text-primary-600">{formatScore(weekMoodAvg)}</p>
+				<p class="text-xs text-text-secondary">
+					Ø-Stimmung über {weekMoods.length} Tag{weekMoods.length !== 1 ? 'e' : ''}
+				</p>
+				{#if weekTopActivities.length > 0}
+					<div class="mt-2 flex flex-wrap gap-1.5">
+						{#each weekTopActivities as stat (stat.id)}
+							<span class="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-text-secondary">
+								{activityLabel(stat.id)} · {stat.count}x
+							</span>
+						{/each}
+					</div>
+				{/if}
+			{/if}
+			<div class="mt-3 flex flex-wrap gap-3 border-t border-border-color/40 pt-3 text-xs text-text-secondary">
+				<span>😴 Ø {formatMetric('sleep_h', weekSleepAvg)}</span>
+				<span>💧 Ziel an {weekWaterHit.hit}/{weekWaterHit.tracked} Tagen</span>
+			</div>
 		</div>
 
 		<!-- Fokuszeit (W6) -->

@@ -8,6 +8,8 @@
 	import { profileState } from '$lib/features/profile/store.svelte';
 	import { shoppingState } from '$lib/features/shopping/store.svelte';
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { moodState } from '$lib/features/mood/store.svelte';
+	import { healthState } from '$lib/features/health/store.svelte';
 	import { formatMinutes } from '$lib/features/timetracking/stats';
 	import { isOpenToday } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
@@ -76,6 +78,9 @@
 
 	const openShopping = $derived(shoppingState.items.filter((i) => !i.checked).length);
 	const focusToday = $derived(timeTrackingState.totalTodayMin);
+	const moodLogged = $derived(moodState.todayEntry !== null);
+	const waterToday = $derived(healthState.todayEntry?.water_glasses ?? 0);
+	const waterGoal = $derived(profileState.waterGoalGlasses);
 
 	const hasContent = $derived(
 		todayEvents.length > 0 ||
@@ -84,7 +89,8 @@
 			workoutStale ||
 			fitnessState.plans.length > 0 ||
 			openShopping > 0 ||
-			focusToday > 0
+			focusToday > 0 ||
+			!moodLogged
 	);
 </script>
 
@@ -146,6 +152,16 @@
 			{#if openShopping > 0}
 				<a href="/shopping" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
 					🛒 {openShopping} Artikel
+				</a>
+			{/if}
+			{#if !moodLogged}
+				<a href="/mood" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+					🙂 Stimmung erfassen
+				</a>
+			{/if}
+			{#if waterToday < waterGoal}
+				<a href="/health" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+					💧 {waterToday}/{waterGoal} Gläser
 				</a>
 			{/if}
 			{#if dueHabits.length > 0}
