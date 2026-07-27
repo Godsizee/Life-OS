@@ -34,11 +34,17 @@ class NotesState {
 	private subscribe() {
 		this.unsubscribe?.();
 		if (!this.workspaceId) return;
+		const visible = (row: Note) => !row.private || row.created_by === authState.user?.id;
 		this.unsubscribe = subscribeToTable<Note>('notes', this.workspaceId, {
 			onInsert: (row) => {
+				if (!visible(row)) return;
 				if (!this.notes.some((n) => n.id === row.id)) this.notes = [row, ...this.notes];
 			},
 			onUpdate: (row) => {
+				if (!visible(row)) {
+					this.notes = this.notes.filter((n) => n.id !== row.id);
+					return;
+				}
 				this.notes = this.notes.map((n) => (n.id === row.id ? row : n));
 			},
 			onDelete: ({ id }) => {
@@ -54,7 +60,7 @@ class NotesState {
 		this.workspaceId = null;
 	}
 
-	async addNote(input: { title: string; body?: string }) {
+	async addNote(input: { title: string; body?: string; tags?: string[]; private?: boolean }) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = noteInputSchema.parse(input);
 		const now = new Date().toISOString();
@@ -65,6 +71,8 @@ class NotesState {
 			body: parsed.body,
 			tags: parsed.tags,
 			pinned: false,
+			private: parsed.private,
+			created_by: authState.user!.id,
 			updated_by: authState.user!.id,
 			created_at: now,
 			updated_at: now
@@ -73,11 +81,17 @@ class NotesState {
 		await outbox.runOrQueue('notes', 'insert', note, () => notesApi.insertRaw(note));
 	}
 
-	async updateNote(id: string, patch: Partial<Pick<Note, 'title' | 'body' | 'tags'>>) {
+	async updateNote(
+		id: string,
+		patch: Partial<Pick<Note, 'title' | 'body' | 'tags' | 'private'>>
+	) {
 		const updated_at = new Date().toISOString();
-		this.notes = this.notes.map((n) => (n.id === id ? { ...n, ...patch, updated_at } : n));
-		await outbox.runOrQueue('notes', 'update', { id, ...patch, updated_at }, () =>
-			notesApi.updateRaw({ id, ...patch, updated_at })
+		const updated_by = authState.user!.id;
+		this.notes = this.notes.map((n) =>
+			n.id === id ? { ...n, ...patch, updated_at, updated_by } : n
+		);
+		await outbox.runOrQueue('notes', 'update', { id, ...patch, updated_at, updated_by }, () =>
+			notesApi.updateRaw({ id, ...patch, updated_at, updated_by })
 		);
 	}
 
