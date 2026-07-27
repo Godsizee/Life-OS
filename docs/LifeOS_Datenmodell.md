@@ -32,6 +32,7 @@ shopping_items (id, workspace_id, name, qty, unit, checked, position, added_by)
 goals      (id, workspace_id, parent_id, title, description, target_date, progress, status)
 journal_entries (id, workspace_id, user_id, date, mood, body)         -- PERSÖNLICH
 reminders  (id, workspace_id, entity_type, entity_id, remind_at, channel, sent_at)
+time_entries (id, workspace_id, user_id, task_id, started_at, ended_at, duration_min, source['pomodoro'|'manual'], note) -- PERSÖNLICH
 ```
 
 ## Row Level Security (RLS) — Herz der Mandantentrennung

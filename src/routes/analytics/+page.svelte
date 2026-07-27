@@ -8,9 +8,11 @@
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
 	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
 	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
+	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
 	import MonthlyReport from '$lib/features/analytics/components/MonthlyReport.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
@@ -27,6 +29,7 @@
 			habitsState.load(id);
 			goalsState.load(id);
 			fitnessState.load(id);
+			void timeTrackingState.load();
 		}
 	});
 	onDestroy(() => {
@@ -34,6 +37,7 @@
 		habitsState.unload();
 		goalsState.unload();
 		fitnessState.unload();
+		timeTrackingState.unload();
 	});
 
 	const scoresArray = $derived(analyticsState.scores.map((s) => s.total));
@@ -166,6 +170,9 @@
 			{/each}
 		</div>
 	</section>
+
+	<!-- Fokus-Auswertung (W6) -->
+	<FocusStatsCard />
 
 	<!-- Monatsbericht (Welle 5.7) -->
 	<MonthlyReport days={30} />

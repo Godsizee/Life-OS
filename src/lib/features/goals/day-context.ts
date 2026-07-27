@@ -5,14 +5,14 @@ import { habitsState } from '$lib/features/habits/store.svelte';
 import { healthState } from '$lib/features/health/store.svelte';
 import { moodState } from '$lib/features/mood/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { focusState } from '$lib/features/focus/store.svelte';
+import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { minutesOnDate } from '$lib/features/timetracking/stats';
 import { isDueOn, isCompleted, isSkipped, type HabitCore } from '$lib/features/habits/streak';
 import { toISODate } from '$lib/core/date';
 import type { DayContext } from './types';
 
 export function buildDayContext(dateStr: string): DayContext {
 	const date = new Date(dateStr);
-	const isToday = dateStr === toISODate(new Date());
 
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
@@ -40,6 +40,6 @@ export function buildDayContext(dateStr: string): DayContext {
 		mood: moodEntry?.score ?? null,
 		sleep_h: healthEntry?.sleep_h ?? null,
 		water_glasses: healthEntry?.water_glasses ?? null,
-		focus_minutes: isToday ? focusState.completedPomodoros * 25 : 0
+		focus_minutes: minutesOnDate(timeTrackingState.entries, dateStr)
 	};
 }

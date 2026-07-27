@@ -8,7 +8,7 @@
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { focusState } from '$lib/features/focus/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
 	import GoalList from '$lib/features/goals/components/GoalList.svelte';
 	import JournalEntryForm from '$lib/features/goals/components/JournalEntryForm.svelte';
@@ -33,8 +33,8 @@
 			fitnessState.load(id);
 			healthState.load();
 			moodState.load();
+			void timeTrackingState.load();
 		}
-		focusState.loadToday();
 	});
 	onDestroy(() => {
 		goalsState.unload();
@@ -43,6 +43,7 @@
 		fitnessState.unload();
 		healthState.unload();
 		moodState.unload();
+		timeTrackingState.unload();
 	});
 </script>
 

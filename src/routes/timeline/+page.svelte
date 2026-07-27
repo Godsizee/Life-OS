@@ -9,7 +9,9 @@
 	import { expandEvents } from '$lib/features/calendar/occurrences';
 	import { isCompleted, type HabitDay } from '$lib/features/habits/streak';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell } from 'lucide-svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
+	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 
@@ -23,6 +25,7 @@
 			healthState.load();
 			calendarState.load(id);
 			fitnessState.load(id);
+			void timeTrackingState.load();
 		}
 	});
 
@@ -153,6 +156,27 @@
 			});
 		});
 
+		// 8. Fokuszeit (W6) — pro Tag aggregiert, nicht je Runde.
+		const focusPerDay = new Map<string, number>();
+		timeTrackingState.entries.forEach((e) => {
+			const d = entryDate(e);
+			focusPerDay.set(d, (focusPerDay.get(d) ?? 0) + minutesOf(e));
+		});
+		focusPerDay.forEach((minutes, date) => {
+			if (minutes <= 0) return;
+			const rounds = pomodorosOnDate(timeTrackingState.entries, date);
+			items.push({
+				id: `focus_${date}`,
+				date,
+				title: `${formatMinutes(minutes)} fokussiert`,
+				description: rounds > 0 ? `${rounds} Runde${rounds !== 1 ? 'n' : ''}` : undefined,
+				icon: Zap,
+				color: 'text-yellow-500',
+				bg: 'bg-yellow-50 dark:bg-yellow-950/20',
+				module: 'Focus'
+			});
+		});
+
 		// Sort by Date descending
 		return items.sort((a, b) => b.date.localeCompare(a.date));
 	});
@@ -186,7 +210,7 @@
 			<!-- Filter Chip-row -->
 			<div class="flex gap-2 overflow-x-auto pb-1">
 				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alle</Chip>
-				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod}
+				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar', 'Focus'] as mod}
 					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
 				{/each}
 			</div>

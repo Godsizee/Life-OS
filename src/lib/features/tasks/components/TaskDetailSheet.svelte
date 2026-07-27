@@ -2,6 +2,10 @@
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { formatMinutes } from '$lib/features/timetracking/stats';
+	import TimeEntryForm from '$lib/features/timetracking/components/TimeEntryForm.svelte';
+	import TimeEntryList from '$lib/features/timetracking/components/TimeEntryList.svelte';
 	import Sheet from '$lib/ui/Sheet.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Textarea from '$lib/ui/Textarea.svelte';
@@ -25,6 +29,15 @@
 	
 	let newLabel = $state('');
 	let newSubtaskTitle = $state('');
+
+	let addTimeOpen = $state(false);
+	const timeEntries = $derived(task ? timeTrackingState.entriesForTask(task.id) : []);
+	const timeTotal = $derived(task ? timeTrackingState.totalForTask(task.id) : 0);
+
+	// Sheet schließt -> Nachtrag-Formular wieder einklappen.
+	$effect(() => {
+		if (!open) addTimeOpen = false;
+	});
 
 	const allLabels = $derived(labelUnion(tasksState.tasks));
 	const activeGoals = $derived(goalsState.goals.filter((g) => g.status !== 'done'));
@@ -210,6 +223,32 @@
 						{/snippet}
 					</Button>
 				</form>
+			</Field>
+
+			<Field label="Zeit">
+				<div class="flex items-center justify-between gap-2">
+					<span class="text-sm text-text-secondary">
+						{timeTotal > 0 ? formatMinutes(timeTotal) : 'Noch keine Zeit erfasst'}
+					</span>
+					<button
+						onclick={() => (addTimeOpen = !addTimeOpen)}
+						class="min-h-9 rounded-lg px-2 text-xs font-medium text-primary-600 hover:bg-surface-2 dark:text-primary-400"
+					>
+						{addTimeOpen ? 'Abbrechen' : '+ Zeit nachtragen'}
+					</button>
+				</div>
+
+				{#if addTimeOpen}
+					<div class="mt-3 rounded-xl border border-border-color bg-surface-1 p-3">
+						<TimeEntryForm taskId={task.id} onsaved={() => (addTimeOpen = false)} />
+					</div>
+				{/if}
+
+				{#if timeEntries.length > 0}
+					<div class="mt-2">
+						<TimeEntryList entries={timeEntries} />
+					</div>
+				{/if}
 			</Field>
 
 			<div class="mt-4 border-t border-border-color pt-4 flex justify-end">

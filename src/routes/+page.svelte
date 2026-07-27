@@ -15,7 +15,7 @@
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { linksState } from '$lib/features/links/store.svelte';
-	import { focusState } from '$lib/features/focus/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { parseNLPInput } from '$lib/core/nlp-parse';
@@ -45,8 +45,8 @@
 			healthState.load();
 			moodState.load();
 			analyticsState.load();
+			void timeTrackingState.load();
 		}
-		focusState.loadToday();
 	});
 
 	onDestroy(() => {
@@ -61,6 +61,7 @@
 		healthState.unload();
 		moodState.unload();
 		analyticsState.unload();
+		timeTrackingState.unload();
 	});
 
 	const today = toISODate(new Date());

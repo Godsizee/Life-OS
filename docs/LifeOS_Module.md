@@ -23,6 +23,7 @@ für Navigation und Plan-Gating registriert (OCP).
 | **Kalender** | Termine, All-Day/Recurrence, **ICS-Abo** (read), Erinnerungen | geteilt |
 | **Einkauf & Haushalt** | Gemeinsame Liste in Echtzeit, Mengen, Abhaken, Auto-Aufräumen | geteilt |
 | **Ziele & Tagebuch** | Ziele/OKRs mit Fortschritt + persönliches Journal & Stimmungs-Check-in | Ziele geteilt, Tagebuch **persönlich** |
+| **Fokus-Modus & Zeiterfassung** | Timestamp-basierter Pomodoro-Timer, konfigurierbare Dauern, Pausen-Verkettung, Zeit-Auswertung, manuelle Zeiteinträge | **persönlich** |
 
 > [!note] Wiederholungslogik
 > rrule-Auswertung für Aufgaben/Gewohnheiten lebt **serverseitig** (Edge Function).

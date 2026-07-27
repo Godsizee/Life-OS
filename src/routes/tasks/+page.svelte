@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import type { Task } from '$lib/features/tasks/types';
 	import TaskForm from '$lib/features/tasks/components/TaskForm.svelte';
 	import TaskList from '$lib/features/tasks/components/TaskList.svelte';
@@ -27,9 +28,15 @@
 
 	$effect(() => {
 		const id = workspaceState.workspace?.id;
-		if (id) tasksState.load(id);
+		if (id) {
+			tasksState.load(id);
+			void timeTrackingState.load();
+		}
 	});
-	onDestroy(() => tasksState.unload());
+	onDestroy(() => {
+		tasksState.unload();
+		timeTrackingState.unload();
+	});
 
 	const allLabels = $derived(labelUnion(tasksState.tasks));
 	

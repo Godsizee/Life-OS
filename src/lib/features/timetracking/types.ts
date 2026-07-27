@@ -8,7 +8,10 @@ export interface TimeEntry {
 	task_id: string | null;
 	started_at: string;
 	ended_at: string | null;
+	/** numeric in Postgres — kann als String ankommen, immer über minutesOf() lesen. */
 	duration_min: number;
 	source: TimeSource;
+	/** W6 — Freitext für manuelle Nachträge ohne Aufgabe. */
+	note: string | null;
 	created_at: string;
 }

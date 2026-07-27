@@ -7,6 +7,8 @@
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
 	import { shoppingState } from '$lib/features/shopping/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { formatMinutes } from '$lib/features/timetracking/stats';
 	import { isOpenToday } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
@@ -73,6 +75,7 @@
 	);
 
 	const openShopping = $derived(shoppingState.items.filter((i) => !i.checked).length);
+	const focusToday = $derived(timeTrackingState.totalTodayMin);
 
 	const hasContent = $derived(
 		todayEvents.length > 0 ||
@@ -80,7 +83,8 @@
 			dueHabits.length > 0 ||
 			workoutStale ||
 			fitnessState.plans.length > 0 ||
-			openShopping > 0
+			openShopping > 0 ||
+			focusToday > 0
 	);
 </script>
 
@@ -130,6 +134,15 @@
 		</div>
 
 		<div class="mt-3 flex flex-wrap gap-2 border-t border-border-color/40 pt-3 text-xs">
+			{#if focusToday > 0}
+				<a href="/focus" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+					⏱ {formatMinutes(focusToday)} fokussiert
+				</a>
+			{:else if topTasks.length > 0}
+				<a href="/focus" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+					🎯 Fokus starten
+				</a>
+			{/if}
 			{#if openShopping > 0}
 				<a href="/shopping" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
 					🛒 {openShopping} Artikel

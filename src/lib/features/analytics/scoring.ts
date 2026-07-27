@@ -6,7 +6,8 @@ import { goalsState } from '$lib/features/goals/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { profileState } from '$lib/features/profile/store.svelte';
 import { isDueOn, isCompleted, isSkipped } from '$lib/features/habits/streak';
-import { getPomodorosForDate } from './focus-history';
+import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { focusScoreForDate } from '$lib/features/timetracking/stats';
 import { toISODate } from '$lib/core/date';
 import { getGoalProgress } from '$lib/features/goals/progress';
 import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
@@ -89,9 +90,13 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	const journalEntry = goalsState.entryForDate(dateStr);
 	const journalScore = journalEntry ? 100 : 0;
 
-	// 7. Focus (5%) — liest immer aus localStorage (focus/store.svelte noch nicht implementiert)
-	const poms = getPomodorosForDate(dateStr);
-	const focusScore = poms > 0 ? Math.min(100, poms * 25) : 0;
+	// 7. Focus (5%) — W6: aus time_entries statt localStorage; gilt damit auch für
+	//    vergangene Tage und auf jedem Gerät. Tagessoll = Runden x Fokusdauer.
+	const focusScore = focusScoreForDate(
+		timeTrackingState.entries,
+		dateStr,
+		profileState.focusDailyGoalMinutes
+	);
 
 	// 8. Fitness (10%, Welle F4) — Wochenziel-Score, pro-rata über die laufende Woche.
 	const fitnessScore = fitnessFrequencyScore(fitnessState.logs, profileState.weeklyWorkoutGoal, date);

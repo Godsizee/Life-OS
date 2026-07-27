@@ -6,7 +6,9 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { isDueOn, calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
+	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
 	import Textarea from '$lib/ui/Textarea.svelte';
 
 	$effect(() => {
@@ -16,6 +18,7 @@
 			habitsState.load(id);
 			goalsState.load(id);
 			fitnessState.load(id);
+			void timeTrackingState.load();
 		}
 		void fitnessState.loadAllSetLogs();
 	});
@@ -224,6 +227,9 @@
 				</p>
 			{/if}
 		</div>
+
+		<!-- Fokuszeit (W6) -->
+		<FocusStatsCard title="Fokuszeit diese Woche" />
 
 		<!-- Ziele-Übersicht -->
 		{#if goalsInProgress.length > 0}
