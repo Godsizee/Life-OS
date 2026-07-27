@@ -36,6 +36,14 @@
 
 <div class="flex min-h-screen items-center justify-center p-4">
 	<form onsubmit={submit} class="flex w-full max-w-sm flex-col gap-4">
+		<div class="flex items-center gap-3 mb-2">
+			<img src="/favicon.svg" alt="Life OS Logo" class="h-12 w-12 rounded-2xl premium-shadow" />
+			<div class="flex flex-col">
+				<span class="text-xl font-bold tracking-tight text-text-primary">Life OS</span>
+				<span class="text-xs text-text-secondary">Dein persönliches Betriebssystem</span>
+			</div>
+		</div>
+
 		<h1 class="text-2xl font-bold tracking-tight">
 			{mode === 'login' ? 'Anmelden' : 'Registrieren'}
 		</h1>

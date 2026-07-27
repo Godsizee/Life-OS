@@ -39,10 +39,8 @@
 	<!-- Header / Logo -->
 	<div class="flex h-16 items-center justify-between border-b border-border-color px-4">
 		{#if !collapsed}
-			<div class="flex items-center gap-2 overflow-hidden">
-				<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-700 text-white font-bold premium-shadow">
-					L
-				</div>
+			<div class="flex items-center gap-2.5 overflow-hidden">
+				<img src="/favicon.svg" alt="Life OS Logo" class="h-9 w-9 shrink-0 rounded-xl premium-shadow object-cover" />
 				<div class="flex flex-col min-w-0">
 					<span class="truncate text-sm font-bold tracking-tight text-text-primary">Life OS</span>
 					<span class="truncate text-[10px] text-text-secondary">
@@ -51,9 +49,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-primary-700 text-white font-bold">
-				L
-			</div>
+			<img src="/favicon.svg" alt="Life OS Logo" class="mx-auto h-9 w-9 shrink-0 rounded-xl premium-shadow object-cover" />
 		{/if}
 
 		<button
