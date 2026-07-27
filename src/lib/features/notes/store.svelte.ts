@@ -1,4 +1,5 @@
 import { authState } from '$lib/core/auth.svelte';
+import { attachmentsState } from '$lib/features/attachments/store.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import * as notesApi from './api';
@@ -107,6 +108,8 @@ class NotesState {
 
 	async removeNote(id: string) {
 		this.notes = this.notes.filter((n) => n.id !== id);
+		// Polymorphe Anhaenge haben keinen FK-Cascade -> explizit mitloeschen.
+		await attachmentsState.removeForEntity('note', id);
 		await outbox.runOrQueue('notes', 'delete', { id }, () => notesApi.deleteNote(id));
 	}
 }
