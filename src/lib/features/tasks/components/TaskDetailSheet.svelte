@@ -14,10 +14,10 @@
 	import Chip from '$lib/ui/Chip.svelte';
 	import Field from '$lib/ui/Field.svelte';
 	import CheckCircle from '$lib/ui/CheckCircle.svelte';
-	import { renderMarkdownSafe } from '$lib/features/notes/markdown';
+	import { renderMarkdownSafe, toggleChecklistLine } from '$lib/features/notes/markdown';
 	import { labelUnion } from '../utils';
 
-	let { task, open = $bindable(false) }: { task: Task | null; open?: boolean } = $props();
+	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } = $props();
 
 	let title = $state('');
 	let description = $state('');
@@ -33,6 +33,18 @@
 	let addTimeOpen = $state(false);
 	const timeEntries = $derived(task ? timeTrackingState.entriesForTask(task.id) : []);
 	const timeTotal = $derived(task ? timeTrackingState.totalForTask(task.id) : 0);
+
+	/** Checkbox in der Beschreibungs-Vorschau kippen (Muster: NoteDetailSheet). */
+	function onDescriptionPreviewChange(event: Event) {
+		const target = event.target as HTMLElement | null;
+		if (!task || !target || target.tagName !== 'INPUT') return;
+		const raw = target.getAttribute('data-md-line');
+		if (raw === null) return;
+		const next = toggleChecklistLine(description, Number(raw));
+		if (next === description) return;
+		description = next;
+		update({ description: next });
+	}
 
 	// Sheet schließt -> Nachtrag-Formular wieder einklappen.
 	$effect(() => {
@@ -142,10 +154,16 @@
 				<Input bind:value={title} onblur={handleTitleBlur} />
 			</Field>
 
-			<Field label="Beschreibung">
-				<Textarea bind:value={description} surface="1" onblur={handleDescriptionBlur} />
+			<Field label="Notizen & Checklisten">
+				<Textarea
+					bind:value={description}
+					onblur={handleDescriptionBlur}
+					placeholder="Details zur Aufgabe..."
+					rows={4}
+				/>
 				{#if description}
-					<div class="mt-2 text-sm text-text-secondary prose prose-sm dark:prose-invert">
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div class="markdown-body mt-2" onchange={onDescriptionPreviewChange}>
 						{@html renderMarkdownSafe(description)}
 					</div>
 				{/if}

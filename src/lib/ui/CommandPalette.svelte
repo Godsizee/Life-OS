@@ -108,7 +108,12 @@
 		// Notizen
 		for (const n of notesState.notes) {
 			if (fuzzy(n.title, q)) {
-				out.push({ type: 'note', label: n.title, icon: '📝', action: () => goto('/notes') });
+				out.push({
+					type: 'note',
+					label: n.title,
+					icon: n.private ? '🔒' : '📝',
+					action: () => goto(`/notes?note=${n.id}`)
+				});
 			}
 		}
 

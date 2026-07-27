@@ -11,6 +11,7 @@
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
+	import { notesState } from '$lib/features/notes/store.svelte';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
@@ -26,6 +27,7 @@
 			calendarState.load(id);
 			fitnessState.load(id);
 			void timeTrackingState.load();
+			notesState.load(id);
 		}
 	});
 
@@ -142,6 +144,20 @@
 			}
 		});
 
+		// 8. Notizen (W7)
+		notesState.notes.forEach((n) => {
+			items.push({
+				id: `note_${n.id}`,
+				date: n.created_at.split('T')[0],
+				title: `Notiz angelegt: "${n.title}"`,
+				description: n.private ? 'Privat' : undefined,
+				icon: Notebook,
+				color: 'text-emerald-500',
+				bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+				module: 'Notes'
+			});
+		});
+
 		// 7. Events
 		const pastEvents = expandEvents(calendarState.events, calendarState.overrides, new Date('2020-01-01'), new Date());
 		pastEvents.forEach((o) => {
@@ -208,9 +224,9 @@
 	<PageHeader title="Timeline" subtitle="Verfolge all deine Aktivitäten und Fortschritte chronologisch.">
 		{#snippet trailing()}
 			<!-- Filter Chip-row -->
-			<div class="flex gap-2 overflow-x-auto pb-1">
-				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alle</Chip>
-				{#each ['Tasks', 'Habits', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar', 'Focus'] as mod}
+			<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+				<Chip selected={filterModule === 'All'} onclick={() => (filterModule = 'All')}>Alles</Chip>
+				{#each ['Tasks', 'Habits', 'Notes', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod}
 					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
 				{/each}
 			</div>

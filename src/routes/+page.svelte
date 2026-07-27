@@ -28,7 +28,8 @@
 	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
 	import ShoppingList from '$lib/features/shopping/components/ShoppingList.svelte';
-	import { Plus, Flame, Sparkles, Smile, Droplet, Moon, Activity, Calendar, ShoppingCart, CheckSquare, Check, Notebook, Target } from 'lucide-svelte';
+	import { checklistProgress } from '$lib/features/notes/markdown';
+	import { Plus, Flame, Sparkles, Smile, Droplet, Moon, Activity, Calendar, ShoppingCart, CheckSquare, Check, Notebook, Target, Lock } from 'lucide-svelte';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
 
 	$effect(() => {
@@ -481,8 +482,13 @@
 						{#if pinnedNotes.length > 0}
 							<ul class="flex flex-col gap-2">
 								{#each pinnedNotes as note (note.id)}
-									<li class="truncate text-xs font-semibold text-text-secondary bg-surface-2 px-3 py-2 rounded-lg border border-border-color">
-										{note.title}
+									{@const progress = checklistProgress(note.body ?? '')}
+									<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-2 px-3 py-2 text-xs font-semibold text-text-secondary">
+										{#if note.private}<Lock size={12} class="shrink-0 text-text-tertiary" />{/if}
+										<span class="min-w-0 flex-1 truncate">{note.title}</span>
+										{#if progress.total > 0}
+											<span class="shrink-0 text-text-tertiary">{progress.done}/{progress.total}</span>
+										{/if}
 									</li>
 								{/each}
 							</ul>
