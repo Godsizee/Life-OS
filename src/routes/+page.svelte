@@ -14,9 +14,9 @@
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { linksState } from '$lib/features/links/store.svelte';
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
+	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { parseNLPInput } from '$lib/core/nlp-parse';
 
@@ -47,6 +47,7 @@
 			moodState.load();
 			analyticsState.load();
 			void timeTrackingState.load();
+			remindersState.load(id);
 		}
 	});
 
