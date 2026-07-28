@@ -3,6 +3,7 @@
 	import Input from '$lib/ui/Input.svelte';
 	import Select from '$lib/ui/Select.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
+	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
 	import { calendarState } from '../store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import type { Event } from '../types';
@@ -144,6 +145,17 @@
 				{/each}
 			</div>
 		</div>
+	{/if}
+
+	{#if event}
+		<ReminderSection
+			entityType="event"
+			entityId={event.id}
+			title={event.title}
+			url="/calendar"
+			mode="offset"
+			anchor={event.start}
+		/>
 	{/if}
 
 	<Button type="submit">

@@ -33,6 +33,7 @@ describe('buildRrule', () => {
 	it('baut täglich und wöchentlich mit Wochentagen', () => {
 		expect(buildRrule({ type: 'daily' })).toBe('RRULE:FREQ=DAILY');
 		expect(buildRrule({ type: 'weekly', days: [5, 1] })).toBe('RRULE:FREQ=WEEKLY;BYDAY=MO,FR');
+		expect(buildRrule({ type: 'weekly_count', times: 3 })).toBeNull();
 	});
 });
 

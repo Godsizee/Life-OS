@@ -5,6 +5,7 @@ import * as habitsApi from './api';
 import { habitInputSchema, habitPatchSchema, type HabitInput, type HabitPatch } from './schema';
 import { isCompleted, isSkipped, toHabitDays, toISODate, type HabitDay } from './streak';
 import type { Habit, HabitLog, HabitLogStatus } from './types';
+import { remindersState } from '$lib/features/reminders/store.svelte';
 
 class HabitsState {
 	habits = $state<Habit[]>([]);
@@ -248,6 +249,7 @@ class HabitsState {
 		await outbox.runOrQueue('habits', 'update', { id, archived: true, updated_at }, () =>
 			habitsApi.updateRaw({ id, archived: true, updated_at })
 		);
+		await remindersState.removeFor('habit', id);
 	}
 }
 

@@ -6,6 +6,7 @@ import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
 import { habitsState } from '$lib/features/habits/store.svelte';
+import { remindersState } from '$lib/features/reminders/store.svelte';
 
 class TasksState {
 	tasks = $state<Task[]>([]);
@@ -96,6 +97,8 @@ class TasksState {
 			tasksApi.updateRaw({ id, status, updated_at })
 		);
 
+		if (status === 'done') await remindersState.deactivateFor('task', id);
+
 		if (status === 'done' && task) {
 			const matchedHabit = habitsState.habits.find(
 				(h) => !h.archived && h.name.toLowerCase() === task.title.toLowerCase()
@@ -138,6 +141,7 @@ class TasksState {
 		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
 			tasksApi.updateRaw({ id, ...patch, updated_at })
 		);
+		if ('due_at' in patch) await remindersState.syncAnchor('task', id, patch.due_at ?? null);
 	}
 
 	async moveTask(id: string, patch: { status?: TaskStatus; position?: number }) {
@@ -151,6 +155,7 @@ class TasksState {
 	async removeTask(id: string) {
 		this.tasks = this.tasks.filter((t) => t.id !== id);
 		await outbox.runOrQueue('tasks', 'delete', { id }, () => tasksApi.deleteTask(id));
+		await remindersState.removeFor('task', id);
 	}
 
 	async updateGoalLink(id: string, goal_id: string | null) {

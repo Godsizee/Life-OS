@@ -34,8 +34,9 @@ export function parseReminderRrule(rrule: string | null): ReminderRule | null {
 }
 
 /** Baut eine RRULE aus einem Habit-Schedule (JS-Wochentage). */
-export function buildRrule(schedule: { type: 'daily' } | { type: 'weekly'; days: number[] }): string {
+export function buildRrule(schedule: { type: 'daily' } | { type: 'weekly'; days: number[] } | { type: 'weekly_count'; times: number }): string | null {
 	if (schedule.type === 'daily') return 'RRULE:FREQ=DAILY';
+	if (schedule.type === 'weekly_count') return null;
 	const days = [...schedule.days].sort((a, b) => a - b).map((d) => DAY_CODES[d]);
 	return days.length > 0 ? `RRULE:FREQ=WEEKLY;BYDAY=${days.join(',')}` : 'RRULE:FREQ=WEEKLY';
 }

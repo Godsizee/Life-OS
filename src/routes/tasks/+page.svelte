@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { remindersState } from '$lib/features/reminders/store.svelte';

@@ -16,6 +16,7 @@
 	import CheckCircle from '$lib/ui/CheckCircle.svelte';
 	import { renderMarkdownSafe, toggleChecklistLine } from '$lib/features/notes/markdown';
 	import { labelUnion } from '../utils';
+	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
 
 	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } = $props();
 
@@ -268,6 +269,18 @@
 					</div>
 				{/if}
 			</Field>
+
+			<div class="border-t border-border-color pt-4">
+				<ReminderSection
+					entityType="task"
+					entityId={task.id}
+					title={task.title}
+					url="/tasks"
+					mode="datetime"
+					defaultDate={task.due_at?.slice(0, 10) ?? null}
+					defaultTime="09:00"
+				/>
+			</div>
 
 			<div class="mt-4 border-t border-border-color pt-4 flex justify-end">
 				<Button variant="ghost" onclick={del}>

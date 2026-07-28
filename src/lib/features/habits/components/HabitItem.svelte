@@ -2,9 +2,13 @@
 	import { habitsState } from '../store.svelte';
 	import type { Habit } from '../types';
 	import { isCompleted, isSkipped, calculateStreak, streakLabel } from '../streak';
-	import { Flame, MoreVertical } from 'lucide-svelte';
+	import { Flame, MoreVertical, Bell } from 'lucide-svelte';
 	import HabitProgressButton from './HabitProgressButton.svelte';
 	import HabitActionsSheet from './HabitActionsSheet.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
+	import { buildRrule } from '$lib/features/reminders/schedule';
+	import { remindersState } from '$lib/features/reminders/store.svelte';
 
 	interface Props {
 		habit: Habit;
@@ -12,6 +16,8 @@
 	const { habit }: Props = $props();
 
 	let actionsOpen = $state(false);
+	let reminderOpen = $state(false);
+	const reminderCount = $derived(remindersState.forEntity('habit', habit.id).length);
 
 	const days = $derived(habitsState.entriesFor(habit.id));
 	const day = $derived(habitsState.entryToday(habit.id));
@@ -46,6 +52,14 @@
 		</div>
 	</div>
 
+	<button
+		onclick={() => (reminderOpen = true)}
+		aria-label="Erinnerung"
+		class="mr-1 shrink-0 {reminderCount > 0 ? 'text-primary-600 dark:text-primary-400' : 'text-text-tertiary'}"
+	>
+		<Bell size={18} />
+	</button>
+
 	<!-- Kontext-Menü (W5 HabitActionsSheet) -->
 	<button
 		onclick={() => (actionsOpen = true)}
@@ -55,5 +69,19 @@
 		<MoreVertical size={18} />
 	</button>
 </div>
+
+<Sheet bind:open={reminderOpen} title={habit.name}>
+	<div class="p-4">
+		<ReminderSection
+			entityType="habit"
+			entityId={habit.id}
+			title={habit.name}
+			url="/habits"
+			mode="time"
+			rrule={buildRrule(habit.schedule)}
+			defaultTime="08:00"
+		/>
+	</div>
+</Sheet>
 
 <HabitActionsSheet bind:open={actionsOpen} {habit} onClose={() => (actionsOpen = false)} />

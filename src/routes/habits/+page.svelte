@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { remindersState } from '$lib/features/reminders/store.svelte';
