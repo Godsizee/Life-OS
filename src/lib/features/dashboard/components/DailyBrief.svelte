@@ -10,6 +10,7 @@
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
+	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import { formatMinutes } from '$lib/features/timetracking/stats';
 	import { isOpenToday } from '$lib/features/habits/streak';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
@@ -90,7 +91,8 @@
 			fitnessState.plans.length > 0 ||
 			openShopping > 0 ||
 			focusToday > 0 ||
-			!moodLogged
+			!moodLogged ||
+			remindersState.todayCount > 0
 	);
 </script>
 
@@ -140,6 +142,11 @@
 		</div>
 
 		<div class="mt-3 flex flex-wrap gap-2 border-t border-border-color/40 pt-3 text-xs">
+			{#if remindersState.todayCount > 0}
+				<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
+					🔔 {remindersState.todayCount} Erinnerung{remindersState.todayCount !== 1 ? 'en' : ''} heute
+				</span>
+			{/if}
 			{#if focusToday > 0}
 				<a href="/focus" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
 					⏱ {formatMinutes(focusToday)} fokussiert

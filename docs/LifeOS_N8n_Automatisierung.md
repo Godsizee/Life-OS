@@ -39,7 +39,7 @@ Die Edge Function validiert, prüft Rechte/Dubletten und schreibt regelkonform.
 
 ```text
 LifeOS - WF-01 - Daily Digest        (06:00 → Push/E-Mail „Heute …")
-LifeOS - WF-02 - Reminder Dispatch   (fällige reminders → Push/Telegram)
+LifeOS - WF-02 - Reminder Dispatch   (fällige reminders → Web-Push via Edge Function `lifeos-reminder-dispatch` alle 5 Min. + Cleanup-Lauf um 03:10)
 LifeOS - WF-03 - Recurring Builder   (00:10 → Edge Fn instanziiert Aufgaben/Habits aus rrule)
 LifeOS - WF-04 - ICS Calendar Sync   (externe Kalender → events upsert)
 LifeOS - WF-05 - Telegram Quick Add  (/task, /note → Intake-Endpoint)

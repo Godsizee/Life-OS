@@ -31,7 +31,7 @@ events     (id, workspace_id, calendar_id, title, start, "end", all_day, locatio
 shopping_items (id, workspace_id, name, qty, unit, checked, position, added_by)
 goals      (id, workspace_id, parent_id, title, description, target_date, progress, status)
 journal_entries (id, workspace_id, user_id, date, mood, body)         -- PERSÖNLICH
-reminders  (id, workspace_id, entity_type, entity_id, remind_at, channel, sent_at)
+reminders  (id, workspace_id, user_id, entity_type, entity_id, title, body, url, remind_at, rrule, offset_minutes, active, last_sent_at)
 time_entries (id, workspace_id, user_id, task_id, started_at, ended_at, duration_min, source['pomodoro'|'manual'], note) -- PERSÖNLICH
 ```
 
@@ -51,6 +51,11 @@ create policy "members rw" on tasks
 -- Tagebuch ist privat — nur der Autor:
 create policy "owner only" on journal_entries
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- Reminder-Dispatch (Edge Function)
+-- next_reminder_occurrence(remind_at timestamp, rrule text) -> timestamp
+-- claim_due_reminders(p_limit int) -> setof reminders
+-- cleanup_orphan_reminders() -> int
 ```
 
 > [!tip] Prinzip

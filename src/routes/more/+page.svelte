@@ -188,6 +188,15 @@
 					Benachrichtigungen sind im Browser blockiert. Bitte in den Browser-Einstellungen erlauben.
 				</p>
 			{/if}
+			{#if pushState.subscribed}
+				<p class="px-2 text-xs text-text-secondary">
+					Push aktiv auf diesem Gerät. Erinnerungen kommen auch bei geschlossener App.
+				</p>
+			{:else}
+				<p class="px-2 text-xs text-text-secondary">
+					Ohne Push zeigt Life OS Erinnerungen nur, solange die App geöffnet ist.
+				</p>
+			{/if}
 		{/if}
 	</div>
 
