@@ -14,17 +14,22 @@ coverage
 Thumbs.db
 desktop.ini
 
-# Env
+# Env & Secrets
 .env
 .env.*
 !.env.example
 !.env.test
+# Temporaere Secret-Dateien fuer `supabase secrets set --env-file`
+# (Anleitung: Vault -> LifeOS_Reminder_Dispatch_Setup.md, Schritt 3)
+*.secrets.env
+supabase/.secrets.env
 
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Supabase CLI (lokaler State, nicht versioniert)
+# supabase/config.toml und supabase/migrations/ gehoeren BEWUSST ins Repo.
 supabase/.branches
 supabase/.temp
 .supabase
@@ -41,15 +46,26 @@ supabase/.temp
 *.log
 npm-debug.log*
 
-# Model / AI context & custom plans
+# KI-Kontext, lokale Tool-Bruecken und Plaene.
+# Enthalten maschinenspezifische absolute Pfade und gehoeren niemandem ausser
+# dieser Arbeitskopie — fuer Build und Betrieb der App irrelevant.
 .agents/
 AGENTS.md
 CLAUDE.md
 EXPANSION_PLAN.md
 .claude/
 .mcp.json
+.cursor/
+.windsurf/
+.roo/
+.clinerules/
+
+# Python-Artefakte der lokalen Gemini-Bruecke (.claude/delegate_to_gemini.py)
+__pycache__/
+*.py[cod]
 
 # Lokale Arbeitsdateien
 Recent.md
 check_output.txt
 *.tmp
+DEPLOY_EDGE_FUNCTION_TODO.md
