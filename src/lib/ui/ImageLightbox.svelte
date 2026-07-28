@@ -58,6 +58,7 @@
 		role="dialog"
 		aria-modal="true"
 		aria-label="Bildansicht"
+		tabindex="-1"
 		class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90"
 		transition:fade={{ duration: motionDuration(DURATION.fast) }}
 		onpointerdown={onPointerDown}

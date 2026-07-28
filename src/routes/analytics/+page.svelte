@@ -1,14 +1,7 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
 	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
 	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
@@ -20,26 +13,10 @@
 	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
 	import { APP_LOCALE } from '$lib/core/locale';
 
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Nur die Satz-Historie ist bewusst lazy und wird hier angestoßen.
 	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			analyticsState.load();
-			moodState.load();
-			healthState.load();
-			// Für den Monatsbericht (5.7) nötig.
-			tasksState.load(id);
-			habitsState.load(id);
-			goalsState.load(id);
-			fitnessState.load(id);
-			void timeTrackingState.load();
-		}
-	});
-	onDestroy(() => {
-		tasksState.unload();
-		habitsState.unload();
-		goalsState.unload();
-		fitnessState.unload();
-		timeTrackingState.unload();
+		if (fitnessState.loaded) void fitnessState.loadAllSetLogs();
 	});
 
 	const scoresArray = $derived(analyticsState.scores.map((s) => s.total));

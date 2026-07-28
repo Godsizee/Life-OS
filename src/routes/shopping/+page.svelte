@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { workspaceState } from '$lib/features/workspace/store.svelte';
   import { shoppingState } from '$lib/features/shopping/store.svelte';
   import type { ShoppingItem } from '$lib/features/shopping/types';
   import ShoppingForm from '$lib/features/shopping/components/ShoppingForm.svelte';
@@ -20,11 +18,7 @@
   let editItem = $state<ShoppingItem | null>(null);
   let editOpen = $state(false);
 
-  $effect(() => {
-    const id = workspaceState.workspace?.id;
-    if (id) shoppingState.load(id);
-  });
-  onDestroy(() => shoppingState.unload());
+  // Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
   const activeItems = $derived(shoppingState.items.filter((i) => !i.checked));
   const suggestions = $derived(recentlyBought(shoppingState.items));

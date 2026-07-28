@@ -1,6 +1,7 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as attachmentsApi from './api';
 import {
 	buildStoragePath,
@@ -17,6 +18,7 @@ const RENEW_BEFORE_MS = 5 * 60 * 1000;
 class AttachmentsState {
 	items = $state<Attachment[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	/** storage_path -> signierte URL. */
 	urls = $state<Record<string, string>>({});
 	/** attachment.id -> Object-URL des lokalen Blobs (optimistische/Offline-Vorschau). */
@@ -46,11 +48,15 @@ class AttachmentsState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Anhänge', async () => {
 			this.items = await attachmentsApi.listAttachments(workspaceId);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -75,6 +81,7 @@ class AttachmentsState {
 		this.urls = {};
 		this.expiry.clear();
 		this.items = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

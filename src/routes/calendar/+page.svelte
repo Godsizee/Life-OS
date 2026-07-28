@@ -1,11 +1,7 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { calendarState } from '$lib/features/calendar/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { linksState } from '$lib/features/links/store.svelte';
 	import { isOpenToday, isCompleted } from '$lib/features/habits/streak';
 	import { toISODate } from '$lib/core/date';
 	import { expandEvents } from '$lib/features/calendar/occurrences';
@@ -21,23 +17,7 @@
 
 	let createOpen = $state(false);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			calendarState.load(id);
-			tasksState.load(id);
-			habitsState.load(id);
-			fitnessState.load(id);
-			linksState.load(id);
-		}
-	});
-	onDestroy(() => {
-		calendarState.unload();
-		tasksState.unload();
-		habitsState.unload();
-		fitnessState.unload();
-		linksState.unload();
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	// ── View-Umschalter (persistiert) ────────────────────────────────
 	type View = 'agenda' | 'month' | 'week';

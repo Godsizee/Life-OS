@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
@@ -19,18 +17,11 @@
 	let settingsOpen = $state(false);
 	let manualOpen = $state(false);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			tasksState.load(id);
-			goalsState.load(id);
-			// Erst laden, dann restaurieren: settle() braucht die Runden von heute.
-			void timeTrackingState.load().then(() => focusSession.restore());
-		}
-	});
+	// Stores kommen zentral aus core/workspace-data.ts. Hier nur die Session:
+	// settle() braucht die Runden von heute, also erst nach dem Laden restaurieren.
 	// Die Session wird NICHT beendet — sie soll Navigation überleben (W6-Kern).
-	onDestroy(() => {
-		timeTrackingState.unload();
+	$effect(() => {
+		if (timeTrackingState.loaded) focusSession.restore();
 	});
 
 	// ── Task-Queue ────────────────────────────────────────────────────

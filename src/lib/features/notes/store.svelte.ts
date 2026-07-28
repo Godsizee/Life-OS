@@ -2,6 +2,7 @@ import { authState } from '$lib/core/auth.svelte';
 import { attachmentsState } from '$lib/features/attachments/store.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as notesApi from './api';
 import { noteInputSchema } from './schema';
 import type { Note } from './types';
@@ -9,6 +10,7 @@ import type { Note } from './types';
 class NotesState {
 	notes = $state<Note[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
@@ -24,11 +26,15 @@ class NotesState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Notizen', async () => {
 			this.notes = await notesApi.listNotes(workspaceId);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -58,6 +64,7 @@ class NotesState {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
 		this.notes = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

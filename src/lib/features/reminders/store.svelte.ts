@@ -2,6 +2,7 @@ import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { toastState } from '$lib/core/toast.svelte';
+import { ladeSicher } from '$lib/core/store-load';
 import { pushState } from '$lib/core/push.svelte';
 import * as remindersApi from './api';
 import { reminderInputSchema, type ReminderInput } from './schema';
@@ -14,6 +15,7 @@ const TICK_MS = 60_000;
 class RemindersState {
 	reminders = $state<Reminder[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsub: (() => void) | null = null;
 	private timer: ReturnType<typeof setInterval> | null = null;
@@ -44,11 +46,15 @@ class RemindersState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Erinnerungen', async () => {
 			this.reminders = await remindersApi.listReminders(workspaceId);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 		this.startTicker();
 	}
@@ -97,6 +103,7 @@ class RemindersState {
 		this.timer = null;
 		this.announced.clear();
 		this.reminders = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

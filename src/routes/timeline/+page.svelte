@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
@@ -18,20 +17,7 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			tasksState.load(id);
-			habitsState.load(id);
-			moodState.load();
-			goalsState.load(id);
-			healthState.load();
-			calendarState.load(id);
-			fitnessState.load(id);
-			void timeTrackingState.load();
-			notesState.load(id);
-		}
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	interface TimelineItem {
 		id: string;

@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onDestroy } from 'svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
@@ -12,12 +10,7 @@
 
 	let id = $derived($page.params.id);
 
-	$effect(() => {
-		const wId = workspaceState.workspace?.id;
-		if (wId) habitsState.load(wId);
-	});
-
-	onDestroy(() => habitsState.unload());
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	const habit = $derived(habitsState.habits.find((h) => h.id === id));
 	const entries = $derived(habit ? habitsState.entriesFor(habit.id) : []);

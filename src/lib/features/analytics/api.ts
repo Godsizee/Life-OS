@@ -1,4 +1,5 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 
 export interface DBScoreEntry {
 	id?: string;
@@ -15,15 +16,17 @@ export async function getRecentScores(
 	userId: string,
 	sinceDate: string
 ): Promise<DBScoreEntry[]> {
-	const { data, error } = await supabase
-		.from('life_scores')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('date', sinceDate)
-		.order('date', { ascending: true });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<DBScoreEntry>('life_scores', (from, to) =>
+		supabase
+			.from('life_scores')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.eq('user_id', userId)
+			.gte('date', sinceDate)
+			.order('date', { ascending: true })
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function upsertScore(

@@ -1,6 +1,7 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as habitsApi from './api';
 import { habitInputSchema, habitPatchSchema, type HabitInput, type HabitPatch } from './schema';
 import { isCompleted, isSkipped, toHabitDays, toISODate, type HabitDay } from './streak';
@@ -11,6 +12,7 @@ class HabitsState {
 	habits = $state<Habit[]>([]);
 	logs = $state<HabitLog[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribeHabits: (() => void) | null = null;
 	private unsubscribeLogs: (() => void) | null = null;
@@ -31,14 +33,18 @@ class HabitsState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Routinen', async () => {
 			[this.habits, this.logs] = await Promise.all([
 				habitsApi.listHabits(workspaceId),
 				habitsApi.listLogs(workspaceId)
 			]);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -81,6 +87,7 @@ class HabitsState {
 		this.unsubscribeLogs = null;
 		this.habits = [];
 		this.logs = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

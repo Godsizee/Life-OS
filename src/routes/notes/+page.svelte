@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import { Hash, Plus } from 'lucide-svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
-	import { attachmentsState } from '$lib/features/attachments/store.svelte';
 	import { filterNotes, sortNotes, tagUnion } from '$lib/features/notes/filter';
 	import type { Note } from '$lib/features/notes/types';
 	import NoteForm from '$lib/features/notes/components/NoteForm.svelte';
@@ -22,18 +19,7 @@
 	let detailOpen = $state(false);
 	let detailNote = $state<Note | null>(null);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			notesState.load(id);
-			attachmentsState.load(id);
-		}
-	});
-
-	onDestroy(() => {
-		notesState.unload();
-		attachmentsState.unload();
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	// Tiefer Link aus der Command-Palette: /notes?note=<id> oeffnet direkt das Sheet.
 	$effect(() => {

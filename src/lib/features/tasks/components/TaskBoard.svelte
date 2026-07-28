@@ -40,7 +40,10 @@
 
 <div class="grid grid-cols-3 gap-4">
 	{#each COLUMNS as col (col.status)}
+		<!-- Drop-Ziel der Spalte. Bedienbar bleibt das Board auch ohne Drag&Drop:
+			 der Status lässt sich im Detail-Sheet der Aufgabe umstellen. -->
 		<div class="rounded-2xl border border-border-color bg-surface-1 p-3"
+				 role="group" aria-label="Spalte {col.label}"
 				 ondragover={(e) => e.preventDefault()} ondrop={(e) => onDrop(e, col.status)}>
 			<h3 class="mb-2 text-sm font-bold text-text-secondary">{col.label} ({column(col.status).length})</h3>
 			<div class="flex min-h-16 flex-col gap-2">

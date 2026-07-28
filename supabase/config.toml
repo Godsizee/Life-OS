@@ -1,0 +1,15 @@
+# Supabase-Projektkonfiguration.
+# Doku: https://supabase.com/docs/guides/local-development/cli/config
+
+project_id = "life-os"
+
+# ── Edge Functions ──────────────────────────────────────────────────────────
+# lifeos-reminder-dispatch wird von pg_cron aufgerufen, also OHNE eingeloggten
+# Nutzer und ohne JWT. Die Absicherung laeuft ueber den Header `x-lifeos-token`
+# (Secret LIFEOS_INTAKE_TOKEN), geprueft in index.ts.
+#
+# Bewusst hier statt ueber `--no-verify-jwt`: das CLI-Flag greift bei Updates
+# einer bestehenden Function nicht zuverlaessig (supabase/cli#4059), die
+# config.toml gilt dagegen bei jedem Deploy.
+[functions.lifeos-reminder-dispatch]
+verify_jwt = false

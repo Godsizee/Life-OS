@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
@@ -40,11 +38,8 @@
 		ChevronRight
 	} from 'lucide-svelte';
 
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			fitnessState.load(id);
-		}
 		liveWorkoutState.restore();
 	});
 
@@ -137,10 +132,6 @@
 		plateCalcWeight = next?.weight_kg ?? null;
 		showPlateCalc = true;
 	}
-
-	onDestroy(() => {
-		fitnessState.unload();
-	});
 
 	type FitnessTab = 'log' | 'plans' | 'library' | 'history';
 	let activeTab = $state<FitnessTab>('log');

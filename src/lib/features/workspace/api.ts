@@ -8,13 +8,30 @@ export async function getCurrentWorkspace(): Promise<Workspace | null> {
 	return data;
 }
 
+interface MemberProfileRow {
+	workspace_id: string;
+	user_id: string;
+	role: WorkspaceMember['role'];
+	joined_at: string;
+	display_name: string | null;
+	avatar_url: string | null;
+}
+
+/**
+ * Ueber RPC statt per Join: die profiles-Policy gibt nur die eigene Zeile frei,
+ * ein Join lieferte fuer alle anderen Mitglieder null. Die Funktion ist
+ * `security definer` und gibt bewusst nur Name/Avatar heraus, nicht settings.
+ */
 export async function listMembers(workspaceId: string): Promise<WorkspaceMember[]> {
-	const { data, error } = await supabase
-		.from('workspace_members')
-		.select('*, profile:profiles(display_name, avatar_url)')
-		.eq('workspace_id', workspaceId);
+	const { data, error } = await supabase.rpc('workspace_member_profiles', { ws: workspaceId });
 	if (error) throw error;
-	return data ?? [];
+	return ((data ?? []) as MemberProfileRow[]).map((row) => ({
+		workspace_id: row.workspace_id,
+		user_id: row.user_id,
+		role: row.role,
+		joined_at: row.joined_at,
+		profile: { display_name: row.display_name, avatar_url: row.avatar_url }
+	}));
 }
 
 export async function inviteMember(workspaceId: string, email: string): Promise<Invite> {

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { moodState } from '$lib/features/mood/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import MoodPicker from '$lib/features/mood/components/MoodPicker.svelte';
 	import ActivityPicker from '$lib/features/mood/components/ActivityPicker.svelte';
 	import YearInPixels from '$lib/features/mood/components/YearInPixels.svelte';
@@ -22,9 +21,7 @@
 	import Textarea from '$lib/ui/Textarea.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 
-	$effect(() => {
-		if (workspaceState.workspace?.id) moodState.load();
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	// ── Heute erfassen ──────────────────────────────────────────────
 	let selectedScore = $state<number | null>(null);

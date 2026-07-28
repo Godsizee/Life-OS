@@ -1,16 +1,15 @@
 import { env } from '$env/dynamic/public';
 import { createClient } from '@supabase/supabase-js';
 
-if (typeof process !== 'undefined' && process.env) {
-	console.log('[SUPABASE DEBUG] Available process.env keys starting with VITE_ or SUPABASE_:', 
-		Object.keys(process.env).filter(key => key.startsWith('VITE_') || key.includes('SUPABASE') || key.includes('VAPID'))
-	);
-}
-console.log('[SUPABASE DEBUG] env.VITE_SUPABASE_URL:', env.VITE_SUPABASE_URL);
-
 const supabaseUrl = env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || '';
 
-// Initialize the Supabase client.
-// In a real environment, you must provide VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env
+// Fehlt die Konfiguration, scheitert sonst erst die erste Query mit einer
+// nichtssagenden Netzwerkmeldung — hier einmal laut und ohne Werte zu leaken.
+if (!supabaseUrl || !supabaseAnonKey) {
+	console.error(
+		'Supabase ist nicht konfiguriert: VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY fehlen (.env).'
+	);
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

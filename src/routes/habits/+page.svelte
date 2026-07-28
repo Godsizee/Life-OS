@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import { calculateStreak } from '$lib/features/habits/streak';
 	import HabitForm from '$lib/features/habits/components/HabitForm.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
@@ -14,15 +11,7 @@
 
 	let createOpen = $state(false);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			habitsState.load(id);
-			remindersState.load(id);
-		}
-	});
-	onDestroy(() => habitsState.unload());
-
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const streakStats = $derived(
 		habitsState.habits.map((h) => ({
 			habit: h,

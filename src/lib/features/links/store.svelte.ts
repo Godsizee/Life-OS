@@ -1,11 +1,13 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as linksApi from './api';
 import type { EntityLink, LinkEntityType } from './types';
 
 class LinksState {
 	links = $state<EntityLink[]>([]);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsub: (() => void) | null = null;
 
@@ -19,7 +21,14 @@ class LinksState {
 	async load(workspaceId: string) {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
-		this.links = await linksApi.listLinks(workspaceId);
+		const ok = await ladeSicher('Verknüpfungen', async () => {
+			this.links = await linksApi.listLinks(workspaceId);
+		});
+		if (!ok) {
+			this.workspaceId = null;
+			return;
+		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -40,6 +49,7 @@ class LinksState {
 		this.unsub?.();
 		this.unsub = null;
 		this.links = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

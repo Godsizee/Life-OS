@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Offline — Life OS</title>
+		<link rel="icon" href="/favicon.svg" />
+		<style>
+			:root {
+				color-scheme: light dark;
+				--bg: #f6f6f8;
+				--card: #ffffff;
+				--text: #1a1a1f;
+				--muted: #6b6b76;
+				--border: #e3e3e8;
+				--accent: #4f46e5;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--bg: #131317;
+					--card: #1c1c22;
+					--text: #f2f2f5;
+					--muted: #9a9aa6;
+					--border: #2c2c34;
+					--accent: #818cf8;
+				}
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				min-height: 100dvh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 1.5rem;
+				background: var(--bg);
+				color: var(--text);
+				font-family:
+					system-ui,
+					-apple-system,
+					'Segoe UI',
+					sans-serif;
+			}
+			main {
+				width: 100%;
+				max-width: 26rem;
+				padding: 2rem 1.5rem;
+				border: 1px solid var(--border);
+				border-radius: 1rem;
+				background: var(--card);
+				text-align: center;
+			}
+			.icon {
+				font-size: 2.5rem;
+				line-height: 1;
+			}
+			h1 {
+				margin: 1rem 0 0.5rem;
+				font-size: 1.25rem;
+			}
+			p {
+				margin: 0 0 1.5rem;
+				color: var(--muted);
+				font-size: 0.9375rem;
+				line-height: 1.6;
+			}
+			button {
+				min-height: 48px;
+				width: 100%;
+				padding: 0 1.25rem;
+				border: none;
+				border-radius: 0.75rem;
+				background: var(--accent);
+				color: #fff;
+				font-size: 0.9375rem;
+				font-weight: 600;
+				cursor: pointer;
+			}
+			button:hover {
+				filter: brightness(1.08);
+			}
+			button:focus-visible {
+				outline: 2px solid var(--text);
+				outline-offset: 2px;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<div class="icon" aria-hidden="true">📡</div>
+			<h1>Keine Verbindung</h1>
+			<p>
+				Life OS ist gerade nicht erreichbar. Bereits gespeicherte Änderungen bleiben erhalten und
+				werden übertragen, sobald du wieder online bist.
+			</p>
+			<button type="button" onclick="location.reload()">Erneut versuchen</button>
+		</main>
+	</body>
+</html>

@@ -1,14 +1,17 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { Calendar, Event, EventOverride } from './types';
 
 export async function listCalendars(workspaceId: string): Promise<Calendar[]> {
-	const { data, error } = await supabase
-		.from('calendars')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('created_at');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<Calendar>('calendars', (from, to) =>
+		supabase
+			.from('calendars')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('created_at')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function createCalendar(workspaceId: string, name: string): Promise<Calendar> {
@@ -21,14 +24,21 @@ export async function createCalendar(workspaceId: string, name: string): Promise
 	return data;
 }
 
+/**
+ * Ohne Zeitfenster und bewusst so: eine Serie mit fruehem `start` laeuft bis
+ * heute weiter. Ein Filter auf `start >= x` wuerde genau die Termine wegwerfen,
+ * die occurrences.ts noch expandieren muss.
+ */
 export async function listEvents(workspaceId: string): Promise<Event[]> {
-	const { data, error } = await supabase
-		.from('events')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('start');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<Event>('events', (from, to) =>
+		supabase
+			.from('events')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('start')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function insertRaw(event: Event): Promise<Event> {
@@ -55,12 +65,14 @@ export async function deleteEvent(id: string): Promise<void> {
 }
 
 export async function listOverrides(workspaceId: string): Promise<EventOverride[]> {
-	const { data, error } = await supabase
-		.from('event_overrides')
-		.select('*')
-		.eq('workspace_id', workspaceId);
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<EventOverride>('event_overrides', (from, to) =>
+		supabase
+			.from('event_overrides')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function upsertOverrideRaw(row: EventOverride): Promise<EventOverride> {

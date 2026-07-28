@@ -1,4 +1,5 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { MoodEntry } from './types';
 
 /** Nutzlast eines Upserts — bewusst OHNE `id`:
@@ -20,15 +21,17 @@ export async function listMoodEntries(
 	userId: string,
 	sinceDate: string
 ): Promise<MoodEntry[]> {
-	const { data, error } = await supabase
-		.from('mood_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('date', sinceDate)
-		.order('date');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<MoodEntry>('mood_entries', (from, to) =>
+		supabase
+			.from('mood_entries')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.eq('user_id', userId)
+			.gte('date', sinceDate)
+			.order('date')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 /** Fuer den Jahres-Umschalter: exakt ein Kalenderjahr nachladen. */
@@ -38,16 +41,18 @@ export async function listMoodEntriesInRange(
 	fromDate: string,
 	toDate: string
 ): Promise<MoodEntry[]> {
-	const { data, error } = await supabase
-		.from('mood_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('date', fromDate)
-		.lte('date', toDate)
-		.order('date');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<MoodEntry>('mood_entries (Jahr)', (from, to) =>
+		supabase
+			.from('mood_entries')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.eq('user_id', userId)
+			.gte('date', fromDate)
+			.lte('date', toDate)
+			.order('date')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 /** Einziger Schreibpfad. Idempotent -> Outbox-Replay-sicher. */

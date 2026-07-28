@@ -4,9 +4,8 @@
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+	import { reviewWeek } from '$lib/features/analytics/week-window';
 	import { evaluateTrack } from '$lib/features/goals/checkins';
 	import { getGoalProgress } from '$lib/features/goals/progress';
 	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
@@ -20,36 +19,27 @@
 	import { averageScore, activityStats, formatScore } from '$lib/features/mood/stats';
 	import { goalHitDays, metricAverage, formatMetric } from '$lib/features/health/stats';
 
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Nur die Satz-Historie ist bewusst lazy und wird hier angestoßen.
 	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			tasksState.load(id);
-			habitsState.load(id);
-			goalsState.load(id);
-			fitnessState.load(id);
-			void timeTrackingState.load();
-			moodState.load();
-			healthState.load();
-			void profileState.load();
-		}
-		void fitnessState.loadAllSetLogs();
+		if (fitnessState.loaded) void fitnessState.loadAllSetLogs();
 	});
 
 	// ── Wochen-Statistiken ────────────────────────────────────────────
-	const now = new Date();
-	const weekStart = new Date(now);
-	weekStart.setDate(now.getDate() - now.getDay() - 6); // letzte 7 Tage
-	const weekEnd = new Date(now);
+	// Der Tick sorgt dafür, dass das Fenster über Mitternacht mitwandert, statt
+	// beim Erzeugen der Komponente einzufrieren.
+	let heute = $state(new Date());
+	$effect(() => {
+		const timer = setInterval(() => (heute = new Date()), 60_000);
+		return () => clearInterval(timer);
+	});
+
+	const week = $derived(reviewWeek(heute));
+	const weekStart = $derived(week.start);
+	const weekEnd = $derived(week.end);
+	const weekDates = $derived(week.dates);
 
 	function isoDate(d: Date) { return toISODate(d); }
-
-	const weekDates = $derived(
-		Array.from({ length: 7 }, (_, i) => {
-			const d = new Date(weekStart);
-			d.setDate(weekStart.getDate() + i);
-			return isoDate(d);
-		})
-	);
 
 	const doneTasks = $derived(
 		tasksState.tasks.filter(
@@ -149,7 +139,14 @@
 				.filter(Boolean)
 				.join('\n\n');
 
-			await goalsState.saveJournalEntry(toISODate(now), '📋', body || '(Kein Text)', null, 'weekly');
+			// Datum beim Speichern frisch bilden, nicht aus dem Render-Tick.
+			await goalsState.saveJournalEntry(
+				toISODate(new Date()),
+				'📋',
+				body || '(Kein Text)',
+				null,
+				'weekly'
+			);
 			goto('/');
 		} finally {
 			saving = false;

@@ -78,13 +78,24 @@
 						fill={cellFill(cell.score, cell.future)}
 						stroke={cell.future ? 'currentColor' : 'none'}
 						stroke-width={cell.future ? 0.5 : 0}
-						class="cursor-pointer text-border-color transition-opacity hover:opacity-70"
-						role="gridcell"
-						tabindex="-1"
+						class="text-border-color transition-opacity hover:opacity-70 focus-visible:opacity-70 focus-visible:outline-2 focus-visible:outline-current
+							{cell.future ? '' : 'cursor-pointer'}"
+						role="button"
+						tabindex={cell.future ? -1 : 0}
+						aria-disabled={cell.future}
 						aria-label="{cell.date}: {cell.score ? MOOD_LABELS[cell.score] : 'kein Eintrag'}"
 						onmouseenter={() => (hovered = { date: cell.date, score: cell.score })}
 						onmouseleave={() => (hovered = null)}
+						onfocus={() => (hovered = { date: cell.date, score: cell.score })}
+						onblur={() => (hovered = null)}
 						onclick={() => !cell.future && onselect?.(cell.date)}
+						onkeydown={(e) => {
+							if (cell.future) return;
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								onselect?.(cell.date);
+							}
+						}}
 					/>
 				{/if}
 			{/each}

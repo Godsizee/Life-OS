@@ -10,27 +10,39 @@
 
 	let { initialData, onsubmitted, oncancel }: Props = $props();
 
-	let name = $state(initialData?.name ?? '');
-
+	let name = $state('');
 	// Typ des Rhythmus: 'daily', 'weekly', 'weekly_count'
-	let scheduleType = $state<HabitSchedule['type']>(initialData?.schedule.type ?? 'daily');
-
+	let scheduleType = $state<HabitSchedule['type']>('daily');
 	// Für 'weekly': Welche Wochentage (0=So, 1=Mo, ...)
-	let selectedDays = $state<number[]>(
-		initialData?.schedule.type === 'weekly' ? initialData.schedule.days : [1, 2, 3, 4, 5]
-	);
-
+	let selectedDays = $state<number[]>([1, 2, 3, 4, 5]);
 	// Für 'weekly_count': Wie oft pro Woche
-	let weeklyTimes = $state<number>(
-		initialData?.schedule.type === 'weekly_count' ? initialData.schedule.times : 3
-	);
-
+	let weeklyTimes = $state<number>(3);
 	// W5: Mengen-Routinen
-	let isQuantity = $state(
-		initialData?.target_value !== null && initialData?.target_value !== undefined
-	);
-	let targetValue = $state<number>(initialData?.target_value ?? 5);
-	let unit = $state(initialData?.unit ?? 'Gläser');
+	let isQuantity = $state(false);
+	let targetValue = $state<number>(5);
+	let unit = $state('Gläser');
+
+	/**
+	 * Felder aus `initialData` befüllen — beim ersten Render und immer, wenn eine
+	 * ANDERE Routine bearbeitet wird. Vorher standen die Initialwerte direkt in
+	 * den `$state`-Deklarationen: die laufen nur einmal, ein Wechsel der Routine
+	 * im offenen Formular zeigte weiter die alten Werte.
+	 */
+	let hydratedFor = $state<string | null | undefined>(undefined);
+	$effect(() => {
+		const key = initialData?.id ?? null;
+		if (key === hydratedFor) return;
+		hydratedFor = key;
+
+		name = initialData?.name ?? '';
+		scheduleType = initialData?.schedule.type ?? 'daily';
+		selectedDays =
+			initialData?.schedule.type === 'weekly' ? [...initialData.schedule.days] : [1, 2, 3, 4, 5];
+		weeklyTimes = initialData?.schedule.type === 'weekly_count' ? initialData.schedule.times : 3;
+		isQuantity = initialData?.target_value !== null && initialData?.target_value !== undefined;
+		targetValue = initialData?.target_value ?? 5;
+		unit = initialData?.unit ?? 'Gläser';
+	});
 
 	let loading = $state(false);
 

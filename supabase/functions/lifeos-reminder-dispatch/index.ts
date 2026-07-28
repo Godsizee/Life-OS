@@ -18,6 +18,12 @@ interface ReminderRow {
 	title: string;
 	body: string | null;
 	url: string;
+	/**
+	 * false = die Faelligkeit lag laenger als das Nachfeuer-Fenster zurueck.
+	 * Die Zeile wurde trotzdem geclaimt und weitergeschoben (sonst waere die
+	 * Serie dauerhaft stumm), es geht aber kein Push mehr raus.
+	 */
+	should_send: boolean;
 }
 
 interface SubscriptionRow {
@@ -106,8 +112,14 @@ Deno.serve(async (req) => {
 	});
 	if (error) return json({ error: error.message }, 500);
 
-	const reminders = (claimed ?? []) as ReminderRow[];
-	if (reminders.length === 0) return json({ claimed: 0, sent: 0, removed: 0, cleaned });
+	const alle = (claimed ?? []) as ReminderRow[];
+	// Zu alte Faelligkeiten wurden weitergeschoben, aber nicht zugestellt —
+	// niemand will nach zwei Tagen Offline einen Schwall alter Pushes.
+	const reminders = alle.filter((r) => r.should_send);
+	const skipped = alle.length - reminders.length;
+	if (reminders.length === 0) {
+		return json({ claimed: alle.length, sent: 0, skipped, removed: 0, cleaned });
+	}
 
 	const userIds = [...new Set(reminders.map((r) => r.user_id))];
 	const { data: subsData } = await supabase
@@ -140,8 +152,9 @@ Deno.serve(async (req) => {
 	}
 
 	return json({
-		claimed: reminders.length,
+		claimed: alle.length,
 		sent,
+		skipped,
 		removed: stale.length,
 		cleaned
 	});

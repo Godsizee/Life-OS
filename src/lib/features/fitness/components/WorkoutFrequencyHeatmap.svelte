@@ -79,10 +79,10 @@
 					fill={cellColor(dateStr)}
 					stroke={isToday ? '#059669' : 'none'}
 					stroke-width={isToday ? 1.5 : 0}
-					class="cursor-pointer transition-opacity hover:opacity-80"
+					class="transition-opacity hover:opacity-80"
 					onmouseenter={() => (tooltip = dateStr)}
 					onmouseleave={() => (tooltip = null)}
-					role="gridcell"
+					role="img"
 					aria-label="{dateStr}: {loggedSet.has(dateStr) ? 'Training' : 'kein Training'}"
 				/>
 			{/each}

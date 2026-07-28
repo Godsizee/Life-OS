@@ -1,16 +1,19 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { ShoppingItem, WorkspaceSettings } from './types';
 
 export async function listItems(workspaceId: string): Promise<ShoppingItem[]> {
-	const { data, error } = await supabase
-		.from('shopping_items')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('checked')
-		.order('position')
-		.order('created_at');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<ShoppingItem>('shopping_items', (from, to) =>
+		supabase
+			.from('shopping_items')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('checked')
+			.order('position')
+			.order('created_at')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function insertRaw(item: ShoppingItem): Promise<ShoppingItem> {

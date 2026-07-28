@@ -1,6 +1,7 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as fitnessApi from './api';
 import {
 	workoutPlanInputSchema,
@@ -32,9 +33,11 @@ class FitnessState {
 	/** Welle F3 — alle erledigten Sätze des Workspace (mit Datum), lazy geladen für Verlauf/Statistik. */
 	allSetLogs = $state<fitnessApi.DatedSetLog[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribePlans: (() => void) | null = null;
 	private unsubscribeLogs: (() => void) | null = null;
+	private unsubscribeCatalog: (() => void) | null = null;
 	private lastSetsCache = new Map<string, WorkoutSetLog[]>();
 	private allSetLogsLoaded = false;
 
@@ -65,26 +68,39 @@ class FitnessState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
-			this.plans = await fitnessApi.listPlans(workspaceId);
-			this.logs = await fitnessApi.listLogs(workspaceId);
-			this.catalog = await fitnessApi.listCatalog(workspaceId);
+		const ok = await ladeSicher('Fitness', async () => {
 			const uid = authState.user?.id;
-			if (uid) this.records = await fitnessApi.listPersonalRecords(workspaceId, uid);
+			// Vorher liefen diese vier nacheinander und danach eine Schleife mit
+			// einem Request PRO Plan — bei 10 Plaenen 14 serielle Roundtrips.
+			const [plans, logs, catalog, records] = await Promise.all([
+				fitnessApi.listPlans(workspaceId),
+				fitnessApi.listLogs(workspaceId),
+				fitnessApi.listCatalog(workspaceId),
+				uid ? fitnessApi.listPersonalRecords(workspaceId, uid) : Promise.resolve([])
+			]);
+			this.plans = plans;
+			this.logs = logs;
+			this.catalog = catalog;
+			this.records = records;
 
-			// Load exercises for all plans
-			for (const plan of this.plans) {
-				this.exercises[plan.id] = await fitnessApi.listExercises(plan.id);
-			}
-		} finally {
-			this.loading = false;
+			const uebungen = await Promise.all(
+				plans.map(async (plan) => [plan.id, await fitnessApi.listExercises(plan.id)] as const)
+			);
+			this.exercises = Object.fromEntries(uebungen);
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
 	private subscribe() {
 		this.unsubscribePlans?.();
 		this.unsubscribeLogs?.();
+		this.unsubscribeCatalog?.();
 		if (!this.workspaceId) return;
 
 		this.unsubscribePlans = subscribeToTable<WorkoutPlan>('workout_plans', this.workspaceId, {
@@ -110,13 +126,33 @@ class FitnessState {
 				this.logs = this.logs.filter((l) => l.id !== id);
 			}
 		});
+
+		// Der Katalog war publiziert, wurde aber nie abonniert: eigene Übungen von
+		// einem zweiten Gerät tauchten erst nach einem Reload im Picker auf.
+		this.unsubscribeCatalog = subscribeToTable<ExerciseCatalogEntry>(
+			'exercise_catalog',
+			this.workspaceId,
+			{
+				onInsert: (row) => {
+					if (!this.catalog.some((e) => e.id === row.id)) this.catalog = [...this.catalog, row];
+				},
+				onUpdate: (row) => {
+					this.catalog = this.catalog.map((e) => (e.id === row.id ? row : e));
+				},
+				onDelete: ({ id }) => {
+					this.catalog = this.catalog.filter((e) => e.id !== id);
+				}
+			}
+		);
 	}
 
 	unload() {
 		this.unsubscribePlans?.();
 		this.unsubscribeLogs?.();
+		this.unsubscribeCatalog?.();
 		this.unsubscribePlans = null;
 		this.unsubscribeLogs = null;
+		this.unsubscribeCatalog = null;
 		this.plans = [];
 		this.exercises = {};
 		this.logs = [];
@@ -125,6 +161,7 @@ class FitnessState {
 		this.recentExercises = [];
 		this.allSetLogs = [];
 		this.allSetLogsLoaded = false;
+		this.loaded = false;
 		this.workspaceId = null;
 		this.lastSetsCache.clear();
 	}

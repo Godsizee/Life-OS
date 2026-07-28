@@ -1,6 +1,7 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as shoppingApi from './api';
 import { shoppingItemInputSchema, type ShoppingItemInput } from './schema';
 import type { ShoppingItem, WorkspaceSettings } from './types';
@@ -16,6 +17,7 @@ class ShoppingState {
   items = $state<ShoppingItem[]>([]);
   settings = $state<WorkspaceSettings>({});
   loading = $state(false);
+  loaded = $state(false);
   private workspaceId: string | null = null;
   private unsubs: (() => void)[] = [];
 
@@ -36,14 +38,18 @@ class ShoppingState {
     if (this.workspaceId === workspaceId) return;
     this.workspaceId = workspaceId;
     this.loading = true;
-    try {
+    const ok = await ladeSicher('Einkaufsliste', async () => {
       [this.items, this.settings] = await Promise.all([
         shoppingApi.listItems(workspaceId),
         shoppingApi.getWorkspaceSettings(workspaceId)
       ]);
-    } finally {
-      this.loading = false;
+    });
+    this.loading = false;
+    if (!ok) {
+      this.workspaceId = null;
+      return;
     }
+    this.loaded = true;
     this.subscribe();
   }
 
@@ -81,6 +87,7 @@ class ShoppingState {
     this.unsubs = [];
     this.items = [];
     this.settings = {};
+    this.loaded = false;
     this.workspaceId = null;
   }
 

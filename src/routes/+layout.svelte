@@ -6,7 +6,7 @@
 	import { prefersReducedMotion } from '$lib/ui/motion';
 	import { authState } from '$lib/core/auth.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
+	import { loadWorkspaceData, unloadWorkspaceData } from '$lib/core/workspace-data';
 	import { outbox } from '$lib/core/outbox.svelte';
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
@@ -30,6 +30,7 @@
 		themeState.init();
 		keyboardState.init();
 		online = navigator.onLine;
+		void outbox.refreshCounts();
 		window.addEventListener('online', () => {
 			online = true;
 			outbox.replay();
@@ -48,11 +49,15 @@
 		const isPublic = publicPaths.includes(page.url.pathname);
 		if (!authState.session) {
 			workspaceState.reset();
-			profileState.unload();
+			unloadWorkspaceData();
 			if (!isPublic) goto('/login');
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
-			workspaceState.load().then(() => outbox.replay());
-			void profileState.load();
+			// Einmal zentral statt pro Route — siehe core/workspace-data.ts.
+			void workspaceState.load().then(async () => {
+				const id = workspaceState.workspace?.id;
+				if (id) await loadWorkspaceData(id);
+				await outbox.replay();
+			});
 		}
 	});
 
@@ -74,15 +79,43 @@
 	);
 	let sidebarCollapsed = $state(false);
 
-	const syncBanner = $derived(
-		!online
-			? { text: 'Offline – Änderungen werden offline gespeichert', class: 'bg-slate-700' }
-			: outbox.status === 'syncing'
-				? { text: 'Synchronisiere…', class: 'bg-primary-700' }
-				: outbox.status === 'error'
-					? { text: 'Sync fehlgeschlagen – tippen für erneuten Versuch', class: 'bg-red-600' }
-					: null
-	);
+	interface SyncBanner {
+		text: string;
+		class: string;
+		/** true = Tippen verwirft die unzustellbaren Änderungen statt neu zu senden. */
+		verwerfen: boolean;
+	}
+
+	const syncBanner = $derived.by<SyncBanner | null>(() => {
+		const wartend = outbox.pending > 0 ? ` (${outbox.pending})` : '';
+		if (!online) {
+			return {
+				text: `Offline – Änderungen werden offline gespeichert${wartend}`,
+				class: 'bg-slate-700',
+				verwerfen: false
+			};
+		}
+		if (outbox.status === 'syncing') {
+			return { text: `Synchronisiere…${wartend}`, class: 'bg-primary-700', verwerfen: false };
+		}
+		if (outbox.status === 'error') {
+			return {
+				text: `Sync fehlgeschlagen${wartend} – tippen für erneuten Versuch`,
+				class: 'bg-red-600',
+				verwerfen: false
+			};
+		}
+		// Unzustellbares bleibt sichtbar, statt still verloren zu gehen.
+		if (outbox.dead > 0) {
+			const mehrzahl = outbox.dead !== 1;
+			return {
+				text: `${outbox.dead} Änderung${mehrzahl ? 'en' : ''} konnte${mehrzahl ? 'n' : ''} nicht gespeichert werden – tippen zum Verwerfen`,
+				class: 'bg-amber-600',
+				verwerfen: true
+			};
+		}
+		return null;
+	});
 </script>
 
 <CommandPalette bind:open={paletteOpen} />
@@ -100,7 +133,7 @@
 	>
 		{#if syncBanner}
 			<button
-				onclick={() => outbox.replay()}
+				onclick={() => (syncBanner.verwerfen ? outbox.clearDead() : outbox.replay())}
 				style="view-transition-name: sync-banner"
 				class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium text-white {syncBanner.class}"
 			>

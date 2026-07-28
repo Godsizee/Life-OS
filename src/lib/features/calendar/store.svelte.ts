@@ -1,6 +1,7 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as calendarApi from './api';
 import { eventInputSchema, type EventInput } from './schema';
 import type { Calendar, Event, EventOverride, EventOverridePatch } from './types';
@@ -11,6 +12,7 @@ class CalendarState {
 	events = $state<Event[]>([]);
 	overrides = $state<EventOverride[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 	private unsubscribeOverrides: (() => void) | null = null;
@@ -32,17 +34,24 @@ class CalendarState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Kalender', async () => {
 			this.calendars = await calendarApi.listCalendars(workspaceId);
 			if (this.calendars.length === 0) {
 				const created = await calendarApi.createCalendar(workspaceId, 'Kalender');
 				this.calendars = [created];
 			}
-			this.events = await calendarApi.listEvents(workspaceId);
-			this.overrides = await calendarApi.listOverrides(workspaceId);
-		} finally {
-			this.loading = false;
+			// Termine und Overrides sind voneinander unabhängig — parallel statt nacheinander.
+			[this.events, this.overrides] = await Promise.all([
+				calendarApi.listEvents(workspaceId),
+				calendarApi.listOverrides(workspaceId)
+			]);
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -84,6 +93,7 @@ class CalendarState {
 		this.calendars = [];
 		this.events = [];
 		this.overrides = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

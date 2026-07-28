@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { profileState } from '$lib/features/profile/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import HealthForm from '$lib/features/health/components/HealthForm.svelte';
 	import HealthRings from '$lib/features/health/components/HealthRings.svelte';
 	import HealthTrends from '$lib/features/health/components/HealthTrends.svelte';
@@ -12,12 +11,7 @@
 	import { formatMetric, goalPercent, num } from '$lib/features/health/stats';
 	import { Pencil } from 'lucide-svelte';
 
-	$effect(() => {
-		if (workspaceState.workspace?.id) {
-			healthState.load();
-			void profileState.load();
-		}
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	// Liste ist bereits absteigend sortiert (neueste zuerst).
 	const recent = $derived(healthState.entries.slice(0, 30));

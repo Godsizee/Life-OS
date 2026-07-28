@@ -4,10 +4,12 @@ import * as analyticsApi from './api';
 import { computeLifeScore } from './scoring';
 import { toISODate } from '$lib/core/date';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 
 class AnalyticsState {
 	scores = $state<analyticsApi.DBScoreEntry[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
@@ -38,15 +40,22 @@ class AnalyticsState {
 		const wId = workspaceState.workspace?.id;
 		const uId = authState.user?.id;
 		if (!wId || !uId) return;
+		// Early-Return wie in allen anderen Stores — vorher lud dieser als einziger
+		// bei jeder Navigation auf /, /analytics und /timeline komplett neu.
+		if (this.workspaceId === wId) return;
 		this.workspaceId = wId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Analytics', async () => {
 			const since = new Date();
 			since.setDate(since.getDate() - 30);
 			this.scores = await analyticsApi.getRecentScores(wId, uId, toISODate(since));
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -72,6 +81,7 @@ class AnalyticsState {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
 		this.scores = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

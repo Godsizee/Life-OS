@@ -1,9 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import type { Task } from '$lib/features/tasks/types';
 	import TaskForm from '$lib/features/tasks/components/TaskForm.svelte';
 	import TaskList from '$lib/features/tasks/components/TaskList.svelte';
@@ -27,19 +23,7 @@
 	let detailOpen = $state(false);
 	let view = $state<'list' | 'board'>('list');
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			tasksState.load(id);
-			void timeTrackingState.load();
-			remindersState.load(id);
-		}
-	});
-	onDestroy(() => {
-		tasksState.unload();
-		timeTrackingState.unload();
-	});
-
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const allLabels = $derived(labelUnion(tasksState.tasks));
 	
 	const filtered = $derived.by(() => {

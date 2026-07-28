@@ -15,7 +15,15 @@
 	let targetExercise = $state('');
 	let targetValue = $state<number | null>(null);
 	let targetUnit = $state('');
-	let parent = $state(parentId ?? '');
+	let parent = $state('');
+	// Wechselt das Elternziel (z. B. „Unterziel anlegen" bei einem anderen Ziel),
+	// muss die Vorauswahl mitziehen — eine `$state`-Initialisierung tut das nicht.
+	let hydratedFor = $state<string | null | undefined>(undefined);
+	$effect(() => {
+		if (parentId === hydratedFor) return;
+		hydratedFor = parentId;
+		parent = parentId ?? '';
+	});
 
 	// Genau eine Ebene: nur Wurzelziele dürfen Eltern sein (Plan §5, Regel 6).
 	const parentOptions = $derived(

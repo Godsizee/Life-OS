@@ -33,30 +33,55 @@
 		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 	}
 
-	let title = $state(event?.title ?? '');
-	// Falls wir eine Occurrence patchen, wäre es gut, das Startdatum auf occurrenceDate zu setzen (mit der Uhrzeit von event.start)
-	let initialStart = event?.start;
-	let initialEnd = event?.end;
-	if (occurrenceDate && event?.start && event?.end) {
-		const s = new Date(event.start);
-		const e = new Date(event.end);
-		const [y, m, d] = occurrenceDate.split('-').map(Number);
+	/**
+	 * Beim Patchen einer einzelnen Ausprägung zählt deren Datum, nicht das
+	 * Startdatum der Serie — Uhrzeit bleibt die des Termins.
+	 */
+	function slotZeiten(e: Event | undefined, datum: string | undefined) {
+		if (!datum || !e?.start || !e?.end) return { start: e?.start, end: e?.end };
+		const s = new Date(e.start);
+		const en = new Date(e.end);
+		const [y, m, d] = datum.split('-').map(Number);
 		s.setFullYear(y, m - 1, d);
-		e.setFullYear(y, m - 1, d);
-		initialStart = s.toISOString();
-		initialEnd = e.toISOString();
+		en.setFullYear(y, m - 1, d);
+		return { start: s.toISOString(), end: en.toISOString() };
 	}
 
-	let start = $state(toDatetimeLocal(initialStart));
-	let end = $state(toDatetimeLocal(initialEnd));
-	let allDay = $state(event?.all_day ?? false);
-	let location = $state(event?.location ?? '');
-	let recurrence = $state<Recurrence>(
-		event?.rrule?.includes('WEEKLY') ? 'weekly' : event?.rrule?.includes('DAILY') ? 'daily' : 'none'
-	);
+	let title = $state('');
+	let start = $state('');
+	let end = $state('');
+	let allDay = $state(false);
+	let location = $state('');
+	let recurrence = $state<Recurrence>('none');
+	let calendarId = $state('');
+	let attendeeIds = $state<string[]>([]);
 
-	let calendarId = $state(event?.calendar_id ?? calendarState.defaultCalendarId ?? '');
-	let attendeeIds = $state<string[]>(event?.attendee_ids ?? []);
+	/**
+	 * Felder aus `event`/`occurrenceDate` befüllen — beim ersten Render und immer,
+	 * wenn ein ANDERER Termin/Slot bearbeitet wird. Vorher standen die Werte direkt
+	 * in den `$state`-Deklarationen: die laufen nur einmal, ein zweiter im selben
+	 * offenen Formular angeklickter Termin zeigte weiter die alten Daten.
+	 */
+	let hydratedFor = $state<string | null | undefined>(undefined);
+	$effect(() => {
+		const key = event ? `${event.id}:${occurrenceDate ?? ''}` : null;
+		if (key === hydratedFor) return;
+		hydratedFor = key;
+
+		const zeiten = slotZeiten(event, occurrenceDate);
+		title = event?.title ?? '';
+		start = toDatetimeLocal(zeiten.start);
+		end = toDatetimeLocal(zeiten.end);
+		allDay = event?.all_day ?? false;
+		location = event?.location ?? '';
+		recurrence = event?.rrule?.includes('WEEKLY')
+			? 'weekly'
+			: event?.rrule?.includes('DAILY')
+				? 'daily'
+				: 'none';
+		calendarId = event?.calendar_id ?? calendarState.defaultCalendarId ?? '';
+		attendeeIds = [...(event?.attendee_ids ?? [])];
+	});
 
 	function toggleAttendee(id: string) {
 		if (attendeeIds.includes(id)) {

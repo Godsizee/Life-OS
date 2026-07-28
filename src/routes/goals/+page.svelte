@@ -1,14 +1,6 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { moodState } from '$lib/features/mood/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
 	import GoalList from '$lib/features/goals/components/GoalList.svelte';
 	import JournalList from '$lib/features/goals/components/JournalList.svelte';
@@ -41,28 +33,7 @@
 		journalSheetOpen = true;
 	}
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			goalsState.load(id);
-			// Für den „Tag in Zahlen"-Snapshot (5.5) und PR-Ziele (5.2) nötig.
-			tasksState.load(id);
-			habitsState.load(id);
-			fitnessState.load(id);
-			healthState.load();
-			moodState.load();
-			void timeTrackingState.load();
-		}
-	});
-	onDestroy(() => {
-		goalsState.unload();
-		tasksState.unload();
-		habitsState.unload();
-		fitnessState.unload();
-		healthState.unload();
-		moodState.unload();
-		timeTrackingState.unload();
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 </script>
 
 <svelte:head>

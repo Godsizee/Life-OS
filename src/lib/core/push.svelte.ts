@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { supabase } from './supabase';
+import * as remindersApi from '$lib/features/reminders/api';
 
 const VAPID_PUBLIC_KEY = env.VITE_VAPID_PUBLIC_KEY || '';
 
@@ -41,15 +42,13 @@ class PushState {
 			if (!userId) return;
 
 			const json = subscription.toJSON();
-			await supabase.from('push_subscriptions').upsert(
-				{
-					user_id: userId,
-					endpoint: json.endpoint,
-					p256dh: json.keys?.p256dh,
-					auth_key: json.keys?.auth
-				},
-				{ onConflict: 'user_id,endpoint' }
-			);
+			if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) return;
+			await remindersApi.upsertPushSubscription({
+				user_id: userId,
+				endpoint: json.endpoint,
+				p256dh: json.keys.p256dh,
+				auth_key: json.keys.auth
+			});
 			this.subscribed = true;
 		} finally {
 			this.loading = false;
@@ -65,7 +64,7 @@ class PushState {
 			if (subscription) {
 				const endpoint = subscription.endpoint;
 				await subscription.unsubscribe();
-				await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
+				await remindersApi.deletePushSubscription(endpoint);
 			}
 			this.subscribed = false;
 		} finally {

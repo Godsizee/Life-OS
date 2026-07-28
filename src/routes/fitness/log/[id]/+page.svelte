@@ -1,8 +1,6 @@
 <script lang="ts">
 	// Welle F3 — Log-Detail: alle Sätze, Gesamtvolumen, PRs des Workouts.
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import * as fitnessApi from '$lib/features/fitness/api';
 	import { bestPerExercise } from '$lib/features/fitness/utils/1rm';
@@ -12,12 +10,7 @@
 
 	const logId = $derived(page.params.id);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) fitnessState.load(id);
-	});
-	onDestroy(() => fitnessState.unload());
-
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const log = $derived(fitnessState.logs.find((l) => l.id === logId) ?? null);
 	const planName = $derived(
 		log ? (fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training') : ''

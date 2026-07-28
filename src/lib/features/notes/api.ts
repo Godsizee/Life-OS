@@ -1,15 +1,18 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { Note } from './types';
 
 export async function listNotes(workspaceId: string): Promise<Note[]> {
-	const { data, error } = await supabase
-		.from('notes')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('pinned', { ascending: false })
-		.order('updated_at', { ascending: false });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<Note>('notes', (from, to) =>
+		supabase
+			.from('notes')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('pinned', { ascending: false })
+			.order('updated_at', { ascending: false })
+			.order('id') // eindeutiger Tiebreaker — sonst wackelt die Seitengrenze
+			.range(from, to)
+	);
 }
 
 export async function insertRaw(note: Note): Promise<Note> {

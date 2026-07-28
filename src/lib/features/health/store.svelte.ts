@@ -2,6 +2,7 @@ import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { toISODate } from '$lib/core/date';
+import { ladeSicher } from '$lib/core/store-load';
 import { workspaceState } from '$lib/features/workspace/store.svelte';
 import * as healthApi from './api';
 import { healthInputSchema } from './schema';
@@ -14,6 +15,7 @@ class HealthState {
 	/** Absteigend nach Datum (neueste zuerst) — die Liste auf /health nutzt das direkt. */
 	entries = $state<HealthEntry[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
@@ -45,13 +47,17 @@ class HealthState {
 		if (this.workspaceId === wId) return;
 		this.workspaceId = wId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Gesundheit', async () => {
 			const since = new Date();
 			since.setDate(since.getDate() - WINDOW_DAYS);
 			this.entries = await healthApi.listHealthEntries(wId, uId, toISODate(since));
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -77,6 +83,7 @@ class HealthState {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
 		this.entries = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

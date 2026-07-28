@@ -3,6 +3,7 @@ import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { workspaceState } from '$lib/features/workspace/store.svelte';
 import { toISODate } from '$lib/core/date';
+import { ladeSicher } from '$lib/core/store-load';
 import * as timeApi from './api';
 import { timeEntryInputSchema, type TimeEntryInput } from './schema';
 import { minutesOf, minutesOnDate, minutesThisWeek, pomodorosOnDate } from './stats';
@@ -21,6 +22,7 @@ interface LogOptions {
 class TimeTrackingState {
 	entries = $state<TimeEntry[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
@@ -39,13 +41,17 @@ class TimeTrackingState {
 		if (this.workspaceId === wId) return;
 		this.workspaceId = wId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Zeiterfassung', async () => {
 			const since = new Date();
 			since.setDate(since.getDate() - WINDOW_DAYS);
 			this.entries = await timeApi.listTimeEntries(wId, uId, since.toISOString());
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -71,6 +77,7 @@ class TimeTrackingState {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
 		this.entries = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

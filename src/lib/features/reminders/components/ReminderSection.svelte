@@ -54,11 +54,16 @@
 	const list = $derived(remindersState.forEntity(entityType, entityId));
 
 	let date = $state('');
-	let time = $state(defaultTime);
+	let time = $state('');
 	let saving = $state(false);
 
+	// Vorbelegungen erst im Effect setzen: als $state-Initialwert würde `defaultTime`
+	// nur beim ersten Render gelesen und ein Wechsel der Entität nicht mitziehen.
 	$effect(() => {
 		if (!date) date = defaultDate ?? toISODate(new Date());
+	});
+	$effect(() => {
+		if (!time) time = defaultTime;
 	});
 
 	async function create(remindAt: string, offsetMinutes: number, rule: string | null) {

@@ -1,13 +1,16 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { EntityLink } from './types';
 
 export async function listLinks(workspaceId: string): Promise<EntityLink[]> {
-	const { data, error } = await supabase
-		.from('entity_links')
-		.select('*')
-		.eq('workspace_id', workspaceId);
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<EntityLink>('entity_links', (from, to) =>
+		supabase
+			.from('entity_links')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function insertLinkRaw(link: EntityLink): Promise<EntityLink> {

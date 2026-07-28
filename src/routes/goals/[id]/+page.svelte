@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { linksState } from '$lib/features/links/store.svelte';
 	import { getGoalProgress } from '$lib/features/goals/progress';
 	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
 	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
@@ -21,24 +18,7 @@
 
 	const goalId = $derived(page.params.id);
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			goalsState.load(id);
-			tasksState.load(id);
-			habitsState.load(id);
-			fitnessState.load(id);
-			linksState.load(id);
-		}
-	});
-	onDestroy(() => {
-		goalsState.unload();
-		tasksState.unload();
-		habitsState.unload();
-		fitnessState.unload();
-		linksState.unload();
-	});
-
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const goal = $derived(goalsState.goals.find((g) => g.id === goalId) ?? null);
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
 	const track = $derived(goal ? evaluateTrack(goal, progress) : null);

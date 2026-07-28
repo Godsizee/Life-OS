@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { toISODate, formatDate, formatShortDate } from '$lib/core/date';
 	import { toastState } from '$lib/core/toast.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
 	import { habitsState } from '$lib/features/habits/store.svelte';
@@ -13,11 +11,7 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { linksState } from '$lib/features/links/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import { rankTasks } from '$lib/features/dashboard/scoring';
 	import { parseNLPInput } from '$lib/core/nlp-parse';
 
@@ -33,39 +27,7 @@
 	import { Plus, Flame, Sparkles, Smile, Droplet, Moon, Activity, Calendar, ShoppingCart, CheckSquare, Check, Notebook, Target, Lock } from 'lucide-svelte';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
 
-	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) {
-			tasksState.load(id);
-			notesState.load(id);
-			habitsState.load(id);
-			calendarState.load(id);
-			shoppingState.load(id);
-			goalsState.load(id);
-			fitnessState.load(id);
-			linksState.load(id);
-			healthState.load();
-			moodState.load();
-			analyticsState.load();
-			void timeTrackingState.load();
-			remindersState.load(id);
-		}
-	});
-
-	onDestroy(() => {
-		tasksState.unload();
-		notesState.unload();
-		habitsState.unload();
-		calendarState.unload();
-		shoppingState.unload();
-		goalsState.unload();
-		fitnessState.unload();
-		linksState.unload();
-		healthState.unload();
-		moodState.unload();
-		analyticsState.unload();
-		timeTrackingState.unload();
-	});
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
 	const today = toISODate(new Date());
 

@@ -2,6 +2,7 @@ import { authState } from '$lib/core/auth.svelte';
 import { toISODate } from '$lib/core/date';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
 import * as goalsApi from './api';
 import { attachmentsState } from '$lib/features/attachments/store.svelte';
 import { goalCheckinInputSchema, goalInputSchema, journalEntryInputSchema, type GoalInput } from './schema';
@@ -13,6 +14,7 @@ class GoalsState {
 	journalEntries = $state<JournalEntry[]>([]);
 	checkins = $state<GoalCheckin[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribeGoals: (() => void) | null = null;
 	private unsubscribeJournal: (() => void) | null = null;
@@ -40,15 +42,19 @@ class GoalsState {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Ziele & Tagebuch', async () => {
 			[this.goals, this.journalEntries, this.checkins] = await Promise.all([
 				goalsApi.listGoals(workspaceId),
 				goalsApi.listJournalEntries(workspaceId),
 				goalsApi.listGoalCheckins(workspaceId)
 			]);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 		void this.purgeInvalidJournalMutations();
 	}
@@ -115,6 +121,7 @@ class GoalsState {
 		this.goals = [];
 		this.journalEntries = [];
 		this.checkins = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 
@@ -276,7 +283,11 @@ class GoalsState {
 	/**
 	 * Einmalig pro Session: entfernt Journal-Mutationen mit ungültigem Datum aus der
 	 * Outbox. Solche Zeilen (Alt-Bestand des Weekly-Review-Bugs, Plan §3.5) scheitern
-	 * serverseitig für immer und blockieren den Replay ALLER weiteren Mutationen.
+	 * serverseitig für immer.
+	 *
+	 * Den allgemeinen Fall deckt inzwischen das Dead-Letter der Outbox ab
+	 * (MAX_ATTEMPTS in core/outbox.svelte.ts). Diese Entgiftung bleibt, weil sie den
+	 * bekannten Alt-Bestand sofort räumt, statt erst nach fünf Fehlversuchen.
 	 */
 	private async purgeInvalidJournalMutations() {
 		if (this.purgedOutbox) return;
@@ -287,7 +298,7 @@ class GoalsState {
 				if (m.table !== 'journal_entries') continue;
 				const date = (m.payload as { date?: unknown })?.date;
 				if (typeof date !== 'string' || !isValidEntryDate(date)) {
-					await outbox.remove(m.id);
+					await outbox.remove(m.seq!);
 				}
 			}
 		} catch {

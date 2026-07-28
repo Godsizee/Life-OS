@@ -23,7 +23,15 @@
 
 	let minutes = $state<number | null>(25);
 	let date = $state(toISODate(new Date()));
-	let selectedTaskId = $state<string>(taskId ?? '');
+	let selectedTaskId = $state<string>('');
+	// Wechselt die vorbelegte Aufgabe, muss die Auswahl mitziehen —
+	// eine `$state`-Initialisierung läuft nur einmal.
+	let hydratedFor = $state<string | null | undefined>(undefined);
+	$effect(() => {
+		if (taskId === hydratedFor) return;
+		hydratedFor = taskId;
+		selectedTaskId = taskId ?? '';
+	});
 	let note = $state('');
 	let saving = $state(false);
 

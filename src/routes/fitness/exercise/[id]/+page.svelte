@@ -1,9 +1,7 @@
 <script lang="ts">
 	// Welle F3 — Übungs-Detail: Verlauf + 1RM-/Volumen-/Pace-Progression.
 	// Kein Chart-Framework im Projekt (F1-Recherche) — Muster: handgerolltes Inline-SVG (TrendChart).
-	import { onDestroy } from 'svelte';
 	import { page } from '$app/state';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { exerciseProgression } from '$lib/features/fitness/utils/progression';
@@ -12,19 +10,11 @@
 
 	const exerciseId = $derived(page.params.id);
 
+	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Nur die Satz-Historie ist bewusst lazy und wird hier angestoßen.
 	$effect(() => {
-		const id = workspaceState.workspace?.id;
-		if (id) fitnessState.load(id);
-		healthState.load();
+		if (fitnessState.loaded) void fitnessState.loadAllSetLogs();
 	});
-	$effect(() => {
-		void fitnessState.loadAllSetLogs();
-	});
-	onDestroy(() => {
-		fitnessState.unload();
-		healthState.unload();
-	});
-
 	const entry = $derived(fitnessState.catalog.find((e) => e.id === exerciseId) ?? null);
 	const sets = $derived(fitnessState.allSetLogs.filter((s) => s.exercise_id === exerciseId));
 	const sessions = $derived(exerciseProgression(sets));

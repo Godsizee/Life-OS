@@ -134,10 +134,10 @@
 					fill={cellColor(data)}
 					stroke={isToday ? '#059669' : 'none'}
 					stroke-width={isToday ? 1.5 : 0}
-					class="cursor-pointer transition-opacity hover:opacity-80"
+					class="transition-opacity hover:opacity-80"
 					onmouseenter={() => (tooltip = data)}
 					onmouseleave={() => (tooltip = null)}
-					role="gridcell"
+					role="img"
 					aria-label="{dateStr}: {data.logged}/{data.due} Habits"
 				/>
 			{/each}

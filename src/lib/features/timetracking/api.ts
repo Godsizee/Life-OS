@@ -1,4 +1,5 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { TimeEntry } from './types';
 
 export async function listTimeEntries(
@@ -6,15 +7,17 @@ export async function listTimeEntries(
 	userId: string,
 	sinceIso: string
 ): Promise<TimeEntry[]> {
-	const { data, error } = await supabase
-		.from('time_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.eq('user_id', userId)
-		.gte('started_at', sinceIso)
-		.order('started_at', { ascending: false });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<TimeEntry>('time_entries', (from, to) =>
+		supabase
+			.from('time_entries')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.eq('user_id', userId)
+			.gte('started_at', sinceIso)
+			.order('started_at', { ascending: false })
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function insertTimeEntryRaw(entry: TimeEntry): Promise<TimeEntry> {

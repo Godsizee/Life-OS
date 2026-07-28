@@ -1,9 +1,11 @@
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
+import { ladeSicher } from '$lib/core/store-load';
+import { toISODate } from '$lib/core/date';
 import * as tasksApi from './api';
 import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
-import type { Task, TaskStatus } from './types';
+import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
 import { habitsState } from '$lib/features/habits/store.svelte';
 import { remindersState } from '$lib/features/reminders/store.svelte';
@@ -12,8 +14,11 @@ class TasksState {
 	tasks = $state<Task[]>([]);
 	projects = $state<import('./types').Project[]>([]);
 	loading = $state(false);
+	/** true erst nach erfolgreichem Laden — leer + loaded ist etwas anderes als leer + Fehler. */
+	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
+	private unsubscribeProjects: (() => void) | null = null;
 
 	constructor() {
 		outbox.registerExecutor('tasks', {
@@ -21,20 +26,28 @@ class TasksState {
 			update: (payload) => tasksApi.updateRaw(payload as Partial<Task> & { id: string }),
 			delete: (payload) => tasksApi.deleteTask((payload as { id: string }).id)
 		});
+		outbox.registerExecutor('projects', {
+			insert: (payload) => tasksApi.insertProjectRaw(payload as Project),
+			delete: (payload) => tasksApi.deleteProject((payload as { id: string }).id)
+		});
 	}
 
 	async load(workspaceId: string) {
 		if (this.workspaceId === workspaceId) return;
 		this.workspaceId = workspaceId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Aufgaben', async () => {
 			[this.tasks, this.projects] = await Promise.all([
 				tasksApi.listTasks(workspaceId),
 				tasksApi.listProjects(workspaceId)
 			]);
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null; // naechster Aufruf versucht es erneut
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -52,13 +65,35 @@ class TasksState {
 				this.tasks = this.tasks.filter((t) => t.id !== id);
 			}
 		});
+		// Projekte sind publiziert, wurden aber nie abonniert: neue Projekte vom
+		// Zweitgeraet tauchten erst nach einem Reload auf.
+		this.unsubscribeProjects = subscribeToTable<import('./types').Project>(
+			'projects',
+			this.workspaceId,
+			{
+				onInsert: (row) => {
+					if (!this.projects.some((p) => p.id === row.id)) this.projects = [...this.projects, row];
+				},
+				onUpdate: (row) => {
+					this.projects = row.archived
+						? this.projects.filter((p) => p.id !== row.id)
+						: this.projects.map((p) => (p.id === row.id ? row : p));
+				},
+				onDelete: ({ id }) => {
+					this.projects = this.projects.filter((p) => p.id !== id);
+				}
+			}
+		);
 	}
 
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
+		this.unsubscribeProjects?.();
+		this.unsubscribeProjects = null;
 		this.tasks = [];
 		this.projects = [];
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 
@@ -111,12 +146,17 @@ class TasksState {
 		if (status === 'done' && task?.rrule) {
 			const nextDate = expandNextOccurrence(task);
 			if (nextDate) {
-				const nextDateStr = nextDate.toISOString().split('T')[0];
+				// Beide Seiten in LOKALE Kalendertage umrechnen. Vorher wurde ein
+				// per toISOString() erzeugter UTC-Tag gegen den Präfix von due_at
+				// geprüft — bei Fälligkeit vor 02:00 MESZ war das der Vortag, die
+				// Dublettenprüfung griff nicht und die Serie legte doppelt an.
+				const nextDateStr = toISODate(nextDate);
 				const exists = this.tasks.some(
 					(t) =>
 						t.title === task.title &&
 						t.rrule === task.rrule &&
-						t.due_at?.startsWith(nextDateStr)
+						!!t.due_at &&
+						toISODate(new Date(t.due_at)) === nextDateStr
 				);
 				if (!exists) {
 					await this.addTask({
@@ -169,8 +209,20 @@ class TasksState {
 	async addProject(name: string) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = projectInputSchema.parse({ name });
-		const project = await tasksApi.createProject(this.workspaceId, parsed.name);
+		// Wie addTask: id im Client, optimistisch anzeigen, über die Outbox schreiben.
+		// Vorher lief das direkt gegen die API und war offline nicht nutzbar.
+		const project: Project = {
+			id: crypto.randomUUID(),
+			workspace_id: this.workspaceId,
+			name: parsed.name,
+			color: null,
+			archived: false,
+			created_at: new Date().toISOString()
+		};
 		this.projects = [...this.projects, project];
+		await outbox.runOrQueue('projects', 'insert', project, () =>
+			tasksApi.insertProjectRaw(project)
+		);
 	}
 }
 

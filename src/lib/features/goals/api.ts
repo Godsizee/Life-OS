@@ -1,14 +1,17 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { Goal, GoalCheckin, JournalEntry } from './types';
 
 export async function listGoals(workspaceId: string): Promise<Goal[]> {
-	const { data, error } = await supabase
-		.from('goals')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('created_at');
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<Goal>('goals', (from, to) =>
+		supabase
+			.from('goals')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('created_at')
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function insertGoalRaw(goal: Goal): Promise<Goal> {
@@ -35,14 +38,17 @@ export async function deleteGoal(id: string): Promise<void> {
 }
 
 // RLS beschraenkt journal_entries serverseitig automatisch auf die eigenen Zeilen.
+// Ohne Zeitfenster: „An diesem Tag" blickt bewusst Jahre zurueck.
 export async function listJournalEntries(workspaceId: string): Promise<JournalEntry[]> {
-	const { data, error } = await supabase
-		.from('journal_entries')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('date', { ascending: false });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<JournalEntry>('journal_entries', (from, to) =>
+		supabase
+			.from('journal_entries')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('date', { ascending: false })
+			.order('id')
+			.range(from, to)
+	);
 }
 
 export async function upsertJournalEntry(entry: JournalEntry): Promise<JournalEntry> {
@@ -62,13 +68,15 @@ export async function deleteJournalEntry(id: string): Promise<void> {
 
 // W8 — Check-ins sind geteilt (RLS "members rw" wie goals selbst).
 export async function listGoalCheckins(workspaceId: string): Promise<GoalCheckin[]> {
-	const { data, error } = await supabase
-		.from('goal_checkins')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('date', { ascending: false });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<GoalCheckin>('goal_checkins', (from, to) =>
+		supabase
+			.from('goal_checkins')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('date', { ascending: false })
+			.order('id')
+			.range(from, to)
+	);
 }
 
 // upsert statt insert -> ein Outbox-Replay darf beliebig oft laufen.

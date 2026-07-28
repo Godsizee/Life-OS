@@ -2,6 +2,7 @@ import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { toISODate } from '$lib/core/date';
+import { ladeSicher } from '$lib/core/store-load';
 import { workspaceState } from '$lib/features/workspace/store.svelte';
 import * as moodApi from './api';
 import { cleanActivities } from './activities';
@@ -16,6 +17,7 @@ const WINDOW_DAYS = 400;
 class MoodState {
 	entries = $state<MoodEntry[]>([]);
 	loading = $state(false);
+	loaded = $state(false);
 	/** Jahre, die ueber loadYear() bereits nachgeladen wurden. */
 	private loadedYears = new Set<number>();
 	private workspaceId: string | null = null;
@@ -62,14 +64,18 @@ class MoodState {
 		if (this.workspaceId === wId) return;
 		this.workspaceId = wId;
 		this.loading = true;
-		try {
+		const ok = await ladeSicher('Stimmung', async () => {
 			const since = new Date();
 			since.setDate(since.getDate() - WINDOW_DAYS);
 			this.entries = await moodApi.listMoodEntries(wId, uId, toISODate(since));
 			this.loadedYears.clear();
-		} finally {
-			this.loading = false;
+		});
+		this.loading = false;
+		if (!ok) {
+			this.workspaceId = null;
+			return;
 		}
+		this.loaded = true;
 		this.subscribe();
 	}
 
@@ -113,6 +119,7 @@ class MoodState {
 		this.unsubscribe = null;
 		this.entries = [];
 		this.loadedYears.clear();
+		this.loaded = false;
 		this.workspaceId = null;
 	}
 

@@ -1,17 +1,20 @@
 import { supabase } from '$lib/core/supabase';
+import { fetchAllPages } from '$lib/core/query';
 import type { Attachment } from './types';
 
 export const BUCKET = 'attachments';
 export const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 export async function listAttachments(workspaceId: string): Promise<Attachment[]> {
-	const { data, error } = await supabase
-		.from('attachments')
-		.select('*')
-		.eq('workspace_id', workspaceId)
-		.order('created_at', { ascending: true });
-	if (error) throw error;
-	return data ?? [];
+	return fetchAllPages<Attachment>('attachments', (from, to) =>
+		supabase
+			.from('attachments')
+			.select('*')
+			.eq('workspace_id', workspaceId)
+			.order('created_at', { ascending: true })
+			.order('id')
+			.range(from, to)
+	);
 }
 
 /** upsert statt insert -> ein Outbox-Replay darf die Zeile erneut schreiben. */
