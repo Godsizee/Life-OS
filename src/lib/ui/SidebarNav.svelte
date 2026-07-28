@@ -10,10 +10,20 @@
 	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
 
 	$effect(() => {
-		if (typeof window !== 'undefined') {
-			const saved = localStorage.getItem('sidebar_collapsed');
+		if (typeof window === 'undefined') return;
+		const saved = localStorage.getItem('sidebar_collapsed');
+		if (saved !== null) {
 			collapsed = saved === 'true';
+			return;
 		}
+		// Ohne ausdrueckliche Wahl richtet sich der Startzustand nach der Breite:
+		// zwischen 768px und 1024px liegt u. a. das aufgeklappte Galaxy Z Fold
+		// (~928px). Dort kostet die breite Leiste zu viel von der Inhaltsspalte.
+		const mq = window.matchMedia('(min-width: 1024px)');
+		collapsed = !mq.matches;
+		const onChange = (e: MediaQueryListEvent) => (collapsed = !e.matches);
+		mq.addEventListener('change', onChange);
+		return () => mq.removeEventListener('change', onChange);
 	});
 
 	function toggleCollapse() {
@@ -32,7 +42,7 @@
 </script>
 
 <aside
-	class="fixed bottom-0 top-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 transition-all duration-300 ease-in-out md:flex md:flex-col
+	class="fixed bottom-0 top-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 pt-safe pl-safe transition-all duration-300 ease-in-out md:flex md:flex-col
 		{collapsed ? 'w-20' : 'w-64'}"
 	style="view-transition-name: sidebar"
 >
@@ -88,7 +98,7 @@
 					<span class="truncate">{item.label}</span>
 				{:else}
 					<!-- Tooltip on Collapse -->
-					<div class="absolute left-16 z-50 hidden rounded-md bg-slate-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-slate-800">
+					<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
 						{item.label}
 					</div>
 				{/if}

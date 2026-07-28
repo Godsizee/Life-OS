@@ -15,10 +15,14 @@
 	import BottomNav from '$lib/ui/BottomNav.svelte';
 	import SidebarNav from '$lib/ui/SidebarNav.svelte';
 	import CommandPalette from '$lib/ui/CommandPalette.svelte';
+	import QuickAddSheet from '$lib/ui/QuickAddSheet.svelte';
+	import ModuleGridSheet from '$lib/ui/ModuleGridSheet.svelte';
 	import Toaster from '$lib/ui/Toaster.svelte';
 	let { children } = $props();
 
 	let paletteOpen = $state(false);
+	let quickAddOpen = $state(false);
+	let moduleGridOpen = $state(false);
 
 	const publicPaths = ['/login', '/invite'];
 	let online = $state(true);
@@ -91,17 +95,21 @@
 		if (!online) {
 			return {
 				text: `Offline – Änderungen werden offline gespeichert${wartend}`,
-				class: 'bg-slate-700',
+				class: 'bg-surface-3 text-text-primary',
 				verwerfen: false
 			};
 		}
 		if (outbox.status === 'syncing') {
-			return { text: `Synchronisiere…${wartend}`, class: 'bg-primary-700', verwerfen: false };
+			return {
+				text: `Synchronisiere…${wartend}`,
+				class: 'bg-primary-700 text-white',
+				verwerfen: false
+			};
 		}
 		if (outbox.status === 'error') {
 			return {
 				text: `Sync fehlgeschlagen${wartend} – tippen für erneuten Versuch`,
-				class: 'bg-red-600',
+				class: 'bg-red-600 text-white',
 				verwerfen: false
 			};
 		}
@@ -110,7 +118,7 @@
 			const mehrzahl = outbox.dead !== 1;
 			return {
 				text: `${outbox.dead} Änderung${mehrzahl ? 'en' : ''} konnte${mehrzahl ? 'n' : ''} nicht gespeichert werden – tippen zum Verwerfen`,
-				class: 'bg-amber-600',
+				class: 'bg-amber-600 text-white',
 				verwerfen: true
 			};
 		}
@@ -119,6 +127,8 @@
 </script>
 
 <CommandPalette bind:open={paletteOpen} />
+<QuickAddSheet bind:open={quickAddOpen} />
+<ModuleGridSheet bind:open={moduleGridOpen} currentPath={page.url.pathname} />
 <Toaster />
 
 <div class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
@@ -135,7 +145,7 @@
 			<button
 				onclick={() => (syncBanner.verwerfen ? outbox.clearDead() : outbox.replay())}
 				style="view-transition-name: sync-banner"
-				class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium text-white {syncBanner.class}"
+				class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium {syncBanner.class}"
 			>
 				{syncBanner.text}
 			</button>
@@ -144,7 +154,11 @@
 			{@render children()}
 		</main>
 		{#if showNav}
-			<BottomNav currentPath={page.url.pathname} />
+			<BottomNav
+				currentPath={page.url.pathname}
+				onQuickAdd={() => (quickAddOpen = true)}
+				onMore={() => (moduleGridOpen = true)}
+			/>
 		{/if}
 	</div>
 </div>

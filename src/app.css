@@ -2,17 +2,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Lokal gebuendelt statt ueber ein CDN geladen: kein Drittanbieter-Request beim
+   Seitenaufruf, damit keine Nutzer-IP an Dritte abfliesst (DSGVO).
+   Lizenz: SIL OFL 1.1 — siehe LICENSE-plus-jakarta-sans.txt im selben Ordner. */
 @font-face {
-  font-family: 'Outfit';
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 200 800;
   font-display: swap;
-  src: url('$lib/assets/fonts/outfit-variable.woff2') format('woff2-variations');
+  src: url('$lib/assets/fonts/plus-jakarta-sans-variable.woff2') format('woff2-variations');
 }
 
 @theme {
   --breakpoint-xs: 360px;
   --breakpoint-md: 768px;
+
+  /* Fluide Typo-Skala. --text-base bleibt bewusst fix bei 1rem: faellt die
+     Schriftgroesse eines Eingabefelds unter 16px, zoomt iOS beim Fokussieren
+     ins Feld hinein und die Seite laesst sich danach seitlich schieben. */
+  --text-base: 1rem;
+  --text-lg: clamp(1.0625rem, 1.02rem + 0.25vw, 1.125rem);
+  --text-xl: clamp(1.1875rem, 1.12rem + 0.35vw, 1.375rem);
+  --text-2xl: clamp(1.375rem, 1.26rem + 0.55vw, 1.75rem);
+  --text-3xl: clamp(1.75rem, 1.55rem + 0.9vw, 2.25rem);
 
   /* Semantic Theme-Farben */
   --color-surface-0: var(--surface-0);
@@ -69,6 +81,12 @@
     --accent-glow: rgba(99, 102, 241, 0.08);
     --primary-active: #4F46E5;
     --primary-active-bg: #EEF2FF;
+
+    /* Tiefe in drei Stufen statt pro Komponente geratener Schatten:
+       1 = Karten, 2 = Erhabenes (FAB), 3 = Overlays (Sheet/Modal). */
+    --elevation-1: 0 4px 20px -2px rgba(17, 17, 20, 0.06), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+    --elevation-2: 0 8px 24px -4px rgba(17, 17, 20, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+    --elevation-3: 0 -8px 40px -8px rgba(17, 17, 20, 0.16), 0 -2px 12px -4px rgba(0, 0, 0, 0.06);
   }
 
   html.dark {
@@ -83,6 +101,10 @@
     --accent-glow: rgba(129, 140, 248, 0.12);
     --primary-active: #818CF8;
     --primary-active-bg: rgba(49, 46, 129, 0.35);
+
+    --elevation-1: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3);
+    --elevation-2: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+    --elevation-3: 0 -8px 40px -8px rgba(0, 0, 0, 0.7), 0 -2px 12px -4px rgba(0, 0, 0, 0.45);
   }
 
   html {
@@ -96,7 +118,7 @@
     background-color: var(--surface-1);
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'Outfit', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     /* Native-App-Gefühl: kein Gummiband-Scrollen des Bodys, keine horizontale
        Überlauf-Verschiebung und kein blaues Tap-Highlight beim Antippen. */
     overscroll-behavior-y: none;
@@ -140,9 +162,21 @@
     user-select: none;
     -webkit-touch-callout: none;
   }
+
+  /* Gleich breite Ziffern für alles, was sich laufend ändert (Timer, Life
+     Score, Streaks, Gewichte) – sonst springt die Zeile bei jedem Tick. */
+  .nums-tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
 }
 
 @layer utilities {
+  /* Glass ist Navigation und Overlay-Chrome vorbehalten, nicht gewöhnlichen
+     Content-Karten (siehe docs/LifeOS_Frontend_Guidelines.md).
+     .glass-card bleibt als Alias bestehen, bis die Routen-Wellen die rund 40
+     regelwidrigen Content-Nutzungen auf <Card> umgestellt haben. */
+  .glass-chrome,
   .glass-card {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
@@ -150,6 +184,7 @@
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
+  html.dark .glass-chrome,
   html.dark .glass-card {
     background: rgba(23, 23, 29, 0.7);
     backdrop-filter: blur(12px);
@@ -157,12 +192,19 @@
     border: 1px solid rgba(42, 42, 52, 0.5);
   }
 
+  /* Die Elevation-Stufen als Klassen. .premium-shadow bleibt Alias auf Stufe 1,
+     damit die rund 60 bestehenden Nutzungen unverändert weiterlaufen. */
+  .elevation-1,
   .premium-shadow {
-    box-shadow: 0 4px 20px -2px rgba(17, 17, 20, 0.06), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+    box-shadow: var(--elevation-1);
   }
 
-  html.dark .premium-shadow {
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3);
+  .elevation-2 {
+    box-shadow: var(--elevation-2);
+  }
+
+  .elevation-3 {
+    box-shadow: var(--elevation-3);
   }
 
   .interactive-card {

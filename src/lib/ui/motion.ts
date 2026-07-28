@@ -39,6 +39,14 @@ export const EASE_STANDARD = cubicBezier(0.32, 0.72, 0, 1);
 /** Spring-Feel-Easing für Cards. */
 export const EASE_SPRING = cubicBezier(0.34, 1.56, 0.64, 1);
 
+/**
+ * Dieselben Kurven als CSS-Zeichenkette – für inline `transition`-Styles, die
+ * keine JS-Easing-Funktion entgegennehmen. Werte müssen zu den Konstanten
+ * darüber passen.
+ */
+export const EASE_STANDARD_CSS = 'cubic-bezier(0.32, 0.72, 0, 1)';
+export const EASE_SPRING_CSS = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+
 /** Dauer 0 bei Reduced Motion, sonst der übergebene Wert. */
 export function motionDuration(ms: number): number {
 	return prefersReducedMotion() ? 0 : ms;

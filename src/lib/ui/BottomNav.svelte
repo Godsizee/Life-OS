@@ -1,21 +1,34 @@
 <script lang="ts">
-	import { Settings, Zap } from 'lucide-svelte';
-	import { modules } from '$lib/config/modules';
+	import { Plus, LayoutGrid } from 'lucide-svelte';
+	import { bottomNavModules } from '$lib/config/modules';
 	import { keyboardState } from '$lib/core/keyboard.svelte';
 	import { haptic } from '$lib/core/haptics';
 
-	let { currentPath = '/' }: { currentPath?: string } = $props();
+	let {
+		currentPath = '/',
+		onQuickAdd,
+		onMore
+	}: {
+		currentPath?: string;
+		onQuickAdd: () => void;
+		onMore: () => void;
+	} = $props();
 
-	const navModuleIds = ['dashboard', 'tasks', 'notes', 'calendar'];
-	const leftItems = modules
-		.filter((m) => navModuleIds.slice(0, 2).includes(m.id))
-		.map((m) => ({ name: m.label, path: m.route, icon: m.icon }));
-	const rightItems = modules
-		.filter((m) => navModuleIds.slice(2).includes(m.id))
-		.map((m) => ({ name: m.label, path: m.route, icon: m.icon }));
+	const leftItems = bottomNavModules.slice(0, 2);
+	const rightItems = bottomNavModules.slice(2);
 
-	function triggerVibration() {
+	function tap() {
 		haptic(10);
+	}
+
+	function quickAdd() {
+		haptic(15);
+		onQuickAdd();
+	}
+
+	function more() {
+		haptic(10);
+		onMore();
 	}
 </script>
 
@@ -25,67 +38,61 @@
 	style="view-transition-name: bottom-nav"
 >
 	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1 xs:px-3">
-		{#each leftItems as item}
+		{#each leftItems as item (item.id)}
 			{@const Icon = item.icon}
-			{@const active = currentPath === item.path}
+			{@const active = currentPath === item.route}
 			<a
-				href={item.path}
-				onclick={triggerVibration}
-				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
-					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
-					active:scale-95 transition-transform"
+				href={item.route}
+				onclick={tap}
+				aria-current={active ? 'page' : undefined}
+				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-transform active:scale-95
+					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">{item.name}</span>
+				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">{item.label}</span>
 				{#if active}
 					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
 				{/if}
 			</a>
 		{/each}
 
-		<!-- Mitte: Fokus-FAB -->
-		<a
-			href="/focus"
-			onclick={triggerVibration}
-			class="relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full shadow-lg transition-all active:scale-90 premium-shadow
-				{currentPath === '/focus'
-					? 'bg-primary-800 text-white dark:bg-primary-600'
-					: 'bg-primary-700 text-white dark:bg-primary-500'}"
-			aria-label="Fokus-Modus"
+		<!-- Mitte: Schnellerfassung. Etwas festhalten ist die haeufigste Aktion der
+		     App und gehoert deshalb in Daumenreichweite – Fokus liegt im Modul-Grid. -->
+		<button
+			type="button"
+			onclick={quickAdd}
+			aria-label="Schnell erfassen"
+			class="relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white transition-all active:scale-90 elevation-2 hero-gradient"
 		>
-			<Zap size={22} strokeWidth={2.5} />
-		</a>
+			<Plus size={24} strokeWidth={2.5} />
+		</button>
 
-		{#each rightItems as item}
+		{#each rightItems as item (item.id)}
 			{@const Icon = item.icon}
-			{@const active = currentPath === item.path}
+			{@const active = currentPath === item.route}
 			<a
-				href={item.path}
-				onclick={triggerVibration}
-				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
-					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
-					active:scale-95 transition-transform"
+				href={item.route}
+				onclick={tap}
+				aria-current={active ? 'page' : undefined}
+				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-transform active:scale-95
+					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">{item.name}</span>
+				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">{item.label}</span>
 				{#if active}
 					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
 				{/if}
 			</a>
 		{/each}
 
-		<a
-			href="/more"
-			onclick={triggerVibration}
-			class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5
-				{currentPath === '/more' ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}
-				active:scale-95 transition-transform"
+		<button
+			type="button"
+			onclick={more}
+			aria-label="Alle Module"
+			class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 text-text-secondary transition-transform active:scale-95"
 		>
-			<Settings size={20} strokeWidth={currentPath === '/more' ? 2.5 : 2} />
-			<span class="w-full truncate text-center text-[10px] font-medium xs:text-xs">Mehr</span>
-			{#if currentPath === '/more'}
-				<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
-			{/if}
-		</a>
+			<LayoutGrid size={20} strokeWidth={2} />
+			<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">Mehr</span>
+		</button>
 	</div>
 </nav>

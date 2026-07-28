@@ -60,7 +60,7 @@
 					type="button"
 					onclick={() => (energy = e)}
 					class="flex h-10 flex-1 items-center justify-center rounded-xl border-2 text-sm font-bold transition-all active:scale-95
-						{energy === e ? 'border-primary-700 bg-primary-700 dark:border-primary-650 dark:bg-primary-650 text-white' : 'border-border-color text-text-secondary bg-surface-0 hover:bg-surface-2'}"
+						{energy === e ? 'border-primary-700 bg-primary-700 dark:border-primary-600 dark:bg-primary-600 text-white' : 'border-border-color text-text-secondary bg-surface-0 hover:bg-surface-2'}"
 				>
 					{e}
 				</button>

@@ -591,7 +591,7 @@
 					<!-- Desktop-Speichern (im sticky Sidebar) -->
 					<button
 						onclick={handleSaveWorkoutLog}
-						class="hidden lg:flex w-full min-h-12 bg-primary-750 text-white rounded-xl font-bold items-center justify-center gap-2 hover:bg-primary-850 active:scale-[0.99] transition-all"
+						class="hidden lg:flex w-full min-h-12 bg-primary-700 text-white rounded-xl font-bold items-center justify-center gap-2 hover:bg-primary-800 active:scale-[0.99] transition-all"
 					>
 						<Save size={18} />
 						<span>Workout speichern</span>
@@ -606,7 +606,7 @@
 			>
 				<button
 					onclick={handleSaveWorkoutLog}
-					class="w-full min-h-12 bg-primary-750 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-850 active:scale-[0.99] transition-all"
+					class="w-full min-h-12 bg-primary-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary-800 active:scale-[0.99] transition-all"
 				>
 					<Save size={18} />
 					<span>Workout speichern</span>

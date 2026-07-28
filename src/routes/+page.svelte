@@ -210,7 +210,7 @@
 
 	<!-- Streak-Banner -->
 	{#if longestStreak.streak >= 2}
-		<div class="flex items-center gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-850 dark:bg-amber-950/20 dark:text-amber-400 premium-shadow border border-amber-100 dark:border-amber-900/50">
+		<div class="flex items-center gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 premium-shadow border border-amber-100 dark:border-amber-900/50">
 			<Flame class="text-amber-500 animate-pulse" size={18} />
 			<div>
 				<span class="font-bold">{longestStreak.streak} Tage Streak!</span>
