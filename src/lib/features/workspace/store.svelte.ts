@@ -23,6 +23,11 @@ class WorkspaceState {
 		this.members = [];
 	}
 
+	async rename(name: string) {
+		if (!this.workspace) throw new Error('Kein Workspace geladen');
+		this.workspace = await workspaceApi.renameWorkspace(this.workspace.id, name);
+	}
+
 	async invite(email: string) {
 		if (!this.workspace) throw new Error('Kein Workspace geladen');
 		await workspaceApi.inviteMember(this.workspace.id, email);

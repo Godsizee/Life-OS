@@ -1,31 +1,69 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { supabase } from '$lib/core/supabase';
+	import { page } from '$app/state';
+	import { Fingerprint } from 'lucide-svelte';
 	import Button from '$lib/ui/Button.svelte';
+	import Field from '$lib/ui/Field.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
+	import PasswordField from '$lib/features/auth/components/PasswordField.svelte';
+	import { signInWithPasskey, signInWithPassword } from '$lib/features/auth/api';
+	import { passkeyAvailable } from '$lib/features/auth/capabilities';
+	import { authErrorText } from '$lib/features/auth/errors';
+	import { safeNextPath } from '$lib/features/auth/redirect';
+	import { emailSchema } from '$lib/features/auth/schema';
 
-	let mode = $state<'login' | 'signup'>('login');
 	let email = $state('');
 	let password = $state('');
-	let error = $state('');
+	let emailError = $state('');
+	let formError = $state('');
 	let loading = $state(false);
+	let passkeyLoading = $state(false);
+	let passkeyReady = $state(false);
+	let resetHintOpen = $state(false);
+
+	// Der Auth-Guard hängt das ursprüngliche Ziel an; safeNextPath lässt nur
+	// eigene, relative Pfade durch.
+	const next = $derived(safeNextPath(page.url.searchParams.get('next')));
+
+	$effect(() => {
+		// Der Passkey-Weg erscheint nur, wenn Browser UND Server ihn können —
+		// siehe features/auth/capabilities.ts.
+		void passkeyAvailable().then((ok) => (passkeyReady = ok));
+	});
+
+	function validateEmail(): boolean {
+		const result = emailSchema.safeParse(email.trim());
+		emailError = result.success ? '' : result.error.issues[0].message;
+		return result.success;
+	}
 
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
-		error = '';
+		formError = '';
+		if (!validateEmail()) return;
+
 		loading = true;
 		try {
-			const { error: authError } =
-				mode === 'login'
-					? await supabase.auth.signInWithPassword({ email, password })
-					: await supabase.auth.signUp({ email, password });
-			if (authError) {
-				error = authError.message;
-				return;
-			}
-			await goto('/');
+			await signInWithPassword(email, password);
+			await goto(next);
+		} catch (error) {
+			formError = authErrorText(error);
 		} finally {
 			loading = false;
+		}
+	}
+
+	async function passkeyLogin() {
+		formError = '';
+		passkeyLoading = true;
+		try {
+			await signInWithPasskey();
+			await goto(next);
+		} catch (error) {
+			formError = authErrorText(error);
+		} finally {
+			passkeyLoading = false;
 		}
 	}
 </script>
@@ -34,39 +72,71 @@
 	<title>Anmelden - Life OS</title>
 </svelte:head>
 
-<div class="flex min-h-screen items-center justify-center p-4">
-	<form onsubmit={submit} class="flex w-full max-w-sm flex-col gap-4">
-		<div class="flex items-center gap-3 mb-2">
-			<img src="/favicon.svg" alt="Life OS Logo" class="h-12 w-12 rounded-2xl premium-shadow" />
-			<div class="flex flex-col">
-				<span class="text-xl font-bold tracking-tight text-text-primary">Life OS</span>
-				<span class="text-xs text-text-secondary">Dein persönliches Betriebssystem</span>
-			</div>
-		</div>
+<AuthShell title="Willkommen zurück" subtitle="Melde dich an, um weiterzumachen.">
+	<form onsubmit={submit} class="flex flex-col gap-4" novalidate>
+		<Field label="E-Mail" error={emailError}>
+			<Input
+				type="email"
+				inputmode="email"
+				autocomplete="username"
+				placeholder="du@beispiel.de"
+				bind:value={email}
+				invalid={!!emailError}
+				oninput={() => (emailError = '')}
+				required
+			/>
+		</Field>
 
-		<h1 class="text-2xl font-bold tracking-tight">
-			{mode === 'login' ? 'Anmelden' : 'Registrieren'}
-		</h1>
+		<PasswordField bind:value={password} autocomplete="current-password" />
 
-		<Input type="email" placeholder="E-Mail" bind:value={email} required />
-		<Input type="password" placeholder="Passwort" bind:value={password} required />
-
-		{#if error}
-			<p class="text-sm text-red-600">{error}</p>
+		{#if formError}
+			<p role="alert" class="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
+				{formError}
+			</p>
 		{/if}
 
-		<Button type="submit" disabled={loading}>
-			{#snippet children()}
-				{mode === 'login' ? 'Anmelden' : 'Registrieren'}
-			{/snippet}
+		<Button type="submit" {loading} fullWidth>
+			{#snippet children()}Anmelden{/snippet}
 		</Button>
+
+		{#if passkeyReady}
+			<div class="flex items-center gap-3 text-xs text-text-tertiary">
+				<span class="h-px flex-1 bg-border-color"></span>
+				oder
+				<span class="h-px flex-1 bg-border-color"></span>
+			</div>
+			<Button variant="secondary" loading={passkeyLoading} onclick={passkeyLogin} fullWidth>
+				{#snippet icon()}<Fingerprint size={18} />{/snippet}
+				{#snippet children()}Mit Passkey anmelden{/snippet}
+			</Button>
+		{/if}
+	</form>
+
+	{#snippet footer()}
+		<p>
+			Noch kein Konto?
+			<a href="/register" class="font-medium text-primary-600 underline dark:text-primary-400">
+				Registrieren
+			</a>
+		</p>
 
 		<button
 			type="button"
-			class="text-sm text-text-secondary hover:text-text-primary transition-colors"
-			onclick={() => (mode = mode === 'login' ? 'signup' : 'login')}
+			onclick={() => (resetHintOpen = !resetHintOpen)}
+			aria-expanded={resetHintOpen}
+			class="min-h-11 text-text-tertiary underline transition-colors hover:text-text-primary"
 		>
-			{mode === 'login' ? 'Noch kein Konto? Registrieren' : 'Schon registriert? Anmelden'}
+			Passwort vergessen?
 		</button>
-	</form>
-</div>
+
+		{#if resetHintOpen}
+			<!-- Ehrlich statt stumme Sackgasse: ohne SMTP kann der Server keine
+			     Zurücksetzen-Mail verschicken. -->
+			<p class="rounded-xl bg-surface-2 px-3 py-2 text-left text-xs leading-relaxed text-text-secondary">
+				Life OS verschickt im Pilotbetrieb noch keine E-Mails, ein automatisches Zurücksetzen ist
+				deshalb nicht möglich. Melde dich bei der Person, die dich eingeladen hat — sie kann das
+				Passwort im Supabase-Studio neu setzen.
+			</p>
+		{/if}
+	{/snippet}
+</AuthShell>

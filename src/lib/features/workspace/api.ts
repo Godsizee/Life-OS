@@ -34,6 +34,18 @@ export async function listMembers(workspaceId: string): Promise<WorkspaceMember[
 	}));
 }
 
+/** Nur der Owner darf umbenennen (RLS-Policy "owners can update workspaces"). */
+export async function renameWorkspace(workspaceId: string, name: string): Promise<Workspace> {
+	const { data, error } = await supabase
+		.from('workspaces')
+		.update({ name })
+		.eq('id', workspaceId)
+		.select()
+		.single();
+	if (error) throw error;
+	return data;
+}
+
 export async function inviteMember(workspaceId: string, email: string): Promise<Invite> {
 	const validEmail = inviteEmailSchema.parse(email);
 	const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

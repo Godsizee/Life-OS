@@ -12,4 +12,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 	);
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+	auth: {
+		// Opt-in fuer signInWithPasskey()/registerPasskey(). Ohne das Flag wirft das
+		// SDK beim Aufruf. Ob der Auth-Server die Endpunkte ueberhaupt kennt, prueft
+		// features/auth/capabilities.ts zur Laufzeit — der self-hosted GoTrue hier
+		// antwortet aktuell mit 404 (siehe HANDOFF.md).
+		experimental: { passkey: true }
+	}
+});

@@ -38,7 +38,14 @@
 	}
 </script>
 
-<div class="grid grid-cols-3 gap-4">
+<!--
+	Drei Spalten passen unter ~600px nicht mehr sinnvoll nebeneinander: Titel
+	brechen mitten im Wort oder ragen aus der Spalte. Statt sie zu quetschen,
+	scrollt das Board waagerecht in seinem eigenen Container — die Seite selbst
+	bleibt frei von horizontalem Scroll.
+-->
+<div class="overflow-x-auto pb-1">
+	<div class="grid min-w-xl grid-cols-3 gap-4 sm:min-w-0">
 	{#each COLUMNS as col (col.status)}
 		<!-- Drop-Ziel der Spalte. Bedienbar bleibt das Board auch ohne Drag&Drop:
 			 der Status lässt sich im Detail-Sheet der Aufgabe umstellen. -->
@@ -64,7 +71,8 @@
 										{:else if task.priority === 'low'}
 											<span class="inline-block h-2 w-2 rounded-full bg-slate-400 shrink-0"></span>
 										{/if}
-										<p class="text-sm font-medium {task.status === 'done' ? 'text-text-tertiary line-through' : 'text-text-primary'}">{task.title}</p>
+										<!-- wrap-break-word: ein langes Wort wuerde sonst aus der schmalen Spalte ragen. -->
+										<p class="min-w-0 wrap-break-word text-sm font-medium {task.status === 'done' ? 'text-text-tertiary line-through' : 'text-text-primary'}">{task.title}</p>
 									</div>
 									<div class="flex items-center gap-1.5 flex-wrap">
 										{#if task.due_at}
@@ -106,5 +114,6 @@
 				{/each}
 			</div>
 		</div>
-	{/each}
+		{/each}
+	</div>
 </div>

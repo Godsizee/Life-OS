@@ -3,8 +3,13 @@
 	import { page } from '$app/state';
 	import { authState } from '$lib/core/auth.svelte';
 	import { acceptInvite } from '$lib/features/workspace/api';
+	import { loginUrlFor, safeNextPath } from '$lib/features/auth/redirect';
 
 	let status = $state<'pending' | 'accepted' | 'invalid' | 'needs-login'>('pending');
+
+	const registerUrl = $derived(
+		`/register?next=${encodeURIComponent(safeNextPath(page.url.pathname + page.url.search))}`
+	);
 
 	$effect(() => {
 		if (authState.loading) return;
@@ -36,7 +41,13 @@
 	{:else if status === 'needs-login'}
 		<div class="flex flex-col gap-3">
 			<p class="text-slate-700">Bitte zuerst anmelden, um die Einladung anzunehmen.</p>
-			<a href="/login" class="text-primary-600 underline">Zur Anmeldung</a>
+			<!-- Mit ?next=, sonst geht das Einladungs-Token beim Login verloren. -->
+			<a href={loginUrlFor(page.url.pathname, page.url.search)} class="text-primary-600 underline">
+				Zur Anmeldung
+			</a>
+			<a href={registerUrl} class="text-sm text-text-secondary underline">
+				Noch kein Konto? Registrieren
+			</a>
 		</div>
 	{:else}
 		<p class="text-red-600">Einladung ungültig oder abgelaufen.</p>

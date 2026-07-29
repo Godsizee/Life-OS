@@ -16,10 +16,10 @@ class AuthState {
 			this.session = session;
 		});
 	}
-
-	async signOut() {
-		await supabase.auth.signOut();
-	}
 }
+
+// Abmelden liegt bewusst nicht hier, sondern in features/auth/logout.ts:
+// es muss zusaetzlich Workspace-Daten und Outbox aufraeumen, und core darf
+// nicht auf features zugreifen.
 
 export const authState = new AuthState();

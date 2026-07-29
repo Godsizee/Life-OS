@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { authState } from '$lib/core/auth.svelte';
-	import { outbox } from '$lib/core/outbox.svelte';
+	import { logout } from '$lib/features/auth/logout';
+	import { resetWelcome } from '$lib/features/dashboard/welcome';
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
@@ -17,12 +17,6 @@
 		['habits', 'shopping', 'goals', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
 	);
 
-	async function logout() {
-		await authState.signOut();
-		workspaceState.reset();
-		await outbox.clear();
-		await goto('/login');
-	}
 </script>
 
 <svelte:head>
@@ -150,6 +144,17 @@
 						: ''}"
 				></span>
 			</span>
+		</button>
+
+		<!-- Ein weggeklickter Hinweis darf nicht unerreichbar werden. -->
+		<button
+			onclick={async () => {
+				resetWelcome();
+				await goto('/');
+			}}
+			class="flex min-h-12 items-center justify-between gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
+		>
+			<span class="truncate">👋 Willkommens-Hinweis erneut zeigen</span>
 		</button>
 
 		{#if installState.canInstall}

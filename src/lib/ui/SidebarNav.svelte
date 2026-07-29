@@ -4,7 +4,7 @@
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
 	import { outbox } from '$lib/core/outbox.svelte';
-	import { goto } from '$app/navigation';
+	import { logout } from '$lib/features/auth/logout';
 	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning } from 'lucide-svelte';
 
 	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
@@ -33,12 +33,6 @@
 		} catch {}
 	}
 
-	async function logout() {
-		await authState.signOut();
-		workspaceState.reset();
-		await outbox.clear();
-		await goto('/login');
-	}
 </script>
 
 <aside

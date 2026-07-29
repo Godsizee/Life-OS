@@ -12,6 +12,7 @@
 	import { pushState } from '$lib/core/push.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
 	import { keyboardState } from '$lib/core/keyboard.svelte';
+	import { loginUrlFor } from '$lib/features/auth/redirect';
 	import BottomNav from '$lib/ui/BottomNav.svelte';
 	import SidebarNav from '$lib/ui/SidebarNav.svelte';
 	import CommandPalette from '$lib/ui/CommandPalette.svelte';
@@ -24,7 +25,10 @@
 	let quickAddOpen = $state(false);
 	let moduleGridOpen = $state(false);
 
-	const publicPaths = ['/login', '/invite'];
+	const publicPaths = ['/login', '/register', '/invite'];
+	// Anmeldung und Onboarding bringen ihren eigenen Rahmen mit (AuthShell);
+	// Navigation waere dort nur Ablenkung von der einen offenen Aufgabe.
+	const chromelessPaths = [...publicPaths, '/onboarding'];
 	let online = $state(true);
 
 	onMount(() => {
@@ -54,7 +58,9 @@
 		if (!authState.session) {
 			workspaceState.reset();
 			unloadWorkspaceData();
-			if (!isPublic) goto('/login');
+			// Ziel mitnehmen, statt es zu verlieren: sonst landet z. B. ein
+			// Einladungslink nach dem Login stumm auf dem Dashboard.
+			if (!isPublic) goto(loginUrlFor(page.url.pathname, page.url.search));
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
 			// Einmal zentral statt pro Route — siehe core/workspace-data.ts.
 			void workspaceState.load().then(async () => {
@@ -75,7 +81,7 @@
 		});
 	});
 
-	const showNav = $derived(!publicPaths.includes(page.url.pathname));
+	const showNav = $derived(!chromelessPaths.includes(page.url.pathname));
 	// F5 — /fitness bekommt mehr Breite (Desktop-Zwei-Spalten im Live-Workout),
 	// statt den mobilen Ein-Spalten-Fluss nur gestreckt breiter darzustellen.
 	const wideRoute = $derived(
@@ -150,7 +156,11 @@
 				{syncBanner.text}
 			</button>
 		{/if}
-		<main class="mx-auto w-full flex-1 p-4 md:p-8 {wideRoute ? 'max-w-6xl' : 'max-w-4xl'}">
+		<main
+			class="mx-auto w-full flex-1 {showNav ? 'p-4 md:p-8' : ''} {wideRoute
+				? 'max-w-6xl'
+				: 'max-w-4xl'}"
+		>
 			{@render children()}
 		</main>
 		{#if showNav}

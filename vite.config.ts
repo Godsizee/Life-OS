@@ -34,6 +34,11 @@ export default defineConfig({
 				name: 'Life OS',
 				short_name: 'Life',
 				description: 'Midweight Life OS',
+				// Bewusst fest auf Hell: Manifeste kennen keine Media Queries, ein
+				// dunkler Wert waere im Light Mode genauso falsch. Massgeblich zur
+				// Laufzeit ist ohnehin themeState.apply() zusammen mit dem Inline-
+				// Skript in src/app.html — der Wert hier faerbt nur den Splash beim
+				// Start vom Homescreen. Nicht "reparieren".
 				theme_color: '#F6F6F8',
 				background_color: '#F6F6F8',
 				display: 'standalone',

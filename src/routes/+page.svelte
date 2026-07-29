@@ -20,6 +20,7 @@
 	import Card from '$lib/ui/Card.svelte';
 	import SuggestionCarousel from '$lib/features/suggestions/components/SuggestionCarousel.svelte';
 	import DailyBrief from '$lib/features/dashboard/components/DailyBrief.svelte';
+	import WelcomeModal from '$lib/features/dashboard/components/WelcomeModal.svelte';
 	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
 	import ShoppingList from '$lib/features/shopping/components/ShoppingList.svelte';
@@ -190,6 +191,9 @@
 <svelte:head>
 	<title>Heute - Life OS</title>
 </svelte:head>
+
+<!-- Beta-Hinweis; entscheidet selbst anhand von localStorage, ob er erscheint. -->
+<WelcomeModal />
 
 <div class="space-y-6">
 	<!-- Header Zone -->
