@@ -38,7 +38,15 @@ export function safeNextPath(raw: string | null | undefined, fallback = '/'): st
 }
 
 /** Baut das Login-Ziel für den Auth-Guard, damit die ursprüngliche Route erhalten bleibt. */
-export function loginUrlFor(pathname: string, search = ''): string {
+export function loginUrlFor(
+	pathname: string,
+	search = '',
+	options?: { /** Sitzung ist unerwartet weggefallen, nicht durch Klick auf "Abmelden". */ expired?: boolean }
+): string {
 	const next = safeNextPath(`${pathname}${search}`, '');
-	return next ? `/login?next=${encodeURIComponent(next)}` : '/login';
+	const params = new URLSearchParams();
+	if (next) params.set('next', next);
+	if (options?.expired) params.set('expired', '1');
+	const query = params.toString();
+	return query ? `/login?${query}` : '/login';
 }

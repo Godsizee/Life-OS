@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { logout } from '$lib/features/auth/logout';
+	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
 	import { resetWelcome } from '$lib/features/dashboard/welcome';
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
@@ -205,7 +205,7 @@
 		{/if}
 	</div>
 
-	<Button variant="secondary" onclick={logout}>
+	<Button variant="secondary" onclick={logout} loading={logoutState.loading}>
 		{#snippet children()}
 			Abmelden
 		{/snippet}

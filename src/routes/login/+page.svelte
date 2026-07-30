@@ -9,7 +9,7 @@
 	import PasswordField from '$lib/features/auth/components/PasswordField.svelte';
 	import { signInWithPasskey, signInWithPassword } from '$lib/features/auth/api';
 	import { passkeyAvailable } from '$lib/features/auth/capabilities';
-	import { authErrorText } from '$lib/features/auth/errors';
+	import { SESSION_EXPIRED_MESSAGE, authErrorText } from '$lib/features/auth/errors';
 	import { safeNextPath } from '$lib/features/auth/redirect';
 	import { emailSchema } from '$lib/features/auth/schema';
 
@@ -25,6 +25,10 @@
 	// Der Auth-Guard hängt das ursprüngliche Ziel an; safeNextPath lässt nur
 	// eigene, relative Pfade durch.
 	const next = $derived(safeNextPath(page.url.searchParams.get('next')));
+	// Vom Auth-Guard gesetzt, wenn eine bestehende Sitzung unerwartet verschwand
+	// (Server-Refresh fehlgeschlagen) statt durch Klick auf "Abmelden" — sonst
+	// landet der Nutzer kommentarlos auf dieser Seite und haelt es fuer einen Bug.
+	const showExpiredNotice = $derived(page.url.searchParams.get('expired') === '1');
 
 	$effect(() => {
 		// Der Passkey-Weg erscheint nur, wenn Browser UND Server ihn können —
@@ -73,6 +77,11 @@
 </svelte:head>
 
 <AuthShell title="Willkommen zurück" subtitle="Melde dich an, um weiterzumachen.">
+	{#if showExpiredNotice}
+		<p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
+			{SESSION_EXPIRED_MESSAGE}
+		</p>
+	{/if}
 	<form onsubmit={submit} class="flex flex-col gap-4" novalidate>
 		<Field label="E-Mail" error={emailError}>
 			<Input

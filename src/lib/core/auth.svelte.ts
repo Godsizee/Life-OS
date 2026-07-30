@@ -7,6 +7,15 @@ class AuthState {
 
 	user = $derived<User | null>(this.session?.user ?? null);
 
+	/**
+	 * Von logout() gesetzt, bevor signOut() feuert. `onAuthStateChange` liefert
+	 * fuer eine gewollte Abmeldung und eine serverseitig abgelaufene Sitzung
+	 * denselben SIGNED_OUT-Event — der Guard in +layout.svelte braucht dieses
+	 * Flag, um beide Faelle auseinanderzuhalten und nur beim zweiten einen
+	 * "Sitzung abgelaufen"-Hinweis zu zeigen.
+	 */
+	private expectingSignOut = false;
+
 	async init() {
 		const { data } = await supabase.auth.getSession();
 		this.session = data.session;
@@ -15,6 +24,17 @@ class AuthState {
 		supabase.auth.onAuthStateChange((_event, session) => {
 			this.session = session;
 		});
+	}
+
+	markIntentionalSignOut() {
+		this.expectingSignOut = true;
+	}
+
+	/** Liest das Flag und setzt es zurueck — darf pro Abmeldung nur einmal greifen. */
+	consumeIntentionalSignOut(): boolean {
+		const was = this.expectingSignOut;
+		this.expectingSignOut = false;
+		return was;
 	}
 }
 

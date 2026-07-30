@@ -16,6 +16,17 @@ export const credentialsSchema = z.object({
 
 export type Credentials = z.infer<typeof credentialsSchema>;
 
+// Beim Login zaehlt nur, was der Server selbst als richtig oder falsch
+// bewertet: passwordSchema erzwingt die Vergabe-Policy (min. 8 Zeichen), die
+// aber nicht rueckwirkend fuer Bestandskonten gilt — z. B. Passkey-Only-Konten
+// oder ein im Supabase-Studio manuell gesetztes kuerzeres Passwort. Wuerde der
+// Login dieselbe Policy erzwingen, kaeme so ein Nutzer nie wieder rein und
+// laese "Mindestens 8 Zeichen." statt einer Erklaerung fuer die Sackgasse.
+export const loginCredentialsSchema = z.object({
+	email: emailSchema,
+	password: z.string().min(1, 'Bitte ein Passwort eingeben.')
+});
+
 export const onboardingSchema = z.object({
 	displayName: z.string().trim().min(2, 'Mindestens 2 Zeichen.').max(60, 'Höchstens 60 Zeichen.'),
 	workspaceName: z.string().trim().min(2, 'Mindestens 2 Zeichen.').max(60, 'Höchstens 60 Zeichen.')

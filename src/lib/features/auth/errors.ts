@@ -39,6 +39,10 @@ const BY_DOM_EXCEPTION: Record<string, string> = {
 const NETWORK = 'Keine Verbindung zum Server. Prüfe deine Internetverbindung.';
 const FALLBACK = 'Das hat leider nicht geklappt. Bitte später erneut versuchen.';
 
+/** Fuer den Auth-Guard: gleicher Text wie bei einem `session_expired`-Fehler
+ * vom Server, aber hier ausgeloest durch den Client (siehe redirect.ts). */
+export const SESSION_EXPIRED_MESSAGE = BY_CODE.session_expired;
+
 interface ErrorLike {
 	name?: unknown;
 	code?: unknown;

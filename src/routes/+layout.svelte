@@ -30,6 +30,10 @@
 	// Navigation waere dort nur Ablenkung von der einen offenen Aufgabe.
 	const chromelessPaths = [...publicPaths, '/onboarding'];
 	let online = $state(true);
+	// Nur gesetzt, nachdem wir tatsaechlich eine Sitzung gesehen haben — sonst
+	// meldete ein direkter Aufruf einer geschuetzten URL ganz ohne Login
+	// faelschlich "Sitzung abgelaufen" statt schlicht "bitte anmelden".
+	let hadSession = false;
 
 	onMount(() => {
 		authState.init();
@@ -56,11 +60,18 @@
 		if (authState.loading) return;
 		const isPublic = publicPaths.includes(page.url.pathname);
 		if (!authState.session) {
+			// Ein Klick auf "Abmelden" setzt dieses Flag VOR signOut() — beide Faelle
+			// loesen denselben SIGNED_OUT-Event aus, aber nur der unerwartete soll
+			// den "Sitzung abgelaufen"-Hinweis auf der Login-Seite zeigen.
+			const wasIntentional = authState.consumeIntentionalSignOut();
+			const wasUnexpected = hadSession && !wasIntentional;
 			workspaceState.reset();
 			unloadWorkspaceData();
 			// Ziel mitnehmen, statt es zu verlieren: sonst landet z. B. ein
 			// Einladungslink nach dem Login stumm auf dem Dashboard.
-			if (!isPublic) goto(loginUrlFor(page.url.pathname, page.url.search));
+			if (!isPublic) {
+				goto(loginUrlFor(page.url.pathname, page.url.search, { expired: wasUnexpected }));
+			}
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
 			// Einmal zentral statt pro Route — siehe core/workspace-data.ts.
 			void workspaceState.load().then(async () => {
@@ -69,6 +80,7 @@
 				await outbox.replay();
 			});
 		}
+		hadSession = !!authState.session;
 	});
 
 	onNavigate((navigation) => {

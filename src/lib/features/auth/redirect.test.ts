@@ -55,4 +55,16 @@ describe('loginUrlFor', () => {
 	it('laesst den Parameter weg, wenn das Ziel selbst der Login ist', () => {
 		expect(loginUrlFor('/login', '')).toBe('/login');
 	});
+
+	it('haengt expired=1 an, wenn die Sitzung unerwartet weggefallen ist', () => {
+		expect(loginUrlFor('/tasks', '', { expired: true })).toBe('/login?next=%2Ftasks&expired=1');
+	});
+
+	it('zeigt expired auch ohne next-Ziel', () => {
+		expect(loginUrlFor('/login', '', { expired: true })).toBe('/login?expired=1');
+	});
+
+	it('laesst expired ohne next-Ziel weg, wenn es nicht gesetzt ist', () => {
+		expect(loginUrlFor('/login', '', { expired: false })).toBe('/login');
+	});
 });

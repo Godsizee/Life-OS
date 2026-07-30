@@ -1,7 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '$lib/core/supabase';
 import { passkeyAvailable } from './capabilities';
-import { credentialsSchema } from './schema';
+import { credentialsSchema, loginCredentialsSchema } from './schema';
 
 /**
  * Einziger Ort im Projekt, der `supabase.auth` berührt (AGENTS.md: UI spricht
@@ -10,7 +10,7 @@ import { credentialsSchema } from './schema';
  */
 
 export async function signInWithPassword(email: string, password: string): Promise<Session> {
-	const credentials = credentialsSchema.parse({ email: email.trim(), password });
+	const credentials = loginCredentialsSchema.parse({ email: email.trim(), password });
 	const { data, error } = await supabase.auth.signInWithPassword(credentials);
 	if (error) throw error;
 	if (!data.session) throw new Error('Anmeldung ohne Sitzung zurückgekommen.');
@@ -31,7 +31,10 @@ export async function signUpWithPassword(email: string, password: string): Promi
 }
 
 export async function signOut(): Promise<void> {
-	const { error } = await supabase.auth.signOut();
+	// scope: 'global' (SDK-Default) meldet auf allen Geraeten ab, an denen dieses
+	// Konto eingeloggt ist. Fuer einen "Abmelden"-Knopf ist 'local' das erwartete
+	// Verhalten — sonst wirft ein Logout am Handy die Desktop-Sitzung mit raus.
+	const { error } = await supabase.auth.signOut({ scope: 'local' });
 	if (error) throw error;
 }
 
