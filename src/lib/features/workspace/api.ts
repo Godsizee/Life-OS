@@ -3,7 +3,12 @@ import { inviteEmailSchema } from './schema';
 import type { Invite, Workspace, WorkspaceMember } from './types';
 
 export async function getCurrentWorkspace(): Promise<Workspace | null> {
-	const { data, error } = await supabase.from('workspaces').select('*').limit(1).maybeSingle();
+	const { data, error } = await supabase
+		.from('workspaces')
+		.select('*')
+		.order('created_at', { ascending: true })
+		.limit(1)
+		.maybeSingle();
 	if (error) throw error;
 	return data;
 }
