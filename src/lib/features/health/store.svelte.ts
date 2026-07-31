@@ -8,8 +8,8 @@ import * as healthApi from './api';
 import { healthInputSchema } from './schema';
 import type { HealthEntry, HealthValues } from './types';
 
-/** 90 Tage: deckt 30-Tage-Trends, Monatsbericht und Weekly Review ab. */
-const WINDOW_DAYS = 90;
+/** 400 Tage: deckt Jahresansicht und "An diesem Tag" ohne Nachladen ab. */
+const WINDOW_DAYS = 400;
 
 class HealthState {
 	/** Absteigend nach Datum (neueste zuerst) — die Liste auf /health nutzt das direkt. */
@@ -109,7 +109,7 @@ class HealthState {
 			date: parsed.data.date,
 			weight_kg: parsed.data.weight_kg,
 			sleep_h: parsed.data.sleep_h,
-			water_glasses: parsed.data.water_glasses,
+			water_ml: parsed.data.water_ml,
 			energy: parsed.data.energy
 		};
 
@@ -121,7 +121,8 @@ class HealthState {
 			date: parsed.data.date,
 			weight_kg: parsed.data.weight_kg,
 			sleep_h: parsed.data.sleep_h,
-			water_glasses: parsed.data.water_glasses as HealthEntry['water_glasses'],
+			water_ml: parsed.data.water_ml as HealthEntry['water_ml'],
+			water_glasses: existing?.water_glasses ?? null,
 			energy: parsed.data.energy as HealthEntry['energy']
 		});
 
@@ -139,6 +140,19 @@ class HealthState {
 		await outbox.runOrQueue('health_entries', 'delete', { id }, () =>
 			healthApi.deleteHealthEntry(id)
 		);
+	}
+
+	/** Wasser um `deltaMl` verändern (auch negativ). Nie unter 0. */
+	async addWater(deltaMl: number) {
+		const heute = this.todayKey();
+		const e = this.entryForDate(heute);
+		const aktuell = e ? (e.water_ml ?? 0) : 0;
+		await this.saveFor(heute, {
+			weight_kg: e?.weight_kg ?? null,
+			sleep_h: e?.sleep_h ?? null,
+			water_ml: Math.max(0, aktuell + deltaMl),
+			energy: e?.energy ?? null
+		});
 	}
 }
 

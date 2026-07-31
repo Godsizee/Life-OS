@@ -12,6 +12,7 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus } from 'lucide-svelte';
 	import { APP_LOCALE } from '$lib/core/locale';
+	import { toISODate } from '$lib/core/date';
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	// Nur die Satz-Historie ist bewusst lazy und wird hier angestoßen.
@@ -27,7 +28,7 @@
 	);
 	const moodStatsEntries = $derived(filterSince(moodState.entries, 90));
 
-	const breakdown = $derived(analyticsState.todayBreakdown() ?? {
+	const breakdown = $derived(analyticsState.todayBreakdown ?? {
 		tasks: 0,
 		habits: 0,
 		health: 0,
@@ -39,18 +40,18 @@
 	});
 
 	// Gestern-Breakdown für Trendpfeil (#12)
-	const yesterdayStr = $derived(() => {
+	const yesterdayStr = $derived.by(() => {
 		const d = new Date();
 		d.setDate(d.getDate() - 1);
-		return d.toISOString().split('T')[0];
+		return toISODate(d);
 	});
-	const yesterdayBreakdown = $derived(() => {
-		const entry = analyticsState.scores.find((s) => s.date === yesterdayStr());
+	const yesterdayBreakdown = $derived.by(() => {
+		const entry = analyticsState.scores.find((s) => s.date === yesterdayStr);
 		return entry?.breakdown ?? null;
 	});
 
 	function trend(key: string): 'up' | 'down' | 'flat' {
-		const yb = yesterdayBreakdown();
+		const yb = yesterdayBreakdown;
 		if (!yb) return 'flat';
 		const today = (breakdown as any)[key] ?? 0;
 		const yesterday = (yb as any)[key] ?? 0;
@@ -83,7 +84,7 @@
 	<div class="grid gap-6 md:grid-cols-3">
 		<!-- Ring / Score Card -->
 		<div class="glass-card rounded-2xl p-6 premium-shadow flex flex-col items-center justify-center text-center">
-			<ScoreRing score={analyticsState.todayScore()} size={140} />
+			<ScoreRing score={analyticsState.todayScore} size={140} />
 			<div class="mt-4">
 				<h3 class="text-base font-bold text-text-primary">Heutiger Life Score</h3>
 				<p class="text-xs text-text-secondary mt-1">Berechnet aus Aufgaben, Gewohnheiten, Fitness und Gesundheit logs.</p>
@@ -115,7 +116,7 @@
 	<section class="space-y-3">
 		<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Heutige Aufschlüsselung</h2>
 		<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-			{#each categories as cat}
+			{#each categories as cat (cat.key)}
 				{@const Icon = cat.icon}
 				{@const val = (breakdown as any)[cat.key] ?? 0}
 				{@const t = trend(cat.key)}
@@ -173,7 +174,7 @@
 		<section class="space-y-3">
 			<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Verlauf</h2>
 			<div class="glass-card rounded-2xl p-4 premium-shadow overflow-hidden divide-y divide-border-color">
-				{#each analyticsState.scores.slice().reverse() as entry}
+				{#each analyticsState.scores.slice().reverse() as entry (entry.id)}
 					<div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
 						<div class="flex items-center gap-3">
 							<span class="text-xs font-bold text-text-primary">

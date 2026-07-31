@@ -2,6 +2,8 @@
 	import type { DayContext } from '../types';
 	import { CheckSquare, Repeat, Dumbbell, Smile, Moon, Droplet, Zap, Tag } from 'lucide-svelte';
 	import { activityLabel } from '$lib/features/mood/activities';
+	import { formatMetric } from '$lib/features/health/stats';
+	import { profileState } from '$lib/features/profile/store.svelte';
 
 	let { context }: { context: DayContext } = $props();
 
@@ -27,8 +29,8 @@
 		{ icon: Moon, label: `${context.sleep_h} h Schlaf`, show: context.sleep_h !== null },
 		{
 			icon: Droplet,
-			label: `${context.water_glasses} Gläser`,
-			show: context.water_glasses !== null && context.water_glasses > 0
+			label: context.water_ml !== null ? formatMetric('water_ml', context.water_ml, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl }) : '',
+			show: context.water_ml !== null && context.water_ml > 0
 		},
 		{ icon: Zap, label: `${context.focus_minutes} min Fokus`, show: context.focus_minutes > 0 }
 	]);

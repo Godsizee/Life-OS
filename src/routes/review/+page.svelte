@@ -87,7 +87,7 @@
 		)
 	);
 	const weekPRs = $derived(
-		fitnessState.records.filter((r) => r.achieved_at.split('T')[0] >= isoDate(weekStart))
+		fitnessState.records.filter((r) => toISODate(new Date(r.achieved_at)) >= isoDate(weekStart))
 	);
 
 	const weekMoods = $derived(moodState.entries.filter((m) => m.date >= isoDate(weekStart)));
@@ -95,7 +95,7 @@
 	const weekTopActivities = $derived(activityStats(weekMoods, 2).slice(0, 3));
 	const weekSleepAvg = $derived(metricAverage(healthState.entries, 'sleep_h', 7));
 	const weekWaterHit = $derived(
-		goalHitDays(healthState.entries, 'water_glasses', profileState.waterGoalGlasses, 7)
+		goalHitDays(healthState.entries, 'water_ml', profileState.waterGoalMl, 7)
 	);
 
 	// Nächste Woche Top-3 (aus offenen Tasks wählen)

@@ -1,14 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
-	import { resetWelcome } from '$lib/features/dashboard/welcome';
-	import { installState } from '$lib/core/install.svelte';
-	import { pushState } from '$lib/core/push.svelte';
-	import { themeState } from '$lib/core/theme.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
 	import { modules } from '$lib/config/modules';
-	import InviteForm from '$lib/features/workspace/components/InviteForm.svelte';
-	import MemberList from '$lib/features/workspace/components/MemberList.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
@@ -16,7 +8,6 @@
 	const moreLinks = modules.filter((m) =>
 		['habits', 'shopping', 'goals', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
 	);
-
 </script>
 
 <svelte:head>
@@ -45,164 +36,17 @@
 	</div>
 
 	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 font-semibold text-text-primary">Mitglieder</h2>
-		<MemberList members={workspaceState.members} />
-	</div>
-
-	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<InviteForm />
-	</div>
-
-	<div class="flex flex-col gap-3 rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="font-semibold text-text-primary">App & Einstellungen</h2>
-
-		<!-- Trainingsziel/Woche -->
-		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
-			<span>🏋️ Trainingsziel pro Woche</span>
-			<input
-				type="number"
-				min="1"
-				max="14"
-				value={profileState.weeklyWorkoutGoal}
-				onchange={(e) => profileState.setWeeklyWorkoutGoal(Number(e.currentTarget.value))}
-				class="w-16 min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
-		</label>
-
-		<!-- F6 — Pausen-Timer-Dauer im Live-Workout -->
-		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
-			<span>⏱️ Pausen-Timer (Sekunden)</span>
-			<input
-				type="number"
-				min="15"
-				max="600"
-				step="15"
-				value={profileState.restTimerSeconds}
-				onchange={(e) => profileState.setRestTimerSeconds(Number(e.currentTarget.value))}
-				class="w-16 min-h-9 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
-		</label>
-
-		<!-- W9 — Gesundheitsziele -->
-		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
-			<span>💧 Wasserziel (Gläser/Tag)</span>
-			<input
-				type="number"
-				min="1"
-				max="30"
-				step="1"
-				value={profileState.waterGoalGlasses}
-				onchange={(e) => profileState.setHealthSetting('water_goal_glasses', Number(e.currentTarget.value))}
-				class="min-h-9 w-16 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
-		</label>
-
-		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
-			<span>😴 Schlafziel (Stunden)</span>
-			<input
-				type="number"
-				min="4"
-				max="12"
-				step="0.5"
-				value={profileState.sleepGoalH}
-				onchange={(e) => profileState.setHealthSetting('sleep_goal_h', Number(e.currentTarget.value))}
-				class="min-h-9 w-16 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
-		</label>
-
-		<label class="flex min-h-12 items-center justify-between gap-3 px-2 text-text-primary">
-			<span>⚖️ Zielgewicht (kg, optional)</span>
-			<input
-				type="number"
-				min="0"
-				max="500"
-				step="0.1"
-				placeholder="—"
-				value={profileState.weightGoalKg ?? ''}
-				onchange={(e) => {
-					const raw = e.currentTarget.value.trim();
-					profileState.setWeightGoal(raw === '' ? null : Number(raw));
-				}}
-				class="min-h-9 w-20 rounded-lg border border-border-color bg-surface-0 px-2 text-center text-sm text-text-primary focus:border-primary-500 focus:outline-none"
-			/>
-		</label>
-
-		<!-- Dark-Mode-Toggle -->
-		<button
-			onclick={() => themeState.toggle()}
-			class="flex min-h-12 items-center justify-between gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
-		>
-			<span>{themeState.isDark ? '☀️ Helles Design' : '🌙 Dunkles Design'}</span>
-			<span
-				class="flex h-6 w-11 items-center rounded-full p-0.5 transition-colors {themeState.isDark
-					? 'bg-primary-700'
-					: 'bg-surface-3 border border-border-color/50'}"
-			>
-				<span
-					class="h-5 w-5 rounded-full bg-white transition-transform {themeState.isDark
-						? 'translate-x-5'
-						: ''}"
-				></span>
-			</span>
-		</button>
-
-		<!-- Ein weggeklickter Hinweis darf nicht unerreichbar werden. -->
-		<button
-			onclick={async () => {
-				resetWelcome();
-				await goto('/');
-			}}
-			class="flex min-h-12 items-center justify-between gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
-		>
-			<span class="truncate">👋 Willkommens-Hinweis erneut zeigen</span>
-		</button>
-
-		{#if installState.canInstall}
-			<button
-				onclick={() => installState.install()}
-				class="flex min-h-12 items-center justify-between gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
-			>
-				<span class="truncate">App installieren</span>
-				<span class="shrink-0 text-xs text-primary-600 dark:text-primary-400 font-medium">Installieren</span>
-			</button>
-		{:else if installState.installed}
-			<p class="text-sm text-text-secondary px-2">App ist installiert.</p>
-		{/if}
-
-		{#if pushState.supported}
-			<button
-				onclick={() => (pushState.subscribed ? pushState.unsubscribe() : pushState.subscribe())}
-				disabled={pushState.loading}
-				class="flex min-h-12 items-center justify-between gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors disabled:opacity-50"
-			>
-				<span class="truncate">Push-Benachrichtigungen</span>
-				<span
-					class="flex h-6 w-11 items-center rounded-full p-0.5 transition-colors {pushState.subscribed
-						? 'bg-primary-700'
-						: 'bg-surface-3 border border-border-color/50'}"
+		<ul class="flex flex-col gap-1">
+			<li>
+				<a
+					href="/settings"
+					class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
 				>
-					<span
-						class="h-5 w-5 rounded-full bg-white transition-transform {pushState.subscribed
-							? 'translate-x-5'
-							: ''}"
-					></span>
-				</span>
-			</button>
-			{#if pushState.permission === 'denied'}
-				<p class="text-xs text-text-secondary px-2">
-					Benachrichtigungen sind im Browser blockiert. Bitte in den Browser-Einstellungen erlauben.
-				</p>
-			{/if}
-			{#if pushState.subscribed}
-				<p class="px-2 text-xs text-text-secondary">
-					Push aktiv auf diesem Gerät. Erinnerungen kommen auch bei geschlossener App.
-				</p>
-			{:else}
-				<p class="px-2 text-xs text-text-secondary">
-					Ohne Push zeigt Life OS Erinnerungen nur, solange die App geöffnet ist.
-				</p>
-			{/if}
-		{/if}
+					<span class="text-xl">⚙️</span>
+					Einstellungen
+				</a>
+			</li>
+		</ul>
 	</div>
 
 	<Button variant="secondary" onclick={logout} loading={logoutState.loading}>

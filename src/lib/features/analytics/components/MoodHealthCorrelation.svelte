@@ -2,6 +2,7 @@
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { waterMl } from '$lib/features/health/stats';
 	import { toISODate } from '$lib/core/date';
 
 	/**
@@ -51,7 +52,7 @@
 					mood: mood.score,
 					sleep: health?.sleep_h ?? null,
 					energy: health?.energy ?? null,
-					water: health?.water_glasses ?? null,
+					water: health ? waterMl(health) : null,
 					trained: fitnessState.logs.some((l) => l.date === date) ? (1 as const) : (0 as const)
 				};
 			})

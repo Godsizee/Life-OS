@@ -49,7 +49,7 @@ export interface DayContext {
 	/** W9 — Aktivitäten-Tags des Tages (Daylio). Optional: ältere Snapshots haben es nicht. */
 	mood_activities?: string[];
 	sleep_h: number | null;
-	water_glasses: number | null;
+	water_ml: number | null;
 	focus_minutes: number;
 }
 

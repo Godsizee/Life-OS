@@ -11,6 +11,10 @@ import {
 	weightToGoal,
 	weightTrend,
 	windowEntries,
+	waterMl,
+	movingAverage,
+	weightGoalPercent,
+	sleepEnergyBuckets,
 	type HealthLike
 } from './stats';
 
@@ -22,6 +26,7 @@ const E = (
 	weight_kg: p.weight_kg ?? null,
 	sleep_h: p.sleep_h ?? null,
 	water_glasses: p.water_glasses ?? null,
+	water_ml: p.water_ml ?? null,
 	energy: p.energy ?? null
 });
 
@@ -38,6 +43,73 @@ describe('num', () => {
 	});
 	it('laesst 0 durch', () => {
 		expect(num(0)).toBe(0);
+	});
+});
+
+describe('waterMl', () => {
+	it('bevorzugt water_ml', () => {
+		expect(waterMl(E('2026-07-31', { water_ml: 1750, water_glasses: 8 }))).toBe(1750);
+	});
+
+	it('rechnet Altzeilen mit 250 ml je Glas hoch', () => {
+		expect(waterMl(E('2026-01-01', { water_ml: null, water_glasses: 6 }))).toBe(1500);
+	});
+
+	it('liefert null, wenn beide Felder leer sind', () => {
+		expect(waterMl(E('2026-01-01', { water_ml: null, water_glasses: null }))).toBeNull();
+	});
+
+	it('unterscheidet 0 ml von "nicht erfasst"', () => {
+		expect(waterMl(E('2026-01-01', { water_ml: 0, water_glasses: null }))).toBe(0);
+	});
+});
+
+describe('movingAverage', () => {
+	it('glättet und behält die Punktanzahl', () => {
+		const p = [1, 3, 2, 4].map((v, i) => ({ date: `2026-07-0${i + 1}`, label: '', value: v }));
+		const g = movingAverage(p, 2);
+		expect(g).toHaveLength(4);
+		expect(g[1].value).toBe(2);   // (1+3)/2
+		expect(g[3].value).toBe(3);   // (2+4)/2
+	});
+});
+
+describe('weightGoalPercent', () => {
+	it('misst den Weg von Start zu Ziel', () => {
+		expect(weightGoalPercent(80, 75, 70)).toBe(50);
+		expect(weightGoalPercent(80, 80, 70)).toBe(0);
+		expect(weightGoalPercent(80, 70, 70)).toBe(100);
+	});
+
+	it('funktioniert auch beim Zunehmen', () => {
+		expect(weightGoalPercent(60, 65, 70)).toBe(50);
+	});
+
+	it('liefert null ohne Ziel', () => {
+		expect(weightGoalPercent(80, 75, null)).toBeNull();
+	});
+});
+
+describe('sleepEnergyBuckets', () => {
+	it('gruppiert nach Schlafklasse und lässt leere Klassen weg', () => {
+		const entries = [
+			E('2026-01-01', { sleep_h: 5.5, energy: 2 }),
+			E('2026-01-02', { sleep_h: 6.5, energy: 3 }),
+			E('2026-01-03', { sleep_h: 6.5, energy: 4 })
+		];
+		const buckets = sleepEnergyBuckets(entries, 30, TODAY);
+		expect(buckets).toHaveLength(2);
+		expect(buckets[0].label).toBe('unter 6 h');
+		expect(buckets[0].avgEnergy).toBe(2);
+		expect(buckets[1].label).toBe('6–7 h');
+		expect(buckets[1].avgEnergy).toBe(3.5);
+	});
+	it('ignoriert Tage, an denen eine der beiden Metriken fehlt', () => {
+		const entries = [
+			E('2026-01-01', { sleep_h: 7.5, energy: null }),
+			E('2026-01-02', { sleep_h: null, energy: 4 })
+		];
+		expect(sleepEnergyBuckets(entries, 30, TODAY)).toHaveLength(0);
 	});
 });
 
@@ -66,15 +138,15 @@ describe('metricSeries', () => {
 		]);
 	});
 	it('gibt eine leere Serie ohne Daten', () => {
-		expect(metricSeries([], 'water_glasses', 30, TODAY)).toEqual([]);
+		expect(metricSeries([], 'water_ml', 30, TODAY)).toEqual([]);
 	});
 });
 
 describe('metricAverage', () => {
 	it('mittelt nur erfasste Tage', () => {
 		expect(
-			metricAverage([E('2026-01-09', { water_glasses: 4 }), E('2026-01-10', { water_glasses: 8 })], 'water_glasses', 7, TODAY)
-		).toBe(6);
+			metricAverage([E('2026-01-09', { water_ml: 1000 }), E('2026-01-10', { water_ml: 2000 })], 'water_ml', 7, TODAY)
+		).toBe(1500);
 	});
 	it('gibt null ohne Werte', () => {
 		expect(metricAverage([E('2026-01-10')], 'sleep_h', 7, TODAY)).toBeNull();
@@ -84,15 +156,15 @@ describe('metricAverage', () => {
 describe('goalHitDays', () => {
 	it('zaehlt erreichte gegen erfasste Tage', () => {
 		const entries = [
-			E('2026-01-08', { water_glasses: 8 }),
-			E('2026-01-09', { water_glasses: 5 }),
-			E('2026-01-10', { water_glasses: 9 }),
+			E('2026-01-08', { water_ml: 2000 }),
+			E('2026-01-09', { water_ml: 1250 }),
+			E('2026-01-10', { water_ml: 2250 }),
 			E('2026-01-07')
 		];
-		expect(goalHitDays(entries, 'water_glasses', 8, 30, TODAY)).toEqual({ hit: 2, tracked: 3 });
+		expect(goalHitDays(entries, 'water_ml', 2000, 30, TODAY)).toEqual({ hit: 2, tracked: 3 });
 	});
 	it('zaehlt nichts ohne Ziel', () => {
-		expect(goalHitDays([E('2026-01-10', { water_glasses: 8 })], 'water_glasses', 0, 30, TODAY).hit).toBe(0);
+		expect(goalHitDays([E('2026-01-10', { water_ml: 2000 })], 'water_ml', 0, 30, TODAY).hit).toBe(0);
 	});
 });
 
@@ -148,8 +220,8 @@ describe('Formatierung', () => {
 	it('formatMetric je Metrik', () => {
 		expect(formatMetric('weight_kg', 72.53)).toBe('72,5 kg');
 		expect(formatMetric('sleep_h', 7.5)).toBe('7,5 h');
-		expect(formatMetric('water_glasses', 1)).toBe('1 Glas');
-		expect(formatMetric('water_glasses', 8)).toBe('8 Gläser');
+		expect(formatMetric('water_ml', 250, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe('1 Glas');
+		expect(formatMetric('water_ml', 2000, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe('8 Gläser');
 		expect(formatMetric('energy', 4)).toBe('4/5');
 		expect(formatMetric('sleep_h', null)).toBe('—');
 	});

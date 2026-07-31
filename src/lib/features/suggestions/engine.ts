@@ -7,6 +7,9 @@ import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { getGoalProgress } from '$lib/features/goals/progress';
 import { calculateStreak, toISODate, isOpenToday, streakLabel } from '$lib/features/habits/streak';
 import { shoppingState } from '$lib/features/shopping/store.svelte';
+import { waterMl } from '$lib/features/health/stats';
+import { profileState } from '$lib/features/profile/store.svelte';
+import { analyticsState } from '$lib/features/analytics/store.svelte';
 
 export interface Suggestion {
 	id: string;
@@ -125,7 +128,8 @@ export function getSuggestions(): Suggestion[] {
 
 	// 6. Wasser Trinken! (0 heute eingetragen)
 	const todayHealth = healthState.todayEntry;
-	if (!todayHealth || todayHealth.water_glasses === null || todayHealth.water_glasses === 0) {
+	const waterVal = todayHealth ? waterMl(todayHealth) : 0;
+	if (waterVal === null || waterVal === 0) {
 		list.push({
 			id: 'drink_water',
 			title: '💧 Denk ans Trinken',
@@ -134,13 +138,8 @@ export function getSuggestions(): Suggestion[] {
 			type: 'action',
 			actionText: '+1 Glas',
 			onClick: async () => {
-				const current = todayHealth?.water_glasses ?? 0;
-				await healthState.save({
-					weight_kg: todayHealth?.weight_kg ?? null,
-					sleep_h: todayHealth?.sleep_h ?? null,
-					water_glasses: current + 1,
-					energy: todayHealth?.energy ?? null
-				});
+				await healthState.addWater(profileState.glassSizeMl);
+				await analyticsState.saveTodayScore();
 			}
 		});
 	}

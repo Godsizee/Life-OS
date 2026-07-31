@@ -35,6 +35,7 @@ import { remindersState } from '$lib/features/reminders/store.svelte';
 import { shoppingState } from '$lib/features/shopping/store.svelte';
 import { tasksState } from '$lib/features/tasks/store.svelte';
 import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { focusSession } from '$lib/features/focus/session.svelte';
 
 /**
  * Laedt alle Module parallel. Ein einzelner Fehlschlag darf die uebrigen nicht
@@ -58,6 +59,9 @@ export async function loadWorkspaceData(workspaceId: string): Promise<void> {
 		timeTrackingState.load(),
 		profileState.load()
 	]);
+	
+	// Nach dem Laden: eine laufende Session muss auch außerhalb von /focus sichtbar sein.
+	focusSession.restore();
 }
 
 /** Nur beim Logout — alle Abos schliessen und den Zustand verwerfen. */

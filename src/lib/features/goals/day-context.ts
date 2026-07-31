@@ -9,6 +9,7 @@ import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 import { minutesOnDate } from '$lib/features/timetracking/stats';
 import { isDueOn, isCompleted, isSkipped, type HabitCore } from '$lib/features/habits/streak';
 import { toISODate } from '$lib/core/date';
+import { waterMl } from '$lib/features/health/stats';
 import type { DayContext } from './types';
 
 export function buildDayContext(dateStr: string): DayContext {
@@ -40,7 +41,7 @@ export function buildDayContext(dateStr: string): DayContext {
 		mood: moodEntry?.score ?? null,
 		mood_activities: moodEntry?.activities ?? [],
 		sleep_h: healthEntry?.sleep_h ?? null,
-		water_glasses: healthEntry?.water_glasses ?? null,
+		water_ml: healthEntry ? waterMl(healthEntry) : null,
 		focus_minutes: minutesOnDate(timeTrackingState.entries, dateStr)
 	};
 }

@@ -3,9 +3,13 @@
 	// Muster analog analytics/components/WeekSparkline.svelte, nur für variable Punktzahl).
 	let {
 		points,
+		overlay,
+		goalLine,
 		formatValue = (v: number) => String(v)
 	}: {
 		points: { label: string; value: number }[];
+		overlay?: { label: string; value: number }[];
+		goalLine?: number;
 		formatValue?: (v: number) => string;
 	} = $props();
 
@@ -13,8 +17,13 @@
 	const HEIGHT = 72;
 	const PAD_Y = 8;
 
-	const maxVal = $derived(points.length ? Math.max(...points.map((p) => p.value)) : 1);
-	const minVal = $derived(points.length ? Math.min(...points.map((p) => p.value), 0) : 0);
+	const allVals = $derived([
+		...points.map(p => p.value),
+		...(overlay ? overlay.map(p => p.value) : []),
+		...(goalLine !== undefined ? [goalLine] : [])
+	]);
+	const maxVal = $derived(allVals.length ? Math.max(...allVals) : 1);
+	const minVal = $derived(allVals.length ? Math.min(...allVals, 0) : 0);
 	const range = $derived(Math.max(maxVal - minVal, 1));
 
 	function x(i: number): number {
@@ -24,6 +33,7 @@
 		return HEIGHT - PAD_Y - ((v - minVal) / range) * (HEIGHT - PAD_Y * 2);
 	}
 	const linePoints = $derived(points.map((p, i) => `${x(i)},${y(p.value)}`).join(' '));
+	const overlayPoints = $derived(overlay ? overlay.map((p, i) => `${x(i)},${y(p.value)}`).join(' ') : null);
 
 	let hoverIndex = $state<number | null>(null);
 	const shown = $derived(hoverIndex !== null ? points[hoverIndex] : points[points.length - 1]);
@@ -49,6 +59,30 @@
 				class="text-primary-600 dark:text-primary-400"
 				points={linePoints}
 			/>
+			{#if overlayPoints}
+				<polyline
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-dasharray="4"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="text-indigo-400 dark:text-indigo-600 opacity-60"
+					points={overlayPoints}
+				/>
+			{/if}
+			{#if goalLine !== undefined}
+				<line
+					x1="0"
+					y1={y(goalLine)}
+					x2={WIDTH}
+					y2={y(goalLine)}
+					stroke="currentColor"
+					stroke-width="1"
+					stroke-dasharray="2"
+					class="text-text-tertiary"
+				/>
+			{/if}
 			{#each points as p, i}
 				<circle
 					cx={x(i)}

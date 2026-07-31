@@ -48,8 +48,3 @@ export const modules: ModuleConfig[] = [
  * der Liste in der Navigationskomponente.
  */
 export const bottomNavModuleIds = ['dashboard', 'tasks', 'notes', 'calendar'] as const;
-
-export const bottomNavModules: ModuleConfig[] = bottomNavModuleIds
-	.map((id) => modules.find((m) => m.id === id))
-	.filter((m): m is ModuleConfig => m !== undefined);
-

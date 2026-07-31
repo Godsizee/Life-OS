@@ -33,7 +33,7 @@ export async function dispatchNLP(text: string): Promise<string | null> {
 			await healthState.save({
 				weight_kg: parsed.parsed.weight_kg ?? healthState.todayEntry?.weight_kg ?? null,
 				sleep_h: parsed.parsed.sleep_h ?? healthState.todayEntry?.sleep_h ?? null,
-				water_glasses: parsed.parsed.water_glasses ?? healthState.todayEntry?.water_glasses ?? null,
+				water_ml: parsed.parsed.water_ml ?? healthState.todayEntry?.water_ml ?? null,
 				energy: parsed.parsed.energy ?? healthState.todayEntry?.energy ?? null
 			});
 			return 'Gesundheitseintrag aktualisiert';

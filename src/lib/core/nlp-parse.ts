@@ -234,8 +234,12 @@ export function parseNLPInput(text: string): ParsedInput {
 
 	if (weightMatch || sleepMatch || waterMatch || energyMatch || energyWordScore || stepsMatch || distanceMatch || pulseMatch) {
 		let water = waterMatch ? parseFloat2(waterMatch) : null;
-		if (waterMatch && waterMatch[0].toLowerCase().includes('l') && !waterMatch[0].toLowerCase().includes('ml')) water = Math.round((water || 0) * 4); // 1L = 4 Glasses
-		if (waterMatch && waterMatch[0].toLowerCase().includes('ml')) water = Math.round((water || 0) / 250); // 250ml = 1 Glass
+		if (water !== null && waterMatch) {
+			const str = waterMatch[0].toLowerCase();
+			if (str.includes('l') && !str.includes('ml')) water = Math.round(water * 1000); // 1L = 1000ml
+			else if (!str.includes('ml')) water = Math.round(water * 250); // Assumed glasses, 250ml = 1 Glass
+			else water = Math.round(water); // already ml
+		}
 
 		let distance = distanceMatch ? parseFloat2(distanceMatch) : null;
 		if (distanceMatch && distanceMatch[0].toLowerCase().includes('m') && !distanceMatch[0].toLowerCase().includes('km')) distance = (distance || 0) / 1000;
@@ -245,7 +249,7 @@ export function parseNLPInput(text: string): ParsedInput {
 			parsed: {
 				weight_kg: parseFloat2(weightMatch),
 				sleep_h: parseFloat2(sleepMatch),
-				water_glasses: water,
+				water_ml: water,
 				energy: energyMatch ? parseInt(energyMatch[1], 10) : energyWordScore,
 				steps: stepsRaw,
 				distance_km: distance,

@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { habitsState } from '$lib/features/habits/store.svelte';
 	import { calculateStreak, isSkipped, isCompleted } from '$lib/features/habits/streak';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
 	import Card from '$lib/ui/Card.svelte';
+	import EmptyState from '$lib/ui/EmptyState.svelte';
 	import { Flame, Trophy, Calendar, CheckSquare, Ban } from 'lucide-svelte';
 	import { toISODate } from '$lib/core/date';
 
-	let id = $derived($page.params.id);
+	const id = $derived(page.params.id);
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
@@ -99,9 +100,7 @@
 		<section>
 			<h3 class="mb-3 text-sm font-semibold text-text-primary">Letzte Einträge</h3>
 			{#if history.length === 0}
-				<div class="rounded-xl border border-border-color bg-surface-0 p-4 text-center text-sm text-text-secondary">
-					Noch keine Einträge vorhanden.
-				</div>
+				<EmptyState title="Noch keine Einträge vorhanden." />
 			{:else}
 				<div class="overflow-hidden rounded-xl border border-border-color bg-surface-0 shadow-sm">
 					<ul class="divide-y divide-border-color">

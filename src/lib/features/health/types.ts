@@ -6,16 +6,19 @@ export interface HealthEntry {
 	/** numeric in Postgres — kann als String ankommen, immer ueber stats.num() lesen. */
 	weight_kg: number | null;
 	sleep_h: number | null;
+	/** Alt-Feld. Nur noch für Zeilen vor Migration 025 relevant — nie direkt anzeigen. */
 	water_glasses: number | null;
+	/** W10 — kanonische Wassermenge in ml. Lesen immer über waterMl() aus stats.ts. */
+	water_ml: number | null;
 	energy: 1 | 2 | 3 | 4 | 5 | null;
 }
 
 /** W9 — die vier festen Metriken. Eigene Metriken sind bewusst gestrichen. */
-export type HealthMetric = 'weight_kg' | 'sleep_h' | 'water_glasses' | 'energy';
+export type HealthMetric = 'weight_kg' | 'sleep_h' | 'water_ml' | 'energy';
 
 export interface HealthValues {
 	weight_kg: number | null;
 	sleep_h: number | null;
-	water_glasses: number | null;
+	water_ml: number | null;
 	energy: number | null;
 }

@@ -6,7 +6,8 @@ export const healthInputSchema = z.object({
 	date: isoDate,
 	weight_kg: z.number().positive().max(500).nullable().default(null),
 	sleep_h: z.number().min(0).max(24).nullable().default(null),
-	water_glasses: z.number().int().min(0).max(30).nullable().default(null),
+	// 0 ist ausdrücklich erlaubt (H-02). Obergrenze 15 l = physiologisches Maximum.
+	water_ml: z.number().int().min(0).max(15000).nullable().default(null),
 	energy: z.number().int().min(1).max(5).nullable().default(null)
 });
 

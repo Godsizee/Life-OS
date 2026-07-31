@@ -11,11 +11,14 @@
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
 	import { notesState } from '$lib/features/notes/store.svelte';
-	import { getGoalProgress } from '$lib/features/goals/progress';
+	import { profileState } from '$lib/features/profile/store.svelte';
+	import { waterMl, formatMetric } from '$lib/features/health/stats';
 	import { activityLabel } from '$lib/features/mood/activities';
 	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
+	import EmptyState from '$lib/ui/EmptyState.svelte';
+	import { toISODate } from '$lib/core/date';
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
@@ -31,14 +34,14 @@
 	}
 
 	// Aggregate activities
-	const timelineItems = $derived((): TimelineItem[] => {
+	const timelineItems = $derived.by((): TimelineItem[] => {
 		const items: TimelineItem[] = [];
 
 		// 1. Completed Tasks
 		tasksState.tasks
 			.filter((t) => t.status === 'done' && t.updated_at)
 			.forEach((t) => {
-				const date = t.updated_at.split('T')[0];
+				const date = toISODate(new Date(t.updated_at!));
 				items.push({
 					id: `task_${t.id}`,
 					date,
@@ -87,7 +90,7 @@
 		// 4. Goals Completed
 		goalsState.goals.forEach((g) => {
 			if (g.status === 'done') {
-				const date = g.updated_at.split('T')[0];
+				const date = toISODate(new Date(g.updated_at!));
 				items.push({
 					id: `goal_${g.id}`,
 					date,
@@ -98,9 +101,6 @@
 					bg: 'bg-indigo-50 dark:bg-indigo-950/20',
 					module: 'Goals'
 				});
-			} else if (g.status === 'open' && g.created_at) {
-				// We can show open goals, maybe their progress? But they aren't discrete events...
-				// For now, we only show completed goals. The plan says "zeige bei Zielen den dynamischen Fortschritt", maybe they meant in another file or just if we add progress updates to timeline.
 			}
 		});
 
@@ -124,7 +124,8 @@
 			const details: string[] = [];
 			if (h.weight_kg) details.push(`${h.weight_kg} kg`);
 			if (h.sleep_h) details.push(`${h.sleep_h} Std. Schlaf`);
-			if (h.water_glasses) details.push(`${h.water_glasses} Gläser Wasser`);
+			const w = waterMl(h);
+			if (w) details.push(formatMetric('water_ml', w, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl }));
 			if (details.length > 0) {
 				items.push({
 					id: `health_${h.id}`,
@@ -143,7 +144,7 @@
 		notesState.notes.forEach((n) => {
 			items.push({
 				id: `note_${n.id}`,
-				date: n.created_at.split('T')[0],
+				date: toISODate(new Date(n.created_at)),
 				title: `Notiz angelegt: "${n.title}"`,
 				description: n.private ? 'Privat' : undefined,
 				icon: Notebook,
@@ -193,8 +194,8 @@
 	});
 
 	// Group items by date
-	const groupedTimeline = $derived((): { date: string; items: TimelineItem[] }[] => {
-		const raw = timelineItems();
+	const groupedTimeline = $derived.by((): { date: string; items: TimelineItem[] }[] => {
+		const raw = timelineItems;
 		const groups: Record<string, TimelineItem[]> = {};
 		
 		raw.forEach((item) => {
@@ -221,7 +222,7 @@
 			<!-- Filter Chip-row -->
 			<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
 				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alles</Chip>
-				{#each ['Tasks', 'Habits', 'Notes', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod}
+				{#each ['Tasks', 'Habits', 'Notes', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod (mod)}
 					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
 				{/each}
 			</div>
@@ -230,7 +231,7 @@
 
 	<!-- Timeline List -->
 	<div class="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-color">
-		{#each groupedTimeline() as group (group.date)}
+		{#each groupedTimeline as group (group.date)}
 			{@const filtered = group.items.filter(item => filterModule === 'all' || item.module === filterModule)}
 			{#if filtered.length > 0}
 				<div class="space-y-4">
@@ -267,10 +268,7 @@
 				</div>
 			{/if}
 		{:else}
-			<div class="flex flex-col items-center justify-center py-12 text-center text-text-tertiary">
-				<Notebook size={48} class="text-text-tertiary mb-2" />
-				<span class="text-sm">Keine Aktivitäten aufgezeichnet</span>
-			</div>
+			<EmptyState icon={Notebook} title="Keine Aktivitäten aufgezeichnet" />
 		{/each}
 	</div>
 </div>

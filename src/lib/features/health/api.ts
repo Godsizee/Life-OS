@@ -9,7 +9,7 @@ export interface HealthUpsert {
 	date: string;
 	weight_kg: number | null;
 	sleep_h: number | null;
-	water_glasses: number | null;
+	water_ml: number | null;
 	energy: number | null;
 }
 

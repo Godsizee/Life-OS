@@ -13,7 +13,7 @@ class AnalyticsState {
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
-	todayScore = $derived((): number => {
+	todayScore = $derived.by((): number => {
 		const todayStr = toISODate(new Date());
 		const entry = this.scores.find((s) => s.date === todayStr);
 		if (entry) return entry.total;
@@ -25,7 +25,7 @@ class AnalyticsState {
 		}
 	});
 
-	todayBreakdown = $derived(() => {
+	todayBreakdown = $derived.by(() => {
 		const todayStr = toISODate(new Date());
 		const entry = this.scores.find((s) => s.date === todayStr);
 		if (entry) return entry.breakdown;

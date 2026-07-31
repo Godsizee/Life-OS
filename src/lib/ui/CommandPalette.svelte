@@ -63,7 +63,7 @@
 		action: () => void;
 	}
 
-	const results = $derived((): Result[] => {
+	const results = $derived.by((): Result[] => {
 		const q = query.trim();
 		const out: Result[] = [];
 
@@ -143,7 +143,7 @@
 
 	// Reset index wenn sich Ergebnisse ändern
 	$effect(() => {
-		results(); // trigger tracking
+		results; // trigger tracking
 		activeIndex = 0;
 	});
 
@@ -154,7 +154,7 @@
 	}
 
 	function selectCurrent() {
-		const r = results();
+		const r = results;
 		if (r[activeIndex]) {
 			r[activeIndex].action();
 			close();
@@ -162,7 +162,7 @@
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		const r = results();
+		const r = results;
 		if (e.key === 'ArrowDown') {
 			e.preventDefault();
 			activeIndex = Math.min(activeIndex + 1, r.length - 1);
@@ -214,7 +214,7 @@
 
 		<!-- Ergebnisse -->
 		<ul class="max-h-72 overflow-y-auto py-2" role="listbox">
-			{#each results() as result, i (i)}
+			{#each results as result, i (i)}
 				<li role="option" aria-selected={i === activeIndex}>
 					<button
 						onclick={() => { result.action(); close(); }}

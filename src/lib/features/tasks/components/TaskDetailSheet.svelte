@@ -205,7 +205,7 @@
 			<Field label="Labels">
 				<Input bind:value={newLabel} onkeydown={addLabel} placeholder="Neu... (Enter/Komma)" />
 				<div class="mt-2 flex flex-wrap gap-1">
-					{#each labels as label}
+					{#each labels as label (label)}
 						<Chip onclick={() => removeLabel(label)}>
 							@{label} <span class="ml-1 opacity-50">×</span>
 						</Chip>
@@ -214,7 +214,7 @@
 				{#if allLabels.filter(l => !labels.includes(l)).length > 0}
 					<div class="mt-2 flex flex-wrap gap-1">
 						<span class="text-xs text-text-tertiary w-full">Vorschläge:</span>
-						{#each allLabels.filter(l => !labels.includes(l)) as label}
+						{#each allLabels.filter(l => !labels.includes(l)) as label (label)}
 							<Chip onclick={() => addSuggestedLabel(label)}>
 								<span class="opacity-70">@{label}</span>
 							</Chip>

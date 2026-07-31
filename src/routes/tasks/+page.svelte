@@ -120,7 +120,7 @@
 	<!-- Labels -->
 	{#if allLabels.length > 0}
 		<section class="flex flex-wrap gap-2">
-			{#each allLabels as label}
+			{#each allLabels as label (label)}
 				<Chip selected={selectedLabels.includes(label)} onclick={() => toggleLabel(label)}>
 					@{label}
 				</Chip>

@@ -113,6 +113,20 @@
 
 	<!-- Footer -->
 	<div class="border-t border-border-color p-3 space-y-2">
+		<!-- Settings -->
+		<a
+			href="/settings"
+			class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {currentPath === '/settings' ? 'bg-primary-active-bg text-primary-active font-semibold' : ''}"
+		>
+			<span class="text-xl shrink-0">⚙️</span>
+			{#if !collapsed}
+				<span class="truncate">Einstellungen</span>
+			{:else}
+				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+					Einstellungen
+				</div>
+			{/if}
+		</a>
 		<!-- Dark Mode Toggle -->
 		<button
 			onclick={() => themeState.toggle()}

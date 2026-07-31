@@ -131,7 +131,7 @@
 		<YearInPixels {months} onselect={openDay} />
 
 		<div class="mt-3 flex flex-wrap items-center gap-2">
-			{#each [1, 2, 3, 4, 5] as score}
+			{#each [1, 2, 3, 4, 5] as score (score)}
 				<span class="inline-flex items-center gap-1 text-[11px] text-text-tertiary">
 					<span class="inline-block h-3 w-3 rounded-sm {MOOD_CLASSES[score]}"></span>
 					{MOOD_LABELS[score]}
@@ -146,7 +146,7 @@
 		<div class="mb-3 flex items-center justify-between gap-3">
 			<h2 class="text-sm font-semibold text-text-primary">Was beeinflusst deine Stimmung?</h2>
 			<div class="flex gap-1.5">
-				{#each [30, 90, 365] as days}
+				{#each [30, 90, 365] as days (days)}
 					<Chip selected={statsDays === days} onclick={() => (statsDays = days)}>{days} T</Chip>
 				{/each}
 			</div>

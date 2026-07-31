@@ -2,18 +2,25 @@
 	import { goto } from '$app/navigation';
 	import { Trash2, Link2, Dumbbell } from 'lucide-svelte';
 	import type { Event } from '../types';
+	import type { Occurrence } from '../occurrences';
 	import { calendarState } from '../store.svelte';
 	import { formatRrule } from '../recurrence';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 
-	let { event }: { event: Event } = $props();
+	let { event, occurrence }: { event: Event; occurrence?: Occurrence } = $props();
+
+	const title = $derived(occurrence?.title ?? event.title);
+	const start = $derived(occurrence?.start ?? event.start);
+	const end = $derived(occurrence?.end ?? event.end);
+	const location = $derived(occurrence?.location ?? event.location);
+	const allDay = $derived(occurrence?.allDay ?? event.all_day);
 
 	const timeLabel = $derived(
-		event.all_day
+		allDay
 			? 'Ganztägig'
-			: `${new Date(event.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} – ${new Date(
-					event.end
+			: `${new Date(start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} – ${new Date(
+					end
 				).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`
 	);
 
@@ -31,10 +38,10 @@
 <li class="flex flex-col gap-2 rounded-xl border border-border-color bg-surface-0 p-3">
 	<div class="flex items-center gap-3">
 		<div class="min-w-0 flex-1">
-			<p class="truncate text-text-primary">{event.title}</p>
+			<p class="truncate text-text-primary">{title}</p>
 			<p class="truncate text-xs text-text-secondary">
-				{timeLabel}{#if event.location}
-					· {event.location}{/if}{#if event.rrule}
+				{timeLabel}{#if location}
+					· {location}{/if}{#if event.rrule}
 					· {formatRrule(event.rrule)}{/if}
 			</p>
 		</div>

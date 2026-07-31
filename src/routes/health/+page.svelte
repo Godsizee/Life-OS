@@ -8,8 +8,10 @@
 	import Sheet from '$lib/ui/Sheet.svelte';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { formatDate } from '$lib/core/date';
-	import { formatMetric, goalPercent, num } from '$lib/features/health/stats';
-	import { Pencil } from 'lucide-svelte';
+	import { formatMetric, goalPercent, num, waterMl } from '$lib/features/health/stats';
+	import { Pencil, Settings, Calendar } from 'lucide-svelte';
+	import HealthGoalsSheet from '$lib/features/health/components/HealthGoalsSheet.svelte';
+	import SleepEnergyCard from '$lib/features/health/components/SleepEnergyCard.svelte';
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
@@ -18,11 +20,28 @@
 
 	let sheetOpen = $state(false);
 	let sheetDate = $state(healthState.todayKey());
+	let goalsOpen = $state(false);
+	
+	let captureDate = $state(healthState.todayKey());
 
 	function edit(date: string) {
 		sheetDate = date;
 		sheetOpen = true;
 	}
+
+	const missingDays = $derived.by(() => {
+		const out = [];
+		const today = new Date();
+		for (let i = 1; i <= 14; i++) {
+			const d = new Date(today);
+			d.setDate(today.getDate() - i);
+			const iso = d.toISOString().split('T')[0];
+			if (!healthState.entries.find((e) => e.date === iso)) {
+				out.push(iso);
+			}
+		}
+		return out;
+	});
 </script>
 
 <svelte:head>
@@ -34,27 +53,52 @@
 <div class="flex flex-col gap-4">
 	<!-- Tagesziele -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-4 text-sm font-semibold text-text-primary">Heute</h2>
+		<div class="mb-4 flex items-center justify-between">
+			<h2 class="text-sm font-semibold text-text-primary">Heute</h2>
+			<button onclick={() => (goalsOpen = true)} class="p-1 text-text-secondary hover:text-text-primary transition-colors">
+				<Settings size={16} />
+			</button>
+		</div>
 		{#if healthState.loading}
 			<Skeleton height="6rem" />
 		{:else}
 			<HealthRings />
 		{/if}
-		<p class="mt-3 text-[11px] text-text-tertiary">
-			Ziele änderst du unter <a href="/more" class="font-medium text-primary-active hover:underline">Mehr</a>.
-		</p>
 	</section>
 
 	<!-- Erfassen -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Heute erfassen</h2>
-		<HealthForm />
+		<div class="mb-3 flex items-center justify-between">
+			<h2 class="text-sm font-semibold text-text-primary">Erfassen</h2>
+			<div class="flex items-center gap-2">
+				<Calendar size={14} class="text-text-tertiary" />
+				<input type="date" bind:value={captureDate} class="bg-transparent text-sm text-text-secondary outline-none cursor-pointer" />
+			</div>
+		</div>
+		
+		{#if missingDays.length > 0}
+			<div class="mb-4 flex flex-wrap gap-1.5">
+				<span class="text-xs text-text-tertiary mr-1 flex items-center">Lücken füllen:</span>
+				{#each missingDays as md}
+					<button 
+						onclick={() => (captureDate = md)}
+						class="rounded border border-border-color bg-surface-1 px-1.5 py-0.5 text-[10px] text-text-secondary transition-all hover:bg-surface-2"
+					>
+						{formatDate(md, { day: '2-digit', month: '2-digit' })}
+					</button>
+				{/each}
+			</div>
+		{/if}
+
+		<HealthForm date={captureDate} onsaved={() => { captureDate = healthState.todayKey(); }} />
 	</section>
+
+	<SleepEnergyCard days={90} />
 
 	<!-- Trends -->
 	<section>
-		<h2 class="mb-3 text-xs font-bold uppercase tracking-wider text-text-tertiary">Trends (30 Tage)</h2>
-		<HealthTrends days={30} />
+		<h2 class="mb-3 text-xs font-bold uppercase tracking-wider text-text-tertiary">Trends</h2>
+		<HealthTrends />
 	</section>
 
 	<!-- Verlauf -->
@@ -63,7 +107,7 @@
 			<h2 class="mb-3 text-sm font-semibold text-text-primary">Verlauf</h2>
 			<div class="flex flex-col gap-2">
 				{#each recent as entry (entry.id)}
-					{@const water = num(entry.water_glasses)}
+					{@const waterVal = waterMl(entry)}
 					{@const sleep = num(entry.sleep_h)}
 					<button
 						type="button"
@@ -76,7 +120,7 @@
 							</span>
 							<span class="flex items-center gap-2 text-xs text-text-secondary">
 								{#if entry.energy != null}<span>⚡{entry.energy}/5</span>{/if}
-								{#if entry.weight_kg != null}<span>{formatMetric('weight_kg', num(entry.weight_kg))}</span>{/if}
+								{#if entry.weight_kg != null}<span>{formatMetric('weight_kg', num(entry.weight_kg), { weightUnit: profileState.weightUnit })}</span>{/if}
 								<Pencil size={11} class="text-text-faint" />
 							</span>
 						</div>
@@ -93,16 +137,16 @@
 									<span class="w-12 text-right text-xs text-text-secondary">{formatMetric('sleep_h', sleep)}</span>
 								</div>
 							{/if}
-							{#if water !== null}
+							{#if waterVal !== null}
 								<div class="flex items-center gap-2">
 									<span class="w-5 text-xs">💧</span>
 									<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
 										<div
-											class="h-full {water >= profileState.waterGoalGlasses ? 'bg-emerald-500' : 'bg-primary-500'}"
-											style="width: {goalPercent(water, profileState.waterGoalGlasses)}%"
+											class="h-full {waterVal >= profileState.waterGoalMl ? 'bg-emerald-500' : 'bg-primary-500'}"
+											style="width: {goalPercent(waterVal, profileState.waterGoalMl)}%"
 										></div>
 									</div>
-									<span class="w-12 text-right text-xs text-text-secondary">{water}x</span>
+									<span class="w-20 text-right text-xs text-text-secondary">{formatMetric('water_ml', waterVal, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })}</span>
 								</div>
 							{/if}
 						</div>
@@ -118,3 +162,5 @@
 		<HealthForm date={sheetDate} onsaved={() => (sheetOpen = false)} />
 	</div>
 </Sheet>
+
+<HealthGoalsSheet bind:open={goalsOpen} />

@@ -11,6 +11,7 @@ import { focusScoreForDate } from '$lib/features/timetracking/stats';
 import { toISODate } from '$lib/core/date';
 import { getGoalProgress } from '$lib/features/goals/progress';
 import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
+import { waterMl } from '$lib/features/health/stats';
 
 export interface ScoreBreakdown {
 	tasks: number;
@@ -59,7 +60,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	// 3. Health (13%) — W9: rechnet gegen die Ziele aus profiles.settings
 	//    statt gegen hartkodierte 8 Gläser / 7–9 h.
 	const healthEntry = healthState.entries.find((e) => e.date === dateStr);
-	const waterGoal = profileState.waterGoalGlasses;
+	const waterGoal = profileState.waterGoalMl;
 	const sleepGoal = profileState.sleepGoalH;
 	let healthPoints = 0;
 	if (healthEntry) {
@@ -69,8 +70,9 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 			const hit = Math.abs(healthEntry.sleep_h - sleepGoal) <= 1;
 			healthPoints += hit ? 25 : 15;
 		}
-		if (healthEntry.water_glasses !== null && waterGoal > 0) {
-			healthPoints += Math.min(25, (healthEntry.water_glasses / waterGoal) * 25);
+		const waterVal = waterMl(healthEntry);
+		if (waterVal !== null && waterGoal > 0) {
+			healthPoints += Math.min(25, (waterVal / waterGoal) * 25);
 		}
 		if (healthEntry.energy !== null && healthEntry.energy > 0) healthPoints += 25;
 	}

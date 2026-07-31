@@ -14,6 +14,7 @@
 	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
 	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck } from 'lucide-svelte';
 	import Select from '$lib/ui/Select.svelte';
+	import EmptyState from '$lib/ui/EmptyState.svelte';
 	import type { GoalStatus } from '$lib/features/goals/types';
 
 	const goalId = $derived(page.params.id);
@@ -74,13 +75,13 @@
 </a>
 
 {#if !goal}
-	<div class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary">
-		{#if goalsState.loading}
+	{#if goalsState.loading}
+		<div class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary">
 			Lade Ziel…
-		{:else}
-			Ziel nicht gefunden.
-		{/if}
-	</div>
+		</div>
+	{:else}
+		<EmptyState title="Ziel nicht gefunden." />
+	{/if}
 {:else}
 	<div class="space-y-6">
 		<!-- Kopf -->

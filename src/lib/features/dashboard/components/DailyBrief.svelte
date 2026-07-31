@@ -10,6 +10,7 @@
 	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 	import { moodState } from '$lib/features/mood/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
+	import { waterMl, formatMetric } from '$lib/features/health/stats';
 	import { remindersState } from '$lib/features/reminders/store.svelte';
 	import { formatMinutes } from '$lib/features/timetracking/stats';
 	import { isOpenToday } from '$lib/features/habits/streak';
@@ -80,8 +81,8 @@
 	const openShopping = $derived(shoppingState.items.filter((i) => !i.checked).length);
 	const focusToday = $derived(timeTrackingState.totalTodayMin);
 	const moodLogged = $derived(moodState.todayEntry !== null);
-	const waterToday = $derived(healthState.todayEntry?.water_glasses ?? 0);
-	const waterGoal = $derived(profileState.waterGoalGlasses);
+	const waterToday = $derived(healthState.todayEntry ? waterMl(healthState.todayEntry) : 0);
+	const waterGoal = $derived(profileState.waterGoalMl);
 
 	const hasContent = $derived(
 		todayEvents.length > 0 ||
@@ -166,9 +167,9 @@
 					🙂 Stimmung erfassen
 				</a>
 			{/if}
-			{#if waterToday < waterGoal}
+			{#if waterToday !== null && waterToday < waterGoal}
 				<a href="/health" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
-					💧 {waterToday}/{waterGoal} Gläser
+					💧 {formatMetric('water_ml', waterToday, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })} / {formatMetric('water_ml', waterGoal, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })}
 				</a>
 			{/if}
 			{#if dueHabits.length > 0}

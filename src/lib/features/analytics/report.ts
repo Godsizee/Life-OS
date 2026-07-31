@@ -49,7 +49,7 @@ export function buildPeriodReport(days = 30): PeriodReport {
 		if (streak > longestStreak.days) longestStreak = { name: h.name, days: streak, unit: streakUnit(h.schedule) };
 	}
 
-	const newPRs = fitnessState.records.filter((r) => r.achieved_at.slice(0, 10) >= sinceStr).length;
+	const newPRs = fitnessState.records.filter((r) => toISODate(new Date(r.achieved_at)) >= sinceStr).length;
 
 	return {
 		days,
