@@ -65,8 +65,16 @@
 			// den "Sitzung abgelaufen"-Hinweis auf der Login-Seite zeigen.
 			const wasIntentional = authState.consumeIntentionalSignOut();
 			const wasUnexpected = hadSession && !wasIntentional;
-			workspaceState.reset();
-			unloadWorkspaceData();
+			// Nur beim tatsaechlichen Wechsel von an- zu abgemeldet aufraeumen: sonst
+			// feuert der Effekt auf /login bei jeder Session-Neubewertung erneut
+			// workspaceState.reset() + unloadWorkspaceData() (~40 State-Schreibvorgaenge
+			// ueber 15 Stores) und geriet in Produktion in eine Effect-Update-Schleife
+			// (svelte.dev/e/effect_update_depth_exceeded), obwohl nie ein Workspace
+			// geladen war.
+			if (hadSession) {
+				workspaceState.reset();
+				unloadWorkspaceData();
+			}
 			// Ziel mitnehmen, statt es zu verlieren: sonst landet z. B. ein
 			// Einladungslink nach dem Login stumm auf dem Dashboard.
 			if (!isPublic) {
