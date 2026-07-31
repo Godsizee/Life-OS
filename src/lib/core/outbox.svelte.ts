@@ -243,11 +243,21 @@ class Outbox {
 	}
 
 	private async durchlauf(): Promise<void> {
-		this.status = 'syncing';
 		let fehler = false;
 		try {
 			const mutations = await this.getAll();
 			this.uebernehmeStand(mutations);
+			if (mutations.length === 0) {
+				// replay() laeuft bei jedem enqueue(), jedem online-Event und jeder
+				// Executor-Registrierung — meist ohne dass etwas wartet. Ohne diesen
+				// fruehen Ausstieg blitzte das Sync-Banner bei jedem dieser Aufrufe kurz
+				// blau auf, obwohl es nichts zu synchronisieren gab (siehe Bug-Report:
+				// "Synchronisiere..."-Leiste flackert staendig).
+				this.status = 'idle';
+				return;
+			}
+
+			this.status = 'syncing';
 			const blockiert = new Set<string>();
 
 			for (const mutation of mutations) {
