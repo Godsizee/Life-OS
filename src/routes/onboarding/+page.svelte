@@ -2,9 +2,15 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { authState } from '$lib/core/auth.svelte';
+	import { scale } from 'svelte/transition';
+	import { Check } from 'lucide-svelte';
+	import Alert from '$lib/ui/Alert.svelte';
+	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import Field from '$lib/ui/Field.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import { haptic } from '$lib/core/haptics';
 	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
 	import { authErrorText } from '$lib/features/auth/errors';
 	import { safeNextPath } from '$lib/features/auth/redirect';
@@ -17,6 +23,7 @@
 	let errors = $state<{ displayName?: string; workspaceName?: string }>({});
 	let formError = $state('');
 	let saving = $state(false);
+	let done = $state(false);
 	let prefilled = false;
 
 	const next = $derived(safeNextPath(page.url.searchParams.get('next')));
@@ -70,10 +77,12 @@
 			await updateDisplayName(userId, result.data.displayName);
 			// Mitglieder fremder Workspaces dürfen nicht umbenennen (RLS).
 			if (isOwner) await workspaceState.rename(result.data.workspaceName);
+			done = true;
+			haptic(15);
+			await new Promise((resolve) => setTimeout(resolve, motionDuration(DURATION.base)));
 			await goto(next);
 		} catch (error) {
 			formError = authErrorText(error);
-		} finally {
 			saving = false;
 		}
 	}
@@ -84,8 +93,29 @@
 </svelte:head>
 
 <AuthShell title="Kurz vorstellen" subtitle="Zwei Angaben, danach geht es los.">
-	{#if workspaceState.loading || !workspaceState.workspace}
-		<p class="text-sm text-text-secondary">Dein Bereich wird vorbereitet…</p>
+	{#if workspaceState.error}
+		<Alert variant="error">
+			{#snippet children()}Dein Bereich konnte nicht geladen werden.{/snippet}
+			{#snippet action()}
+				<button
+					type="button"
+					onclick={() => void workspaceState.load().catch(() => {})}
+					class="text-left font-medium underline underline-offset-2"
+				>
+					Erneut versuchen
+				</button>
+			{/snippet}
+		</Alert>
+	{:else if workspaceState.loading || !workspaceState.workspace}
+		<!-- Skeleton in Formularform statt nacktem Satz — dasselbe Muster wie auf
+		     allen anderen Routen (z. B. routes/tasks/+page.svelte). -->
+		<div class="flex flex-col gap-4" aria-busy="true">
+			<Skeleton height="0.75rem" width="35%" radius="0.25rem" />
+			<Skeleton height="3rem" radius="0.75rem" />
+			<Skeleton height="0.75rem" width="45%" radius="0.25rem" />
+			<Skeleton height="3rem" radius="0.75rem" />
+			<Skeleton height="3rem" radius="0.75rem" />
+		</div>
 	{:else}
 		<form onsubmit={submit} class="flex flex-col gap-4" novalidate>
 			<Field label="Dein Name" hint="So wirst du anderen Mitgliedern angezeigt." error={errors.displayName}>
@@ -110,13 +140,20 @@
 			{/if}
 
 			{#if formError}
-				<p role="alert" class="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
-					{formError}
-				</p>
+				<Alert variant="error">
+					{#snippet children()}{formError}{/snippet}
+				</Alert>
 			{/if}
 
-			<Button type="submit" loading={saving} fullWidth>
-				{#snippet children()}Los geht's{/snippet}
+			<Button type="submit" loading={saving && !done} disabled={saving} fullWidth>
+				{#snippet icon()}
+					{#if done}
+						<span in:scale={{ start: 0.5, duration: motionDuration(DURATION.fast) }}>
+							<Check size={18} />
+						</span>
+					{/if}
+				{/snippet}
+				{#snippet children()}{saving ? 'Wird gespeichert…' : "Los geht's"}{/snippet}
 			</Button>
 		</form>
 	{/if}

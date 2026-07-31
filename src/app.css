@@ -301,6 +301,11 @@
   to { transform: scaleX(1); }
 }
 
+@keyframes authRedirectBar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 /* Markdown-Rendering (renderMarkdownSafe) — greift auf {@html}-Inhalte, die keine
    Utility-Klassen tragen koennen. Nur Typografie, keine Farben ausserhalb der Tokens. */
 .markdown-body {

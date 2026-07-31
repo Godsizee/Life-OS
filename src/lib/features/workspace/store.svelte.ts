@@ -5,14 +5,20 @@ class WorkspaceState {
 	workspace = $state<Workspace | null>(null);
 	members = $state<WorkspaceMember[]>([]);
 	loading = $state(false);
+	/** Ohne diesen Zustand wartete das Onboarding nach einem Ladefehler ewig. */
+	error = $state<string | null>(null);
 
 	async load() {
 		this.loading = true;
+		this.error = null;
 		try {
 			this.workspace = await workspaceApi.getCurrentWorkspace();
 			if (this.workspace) {
 				this.members = await workspaceApi.listMembers(this.workspace.id);
 			}
+		} catch (err) {
+			this.error = err instanceof Error ? err.message : 'Unbekannter Fehler';
+			throw err;
 		} finally {
 			this.loading = false;
 		}
@@ -21,6 +27,7 @@ class WorkspaceState {
 	reset() {
 		this.workspace = null;
 		this.members = [];
+		this.error = null;
 	}
 
 	async rename(name: string) {
