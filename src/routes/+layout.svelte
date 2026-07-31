@@ -19,6 +19,7 @@
 	import QuickAddSheet from '$lib/ui/QuickAddSheet.svelte';
 	import ModuleGridSheet from '$lib/ui/ModuleGridSheet.svelte';
 	import Toaster from '$lib/ui/Toaster.svelte';
+	import AuthSplash from '$lib/features/auth/components/AuthSplash.svelte';
 	let { children } = $props();
 
 	let paletteOpen = $state(false);
@@ -82,11 +83,16 @@
 			}
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
 			// Einmal zentral statt pro Route — siehe core/workspace-data.ts.
-			void workspaceState.load().then(async () => {
-				const id = workspaceState.workspace?.id;
-				if (id) await loadWorkspaceData(id);
-				await outbox.replay();
-			});
+			void workspaceState
+				.load()
+				.then(async () => {
+					const id = workspaceState.workspace?.id;
+					if (id) await loadWorkspaceData(id);
+					await outbox.replay();
+				})
+				// Ohne catch blieb hier eine unbehandelte Rejection stehen und das
+				// Onboarding wartete ewig auf einen Workspace, der nie kam.
+				.catch(() => {});
 		}
 		hadSession = !!authState.session;
 	});
@@ -157,7 +163,10 @@
 <ModuleGridSheet bind:open={moduleGridOpen} currentPath={page.url.pathname} />
 <Toaster />
 
-<div class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
+{#if authState.loading}
+	<AuthSplash />
+{:else}
+	<div class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
 	{#if showNav}
 		<SidebarNav currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 	{/if}
@@ -192,3 +201,4 @@
 		{/if}
 	</div>
 </div>
+{/if}
