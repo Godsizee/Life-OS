@@ -34,17 +34,27 @@ export async function logout(): Promise<void> {
 	if (loading) return;
 	loading = true;
 	authState.markIntentionalSignOut();
+
 	try {
 		await signOut();
 	} catch (error) {
 		toastState.error(authErrorText(error));
+		loading = false;
 		return;
+	}
+
+	// Bewusst KEIN finally um signOut(): der Spinner lief vorher aus, waehrend
+	// Teardown, outbox.clear() (IndexedDB) und goto() noch liefen — sichtbar
+	// passierte in dieser Zeit nichts.
+	try {
+		workspaceState.reset();
+		unloadWorkspaceData();
+		await outbox.clear();
+		await goto('/login');
+		// Der Toaster haengt im Layout ausserhalb des Nav-Guards und laeuft auch
+		// auf /login — die Abmeldung wird damit bestaetigt statt nur beendet.
+		toastState.success('Du bist abgemeldet.');
 	} finally {
 		loading = false;
 	}
-
-	workspaceState.reset();
-	unloadWorkspaceData();
-	await outbox.clear();
-	await goto('/login');
 }

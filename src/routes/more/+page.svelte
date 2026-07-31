@@ -207,7 +207,7 @@
 
 	<Button variant="secondary" onclick={logout} loading={logoutState.loading}>
 		{#snippet children()}
-			Abmelden
+			{logoutState.loading ? 'Melde ab…' : 'Abmelden'}
 		{/snippet}
 	</Button>
 
