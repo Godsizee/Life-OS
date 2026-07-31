@@ -1,15 +1,21 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { Fingerprint } from 'lucide-svelte';
+	import { fade, scale } from 'svelte/transition';
+	import { Check, Fingerprint } from 'lucide-svelte';
+	import Alert from '$lib/ui/Alert.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import Field from '$lib/ui/Field.svelte';
 	import Input from '$lib/ui/Input.svelte';
+	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import { haptic } from '$lib/core/haptics';
 	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
 	import PasswordField from '$lib/features/auth/components/PasswordField.svelte';
 	import { signInWithPasskey, signInWithPassword } from '$lib/features/auth/api';
 	import { passkeyAvailable } from '$lib/features/auth/capabilities';
 	import { SESSION_EXPIRED_MESSAGE, authErrorText } from '$lib/features/auth/errors';
+	import { authErrorCode, focusTargetFor } from '$lib/features/auth/feedback';
 	import { safeNextPath } from '$lib/features/auth/redirect';
 	import { emailSchema } from '$lib/features/auth/schema';
 
@@ -17,17 +23,23 @@
 	let password = $state('');
 	let emailError = $state('');
 	let formError = $state('');
-	let loading = $state(false);
-	let passkeyLoading = $state(false);
+	// Ein Zustand statt zweier loser Flags: vorher liefen Passwort- und Passkey-Weg
+	// unabhaengig, beide Buttons blieben klickbar und die Felder editierbar.
+	let phase = $state<'idle' | 'password' | 'passkey' | 'success'>('idle');
 	let passkeyReady = $state(false);
 	let resetHintOpen = $state(false);
+	let shaking = $state(false);
 
+	let emailInput = $state<HTMLInputElement | null>(null);
+	let passwordInput = $state<HTMLInputElement | null>(null);
+	// Kein $state: nur ein Einmal-Riegel fuer den $effect, kein UI-Zustand.
+	let focusSet = false;
+
+	const busy = $derived(phase !== 'idle');
 	// Der Auth-Guard hängt das ursprüngliche Ziel an; safeNextPath lässt nur
 	// eigene, relative Pfade durch.
 	const next = $derived(safeNextPath(page.url.searchParams.get('next')));
-	// Vom Auth-Guard gesetzt, wenn eine bestehende Sitzung unerwartet verschwand
-	// (Server-Refresh fehlgeschlagen) statt durch Klick auf "Abmelden" — sonst
-	// landet der Nutzer kommentarlos auf dieser Seite und haelt es fuer einen Bug.
+	// Vom Auth-Guard gesetzt, wenn eine bestehende Sitzung unerwartet verschwand.
 	const showExpiredNotice = $derived(page.url.searchParams.get('expired') === '1');
 
 	$effect(() => {
@@ -36,38 +48,82 @@
 		void passkeyAvailable().then((ok) => (passkeyReady = ok));
 	});
 
+	$effect(() => {
+		// Einmalig, sonst ueberschreibt ein spaeterer URL-Wechsel die Eingabe.
+		if (focusSet) return;
+		focusSet = true;
+		// Aus der Registrierung uebernommen ("Konto existiert bereits") — dann fehlt
+		// nur noch das Passwort, also direkt dorthin.
+		const prefill = page.url.searchParams.get('email');
+		if (prefill) {
+			email = prefill;
+			void tick().then(() => passwordInput?.focus());
+		} else {
+			void tick().then(() => emailInput?.focus());
+		}
+	});
+
 	function validateEmail(): boolean {
 		const result = emailSchema.safeParse(email.trim());
 		emailError = result.success ? '' : result.error.issues[0].message;
 		return result.success;
 	}
 
+	/** Beim Verlassen pruefen, aber ein noch leeres Feld nicht vorwurfsvoll anmeckern. */
+	function validateOnBlur() {
+		if (email.trim()) validateEmail();
+	}
+
+	/** Fehler wahrnehmbar machen: Meldung + Wackeln + Haptik + Fokus aufs schuldige Feld. */
+	async function fail(error: unknown) {
+		formError = authErrorText(error);
+		// Erst aus, dann an — sonst startet die Animation beim zweiten Fehler nicht neu.
+		shaking = false;
+		await tick();
+		shaking = true;
+		haptic([10, 60, 10]);
+
+		const target = focusTargetFor(authErrorCode(error));
+		await tick();
+		if (target === 'email') emailInput?.focus();
+		else if (target === 'password') passwordInput?.focus();
+	}
+
+	/** Kurz halten, damit der Erfolg sichtbar wird, bevor die Seite wechselt. */
+	async function succeed() {
+		phase = 'success';
+		haptic(15);
+		await new Promise((resolve) => setTimeout(resolve, motionDuration(DURATION.base)));
+		await goto(next);
+	}
+
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
 		formError = '';
-		if (!validateEmail()) return;
+		if (!validateEmail()) {
+			emailInput?.focus();
+			return;
+		}
 
-		loading = true;
+		phase = 'password';
 		try {
 			await signInWithPassword(email, password);
-			await goto(next);
+			await succeed();
 		} catch (error) {
-			formError = authErrorText(error);
-		} finally {
-			loading = false;
+			phase = 'idle';
+			await fail(error);
 		}
 	}
 
 	async function passkeyLogin() {
 		formError = '';
-		passkeyLoading = true;
+		phase = 'passkey';
 		try {
 			await signInWithPasskey();
-			await goto(next);
+			await succeed();
 		} catch (error) {
-			formError = authErrorText(error);
-		} finally {
-			passkeyLoading = false;
+			phase = 'idle';
+			await fail(error);
 		}
 	}
 </script>
@@ -78,46 +134,92 @@
 
 <AuthShell title="Willkommen zurück" subtitle="Melde dich an, um weiterzumachen.">
 	{#if showExpiredNotice}
-		<p class="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300">
-			{SESSION_EXPIRED_MESSAGE}
-		</p>
+		<Alert variant="info">
+			{#snippet children()}
+				{SESSION_EXPIRED_MESSAGE} Noch nicht synchronisierte Änderungen bleiben gespeichert.
+			{/snippet}
+		</Alert>
 	{/if}
-	<form onsubmit={submit} class="flex flex-col gap-4" novalidate>
-		<Field label="E-Mail" error={emailError}>
+
+	<form
+		onsubmit={submit}
+		class:shake={shaking}
+		onanimationend={(event) => {
+			// Nur die eigene Wackel-Animation zuruecksetzen: animationend blubbert,
+			// und die Svelte-Transitions der Kinder wuerden sie sonst sofort abwuergen.
+			if (event.target === event.currentTarget) shaking = false;
+		}}
+		class="flex flex-col gap-4"
+		novalidate
+	>
+		<Field label="E-Mail" error={emailError} id="login-email">
 			<Input
+				id="login-email"
 				type="email"
 				inputmode="email"
 				autocomplete="username"
 				placeholder="du@beispiel.de"
 				bind:value={email}
+				bind:element={emailInput}
 				invalid={!!emailError}
+				disabled={busy}
+				aria-describedby={emailError ? 'login-email-error' : undefined}
 				oninput={() => (emailError = '')}
+				onblur={validateOnBlur}
 				required
 			/>
 		</Field>
 
-		<PasswordField bind:value={password} autocomplete="current-password" />
+		<PasswordField
+			bind:value={password}
+			bind:element={passwordInput}
+			autocomplete="current-password"
+			disabled={busy}
+		/>
 
 		{#if formError}
-			<p role="alert" class="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
-				{formError}
-			</p>
+			<Alert variant="error">
+				{#snippet children()}{formError}{/snippet}
+			</Alert>
 		{/if}
 
-		<Button type="submit" {loading} fullWidth>
-			{#snippet children()}Anmelden{/snippet}
+		<Button type="submit" loading={phase === 'password'} disabled={busy} fullWidth>
+			{#snippet icon()}
+				{#if phase === 'success'}
+					<span in:scale={{ start: 0.5, duration: motionDuration(DURATION.fast) }}>
+						<Check size={18} />
+					</span>
+				{/if}
+			{/snippet}
+			{#snippet children()}
+				{phase === 'password' ? 'Wird angemeldet…' : phase === 'success' ? 'Angemeldet' : 'Anmelden'}
+			{/snippet}
 		</Button>
 
 		{#if passkeyReady}
-			<div class="flex items-center gap-3 text-xs text-text-tertiary">
-				<span class="h-px flex-1 bg-border-color"></span>
-				oder
-				<span class="h-px flex-1 bg-border-color"></span>
+			<!-- Einblenden statt hartem Pop-in: die Server-Probe laeuft asynchron. -->
+			<div
+				transition:fade={{ duration: motionDuration(DURATION.base) }}
+				class="flex flex-col gap-4"
+			>
+				<div class="flex items-center gap-3 text-xs text-text-tertiary">
+					<span class="h-px flex-1 bg-border-color"></span>
+					oder
+					<span class="h-px flex-1 bg-border-color"></span>
+				</div>
+				<Button
+					variant="secondary"
+					loading={phase === 'passkey'}
+					disabled={busy}
+					onclick={passkeyLogin}
+					fullWidth
+				>
+					{#snippet icon()}<Fingerprint size={18} />{/snippet}
+					{#snippet children()}
+						{phase === 'passkey' ? 'Passkey wird geprüft…' : 'Mit Passkey anmelden'}
+					{/snippet}
+				</Button>
 			</div>
-			<Button variant="secondary" loading={passkeyLoading} onclick={passkeyLogin} fullWidth>
-				{#snippet icon()}<Fingerprint size={18} />{/snippet}
-				{#snippet children()}Mit Passkey anmelden{/snippet}
-			</Button>
 		{/if}
 	</form>
 
