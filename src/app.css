@@ -137,6 +137,14 @@
   textarea {
     touch-action: manipulation;
   }
+
+  /* Bis hierhin hatte die App keinen einzigen sichtbaren Fokus-Indikator auf
+     Buttons oder Links - Tastatur-Navigation war blind. :where() haelt die
+     Spezifitaet bei 0, damit Komponenten die Regel jederzeit ueberschreiben. */
+  :where(a, button, [role='button'], summary):focus-visible {
+    outline: 2px solid var(--primary-active);
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {
@@ -222,6 +230,17 @@
   .hero-gradient {
     background: linear-gradient(135deg, #4F46E5 0%, #E11D48 130%);
   }
+
+  /* Fehlerhafte Eingabe wackelt kurz - dieselbe Kurve wie alle anderen
+     Micro-Interactions (EASE_STANDARD aus ui/motion.ts). */
+  .shake {
+    animation: shake 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Gestaffelter Auftakt der Auth-Screens. Der Versatz kommt per --stagger. */
+  .auth-enter {
+    animation: authEnter 320ms cubic-bezier(0.32, 0.72, 0, 1) var(--stagger, 0ms) both;
+  }
 }
 
 /* View Transitions (Phase 5) — Content faded/slided, Nav-Chrome bleibt statisch
@@ -249,6 +268,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;      /* NEU - sonst bleibt eine sichtbare Leerpause */
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
@@ -263,6 +283,22 @@
 @keyframes pulseSubtle {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.95; transform: scale(1.01); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+@keyframes authEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authRedirectBar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 /* Markdown-Rendering (renderMarkdownSafe) — greift auf {@html}-Inhalte, die keine

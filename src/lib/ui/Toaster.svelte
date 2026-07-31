@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { toastState } from '$lib/core/toast.svelte';
 	import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-svelte';
+	import { flip } from 'svelte/animate';
+	import { fly } from 'svelte/transition';
+	import { DURATION, EASE_STANDARD, motionDuration } from './motion';
 
 	const iconMap = {
 		success: CheckCircle,
@@ -25,10 +28,11 @@
 	{#each toastState.toasts as toast (toast.id)}
 		{@const Icon = iconMap[toast.type]}
 		<div
-			role="status"
+			role={toast.type === 'error' ? 'alert' : 'status'}
+			transition:fly={{ x: 24, duration: motionDuration(DURATION.base), easing: EASE_STANDARD }}
+			animate:flip={{ duration: motionDuration(DURATION.fast) }}
 			class="flex min-w-[220px] max-w-xs items-start gap-2.5 rounded-xl border px-3.5 py-2.5 shadow-lg
-				   text-sm font-medium animate-in slide-in-from-right-4 fade-in duration-200
-				   {colorMap[toast.type]}"
+				   text-sm font-medium {colorMap[toast.type]}"
 		>
 			<Icon size={16} class="mt-0.5 shrink-0" />
 			<span class="flex-1 leading-snug">{toast.message}</span>

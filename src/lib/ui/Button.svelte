@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Spinner from './Spinner.svelte';
 
 	let {
 		variant = 'primary',
@@ -52,10 +53,7 @@
 	]} {sizes[size]} {fullWidth ? 'w-full' : ''} {className}"
 >
 	{#if loading}
-		<span
-			class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent"
-			aria-hidden="true"
-		></span>
+		<Spinner size={16} />
 	{:else if icon}
 		{@render icon()}
 	{/if}

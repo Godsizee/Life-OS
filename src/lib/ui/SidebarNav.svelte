@@ -6,6 +6,7 @@
 	import { outbox } from '$lib/core/outbox.svelte';
 	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
 	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning } from 'lucide-svelte';
+	import Spinner from '$lib/ui/Spinner.svelte';
 
 	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
 
@@ -138,10 +139,7 @@
 			class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20"
 		>
 			{#if logoutState.loading}
-				<span
-					class="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent"
-					aria-hidden="true"
-				></span>
+				<Spinner size={20} />
 			{:else}
 				<LogOut size={20} class="shrink-0" />
 			{/if}

@@ -20,7 +20,7 @@
 	bind:this={element}
 	bind:value
 	aria-invalid={invalid || undefined}
-	class="min-h-12 min-w-0 w-full rounded-xl border bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus:outline-none transition-colors duration-200
+	class="min-h-12 min-w-0 w-full rounded-xl border bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60 transition-colors duration-200
 		{invalid
 		? 'border-red-500 focus:border-red-500'
 		: 'border-border-color focus:border-primary-500'} {className}"
