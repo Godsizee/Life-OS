@@ -28,7 +28,7 @@ export function getGoalProgress(goal: Goal): number {
 	}
 
 	// W8 — Meilensteine: ein Ziel mit Unterzielen misst sich an deren Abschluss.
-	const children = goalsState.goals.filter((g) => g.parent_id === goal.id);
+	const children = goalsState.goals.filter((g) => g.parent_id === goal.id && !g.archived);
 	if (children.length > 0) return milestonePercent(children);
 
 	const linkedTasks = tasksState.tasks.filter((t) => t.goal_id === goal.id);

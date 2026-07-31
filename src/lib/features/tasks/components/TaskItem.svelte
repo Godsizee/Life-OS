@@ -6,6 +6,7 @@
 	import ListRow from '$lib/ui/ListRow.svelte';
 	import CheckCircle from '$lib/ui/CheckCircle.svelte';
 	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
+	import MemberAvatar from '$lib/features/workspace/components/MemberAvatar.svelte';
 
 	let { task, onopen, progress }: { task: Task; onopen?: (task: Task) => void; progress?: { done: number; total: number } } = $props();
 
@@ -31,13 +32,18 @@
 			onclick={() => onopen?.(task)}
 			onkeydown={(e) => e.key === 'Enter' && onopen?.(task)}
 		>
-			<div class="flex items-center gap-1.5">
-				{#if task.priority === 'high'}
-					<span class="inline-block h-2 w-2 rounded-full bg-red-500 shrink-0"></span>
-				{:else if task.priority === 'low'}
-					<span class="inline-block h-2 w-2 rounded-full bg-slate-400 shrink-0"></span>
+			<div class="flex items-center justify-between gap-2">
+				<div class="flex items-center gap-1.5 min-w-0">
+					{#if task.priority === 'high'}
+						<span class="inline-block h-2 w-2 rounded-full bg-red-500 shrink-0"></span>
+					{:else if task.priority === 'low'}
+						<span class="inline-block h-2 w-2 rounded-full bg-slate-400 shrink-0"></span>
+					{/if}
+					<p class="truncate {isDone ? 'text-text-tertiary line-through' : 'text-text-primary'}">{task.title}</p>
+				</div>
+				{#if task.assignee_id}
+					<MemberAvatar userId={task.assignee_id} size="sm" />
 				{/if}
-				<p class="truncate {isDone ? 'text-text-tertiary line-through' : 'text-text-primary'}">{task.title}</p>
 			</div>
 			
 			<div class="flex items-center gap-2 mt-0.5 flex-wrap">

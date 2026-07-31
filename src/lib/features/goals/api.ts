@@ -2,16 +2,17 @@ import { supabase } from '$lib/core/supabase';
 import { fetchAllPages } from '$lib/core/query';
 import type { Goal, GoalCheckin, JournalEntry } from './types';
 
-export async function listGoals(workspaceId: string): Promise<Goal[]> {
-	return fetchAllPages<Goal>('goals', (from, to) =>
-		supabase
+export async function listGoals(workspaceId: string, includeArchived = false): Promise<Goal[]> {
+	return fetchAllPages<Goal>('goals', (from, to) => {
+		let q = supabase
 			.from('goals')
 			.select('*')
-			.eq('workspace_id', workspaceId)
-			.order('created_at')
-			.order('id')
-			.range(from, to)
-	);
+			.eq('workspace_id', workspaceId);
+		if (!includeArchived) {
+			q = q.eq('archived', false);
+		}
+		return q.order('created_at').order('id').range(from, to);
+	});
 }
 
 export async function insertGoalRaw(goal: Goal): Promise<Goal> {

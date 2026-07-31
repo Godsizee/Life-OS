@@ -6,10 +6,15 @@
 	import MoodEntrySheet from '$lib/features/mood/components/MoodEntrySheet.svelte';
 	import MoodActivityStats from '$lib/features/mood/components/MoodActivityStats.svelte';
 	import WeekdayAverages from '$lib/features/mood/components/WeekdayAverages.svelte';
-	import { MOOD_LABELS } from '$lib/features/mood/types';
+	import MoodDistribution from '$lib/features/mood/components/MoodDistribution.svelte';
+	import ActivityManagerSheet from '$lib/features/mood/components/ActivityManagerSheet.svelte';
+	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
+	import { MOOD_LABELS, MOOD_EMOJIS } from '$lib/features/mood/types';
 	import { MOOD_CLASSES } from '$lib/features/mood/colors';
+	import { activityLabel } from '$lib/features/mood/activities';
 	import {
 		availableYears,
+		averageByDaypart,
 		averageScore,
 		entriesInYear,
 		filterSince,
@@ -20,36 +25,31 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Textarea from '$lib/ui/Textarea.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
-
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	import { Settings, Trash2, Sun, Sunset, Moon, Sunrise } from 'lucide-svelte';
 
 	// ── Heute erfassen ──────────────────────────────────────────────
 	let selectedScore = $state<number | null>(null);
 	let note = $state('');
 	let activities = $state<string[]>([]);
 	let saving = $state(false);
-	let hydratedFor = $state<string | null>(null);
 
-	// Formular genau einmal je Tageseintrag aus dem Store befuellen — sonst
-	// wuerde jede Realtime-Aenderung die Eingabe des Nutzers ueberschreiben.
-	$effect(() => {
-		const entry = moodState.todayEntry;
-		const key = entry ? `${entry.id}:${entry.date}` : null;
-		if (key === hydratedFor) return;
-		hydratedFor = key;
-		selectedScore = entry?.score ?? null;
-		note = entry?.note ?? '';
-		activities = [...(entry?.activities ?? [])];
-	});
+	const todayEntries = $derived(moodState.todayEntries);
 
 	async function save() {
 		if (!selectedScore) return;
 		saving = true;
 		try {
 			await moodState.save(selectedScore, note, activities);
+			selectedScore = null;
+			note = '';
+			activities = [];
 		} finally {
 			saving = false;
 		}
+	}
+
+	async function removeEntry(id: string) {
+		await moodState.remove(id);
 	}
 
 	// ── Year in Pixels ──────────────────────────────────────────────
@@ -65,9 +65,10 @@
 		await moodState.loadYear(y);
 	}
 
-	// ── Tages-Sheet ─────────────────────────────────────────────────
+	// ── Sheets & Modals ─────────────────────────────────────────────
 	let sheetOpen = $state(false);
 	let sheetDate = $state(toISODate(new Date()));
+	let managerOpen = $state(false);
 
 	function openDay(date: string) {
 		sheetDate = date;
@@ -77,6 +78,9 @@
 	// ── Statistik-Zeitraum ──────────────────────────────────────────
 	let statsDays = $state(90);
 	const statsEntries = $derived(filterSince(moodState.entries, statsDays));
+	const daypartAverages = $derived(averageByDaypart(statsEntries));
+	const daypartIcons = [Sunrise, Sun, Sunset, Moon];
+	const daypartLabels = ['Morgen', 'Mittag', 'Abend', 'Nacht'];
 </script>
 
 <svelte:head>
@@ -85,10 +89,55 @@
 
 <PageHeader title="Wie geht's dir?" subtitle={formatDate(new Date())} />
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 pb-8">
 	<!-- Heute -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<h2 class="mb-3 text-sm font-semibold text-text-primary">Stimmung heute</h2>
+
+		{#if todayEntries.length > 0}
+			<div class="mb-4 space-y-2">
+				<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+					Heutige Einträge ({todayEntries.length})
+				</p>
+				<ul class="flex flex-col gap-1.5">
+					{#each todayEntries as entry (entry.id)}
+						{@const d = new Date(entry.logged_at)}
+						{@const formattedTime = isNaN(d.getTime())
+							? ''
+							: d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+						<li
+							class="flex items-center justify-between gap-2 rounded-xl border border-border-color bg-surface-1 p-2.5"
+						>
+							<div class="flex items-center gap-2">
+								<span class="text-lg">{MOOD_EMOJIS[entry.score]}</span>
+								<div>
+									<p class="text-xs font-bold text-text-primary">
+										{formattedTime} · {MOOD_LABELS[entry.score]}
+									</p>
+									{#if entry.activities.length > 0}
+										<p class="text-[11px] text-text-tertiary">
+											{entry.activities.map(activityLabel).join(', ')}
+										</p>
+									{/if}
+								</div>
+							</div>
+							<button
+								onclick={() => removeEntry(entry.id)}
+								aria-label="Eintrag löschen"
+								class="p-1 text-text-tertiary hover:text-red-500"
+							>
+								<Trash2 size={16} />
+							</button>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+
+		<p class="mb-2 text-xs font-medium text-text-secondary">
+			{todayEntries.length > 0 ? 'Weiteren Eintrag hinzufügen:' : 'Neuer Eintrag:'}
+		</p>
+
 		<MoodPicker bind:value={selectedScore} />
 
 		{#if selectedScore}
@@ -105,7 +154,7 @@
 					disabled={saving}
 					class="min-h-12 rounded-xl bg-primary-700 text-sm font-medium text-white transition-all hover:bg-primary-800 active:scale-95 disabled:opacity-60 dark:bg-primary-600 dark:hover:bg-primary-700"
 				>
-					{saving ? 'Speichere…' : 'Speichern'}
+					{saving ? 'Speichere…' : 'Eintrag speichern'}
 				</button>
 			</div>
 		{/if}
@@ -128,7 +177,9 @@
 			</div>
 		{/if}
 
-		<YearInPixels {months} onselect={openDay} />
+		<div class="overflow-x-auto">
+			<YearInPixels {months} onselect={openDay} />
+		</div>
 
 		<div class="mt-3 flex flex-wrap items-center gap-2">
 			{#each [1, 2, 3, 4, 5] as score (score)}
@@ -139,12 +190,25 @@
 			{/each}
 		</div>
 		<p class="mt-2 text-[11px] text-text-tertiary">Tippe auf einen Tag, um ihn nachzutragen oder zu ändern.</p>
+
+		<div class="mt-6 border-t border-border-color pt-4">
+			<MoodDistribution entries={statsEntries} />
+		</div>
 	</section>
 
 	<!-- Aktivitaets-Statistik -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<div class="mb-3 flex items-center justify-between gap-3">
-			<h2 class="text-sm font-semibold text-text-primary">Was beeinflusst deine Stimmung?</h2>
+			<div class="flex items-center gap-2">
+				<h2 class="text-sm font-semibold text-text-primary">Was beeinflusst deine Stimmung?</h2>
+				<button
+					onclick={() => (managerOpen = true)}
+					aria-label="Eigene Tags verwalten"
+					class="p-1 text-text-tertiary hover:text-text-primary"
+				>
+					<Settings size={16} />
+				</button>
+			</div>
 			<div class="flex gap-1.5">
 				{#each [30, 90, 365] as days (days)}
 					<Chip selected={statsDays === days} onclick={() => (statsDays = days)}>{days} T</Chip>
@@ -154,11 +218,34 @@
 		<MoodActivityStats entries={statsEntries} />
 	</section>
 
-	<!-- Wochentage -->
+	<!-- Wochentage & Tageszeit -->
+	<div class="grid gap-4 md:grid-cols-2">
+		<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+			<h2 class="mb-3 text-sm font-semibold text-text-primary">Ø nach Wochentag</h2>
+			<WeekdayAverages entries={statsEntries} />
+		</section>
+
+		<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+			<h2 class="mb-3 text-sm font-semibold text-text-primary">Ø nach Tageszeit</h2>
+			<div class="grid grid-cols-4 gap-2">
+				{#each daypartLabels as label, i (label)}
+					{@const score = daypartAverages[i]}
+					{@const IconComponent = daypartIcons[i]}
+					<div class="flex flex-col items-center gap-1 rounded-xl bg-surface-1 p-2 text-center">
+						<IconComponent size={16} class="text-text-tertiary" />
+						<span class="text-[11px] text-text-secondary">{label}</span>
+						<span class="text-sm font-bold text-text-primary">{formatScore(score)}</span>
+					</div>
+				{/each}
+			</div>
+		</section>
+	</div>
+
+	<!-- Stimmung & Körper (Gesundheit) -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Ø nach Wochentag</h2>
-		<WeekdayAverages entries={statsEntries} />
+		<MoodHealthCorrelation days={statsDays} />
 	</section>
 </div>
 
 <MoodEntrySheet bind:open={sheetOpen} date={sheetDate} />
+<ActivityManagerSheet bind:open={managerOpen} />

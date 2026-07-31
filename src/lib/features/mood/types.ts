@@ -3,6 +3,8 @@ export interface MoodEntry {
 	workspace_id: string;
 	user_id: string;
 	date: string;
+	/** W10 — Zeitpunkt der Erfassung. Mehrere Einträge pro Tag sind erlaubt. */
+	logged_at: string;
 	score: 1 | 2 | 3 | 4 | 5;
 	note: string | null;
 	/** W9 — Daylio-Aktivitaeten: Katalog-IDs und eigene Tags im selben Array. */

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+	benoetigtProTag,
+	buildGoalTree,
 	checkinValue,
 	cumulativePoints,
+	cumulativeSeries,
 	daysSinceLastCheckin,
 	diffDays,
 	evaluateTrack,
@@ -10,6 +13,7 @@ import {
 	milestonePercent,
 	sumCheckins,
 	targetPercent,
+	verboteneEltern,
 	type CheckinLike,
 	type TrackableGoal
 } from './checkins';
@@ -170,3 +174,60 @@ describe('milestonePercent', () => {
 		expect(milestonePercent([])).toBe(0);
 	});
 });
+
+describe('cumulativeSeries', () => {
+	it('summiert je Tag auf und sortiert aufsteigend', () => {
+		const r = cumulativeSeries([
+			{ date: '2026-07-03', value: 5 },
+			{ date: '2026-07-01', value: 10 },
+			{ date: '2026-07-01', value: 2 }
+		]);
+		expect(r.map((p) => p.value)).toEqual([12, 17]);
+		expect(r[0].label).toBe('01.07.');
+	});
+
+	it('liefert für leere Eingabe ein leeres Array', () => {
+		expect(cumulativeSeries([])).toEqual([]);
+	});
+});
+
+describe('benoetigtProTag', () => {
+	it('teilt den Rest auf die verbleibenden Tage', () => {
+		expect(benoetigtProTag(500, 200, 30)).toBe(10);
+	});
+	it('liefert 0, wenn das Ziel schon erreicht ist', () => {
+		expect(benoetigtProTag(500, 600, 30)).toBe(0);
+	});
+	it('liefert null ohne verbleibende Tage', () => {
+		expect(benoetigtProTag(500, 200, 0)).toBeNull();
+	});
+});
+
+describe('verboteneEltern', () => {
+	it('schließt das Ziel selbst und alle Nachfahren aus', () => {
+		const alle = [
+			{ id: 'a', parent_id: null },
+			{ id: 'b', parent_id: 'a' },
+			{ id: 'c', parent_id: 'b' },
+			{ id: 'd', parent_id: null }
+		];
+		expect([...verboteneEltern('a', alle)].sort()).toEqual(['a', 'b', 'c']);
+	});
+});
+
+describe('buildGoalTree', () => {
+	it('baut eine Hierarchie aus Top-Level- und Unterzielen auf', () => {
+		const goals = [
+			{ id: 'a', parent_id: null },
+			{ id: 'b', parent_id: 'a' },
+			{ id: 'c', parent_id: null }
+		];
+		const tree = buildGoalTree(goals);
+		expect(tree).toHaveLength(2);
+		expect(tree[0].goal.id).toBe('a');
+		expect(tree[0].children).toHaveLength(1);
+		expect(tree[0].children[0].goal.id).toBe('b');
+		expect(tree[1].goal.id).toBe('c');
+	});
+});
+

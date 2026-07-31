@@ -129,3 +129,20 @@ describe('focusScoreForDate', () => {
 		expect(focusScoreForDate([at(0, 9, 25)], toISODate(today), 0)).toBe(0);
 	});
 });
+
+describe('focusScoreForDate mit eigenem Tagesziel', () => {
+	it('rechnet gegen das übergebene Ziel, nicht gegen eine Konstante', () => {
+		const e = [{ started_at: new Date(2026, 6, 31, 10, 0).toISOString(), duration_min: 50, source: 'pomodoro' as const }];
+		expect(focusScoreForDate(e, '2026-07-31', 100)).toBe(50);
+		expect(focusScoreForDate(e, '2026-07-31', 50)).toBe(100);
+	});
+
+	it('deckelt bei 100', () => {
+		const e = [{ started_at: new Date(2026, 6, 31, 10, 0).toISOString(), duration_min: 500, source: 'pomodoro' as const }];
+		expect(focusScoreForDate(e, '2026-07-31', 100)).toBe(100);
+	});
+
+	it('liefert 0 bei Ziel <= 0', () => {
+		expect(focusScoreForDate([], '2026-07-31', 0)).toBe(0);
+	});
+});

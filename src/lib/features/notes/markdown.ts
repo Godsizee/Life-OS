@@ -220,3 +220,43 @@ export function plainTextPreview(text: string, maxLength = 140): string {
 		.trim();
 	return plain.length > maxLength ? `${plain.slice(0, maxLength - 1)}…` : plain;
 }
+
+export interface MarkdownWerkzeug {
+	id: string;
+	label: string;
+	/** Was am Zeilenanfang eingefügt wird ('## ', '- ', '- [ ] ', '> '). */
+	prefix: string;
+}
+
+export const MARKDOWN_WERKZEUGE: MarkdownWerkzeug[] = [
+	{ id: 'h2',        label: 'Überschrift', prefix: '## ' },
+	{ id: 'list',      label: 'Liste',       prefix: '- ' },
+	{ id: 'checklist', label: 'Checkliste',  prefix: '- [ ] ' },
+	{ id: 'quote',     label: 'Zitat',       prefix: '> ' }
+];
+
+/**
+ * Fügt `prefix` am Anfang der Zeile ein, in der `cursor` steht.
+ * Ist das Präfix dort schon vorhanden, wird es entfernt (Umschalter).
+ * Liefert den neuen Text und die neue Cursor-Position.
+ */
+export function toggleLinePrefix(
+	text: string,
+	cursor: number,
+	prefix: string
+): { text: string; cursor: number } {
+	const zeilenStart = text.lastIndexOf('\n', Math.max(0, cursor - 1)) + 1;
+	const zeilenEnde = text.indexOf('\n', cursor);
+	const zeile = text.slice(zeilenStart, zeilenEnde < 0 ? text.length : zeilenEnde);
+
+	if (zeile.startsWith(prefix)) {
+		return {
+			text: text.slice(0, zeilenStart) + zeile.slice(prefix.length) + text.slice(zeilenStart + zeile.length),
+			cursor: Math.max(zeilenStart, cursor - prefix.length)
+		};
+	}
+	return {
+		text: text.slice(0, zeilenStart) + prefix + zeile + text.slice(zeilenStart + zeile.length),
+		cursor: cursor + prefix.length
+	};
+}

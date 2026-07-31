@@ -2,17 +2,12 @@ import { supabase } from '$lib/core/supabase';
 import { fetchAllPages, seitTagen, VERLAUF_TAGE } from '$lib/core/query';
 import type { Habit, HabitLog } from './types';
 
-export async function listHabits(workspaceId: string): Promise<Habit[]> {
-	return fetchAllPages<Habit>('habits', (from, to) =>
-		supabase
-			.from('habits')
-			.select('*')
-			.eq('workspace_id', workspaceId)
-			.eq('archived', false)
-			.order('created_at')
-			.order('id')
-			.range(from, to)
-	);
+export async function listHabits(workspaceId: string, includeArchived = false): Promise<Habit[]> {
+	return fetchAllPages<Habit>('habits', (from, to) => {
+		let q = supabase.from('habits').select('*').eq('workspace_id', workspaceId);
+		if (!includeArchived) q = q.eq('archived', false);
+		return q.order('created_at').order('id').range(from, to);
+	});
 }
 
 /**

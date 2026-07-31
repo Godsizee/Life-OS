@@ -16,8 +16,8 @@ interface EntityMeta {
 }
 
 export const entityMeta: Record<LinkEntityType, EntityMeta> = {
-	task: { label: 'Aufgabe', icon: CheckSquare, route: () => '/tasks' },
-	note: { label: 'Notiz', icon: Notebook, route: () => '/notes' },
+	task: { label: 'Aufgabe', icon: CheckSquare, route: (id) => `/tasks?task=${id}` },
+	note: { label: 'Notiz', icon: Notebook, route: (id) => `/notes?note=${id}` },
 	event: { label: 'Termin', icon: Calendar, route: () => '/calendar' },
 	goal: { label: 'Ziel', icon: Target, route: (id) => `/goals/${id}` },
 	habit: { label: 'Routine', icon: Repeat, route: () => '/habits' },

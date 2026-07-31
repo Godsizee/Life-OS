@@ -5,6 +5,7 @@ import { moodState } from '$lib/features/mood/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { getGoalProgress } from '$lib/features/goals/progress';
+import { evaluateTrack } from '$lib/features/goals/checkins';
 import { calculateStreak, toISODate, isOpenToday, streakLabel } from '$lib/features/habits/streak';
 import { shoppingState } from '$lib/features/shopping/store.svelte';
 import { waterMl } from '$lib/features/health/stats';
@@ -162,25 +163,22 @@ export function getSuggestions(): Suggestion[] {
 		}
 	} catch {}
 
-	// 8. Ziel-Deadline naht (Welle 5.9): < 14 Tage, Fortschritt < 50 %
-	const in14Days = new Date();
-	in14Days.setDate(in14Days.getDate() + 14);
+	// 8. Ziel-Deadline naht / hinterher (W8)
 	for (const g of goalsState.goals) {
-		if (g.status === 'done' || !g.target_date) continue;
-		const target = new Date(g.target_date);
-		if (target < now || target > in14Days) continue;
-		if (getGoalProgress(g) >= 50) continue;
-		const days = Math.ceil((target.getTime() - now.getTime()) / 86400000);
-		list.push({
-			id: `deadline_${g.id}`,
-			title: '⏳ Ziel-Deadline naht',
-			description: `„${g.title}" ist in ${days} Tag${days !== 1 ? 'en' : ''} fällig — erst ${getGoalProgress(g)}% geschafft.`,
-			icon: '⏳',
-			type: 'warning',
-			actionText: 'Ziel öffnen',
-			actionRoute: `/goals/${g.id}`
-		});
-		break;
+		if (g.status === 'done' || g.archived) continue;
+		const track = evaluateTrack(g, getGoalProgress(g));
+		if (track.state === 'overdue' || track.state === 'behind') {
+			list.push({
+				id: `track_${g.id}`,
+				title: track.state === 'overdue' ? '⚠️ Ziel überfällig' : '📉 Ziel im Verzug',
+				description: `„${g.title}" — ${track.label}`,
+				icon: track.state === 'overdue' ? '⚠️' : '📉',
+				type: 'warning',
+				actionText: 'Ziel öffnen',
+				actionRoute: `/goals/${g.id}`
+			});
+			break;
+		}
 	}
 
 	// 9. Trainings-Erinnerung (Welle 5.9): Pläne vorhanden, aber ≥ 4 Tage kein Workout
@@ -212,7 +210,7 @@ export function getSuggestions(): Suggestion[] {
 			icon: '✍️',
 			type: 'action',
 			actionText: 'Schreiben',
-			actionRoute: '/goals?tab=journal'
+			actionRoute: '/journal'
 		});
 	}
 

@@ -7,6 +7,8 @@
 	import { calendarState } from '../store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import type { Event } from '../types';
+	import RecurrenceEditor from './RecurrenceEditor.svelte';
+	import { type RecurrenceForm, LEERE_REGEL, parseRrule, buildRrule } from '../rrule';
 
 	let {
 		onsubmitted,
@@ -18,12 +20,7 @@
 		occurrenceDate?: string;
 	} = $props();
 
-	type Recurrence = 'none' | 'daily' | 'weekly';
-	const rruleByRecurrence: Record<Recurrence, string | null> = {
-		none: null,
-		daily: 'RRULE:FREQ=DAILY',
-		weekly: 'RRULE:FREQ=WEEKLY'
-	};
+	const isExternal = $derived(!!event?.external_uid);
 
 	function toDatetimeLocal(iso: string | undefined): string {
 		if (!iso) return '';
@@ -52,7 +49,7 @@
 	let end = $state('');
 	let allDay = $state(false);
 	let location = $state('');
-	let recurrence = $state<Recurrence>('none');
+	let recurrence = $state<RecurrenceForm>(LEERE_REGEL);
 	let calendarId = $state('');
 	let attendeeIds = $state<string[]>([]);
 
@@ -74,11 +71,7 @@
 		end = toDatetimeLocal(zeiten.end);
 		allDay = event?.all_day ?? false;
 		location = event?.location ?? '';
-		recurrence = event?.rrule?.includes('WEEKLY')
-			? 'weekly'
-			: event?.rrule?.includes('DAILY')
-				? 'daily'
-				: 'none';
+		recurrence = parseRrule(event?.rrule ?? null);
 		calendarId = event?.calendar_id ?? calendarState.defaultCalendarId ?? '';
 		attendeeIds = [...(event?.attendee_ids ?? [])];
 	});
@@ -111,7 +104,7 @@
 				end: endDate.toISOString(),
 				all_day: allDay,
 				location: location || null,
-				rrule: rruleByRecurrence[recurrence],
+				rrule: buildRrule(recurrence),
 				calendar_id: calendarId,
 				attendee_ids: attendeeIds
 			});
@@ -122,7 +115,7 @@
 				end: endDate.toISOString(),
 				all_day: allDay,
 				location: location || null,
-				rrule: rruleByRecurrence[recurrence],
+				rrule: buildRrule(recurrence),
 				calendar_id: calendarId,
 				attendee_ids: attendeeIds
 			});
@@ -132,28 +125,41 @@
 </script>
 
 <form onsubmit={submit} class="flex flex-col gap-3">
+	{#if isExternal}
+		<div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/30 dark:bg-blue-900/10 dark:text-blue-300">
+			Dieser Termin stammt aus einem externen Kalender-Abo und kann nicht bearbeitet werden.
+		</div>
+	{/if}
+
 	<!-- Kalender Auswahl -->
-	<Select bind:value={calendarId} required>
+	<Select bind:value={calendarId} required disabled={isExternal}>
 		{#each calendarState.calendars as cal (cal.id)}
 			<option value={cal.id}>{cal.name}</option>
 		{/each}
 	</Select>
 
-	<Input placeholder="Titel…" bind:value={title} required />
-	<Input type="datetime-local" bind:value={start} required />
-	<Input type="datetime-local" bind:value={end} />
-	<Input placeholder="Ort (optional)…" bind:value={location} />
+	<Input placeholder="Titel…" bind:value={title} required disabled={isExternal} />
+	<Input type="datetime-local" bind:value={start} required disabled={isExternal} />
+	<Input type="datetime-local" bind:value={end} disabled={isExternal} />
+	<Input placeholder="Ort (optional)…" bind:value={location} disabled={isExternal} />
 	
-	<label class="flex min-h-12 items-center gap-2 text-sm text-text-secondary">
-		<input type="checkbox" bind:checked={allDay} class="h-5 w-5" />
+	<label class="flex min-h-12 items-center gap-2 text-sm text-text-secondary {isExternal ? 'opacity-50' : ''}">
+		<input type="checkbox" bind:checked={allDay} class="h-5 w-5" disabled={isExternal} />
 		Ganztägig
 	</label>
 	
-	<Select bind:value={recurrence} disabled={!!occurrenceDate}>
-		<option value="none">Einmalig</option>
-		<option value="daily">Täglich</option>
-		<option value="weekly">Wöchentlich</option>
-	</Select>
+	{#if isExternal}
+		<!-- Zeige nur an, ob es eine Serie ist oder nicht -->
+		{#if recurrence.freq !== 'none'}
+			<div class="text-sm text-text-secondary">
+				Terminserie (extern verwaltet)
+			</div>
+		{/if}
+	{:else if !occurrenceDate}
+		<div class="mt-2 rounded-xl border border-border-color bg-surface-1 p-3">
+			<RecurrenceEditor bind:value={recurrence} />
+		</div>
+	{/if}
 
 	<!-- Teilnehmer -->
 	{#if workspaceState.members.length > 0 && !occurrenceDate}
@@ -183,9 +189,11 @@
 		/>
 	{/if}
 
-	<Button type="submit">
-		{#snippet children()}
-			{event ? 'Speichern' : 'Hinzufügen'}
-		{/snippet}
-	</Button>
+	{#if !isExternal}
+		<Button type="submit">
+			{#snippet children()}
+				{event ? 'Speichern' : 'Hinzufügen'}
+			{/snippet}
+		</Button>
+	{/if}
 </form>

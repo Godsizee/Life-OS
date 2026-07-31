@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { guessCategory, orderedCategoryIds, groupByCategory, recentlyBought } from './categories';
+import { guessCategory, orderedCategoryIds, groupByCategory, recentlyBought, recordPurchase, suggestions, normalizeUnit, guessCategoryWithHistory } from './categories';
 import type { ShoppingItem } from './types';
 
 const base = {
@@ -63,4 +63,73 @@ describe('recentlyBought', () => {
     // Eier ist aktiv (id 4) → raus; Milch dedupliziert; Sortierung nach checked_at desc.
     expect(recentlyBought(items).map((s) => s.name)).toEqual(['Brot', 'Milch']);
   });
+});
+
+describe('recordPurchase', () => {
+	it('zählt hoch und sortiert nach Häufigkeit', () => {
+		let s = recordPurchase(undefined, { name: 'Milch', category: 'dairy', checked_at: '2026-07-01T10:00:00Z' });
+		s = recordPurchase(s, { name: 'Brot',  category: 'bakery', checked_at: '2026-07-02T10:00:00Z' });
+		s = recordPurchase(s, { name: 'milch', category: 'dairy',  checked_at: '2026-07-03T10:00:00Z' });
+		expect(s[0].name).toBe('milch');
+		expect(s[0].count).toBe(2);
+		expect(s[0].label).toBe('milch');
+		expect(s).toHaveLength(2);
+	});
+
+	it('deckelt bei 60 Einträgen', () => {
+		let s = undefined as any;
+		for (let i = 0; i < 65; i++) {
+			s = recordPurchase(s, { name: `item${i}`, category: null, checked_at: '2026-07-01T10:00:00Z' });
+		}
+		expect(s).toHaveLength(60);
+	});
+	
+	it('ignoriert leere Namen', () => {
+		expect(recordPurchase([], { name: '  ', category: null, checked_at: null })).toEqual([]);
+	});
+});
+
+describe('suggestions', () => {
+	it('überlebt das Löschen aller abgehakten Artikel', () => {
+		const stats = [{ name: 'milch', label: 'Milch', category: 'dairy', count: 5, last: '2026-07-30T10:00:00Z' }];
+		expect(suggestions(stats, [], [])).toHaveLength(1);
+	});
+
+	it('lässt weg, was schon offen auf der Liste steht', () => {
+		const stats = [{ name: 'milch', label: 'Milch', category: 'dairy', count: 5, last: '2026-07-30T10:00:00Z' }];
+		expect(suggestions(stats, [], [item({ id: '1', name: 'Milch', checked: false })])).toHaveLength(0);
+	});
+	
+	it('stellt Stammartikel voran', () => {
+		const stats = [{ name: 'brot', label: 'Brot', category: 'bakery', count: 5, last: '2026-07-30T10:00:00Z' }];
+		const staples = [{ name: 'Eier', category: 'dairy' }];
+		const result = suggestions(stats, staples, []);
+		expect(result[0].name).toBe('Eier');
+		expect(result[0].isStaple).toBe(true);
+		expect(result[1].name).toBe('Brot');
+	});
+});
+
+describe('normalizeUnit', () => {
+	it('führt Schreibweisen zusammen', () => {
+		expect(normalizeUnit('Stück')).toBe('Stk');
+		expect(normalizeUnit('stk')).toBe('Stk');
+		expect(normalizeUnit('PACKUNG')).toBe('Pack');
+	});
+	it('lässt Unbekanntes stehen', () => {
+		expect(normalizeUnit('Kiste')).toBe('Kiste');
+	});
+	it('leer bleibt null', () => {
+		expect(normalizeUnit('  ')).toBeNull();
+	});
+});
+
+describe('guessCategoryWithHistory', () => {
+	it('bevorzugt die zuletzt vom Nutzer gewählte Kategorie', () => {
+		const stats = [{ name: 'hafermilch', label: 'Hafermilch', category: 'drinks', count: 3, last: '2026-07-01T10:00:00Z' }];
+		expect(guessCategoryWithHistory('Hafermilch', stats)).toBe('drinks');
+	});
+	it('fällt ohne Historie auf die Stichwortliste zurück', () => {
+		expect(guessCategoryWithHistory('Hafermilch', [])).toBe('dairy');
+	});
 });

@@ -5,7 +5,7 @@ import { ladeSicher } from '$lib/core/store-load';
 import * as shoppingApi from './api';
 import { shoppingItemInputSchema, type ShoppingItemInput } from './schema';
 import type { ShoppingItem, WorkspaceSettings } from './types';
-import { guessCategory, orderedCategoryIds, DEFAULT_CATEGORY_ORDER } from './categories';
+import { guessCategoryWithHistory, orderedCategoryIds, DEFAULT_CATEGORY_ORDER, recordPurchase } from './categories';
 
 interface WorkspaceSettingsRow {
   workspace_id: string;
@@ -45,6 +45,17 @@ class ShoppingState {
       ]);
     });
     this.loading = false;
+    
+    // Auto-Cleanup älter als 30 Tage
+    if (this.items.length > 0) {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const tooOld = this.items.filter((i) => i.checked && i.checked_at && i.checked_at < thirtyDaysAgo);
+      if (tooOld.length > 0) {
+        this.items = this.items.filter((i) => !tooOld.some((o) => o.id === i.id));
+        // Still remove from backend, ignoring failures
+        Promise.all(tooOld.map((o) => shoppingApi.deleteItem(o.id))).catch(console.error);
+      }
+    }
     if (!ok) {
       this.workspaceId = null;
       return;
@@ -101,7 +112,7 @@ class ShoppingState {
       name: parsed.name,
       qty: parsed.qty,
       unit: parsed.unit,
-      category: parsed.category ?? guessCategory(parsed.name),
+      category: parsed.category ?? guessCategoryWithHistory(parsed.name, this.settings.shopping_stats),
       note: parsed.note,
       checked: false,
       checked_at: null,
@@ -121,6 +132,15 @@ class ShoppingState {
     const updated_at = new Date().toISOString();
     const checked_at = checked ? updated_at : null;
     this.items = this.items.map((i) => (i.id === id ? { ...i, checked, checked_at, updated_at } : i));
+    
+    if (checked && this.workspaceId) {
+      this.settings = {
+        ...this.settings,
+        shopping_stats: recordPurchase(this.settings.shopping_stats, { ...item, checked_at })
+      };
+      await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+    }
+    
     await outbox.runOrQueue('shopping_items', 'update', { id, checked, checked_at, updated_at }, () =>
       shoppingApi.updateRaw({ id, checked, checked_at, updated_at })
     );
@@ -128,13 +148,51 @@ class ShoppingState {
 
   async updateItem(
     id: string,
-    patch: Partial<Pick<ShoppingItem, 'name' | 'qty' | 'unit' | 'category' | 'note'>>
+    patch: Partial<Pick<ShoppingItem, 'name' | 'qty' | 'unit' | 'category' | 'note' | 'list_id'>>
   ) {
     const updated_at = new Date().toISOString();
+    const item = this.items.find((i) => i.id === id);
     this.items = this.items.map((i) => (i.id === id ? { ...i, ...patch, updated_at } : i));
+
+    if (item && patch.category && patch.category !== item.category && this.workspaceId) {
+       // Wenn die Kategorie manuell korrigiert wurde, korrigieren wir auch die Statistik
+       this.settings = {
+         ...this.settings,
+         shopping_stats: recordPurchase(this.settings.shopping_stats, { 
+             name: patch.name ?? item.name, 
+             category: patch.category, 
+             checked_at: item.checked_at 
+         })
+       };
+       await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+    }
+
     await outbox.runOrQueue('shopping_items', 'update', { id, ...patch, updated_at }, () =>
       shoppingApi.updateRaw({ id, ...patch, updated_at })
     );
+  }
+
+  async setAssignee(id: string, assignee_id: string | null) {
+    const updated_at = new Date().toISOString();
+    this.items = this.items.map((i) => (i.id === id ? { ...i, assignee_id, updated_at } : i));
+    await outbox.runOrQueue('shopping_items', 'update', { id, assignee_id, updated_at }, () =>
+      shoppingApi.updateRaw({ id, assignee_id, updated_at })
+    );
+  }
+
+  async toggleStaple(name: string, category: string | null, isStaple: boolean) {
+    if (!this.workspaceId) return;
+    const key = name.trim().toLowerCase();
+    let staples = this.settings.shopping_staples ?? [];
+    if (isStaple) {
+       if (!staples.some((s) => s.name.toLowerCase() === key)) {
+           staples = [...staples, { name: name.trim(), category }];
+       }
+    } else {
+       staples = staples.filter((s) => s.name.toLowerCase() !== key);
+    }
+    this.settings = { ...this.settings, shopping_staples: staples };
+    await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
   }
 
   async removeItem(id: string) {
@@ -142,7 +200,7 @@ class ShoppingState {
     await outbox.runOrQueue('shopping_items', 'delete', { id }, () => shoppingApi.deleteItem(id));
   }
 
-  /** „Verlauf leeren": abgehakte Items endgültig entfernen (leert auch die Vorschläge).
+  /** „Abgehakte aufräumen": abgehakte Items endgültig entfernen. Vorschläge (Statistik) bleiben erhalten.
    *  Bulk-Delete ohne Outbox (passt nicht ins Per-Row-Replay-Modell, wie bisher). */
   async clearChecked() {
     if (!this.workspaceId) return;
@@ -153,6 +211,12 @@ class ShoppingState {
   async setCategoryOrder(order: string[]) {
     if (!this.workspaceId) return;
     this.settings = { ...this.settings, shopping_category_order: order };
+    await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+  }
+
+  async setLists(lists: { id: string; name: string; icon: string }[]) {
+    if (!this.workspaceId) return;
+    this.settings = { ...this.settings, shopping_lists: lists };
     await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
   }
 }

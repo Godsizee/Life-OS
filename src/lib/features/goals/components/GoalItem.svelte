@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Trash2 } from 'lucide-svelte';
+	import { Archive } from 'lucide-svelte';
 	import type { Goal, GoalStatus } from '../types';
 	import { goalsState } from '../store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
@@ -26,7 +26,7 @@
 	const displayProgress = $derived(getGoalProgress(goal));
 	const isManual = $derived(usesManualProgress(goal));
 	const track = $derived(evaluateTrack(goal, displayProgress));
-	const children = $derived(goalsState.goals.filter((g) => g.parent_id === goal.id));
+	const children = $derived(goalsState.goals.filter((g) => g.parent_id === goal.id && !g.archived));
 	const checkinSum = $derived(
 		goal.goal_type === 'target' ? sumCheckins(goalsState.checkinsFor(goal.id)) : 0
 	);
@@ -39,13 +39,26 @@
 		{#if goal.goal_type === 'target'}<span class="ml-1 text-xs">🎯</span>{/if}
 	</a>
 	{#snippet trailing()}
-		<button
-			onclick={() => goalsState.removeGoal(goal.id)}
-			aria-label="Löschen"
-			class="shrink-0 text-text-tertiary active:text-red-600 dark:active:text-red-400"
-		>
-			<Trash2 size={18} />
-		</button>
+		<div class="flex items-center gap-1">
+			{#if goal.archived}
+				<button
+					onclick={() => goalsState.unarchiveGoal(goal.id)}
+					aria-label="Wiederherstellen"
+					class="shrink-0 p-1 text-xs font-medium text-primary-active hover:underline"
+				>
+					Wiederherstellen
+				</button>
+			{:else}
+				<button
+					onclick={() => goalsState.archiveGoal(goal.id)}
+					aria-label="Archivieren"
+					class="shrink-0 p-1 text-text-tertiary hover:text-text-primary"
+					title="Archivieren"
+				>
+					<Archive size={16} />
+				</button>
+			{/if}
+		</div>
 	{/snippet}
 
 	<!-- Fortschritts-Balken -->
@@ -58,6 +71,11 @@
 
 	<div class="mt-2 flex flex-wrap items-center gap-1.5">
 		<OnTrackBadge {track} />
+		{#if track && track.state !== 'no_date' && track.state !== 'done'}
+			<span class="text-xs font-medium {track.daysLeft < 0 ? 'text-red-600 dark:text-red-400' : 'text-text-tertiary'}">
+				{track.daysLeft > 0 ? `noch ${track.daysLeft} Tage` : track.daysLeft === 0 ? 'heute fällig' : `${-track.daysLeft} Tage überfällig`}
+			</span>
+		{/if}
 		{#if goal.goal_type === 'target'}
 			<span class="text-[11px] font-medium tabular-nums text-text-secondary">
 				{formatTargetProgress(checkinSum, goal.target_value, goal.target_unit)}

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { expandEvents, parseRrule } from './occurrences';
+import { buildRrule, type RecurrenceForm } from './rrule';
 import type { Event, EventOverride } from './types';
 
 function ev(partial: Partial<Event>): Event {
@@ -106,5 +107,30 @@ describe('expandEvents', () => {
 		expect(patched?.title).toBe('Verschoben');
 		expect(patched?.overridden).toBe(true);
 		expect(patched?.start).toBe('2026-08-10T14:00:00.000Z');
+	});
+});
+
+describe('Integration mit rrule.ts', () => {
+	it('expandEvents versteht die Ausgaben von buildRrule', () => {
+		const forms: RecurrenceForm[] = [
+			{ freq: 'weekly', interval: 2, byday: [2], ende: 'nie', until: null, count: null },
+			{ freq: 'weekly', interval: 1, byday: [1, 3, 5], ende: 'am', until: '2026-08-15', count: null },
+			{ freq: 'monthly', interval: 3, byday: [], ende: 'nach', until: null, count: 2 }
+		];
+		
+		const ev1 = ev({ rrule: buildRrule(forms[0]), start: '2026-08-04T09:00:00Z' }); // 04.08 = Di
+		const occ1 = expandEvents([ev1], [], R_START, R_END);
+		// 04.08, 18.08 -> 2
+		expect(occ1).toHaveLength(2);
+
+		const ev2 = ev({ rrule: buildRrule(forms[1]), start: '2026-08-03T09:00:00Z' }); // Mo/Mi/Fr bis 15.08
+		const occ2 = expandEvents([ev2], [], R_START, R_END);
+		// 03,05,07, 10,12,14 -> 6
+		expect(occ2).toHaveLength(6);
+		
+		const ev3 = ev({ rrule: buildRrule(forms[2]), start: '2026-08-01T09:00:00Z' }); // monthly
+		const occ3 = expandEvents([ev3], [], R_START, new Date('2027-12-31'));
+		// count: 2
+		expect(occ3).toHaveLength(2);
 	});
 });

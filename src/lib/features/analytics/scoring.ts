@@ -35,7 +35,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	// 1. Tasks (25%)
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
-		const isCompletedToday = t.status === 'done' && t.updated_at?.startsWith(dateStr);
+		const isCompletedToday = !!t.completed_at && toISODate(new Date(t.completed_at)) === dateStr;
 		return isDue || isCompletedToday;
 	});
 	const completedTasks = todaysTasks.filter((t) => t.status === 'done');
@@ -83,7 +83,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	const moodScore = moodEntry ? (moodEntry.score / 5) * 100 : 0;
 
 	// 5. Goals (10%)
-	const openGoals = goalsState.goals.filter((g) => g.status === 'open');
+	const openGoals = goalsState.goals.filter((g) => g.status === 'open' && !g.archived);
 	const goalsScore =
 		openGoals.length > 0
 			? openGoals.reduce((sum, g) => sum + getGoalProgress(g), 0) / openGoals.length

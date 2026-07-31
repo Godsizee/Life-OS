@@ -11,19 +11,25 @@
 	import { evaluateTrack } from '$lib/features/goals/checkins';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 	import GoalTargetCard from '$lib/features/goals/components/GoalTargetCard.svelte';
+	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
 	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
-	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck } from 'lucide-svelte';
+	import CheckCircle from '$lib/ui/CheckCircle.svelte';
+	import Sheet from '$lib/ui/Sheet.svelte';
+	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck, Archive, ArchiveRestore } from 'lucide-svelte';
 	import Select from '$lib/ui/Select.svelte';
 	import EmptyState from '$lib/ui/EmptyState.svelte';
 	import type { GoalStatus } from '$lib/features/goals/types';
 
 	const goalId = $derived(page.params.id);
 
+	let meilensteinOffen = $state(false);
+
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const goal = $derived(goalsState.goals.find((g) => g.id === goalId) ?? null);
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
 	const track = $derived(goal ? evaluateTrack(goal, progress) : null);
 
+	const unterziele = $derived(goalsState.goals.filter((g) => g.parent_id === goalId && !g.archived));
 	const linkedTasks = $derived(goal ? tasksState.tasks.filter((t) => t.goal_id === goal.id) : []);
 	const linkedHabits = $derived(
 		goal ? habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived) : []
@@ -61,6 +67,7 @@
 
 	async function removeGoal() {
 		if (!goal) return;
+		if (!confirm('Ziel endgültig löschen? Alle Check-ins werden ebenfalls gelöscht.')) return;
 		await goalsState.removeGoal(goal.id);
 		goto('/goals');
 	}
@@ -88,9 +95,20 @@
 		<header class="space-y-3">
 			<div class="flex items-start justify-between gap-3">
 				<h1 class="text-2xl font-bold tracking-tight text-text-primary">{goal.title}</h1>
-				<button onclick={removeGoal} aria-label="Ziel löschen" class="shrink-0 text-text-tertiary hover:text-red-500">
-					<Trash2 size={18} />
-				</button>
+				<div class="flex items-center gap-2 shrink-0">
+					{#if goal.archived}
+						<button onclick={() => goalsState.unarchiveGoal(goal.id)} aria-label="Wiederherstellen" class="flex items-center gap-1 text-xs font-medium text-primary-active hover:underline">
+							<ArchiveRestore size={16} /> Wiederherstellen
+						</button>
+					{:else}
+						<button onclick={() => goalsState.archiveGoal(goal.id)} aria-label="Ziel archivieren" class="text-text-tertiary hover:text-text-primary" title="Archivieren">
+							<Archive size={18} />
+						</button>
+					{/if}
+					<button onclick={removeGoal} aria-label="Ziel löschen" class="text-text-tertiary hover:text-red-500" title="Endgültig löschen">
+						<Trash2 size={18} />
+					</button>
+				</div>
 			</div>
 			{#if goal.description}
 				<p class="text-sm text-text-secondary">{goal.description}</p>
@@ -101,7 +119,14 @@
 				<div class="flex items-center justify-between text-xs">
 					<span class="font-semibold text-text-primary">{progress}%</span>
 					{#if goal.target_date}
-						<span class="text-text-tertiary">Zieldatum: {new Date(goal.target_date).toLocaleDateString('de-DE')}</span>
+						<div class="flex items-center gap-2 text-text-tertiary">
+							<span>Zieldatum: {new Date(goal.target_date).toLocaleDateString('de-DE')}</span>
+							{#if track && track.state !== 'no_date' && track.state !== 'done'}
+								<span class="font-medium {track.daysLeft < 0 ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-text-tertiary'}">
+									({track.daysLeft > 0 ? `noch ${track.daysLeft} Tage` : track.daysLeft === 0 ? 'heute fällig' : `${-track.daysLeft} Tage überfällig`})
+								</span>
+							{/if}
+						</div>
 					{/if}
 				</div>
 				<div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
@@ -122,6 +147,31 @@
 				</Select>
 			</div>
 		</header>
+
+		<!-- Meilensteine -->
+		<section class="space-y-2">
+			<div class="flex items-center justify-between">
+				<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Meilensteine</h2>
+				<button onclick={() => (meilensteinOffen = true)} class="text-xs font-medium text-primary-active hover:underline">
+					+ Meilenstein
+				</button>
+			</div>
+			{#if unterziele.length > 0}
+				<ul class="flex flex-col gap-1.5">
+					{#each unterziele as u (u.id)}
+						{@const p = getGoalProgress(u)}
+						<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
+							<CheckCircle checked={u.status === 'done'} ontoggle={() => goalsState.setStatus(u.id, u.status === 'done' ? 'open' : 'done')} />
+							<a href="/goals/{u.id}" class="min-w-0 flex-1 truncate text-sm text-text-primary">{u.title}</a>
+							<span class="shrink-0 text-xs text-text-tertiary">{p}%</span>
+						</li>
+					{/each}
+				</ul>
+				<p class="text-[11px] text-text-tertiary">
+					Der Fortschritt dieses Ziels ergibt sich aus seinen Meilensteinen.
+				</p>
+			{/if}
+		</section>
 
 		<!-- Zielwert (W8) -->
 		{#if goal.goal_type === 'target'}
@@ -220,4 +270,8 @@
 			<LinkedItems type="goal" id={goal.id} />
 		</section>
 	</div>
+
+	<Sheet bind:open={meilensteinOffen} title="Neuer Meilenstein">
+		<GoalForm parentId={goal.id} onsubmitted={() => (meilensteinOffen = false)} />
+	</Sheet>
 {/if}

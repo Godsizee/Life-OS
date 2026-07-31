@@ -18,6 +18,7 @@ export interface Goal {
 	target_value: number | null;
 	/** W8 — freie Einheit für Zielwert-Ziele („Bücher", „km", „€"). */
 	target_unit: string | null;
+	archived: boolean;
 	created_by: string;
 	created_at: string;
 	updated_at: string;

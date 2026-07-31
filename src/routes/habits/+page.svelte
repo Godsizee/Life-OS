@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { calculateStreak } from '$lib/features/habits/streak';
+	import { calculateStreak, bestStreak } from '$lib/features/habits/streak';
 	import HabitForm from '$lib/features/habits/components/HabitForm.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
 	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
@@ -13,10 +13,14 @@
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const streakStats = $derived(
-		habitsState.habits.map((h) => ({
-			habit: h,
-			streak: calculateStreak(h, habitsState.entriesFor(h.id))
-		})).sort((a, b) => b.streak - a.streak)
+		habitsState.habits.map((h) => {
+			const entries = habitsState.entriesFor(h.id);
+			return {
+				habit: h,
+				streak: calculateStreak(h, entries),
+				best: bestStreak(h, entries)
+			};
+		}).sort((a, b) => b.streak - a.streak)
 	);
 
 	const totalActiveStreaks = $derived(streakStats.filter((s) => s.streak > 0).length);
@@ -58,13 +62,13 @@
 		<StreakCalendar habits={habitsState.habits} entriesFor={(id) => habitsState.entriesFor(id)} />
 
 		<!-- Streak-Rangliste -->
-		{#if streakStats.some((s) => s.streak > 0)}
+		{#if streakStats.some((s) => s.streak > 0 || s.best > 0)}
 			<div class="mt-4 flex flex-col gap-1 border-t border-border-color pt-3">
-				{#each streakStats.filter((s) => s.streak > 0) as { habit, streak } (habit.id)}
+				{#each streakStats.filter((s) => s.streak > 0 || s.best > 0) as { habit, streak, best } (habit.id)}
 					<div class="flex items-center gap-2">
 						<span class="min-w-0 flex-1 truncate text-xs text-text-secondary">{habit.name}</span>
 						<span class="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-							🔥 {streak} Tag{streak !== 1 ? 'e' : ''}
+							🔥 {streak} {habit.schedule.type === 'weekly_count' ? 'Wochen' : 'Tage'} <span class="text-text-tertiary opacity-70 ml-1">· Best {best}</span>
 						</span>
 					</div>
 				{/each}
@@ -84,4 +88,24 @@
 		<HabitList habits={habitsState.habits} />
 	{/if}
 </section>
+
+{#if habitsState.archived.length > 0 || !habitsState.archivedLoaded}
+	<details class="mt-6" ontoggle={() => habitsState.loadArchived()}>
+		<summary class="cursor-pointer text-sm font-medium text-text-secondary">
+			Archiv{habitsState.archivedLoaded ? ` (${habitsState.archived.length})` : ''}
+		</summary>
+		<ul class="mt-2 flex flex-col gap-1.5">
+			{#each habitsState.archived as h (h.id)}
+				<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-2">
+					<span class="min-w-0 flex-1 truncate text-sm text-text-secondary">{h.name}</span>
+					<a href="/habits/{h.id}" class="shrink-0 text-xs text-text-tertiary hover:underline">Verlauf</a>
+					<button onclick={() => habitsState.unarchiveHabit(h.id)}
+					        class="shrink-0 text-xs font-medium text-primary-active hover:underline">
+						Wiederherstellen
+					</button>
+				</li>
+			{/each}
+		</ul>
+	</details>
+{/if}
 

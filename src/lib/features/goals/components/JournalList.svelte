@@ -4,12 +4,16 @@
 	import DayContextStrip from './DayContextStrip.svelte';
 	import AttachmentSection from '$lib/features/attachments/components/AttachmentSection.svelte';
 
+	import { journalSnippet } from '../journal-filter';
+
 	let {
 		entries,
-		onEdit
+		onEdit,
+		query = ''
 	}: {
 		entries: JournalEntry[];
 		onEdit: (date: string, kind: JournalKind) => void;
+		query?: string;
 	} = $props();
 
 	const moodEmoji: Record<string, string> = {
@@ -23,6 +27,7 @@
 
 <ul class="flex flex-col gap-2">
 	{#each entries as entry (entry.id)}
+		{@const snippet = query.trim() ? journalSnippet(entry.body, query.trim()) : null}
 		<li
 			class="rounded-xl border border-border-color bg-surface-0 p-3 {entry.kind === 'weekly'
 				? 'border-primary-500/30 bg-primary-50/20 dark:bg-primary-950/10'
@@ -50,6 +55,12 @@
 					Bearbeiten
 				</button>
 			</div>
+
+			{#if snippet}
+				<div class="mt-1.5 rounded-lg bg-surface-2 p-2 text-xs text-text-primary border border-border-color/30">
+					<span class="font-bold text-text-tertiary">Treffer:</span> {snippet}
+				</div>
+			{/if}
 
 			{#if entry.body}
 				<p class="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{entry.body}</p>

@@ -193,3 +193,75 @@ export function milestonePercent(children: { status: 'open' | 'in_progress' | 'd
 	const done = children.filter((c) => c.status === 'done').length;
 	return Math.round((done / children.length) * 100);
 }
+
+/** IDs, die als Elternteil ausscheiden: das Ziel selbst und alle seine Nachfahren. */
+export function verboteneEltern(
+	goalId: string,
+	alle: { id: string; parent_id: string | null }[]
+): Set<string> {
+	const raus = new Set<string>([goalId]);
+	let gewachsen = true;
+	while (gewachsen) {
+		gewachsen = false;
+		for (const g of alle) {
+			if (g.parent_id && raus.has(g.parent_id) && !raus.has(g.id)) {
+				raus.add(g.id);
+				gewachsen = true;
+			}
+		}
+	}
+	return raus;
+}
+
+/** Kumulierte Summe je Check-in-Tag — direkt als TrendChart-Punkte nutzbar. */
+export function cumulativeSeries(list: CheckinLike[]): CheckinPoint[] {
+	const proTag = new Map<string, number>();
+	for (const c of list) proTag.set(c.date, (proTag.get(c.date) ?? 0) + checkinValue(c));
+	let summe = 0;
+	return [...proTag.entries()]
+		.sort((a, b) => a[0].localeCompare(b[0]))
+		.map(([date, wert]) => {
+			summe += wert;
+			const parts = date.split('-');
+			const mm = parts[1] ?? '01';
+			const dd = parts[2] ?? '01';
+			return { date, label: `${dd}.${mm}.`, value: Math.round(summe * 100) / 100 };
+		});
+}
+
+/** Wie viel pro Tag noch nötig ist, um das Ziel bis target_date zu erreichen. */
+export function benoetigtProTag(
+	targetValue: number,
+	summe: number,
+	daysLeft: number
+): number | null {
+	if (daysLeft <= 0) return null;
+	const rest = targetValue - summe;
+	return rest <= 0 ? 0 : Math.round((rest / daysLeft) * 100) / 100;
+}
+
+export interface GoalTreeNode<T extends { id: string; parent_id: string | null }> {
+	goal: T;
+	children: GoalTreeNode<T>[];
+}
+
+/** Erstellt aus einer flachen Liste von Zielen eine Baumstruktur (Top-Level-Ziele mit ihren Unterzielen). */
+export function buildGoalTree<T extends { id: string; parent_id: string | null }>(
+	goals: T[]
+): GoalTreeNode<T>[] {
+	const nodeMap = new Map<string, GoalTreeNode<T>>();
+	for (const g of goals) {
+		nodeMap.set(g.id, { goal: g, children: [] });
+	}
+	const tree: GoalTreeNode<T>[] = [];
+	for (const g of goals) {
+		const node = nodeMap.get(g.id)!;
+		if (g.parent_id && nodeMap.has(g.parent_id)) {
+			nodeMap.get(g.parent_id)!.children.push(node);
+		} else {
+			tree.push(node);
+		}
+	}
+	return tree;
+}
+

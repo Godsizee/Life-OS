@@ -12,6 +12,7 @@ import {
 	Zap,
 	Dumbbell,
 	TrendingUp,
+	BookOpen,
 	History,
 	type Icon
 } from 'lucide-svelte';
@@ -32,6 +33,7 @@ export const modules: ModuleConfig[] = [
 	{ id: 'calendar',  label: 'Kalender',  icon: Calendar,      route: '/calendar',  plan: 'free' },
 	{ id: 'shopping',  label: 'Einkauf',   icon: ShoppingCart,  route: '/shopping',  plan: 'free' },
 	{ id: 'goals',     label: 'Ziele',     icon: Target,        route: '/goals',     plan: 'free' },
+	{ id: 'journal',   label: 'Tagebuch',  icon: BookOpen,      route: '/journal',   plan: 'free' },
 	{ id: 'focus',     label: 'Fokus',     icon: Zap,           route: '/focus',     plan: 'free' },
 	{ id: 'review',    label: 'Review',    icon: ClipboardList, route: '/review',    plan: 'free' },
 	{ id: 'mood',      label: 'Stimmung',  icon: SmilePlus,     route: '/mood',      plan: 'free' },

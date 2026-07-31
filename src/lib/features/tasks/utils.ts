@@ -1,4 +1,5 @@
 import type { Task, TaskStatus } from './types';
+import { toISODate } from '$lib/core/date';
 
 export interface TaskNode { task: Task; children: Task[]; }
 
@@ -24,19 +25,43 @@ export function subtaskProgress(children: Task[]): { done: number; total: number
 	return { done: children.filter((c) => c.status === 'done').length, total: children.length };
 }
 
-export type SmartView = 'all' | 'today' | 'upcoming' | 'no_date';
+/** Wurde die Aufgabe an diesem lokalen Kalendertag erledigt? */
+export function completedOn(task: Pick<Task, 'status' | 'completed_at'>, dateStr: string): boolean {
+	if (task.status !== 'done' || !task.completed_at) return false;
+	return toISODate(new Date(task.completed_at)) === dateStr;
+}
+
+/** Alle Aufgaben, die im Zeitraum [von, bis] erledigt wurden (lokale Kalendertage). */
+export function completedBetween(tasks: Task[], von: string, bis: string): Task[] {
+	return tasks.filter((t) => {
+		if (t.status !== 'done' || !t.completed_at) return false;
+		const d = toISODate(new Date(t.completed_at));
+		return d >= von && d <= bis;
+	});
+}
+
+export type SmartView = 'all' | 'today' | 'overdue' | 'upcoming' | 'no_date';
 
 export function smartViewFilter(tasks: Task[], view: SmartView, now: Date = new Date()): Task[] {
 	if (view === 'all') return tasks;
 	const endOfToday = new Date(now); endOfToday.setHours(23, 59, 59, 999);
+	const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
 	const in7 = new Date(endOfToday); in7.setDate(in7.getDate() + 7);
+
 	return tasks.filter((t) => {
 		if (view === 'no_date') return t.due_at === null;
 		if (!t.due_at) return false;
 		const due = new Date(t.due_at);
-		if (view === 'today') return due <= endOfToday;
+		// Erledigtes ist nie überfällig.
+		if (view === 'overdue') return t.status !== 'done' && due < startOfToday;
+		// "Heute" zeigt ab jetzt NUR den heutigen Tag — Überfälliges hat eine eigene Ansicht.
+		if (view === 'today') return due >= startOfToday && due <= endOfToday;
 		return due > endOfToday && due <= in7;
 	});
+}
+
+export function overdueCount(tasks: Task[], now: Date = new Date()): number {
+	return smartViewFilter(tasks, 'overdue', now).length;
 }
 
 export function labelUnion(tasks: Task[]): string[] {
@@ -48,4 +73,16 @@ export function labelUnion(tasks: Task[]): string[] {
 /** Weist den Karten einer Spalte fortlaufende Positionen 0..n zu (in gegebener Reihenfolge). */
 export function assignColumnPositions(orderedIds: string[]): { id: string; position: number }[] {
 	return orderedIds.map((id, i) => ({ id, position: i }));
+}
+
+/** Volltextfilter über Titel, Beschreibung und Labels (Muster: notes/filter.ts:filterNotes). */
+export function filterTasks(tasks: Task[], query: string): Task[] {
+	const q = query.trim().toLowerCase();
+	if (!q) return tasks;
+	return tasks.filter(
+		(t) =>
+			t.title.toLowerCase().includes(q) ||
+			(t.description ?? '').toLowerCase().includes(q) ||
+			(t.labels ?? []).some((l) => l.toLowerCase().includes(q))
+	);
 }

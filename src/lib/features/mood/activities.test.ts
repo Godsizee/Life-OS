@@ -4,9 +4,11 @@ import {
 	activityLabel,
 	cleanActivities,
 	customActivities,
+	customActivitiesWithCounts,
 	groupedCatalog,
 	isCatalogActivity,
 	normalizeActivity,
+	renameInList,
 	toggleActivity
 } from './activities';
 
@@ -80,17 +82,33 @@ describe('cleanActivities', () => {
 	});
 });
 
-describe('customActivities', () => {
-	it('liefert nur Nicht-Katalog-Tags, haeufigste zuerst', () => {
+describe('customActivitiesWithCounts', () => {
+	it('zählt nur Nicht-Katalog-Tags, absteigend', () => {
 		const entries = [
 			{ activities: ['sport', 'bouldern'] },
 			{ activities: ['bouldern', 'yoga'] },
 			{ activities: ['bouldern'] },
 			{ activities: null }
 		];
-		expect(customActivities(entries)).toEqual(['bouldern', 'yoga']);
-	});
-	it('kommt mit leerer Historie klar', () => {
-		expect(customActivities([])).toEqual([]);
+		expect(customActivitiesWithCounts(entries)).toEqual([
+			{ tag: 'bouldern', count: 3 },
+			{ tag: 'yoga', count: 1 }
+		]);
 	});
 });
+
+describe('renameInList', () => {
+	it('benennt um', () => {
+		expect(renameInList(['sport', 'arbeit'], 'sport', 'laufen').sort()).toEqual(['arbeit', 'laufen']);
+	});
+	it('entfernt bei null', () => {
+		expect(renameInList(['sport', 'arbeit'], 'sport', null)).toEqual(['arbeit']);
+	});
+	it('erzeugt keine Dublette, wenn das Ziel schon vorhanden ist', () => {
+		expect(renameInList(['sport', 'laufen'], 'sport', 'laufen')).toEqual(['laufen']);
+	});
+	it('lässt Listen ohne den Tag unverändert', () => {
+		expect(renameInList(['arbeit'], 'sport', 'laufen')).toEqual(['arbeit']);
+	});
+});
+

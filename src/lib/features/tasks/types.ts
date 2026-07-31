@@ -28,4 +28,8 @@ export interface Task {
 	created_by: string;
 	created_at: string;
 	updated_at: string;
+	/** Zeitpunkt der Erledigung. null, solange die Aufgabe offen ist. */
+	completed_at: string | null;
+	/** W10 — Montag der Woche, für die diese Aufgabe im Weekly Review als Top-3 gewählt wurde. */
+	focus_week: string | null;
 }

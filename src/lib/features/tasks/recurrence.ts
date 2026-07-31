@@ -21,11 +21,9 @@ export function expandNextOccurrence(task: Task): Date | null {
 	return null;
 }
 
+import { formatRecurrence } from '$lib/features/calendar/rrule';
+
 export function formatRRule(rrule: string | null): string | null {
 	if (!rrule) return null;
-	const upper = rrule.toUpperCase();
-	if (upper.includes('FREQ=DAILY')) return 'täglich';
-	if (upper.includes('FREQ=WEEKLY')) return 'wöchentlich';
-	if (upper.includes('FREQ=MONTHLY')) return 'monatlich';
-	return 'wiederkehrend';
+	return formatRecurrence(rrule);
 }

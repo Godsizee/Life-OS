@@ -6,33 +6,41 @@
 
 	let {
 		habits,
-		entriesFor
+		entriesFor,
+		weeks = 12
 	}: {
 		habits: Habit[];
 		entriesFor: (habitId: string) => HabitDay[];
+		weeks?: number;
 	} = $props();
 
-	// ── Datums-Grid (12 Wochen = 84 Tage rückwärts) ──────────────────
-	const WEEKS = 12;
-	const DAYS = WEEKS * 7;
+	// ── Datums-Grid ──────────────────────────────────────────────────
+	const DAYS = $derived(weeks * 7);
 
 	const today = new Date();
-	// Starte am ersten Tag des Grid (84 Tage zurück, dann ausrichten auf Montag)
-	const gridStart = new Date(today);
-	gridStart.setDate(today.getDate() - DAYS + 1);
+	
+	// Starte am ersten Tag des Grid (Tage zurück, dann ausrichten auf Montag)
+	const gridStart = $derived.by(() => {
+		const start = new Date(today);
+		start.setDate(today.getDate() - DAYS + 1);
+		return start;
+	});
 
 	// Alle Tage als ISO-Strings
-	const allDays: string[] = Array.from({ length: DAYS }, (_, i) => {
+	const allDays = $derived(Array.from({ length: DAYS }, (_, i) => {
 		const d = new Date(gridStart);
 		d.setDate(gridStart.getDate() + i);
 		return toISODate(d);
-	});
+	}));
 
 	// Tage nach Wochen gruppieren (je 7 Tage = 1 Spalte im Grid)
-	const weeks: string[][] = [];
-	for (let w = 0; w < WEEKS; w++) {
-		weeks.push(allDays.slice(w * 7, w * 7 + 7));
-	}
+	const weeksGrid = $derived.by(() => {
+		const wg: string[][] = [];
+		for (let w = 0; w < weeks; w++) {
+			wg.push(allDays.slice(w * 7, w * 7 + 7));
+		}
+		return wg;
+	});
 
 	// ── Heatmap-Daten berechnen ────────────────────────────────────────
 	// Pro Tag: wie viele Habits waren fällig und wie viele davon geloggt
@@ -78,16 +86,19 @@
 	);
 
 	// ── Monats-Label (erste Woche des Monats) ────────────────────────
-	const monthLabels: { week: number; label: string }[] = [];
-	for (let w = 0; w < weeks.length; w++) {
-		const firstDay = new Date(weeks[w][0]);
-		if (firstDay.getDate() <= 7 || w === 0) {
-			monthLabels.push({
-				week: w,
-				label: firstDay.toLocaleDateString('de-DE', { month: 'short' })
-			});
+	const monthLabels = $derived.by(() => {
+		const labels: { week: number; label: string }[] = [];
+		for (let w = 0; w < weeksGrid.length; w++) {
+			const firstDay = new Date(weeksGrid[w][0]);
+			if (firstDay.getDate() <= 7 || w === 0) {
+				labels.push({
+					week: w,
+					label: firstDay.toLocaleDateString('de-DE', { month: 'short' })
+				});
+			}
 		}
-	}
+		return labels;
+	});
 
 	// ── Tooltip-State ─────────────────────────────────────────────────
 	let tooltip = $state<{ date: string; logged: number; due: number } | null>(null);
@@ -96,7 +107,7 @@
 	const CELL_GAP = 2;
 	const STEP = CELL_SIZE + CELL_GAP;
 	const LABEL_HEIGHT = 16;
-	const svgWidth = WEEKS * STEP;
+	const svgWidth = $derived(weeks * STEP);
 	const svgHeight = LABEL_HEIGHT + 7 * STEP;
 </script>
 
@@ -105,7 +116,7 @@
 		width={svgWidth}
 		height={svgHeight}
 		viewBox="0 0 {svgWidth} {svgHeight}"
-		aria-label="Habit-Heatmap der letzten 12 Wochen"
+		aria-label="Habit-Heatmap der letzten {weeks} Wochen"
 	>
 		<!-- Monats-Labels -->
 		{#each monthLabels as { week, label }}
@@ -120,8 +131,8 @@
 		{/each}
 
 		<!-- Zellen -->
-		{#each weeks as week, wi}
-			{#each week as dateStr, di}
+		{#each weeksGrid as weekCol, wi}
+			{#each weekCol as dateStr, di}
 				{@const data = dayData[dateStr]}
 				{@const isToday = dateStr === toISODate(today)}
 				<rect

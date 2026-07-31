@@ -12,6 +12,7 @@ export const activityIdSchema = z
 
 export const moodInputSchema = z.object({
 	date: isoDate,
+	logged_at: z.string().optional(),
 	score: z.number().int().min(1).max(5),
 	note: z.string().max(2000).nullable().default(null),
 	activities: z.array(activityIdSchema).max(30).default([])

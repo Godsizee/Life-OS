@@ -17,6 +17,8 @@
 	import { renderMarkdownSafe, toggleChecklistLine } from '$lib/features/notes/markdown';
 	import { labelUnion } from '../utils';
 	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
+	import MemberSelect from '$lib/features/workspace/components/MemberSelect.svelte';
+	import RecurrenceField from './RecurrenceField.svelte';
 
 	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } = $props();
 
@@ -27,6 +29,8 @@
 	let projectId = $state('');
 	let goalId = $state('');
 	let labels = $state<string[]>([]);
+	let assigneeId = $state<string | null>(null);
+	let rrule = $state<string | null>(null);
 	
 	let newLabel = $state('');
 	let newSubtaskTitle = $state('');
@@ -66,10 +70,12 @@
 			projectId = task.project_id || '';
 			goalId = task.goal_id || '';
 			labels = [...(task.labels || [])];
+			assigneeId = task.assignee_id || null;
+			rrule = task.rrule || null;
 		}
 	});
 
-	function update(patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id'>>) {
+	function update(patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id' | 'rrule'>>) {
 		if (task) {
 			tasksState.updateTask(task.id, patch);
 		}
@@ -100,6 +106,14 @@
 
 	function handleGoalChange() {
 		update({ goal_id: goalId || null });
+	}
+
+	function handleAssigneeChange(next: string | null) {
+		if (task && next !== task.assignee_id) tasksState.setAssignee(task.id, next);
+	}
+
+	function handleRruleChange(next: string | null) {
+		if (next !== task?.rrule) update({ rrule: next });
 	}
 
 	function addLabel(e: KeyboardEvent) {
@@ -178,8 +192,22 @@
 						<option value="high">Hoch</option>
 					</Select>
 				</Field>
+				<Field label="Zugewiesen an">
+					<MemberSelect value={assigneeId} onchange={handleAssigneeChange} />
+				</Field>
+			</div>
+
+			<div class="grid grid-cols-2 gap-2">
 				<Field label="Fälligkeit">
 					<Input type="date" bind:value={dueAt} onchange={handleDueAtChange} />
+				</Field>
+				<Field label="Wiederholung">
+					<RecurrenceField value={rrule} onchange={handleRruleChange} />
+					{#if rrule && !dueAt}
+						<div class="mt-2 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
+							Wiederholung braucht ein Fälligkeitsdatum.
+						</div>
+					{/if}
 				</Field>
 			</div>
 
@@ -282,7 +310,19 @@
 				/>
 			</div>
 
-			<div class="mt-4 border-t border-border-color pt-4 flex justify-end">
+			<div class="mt-4 border-t border-border-color pt-4 flex items-center justify-between">
+				<div class="flex items-center gap-1">
+					<Button variant="ghost" onclick={() => tasksState.move(task!.id, -1)}>
+						{#snippet children()}
+							▲<span class="sr-only">Nach oben</span>
+						{/snippet}
+					</Button>
+					<Button variant="ghost" onclick={() => tasksState.move(task!.id, 1)}>
+						{#snippet children()}
+							▼<span class="sr-only">Nach unten</span>
+						{/snippet}
+					</Button>
+				</div>
 				<Button variant="ghost" onclick={del}>
 					{#snippet children()}
 						<span class="text-red-500">Löschen</span>

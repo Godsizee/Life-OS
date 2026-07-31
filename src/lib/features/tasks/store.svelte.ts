@@ -4,6 +4,7 @@ import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
 import { toISODate } from '$lib/core/date';
 import * as tasksApi from './api';
+import { assignColumnPositions } from './utils';
 import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
@@ -118,7 +119,9 @@ class TasksState {
 			position: 0,
 			created_by: authState.user!.id,
 			created_at: now,
-			updated_at: now
+			updated_at: now,
+			completed_at: null,
+			focus_week: null
 		};
 		this.tasks = [...this.tasks, task];
 		await outbox.runOrQueue('tasks', 'insert', task, () => tasksApi.insertRaw(task));
@@ -127,9 +130,13 @@ class TasksState {
 	async setStatus(id: string, status: TaskStatus) {
 		const updated_at = new Date().toISOString();
 		const task = this.tasks.find((t) => t.id === id);
-		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, status, updated_at } : t));
-		await outbox.runOrQueue('tasks', 'update', { id, status, updated_at }, () =>
-			tasksApi.updateRaw({ id, status, updated_at })
+		// Beim Wiederöffnen zurücksetzen — sonst zählt eine reaktivierte Aufgabe
+		// weiterhin in der Woche ihrer alten Erledigung mit.
+		const completed_at = status === 'done' ? updated_at : null;
+
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, status, updated_at, completed_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, status, updated_at, completed_at }, () =>
+			tasksApi.updateRaw({ id, status, updated_at, completed_at })
 		);
 
 		if (status === 'done') await remindersState.deactivateFor('task', id);
@@ -174,7 +181,7 @@ class TasksState {
 
 	async updateTask(
 		id: string,
-		patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id'>>
+		patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id' | 'rrule' | 'position' | 'assignee_id'>>
 	) {
 		const updated_at = new Date().toISOString();
 		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
@@ -190,6 +197,30 @@ class TasksState {
 		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
 			tasksApi.updateRaw({ id, ...patch, updated_at })
 		);
+	}
+
+	async setAssignee(id: string, assigneeId: string | null) {
+		const updated_at = new Date().toISOString();
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, assignee_id: assigneeId, updated_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, assignee_id: assigneeId, updated_at }, () =>
+			tasksApi.updateRaw({ id, assignee_id: assigneeId, updated_at })
+		);
+	}
+
+	/** Verschiebt eine Aufgabe innerhalb ihrer Geschwister um eine Position. */
+	async move(id: string, richtung: -1 | 1) {
+		const task = this.tasks.find((t) => t.id === id);
+		if (!task) return;
+		const geschwister = this.tasks
+			.filter((t) => t.parent_id === task.parent_id && t.status !== 'done')
+			.sort((a, b) => a.position - b.position || a.created_at.localeCompare(b.created_at));
+		const i = geschwister.findIndex((t) => t.id === id);
+		const j = i + richtung;
+		if (i < 0 || j < 0 || j >= geschwister.length) return;
+		[geschwister[i], geschwister[j]] = [geschwister[j], geschwister[i]];
+		for (const { id: tid, position } of assignColumnPositions(geschwister.map((t) => t.id))) {
+			await this.updateTask(tid, { position } as never);
+		}
 	}
 
 	async removeTask(id: string) {

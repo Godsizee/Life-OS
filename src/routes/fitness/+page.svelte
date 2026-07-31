@@ -72,17 +72,12 @@
 	});
 
 	// F6 — Pausen-Timer lebt im liveWorkoutState (Endzeitpunkt), überlebt so Navigation + Reload.
-	// Hier nur die tickende Anzeige + Ende-Feedback (Vibration/Toast), solange die Seite offen ist.
+	// Hier nur die tickende Anzeige. Feedback/Alarm läuft zentral in liveWorkoutState.
 	let restTick = $state(0);
 	$effect(() => {
 		if (liveWorkoutState.restEndsAt === null) return;
 		const interval = setInterval(() => {
 			restTick += 1;
-			if ((liveWorkoutState.restRemainingSec() ?? 0) <= 0) {
-				liveWorkoutState.stopRest();
-				haptic([200, 100, 200]);
-				toastState.info('⏱️ Pause vorbei — weiter geht\'s!');
-			}
 		}, 1000);
 		return () => clearInterval(interval);
 	});

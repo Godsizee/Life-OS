@@ -27,6 +27,17 @@
 	$effect(() => {
 		displayNameInput = profileState.displayName ?? '';
 	});
+
+	let timerSignalsPermission = $state<NotificationPermission | 'unsupported'>(
+		typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported'
+	);
+
+	async function requestTimerSignals() {
+		if (typeof window !== 'undefined' && 'Notification' in window) {
+			const res = await Notification.requestPermission();
+			timerSignalsPermission = res;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -272,6 +283,26 @@
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<h2 class="mb-3 text-sm font-semibold text-text-primary">Benachrichtigungen</h2>
 		<div class="flex flex-col divide-y divide-border-color/50">
+			<SettingRow
+				label="Timer-Signale"
+				hint={timerSignalsPermission === 'granted'
+					? 'Lokale Signale (Vibration, Ton & System-Push) bei Phasen- und Pausenende sind aktiv.'
+					: timerSignalsPermission === 'denied'
+					? 'System-Benachrichtigungen sind im Browser blockiert.'
+					: 'Signalisiert Runden- und Pausenende lokal, auch wenn die App im Hintergrund ist.'}
+			>
+				{#if timerSignalsPermission === 'unsupported'}
+					<span class="text-xs text-text-tertiary">Nicht unterstützt</span>
+				{:else}
+					<Switch
+						label="Timer-Signale"
+						checked={timerSignalsPermission === 'granted'}
+						disabled={timerSignalsPermission === 'denied'}
+						onchange={requestTimerSignals}
+					/>
+				{/if}
+			</SettingRow>
+
 			{#if pushState.supported}
 				<SettingRow
 					label="Push-Benachrichtigungen"

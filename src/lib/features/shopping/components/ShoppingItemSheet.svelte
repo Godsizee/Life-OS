@@ -6,7 +6,9 @@
   import Select from '$lib/ui/Select.svelte';
   import Button from '$lib/ui/Button.svelte';
   import Field from '$lib/ui/Field.svelte';
-  import { CATEGORY_IDS, CATEGORY_LABELS } from '../categories';
+  import Switch from '$lib/ui/Switch.svelte';
+  import MemberSelect from '$lib/features/workspace/components/MemberSelect.svelte';
+  import { CATEGORY_IDS, CATEGORY_LABELS, UNITS } from '../categories';
 
   let { item, open = $bindable(false) }: { item: ShoppingItem | null; open?: boolean } = $props();
 
@@ -15,6 +17,8 @@
   let unit = $state('');
   let category = $state('other');
   let note = $state('');
+  let assigneeId = $state<string | null>(null);
+  let isStaple = $state(false);
 
   $effect(() => {
     if (item && open) {
@@ -23,6 +27,8 @@
       unit = item.unit ?? '';
       category = item.category ?? 'other';
       note = item.note ?? '';
+      assigneeId = item.assignee_id ?? null;
+      isStaple = shoppingState.settings.shopping_staples?.some((s) => s.name.toLowerCase() === item.name.toLowerCase()) ?? false;
     }
   });
 
@@ -36,7 +42,7 @@
     const q = Number(qty) || 1;
     if (q !== item?.qty) persist({ qty: q });
   }
-  function onUnitBlur() {
+  function onUnitChange() {
     const u = unit.trim() || null;
     if (u !== item?.unit) persist({ unit: u });
   }
@@ -46,6 +52,16 @@
   function onNoteBlur() {
     const n = note.trim() || null;
     if (n !== item?.note) persist({ note: n });
+  }
+  function onAssigneeChange(next: string | null) {
+    if (item && next !== item.assignee_id) {
+      shoppingState.setAssignee(item.id, next);
+    }
+  }
+  async function onStapleChange(checked: boolean) {
+    if (!item) return;
+    isStaple = checked;
+    shoppingState.toggleStaple(item.name, item.category, checked);
   }
   async function del() {
     if (item) {
@@ -66,7 +82,15 @@
           <Input type="number" min="0" step="0.5" bind:value={qty} onblur={onQtyBlur} />
         </Field>
         <Field label="Einheit">
-          <Input bind:value={unit} onblur={onUnitBlur} placeholder="z. B. kg, Pack" />
+          <Select bind:value={unit} onchange={onUnitChange}>
+            <option value="">— keine —</option>
+            {#if unit && !UNITS.includes(unit as any)}
+              <option value={unit}>{unit}</option>
+            {/if}
+            {#each UNITS as u}
+              <option value={u}>{u}</option>
+            {/each}
+          </Select>
         </Field>
       </div>
       <Field label="Kategorie">
@@ -79,6 +103,12 @@
       <Field label="Notiz">
         <Input bind:value={note} onblur={onNoteBlur} placeholder="z. B. laktosefrei, 2 Stück" />
       </Field>
+      <Field label="Besorgt von">
+        <MemberSelect value={assigneeId} onchange={onAssigneeChange} />
+      </Field>
+      <div class="flex items-center justify-between mt-2 mb-2">
+        <Switch checked={isStaple} onchange={onStapleChange} label="Stammartikel" />
+      </div>
       <div class="mt-4 flex justify-end border-t border-border-color pt-4">
         <Button variant="ghost" onclick={del}>
           {#snippet children()}<span class="text-red-500">Löschen</span>{/snippet}

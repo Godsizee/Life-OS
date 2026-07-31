@@ -2,8 +2,9 @@
 	import { Eye, Hash, ListChecks, Lock, LockOpen, Pen, Pin, Trash2 } from 'lucide-svelte';
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
-	import { checklistProgress, renderMarkdownSafe, toggleChecklistLine } from '../markdown';
+	import { checklistProgress, renderMarkdownSafe, toggleChecklistLine, MARKDOWN_WERKZEUGE, toggleLinePrefix, type MarkdownWerkzeug } from '../markdown';
 	import { authState } from '$lib/core/auth.svelte';
+	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { haptic } from '$lib/core/haptics';
 	import Sheet from '$lib/ui/Sheet.svelte';
 	import Input from '$lib/ui/Input.svelte';
@@ -12,6 +13,8 @@
 	import Chip from '$lib/ui/Chip.svelte';
 	import Button from '$lib/ui/Button.svelte';
 	import AttachmentSection from '$lib/features/attachments/components/AttachmentSection.svelte';
+	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
+	import { formatDate } from '$lib/core/date';
 
 	let { note, open = $bindable(false) }: { note: Note | null; open?: boolean } = $props();
 
@@ -20,6 +23,7 @@
 	let tags = $state<string[]>([]);
 	let newTag = $state('');
 	let mode = $state<'edit' | 'preview'>('preview');
+	let textareaEl = $state<HTMLTextAreaElement | null>(null);
 
 	const isAuthor = $derived(!!note && note.created_by === authState.user?.id);
 	const progress = $derived(checklistProgress(body));
@@ -61,11 +65,20 @@
 		notesState.updateNote(note.id, { tags });
 	}
 
-	function insertChecklist() {
-		const prefix = body.length === 0 || body.endsWith('\n') ? '' : '\n';
-		body = `${body}${prefix}- [ ] `;
-		mode = 'edit';
+	function einfuegen(w: MarkdownWerkzeug) {
+		if (!textareaEl) return;
+		const cursor = textareaEl.selectionStart ?? body.length;
+		const r = toggleLinePrefix(body, cursor, w.prefix);
+		body = r.text;
 		saveBody();
+		
+		// DOM Update abwarten, dann Cursor setzen
+		setTimeout(() => {
+			if (textareaEl) {
+				textareaEl.focus();
+				textareaEl.setSelectionRange(r.cursor, r.cursor);
+			}
+		}, 0);
 	}
 
 	/** Klick auf eine gerenderte Checkbox -> Markdown-Zeile kippen und speichern. */
@@ -143,8 +156,21 @@
 
 				<!-- Inhalt -->
 				{#if mode === 'edit'}
-					<Field label="Inhalt" hint="Markdown: # Überschrift · - Liste · - [ ] Checkliste · > Zitat">
+					<Field label="Inhalt">
+						<div class="flex flex-wrap gap-1.5 mb-2">
+							{#each MARKDOWN_WERKZEUGE as w (w.id)}
+								<button
+									type="button"
+									onclick={() => einfuegen(w)}
+									class="flex min-h-10 items-center gap-1 rounded-lg border border-border-color px-2.5 text-xs font-bold text-text-secondary active:scale-95"
+									aria-label={w.label}
+								>
+									{w.label}
+								</button>
+							{/each}
+						</div>
 						<Textarea
+							bind:element={textareaEl}
 							bind:value={body}
 							onblur={saveBody}
 							surface="1"
@@ -163,20 +189,13 @@
 					</div>
 				{/if}
 
-				<div class="flex items-center gap-3">
-					<button
-						type="button"
-						onclick={insertChecklist}
-						class="flex min-h-12 items-center gap-1.5 rounded-xl border border-border-color px-3 text-xs font-bold text-text-secondary"
-					>
-						<ListChecks size={16} /> Checkliste
-					</button>
-					{#if progress.total > 0}
+				{#if progress.total > 0}
+					<div class="flex items-center gap-3">
 						<span class="text-xs font-bold text-text-tertiary">
 							{progress.done}/{progress.total} erledigt
 						</span>
-					{/if}
-				</div>
+					</div>
+				{/if}
 
 				<!-- Tags -->
 				<Field label="Tags">
@@ -192,12 +211,23 @@
 					{/if}
 				</Field>
 
+				<!-- Verknüpfungen -->
+				<Field label="Verknüpft mit">
+					<LinkedItems type="note" id={note.id} />
+				</Field>
+
 				<!-- Anhaenge -->
 				<Field label="Anhänge">
 					<AttachmentSection entityType="note" entityId={note.id} />
 				</Field>
 
-				<div class="mt-2 flex justify-end border-t border-border-color pt-4">
+				<div class="mt-2 flex flex-col items-end gap-2 border-t border-border-color pt-4">
+					<p class="text-[11px] text-text-tertiary text-right">
+						Erstellt {formatDate(note.created_at)}
+						{#if workspaceState.memberName(note.created_by)}von {workspaceState.memberName(note.created_by)}{/if}
+						· Zuletzt geändert {formatDate(note.updated_at)}
+						{#if workspaceState.memberName(note.updated_by) && note.updated_by !== note.created_by}von {workspaceState.memberName(note.updated_by)}{/if}
+					</p>
 					<Button variant="ghost" onclick={del}>
 						{#snippet children()}
 							<span class="flex items-center gap-1.5 text-red-500"><Trash2 size={16} /> Löschen</span>

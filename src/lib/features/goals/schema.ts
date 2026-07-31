@@ -9,7 +9,8 @@ export const goalInputSchema = z.object({
 	target_exercise: z.string().max(100).nullable().default(null),
 	target_value: z.number().positive().nullable().default(null),
 	// W8 — Einheit für Zielwert-Ziele; bewusst kurz, sie steht direkt hinter der Zahl.
-	target_unit: z.string().max(20).nullable().default(null)
+	target_unit: z.string().max(20).nullable().default(null),
+	archived: z.boolean().default(false)
 });
 
 export type GoalInput = z.infer<typeof goalInputSchema>;

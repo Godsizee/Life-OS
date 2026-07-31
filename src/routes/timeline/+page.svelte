@@ -39,9 +39,9 @@
 
 		// 1. Completed Tasks
 		tasksState.tasks
-			.filter((t) => t.status === 'done' && t.updated_at)
+			.filter((t) => t.status === 'done' && (t.completed_at || t.updated_at))
 			.forEach((t) => {
-				const date = toISODate(new Date(t.updated_at!));
+				const date = toISODate(new Date(t.completed_at ?? t.updated_at));
 				items.push({
 					id: `task_${t.id}`,
 					date,

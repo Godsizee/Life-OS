@@ -6,12 +6,15 @@
 	import { goalsState } from '$lib/features/goals/store.svelte';
 	import { parseTaskInput } from '../quick-add';
 	import Chip from '$lib/ui/Chip.svelte';
+	import RecurrenceField from './RecurrenceField.svelte';
 
 	let { onsubmitted }: { onsubmitted?: () => void } = $props();
 
 	let title = $state('');
 	let projectId = $state('');
 	let goalId = $state('');
+	let rrule = $state<string | null>(null);
+	let showMore = $state(false);
 
 	const activeGoals = $derived(goalsState.goals.filter((g) => g.status !== 'done'));
 	const parsed = $derived(parseTaskInput(title));
@@ -30,12 +33,13 @@
 			priority: p.priority,
 			due_at: p.due_at,
 			labels: p.labels,
-			rrule: p.rrule,
+			rrule: p.rrule ?? rrule,
 			project_id: project?.id ?? (projectId || null),
 			goal_id: goalId || null
 		});
 		title = '';
 		goalId = '';
+		rrule = null;
 		onsubmitted?.();
 	}
 </script>
@@ -64,22 +68,40 @@
 			{/each}
 		</div>
 	{/if}
-	{#if tasksState.projects.length > 0}
-		<Select bind:value={projectId}>
-			<option value="">Kein Projekt</option>
-			{#each tasksState.projects as project (project.id)}
-				<option value={project.id}>{project.name}</option>
-			{/each}
-		</Select>
+
+	<button 
+		type="button" 
+		class="text-left text-sm text-primary-600 hover:underline flex items-center"
+		onclick={() => showMore = !showMore}
+	>
+		{showMore ? 'Weniger Optionen ▲' : 'Mehr Optionen ▼'}
+	</button>
+
+	{#if showMore}
+		<div class="flex flex-col gap-2 p-2 bg-surface-2 rounded-lg border border-border-color">
+			{#if tasksState.projects.length > 0}
+				<Select bind:value={projectId}>
+					<option value="">Kein Projekt</option>
+					{#each tasksState.projects as project (project.id)}
+						<option value={project.id}>{project.name}</option>
+					{/each}
+				</Select>
+			{/if}
+			{#if activeGoals.length > 0}
+				<Select bind:value={goalId}>
+					<option value="">Kein Ziel</option>
+					{#each activeGoals as goal (goal.id)}
+						<option value={goal.id}>🎯 {goal.title}</option>
+					{/each}
+				</Select>
+			{/if}
+			<div class="text-sm">
+				<label for="task-recurrence" class="block mb-1 text-text-secondary">Wiederholung (falls nicht getippt):</label>
+				<RecurrenceField id="task-recurrence" value={rrule} onchange={(v) => rrule = v} />
+			</div>
+		</div>
 	{/if}
-	{#if activeGoals.length > 0}
-		<Select bind:value={goalId}>
-			<option value="">Kein Ziel</option>
-			{#each activeGoals as goal (goal.id)}
-				<option value={goal.id}>🎯 {goal.title}</option>
-			{/each}
-		</Select>
-	{/if}
+
 	<Button type="submit">
 		{#snippet children()}
 			Hinzufügen

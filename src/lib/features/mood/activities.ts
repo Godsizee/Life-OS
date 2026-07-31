@@ -142,3 +142,25 @@ export function customActivities(
 		.slice(0, limit)
 		.map(([id]) => id);
 }
+
+/** Alle eigenen (nicht im Katalog stehenden) Tags mit Häufigkeit. */
+export function customActivitiesWithCounts(
+	entries: { activities?: string[] | null }[]
+): { tag: string; count: number }[] {
+	const zaehler = new Map<string, number>();
+	for (const e of entries) {
+		for (const a of e.activities ?? []) {
+			if (a && !isCatalogActivity(a)) zaehler.set(a, (zaehler.get(a) ?? 0) + 1);
+		}
+	}
+	return [...zaehler.entries()]
+		.map(([tag, count]) => ({ tag, count }))
+		.sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, 'de'));
+}
+
+/** Tag in einer Aktivitätsliste umbenennen oder (bei null) entfernen. Dublettenfrei. */
+export function renameInList(list: string[], von: string, nach: string | null): string[] {
+	const ohne = list.filter((a) => a !== von);
+	if (nach === null || ohne.includes(nach)) return ohne;
+	return list.includes(von) ? [...ohne, nach] : list;
+}

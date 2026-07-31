@@ -5,6 +5,7 @@
   import ListRow from '$lib/ui/ListRow.svelte';
   import CheckCircle from '$lib/ui/CheckCircle.svelte';
   import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
+  import MemberAvatar from '$lib/features/workspace/components/MemberAvatar.svelte';
 
   let { item, onopen }: { item: ShoppingItem; onopen?: (item: ShoppingItem) => void } = $props();
 </script>
@@ -39,10 +40,13 @@
     </div>
 
     {#snippet trailing()}
+      {#if item.assignee_id}
+        <MemberAvatar userId={item.assignee_id} size="sm" />
+      {/if}
       <button
         onclick={() => shoppingState.removeItem(item.id)}
         aria-label="Löschen"
-        class="shrink-0 text-text-tertiary active:text-red-600 dark:active:text-red-400"
+        class="shrink-0 text-text-tertiary active:text-red-600 dark:active:text-red-400 ml-2"
       >
         <Trash2 size={18} />
       </button>

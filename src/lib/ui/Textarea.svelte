@@ -3,13 +3,15 @@
 
 	let {
 		value = $bindable(''),
+		element = $bindable<HTMLTextAreaElement | null>(null),
 		surface = '0',
 		class: className = '',
 		...rest
-	}: HTMLTextareaAttributes & { value?: string; surface?: '0' | '1' } = $props();
+	}: HTMLTextareaAttributes & { value?: string; element?: HTMLTextAreaElement | null; surface?: '0' | '1' } = $props();
 </script>
 
 <textarea
+	bind:this={element}
 	bind:value
 	class="min-h-12 min-w-0 w-full rounded-xl border border-border-color {surface === '1'
 		? 'bg-surface-1'

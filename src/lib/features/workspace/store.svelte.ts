@@ -40,6 +40,12 @@ class WorkspaceState {
 		await workspaceApi.inviteMember(this.workspace.id, email);
 		this.members = await workspaceApi.listMembers(this.workspace.id);
 	}
+
+	/** Anzeigename eines Mitglieds; Rückfall auf 'Unbekannt'. Für Metadatenzeilen. */
+	memberName(userId: string | null): string | null {
+		if (!userId) return null;
+		return this.members.find((m) => m.user_id === userId)?.profile?.display_name ?? 'Unbekannt';
+	}
 }
 
 export const workspaceState = new WorkspaceState();

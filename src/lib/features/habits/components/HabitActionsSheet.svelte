@@ -9,10 +9,11 @@
 	interface Props {
 		open: boolean;
 		habit: Habit | null;
+		showStatsLink?: boolean;
 		onClose: () => void;
 	}
 
-	let { open = $bindable(false), habit, onClose }: Props = $props();
+	let { open = $bindable(false), habit, showStatsLink = true, onClose }: Props = $props();
 
 	let editOpen = $state(false);
 
@@ -38,7 +39,8 @@
 		
 		<div class="flex flex-col p-2">
 			<!-- Link zur Detailseite -->
-			<a
+			{#if showStatsLink}
+				<a
 				href={`/habits/${habit.id}`}
 				onclick={() => {
 					open = false;
@@ -56,6 +58,7 @@
 			</a>
 
 			<hr class="my-2 border-border-color" />
+			{/if}
 
 			<!-- Skip -->
 			<button
@@ -101,7 +104,7 @@
 				</div>
 				<div class="flex flex-col">
 					<span class="text-sm font-semibold text-red-600">Archivieren</span>
-					<span class="text-xs text-red-500/70">Wird aus der aktuellen Liste entfernt</span>
+					<span class="text-xs text-red-500/70">Wird ins Archiv verschoben — Verlauf bleibt erhalten, Wiederherstellen jederzeit möglich.</span>
 				</div>
 			</button>
 		</div>

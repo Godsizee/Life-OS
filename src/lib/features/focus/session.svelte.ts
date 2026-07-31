@@ -1,8 +1,7 @@
 // W6 — Fokus-Session. Rechnet timestamp-basiert (Endzeitpunkt statt Sekunden-Zähler)
 // und lebt im Store statt im Komponenten-State: damit überlebt sie Reload, Navigation
 // und App-Wechsel. Draft in localStorage. Vorbild: fitness/live-workout.svelte.ts (F2/F6).
-import { haptic } from '$lib/core/haptics';
-import { toastState } from '$lib/core/toast.svelte';
+import { alarm } from '$lib/core/alert.svelte';
 import { profileState } from '$lib/features/profile/store.svelte';
 import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
 import {
@@ -48,8 +47,12 @@ class FocusSessionState {
 	/** Echter ISO-Start der laufenden Fokus-Phase. */
 	startedAt = $state<string | null>(null);
 
+	/** Aufgabe, für die nach Rundenabschluss eine Notiz erfasst werden kann. */
+	pendingNoteTaskId = $state<string | null>(null);
+
 	private restoredOnce = false;
 	private settling = false;
+	private intervalId: ReturnType<typeof setInterval> | null = null;
 
 	running = $derived(this.endsAt !== null);
 	paused = $derived(this.phase !== 'idle' && this.endsAt === null);
@@ -64,6 +67,22 @@ class FocusSessionState {
 			longBreakMinutes: profileState.focusLongBreakMinutes,
 			roundsUntilLongBreak: profileState.focusRoundsUntilLongBreak
 		};
+	}
+
+	private ensureTimer() {
+		if (typeof window === 'undefined') return;
+		if (!this.intervalId) {
+			this.intervalId = setInterval(() => {
+				void this.settle();
+			}, 1000);
+		}
+	}
+
+	stopTimer() {
+		if (this.intervalId) {
+			clearInterval(this.intervalId);
+			this.intervalId = null;
+		}
 	}
 
 	// ── Lesen (in der UI immer über einen tick-abhängigen $derived.by aufrufen) ──
@@ -95,10 +114,22 @@ class FocusSessionState {
 		this.pausedRemainingSec = null;
 		if (phase === 'focus') this.startedAt = new Date().toISOString();
 		this.persist();
+		this.ensureTimer();
 	}
 
 	/** Neue Fokus-Runde für die gegebene Aufgabe starten. */
 	startFocus(taskId: string | null) {
+		if (
+			typeof window !== 'undefined' &&
+			typeof Notification !== 'undefined' &&
+			Notification.permission === 'default'
+		) {
+			const asked = localStorage.getItem('lifeos:notify-asked');
+			if (!asked) {
+				localStorage.setItem('lifeos:notify-asked', '1');
+				void Notification.requestPermission();
+			}
+		}
 		this.taskId = taskId;
 		this.beginPhase('focus');
 	}
@@ -115,6 +146,7 @@ class FocusSessionState {
 		this.endsAt = Date.now() + (this.pausedRemainingSec ?? 0) * 1000;
 		this.pausedRemainingSec = null;
 		this.persist();
+		this.ensureTimer();
 	}
 
 	/** Ein Button für alles: Start → Pause → Weiter. */
@@ -152,6 +184,7 @@ class FocusSessionState {
 		this.phaseTotalSec = 0;
 		this.startedAt = null;
 		this.clearDraft();
+		this.stopTimer();
 	}
 
 	/** Aufgabe wechseln, ohne die laufende Phase zu verlieren. */
@@ -181,16 +214,35 @@ class FocusSessionState {
 
 			if (!chain) {
 				this.reset();
-				if (wasFocus) toastState.info('⏱️ Abgelaufene Fokus-Session nachgetragen.');
+				if (wasFocus) {
+					await alarm({
+						title: '⏱️ Fokus-Session abgelaufen',
+						body: 'Abgelaufene Fokus-Session wurde nachgetragen.',
+						url: '/focus',
+						tag: 'lifeos-focus'
+					});
+				}
 				return true;
 			}
 
-			haptic([200, 100, 200]);
+			const minuten = Math.round(this.phaseTotalSec / 60);
+			const finishedTaskId = this.taskId;
+			if (wasFocus && finishedTaskId) {
+				this.pendingNoteTaskId = finishedTaskId;
+			}
+
+			await alarm({
+				title: wasFocus ? '🎯 Runde geschafft' : '☕ Pause vorbei',
+				body: wasFocus
+					? `${minuten} Minuten fokussiert. Zeit für eine Pause.`
+					: 'Weiter geht’s.',
+				url: '/focus',
+				tag: 'lifeos-focus'
+			});
+
 			if (wasFocus) {
-				toastState.success('🎯 Runde geschafft — Zeit für eine Pause!');
 				this.beginPhase(nextPhase('focus', timeTrackingState.pomodoroCountToday, this.durations));
 			} else {
-				toastState.info('☕ Pause vorbei — weiter geht’s!');
 				this.beginPhase('focus');
 			}
 			return true;
@@ -247,10 +299,16 @@ class FocusSessionState {
 			this.phaseTotalSec = payload.phaseTotalSec;
 			this.taskId = payload.taskId;
 			this.startedAt = payload.startedAt;
+			this.ensureTimer();
 			await this.settle();
 		} catch {
 			this.clearDraft();
 		}
+	}
+
+	unload() {
+		this.stopTimer();
+		this.restoredOnce = false;
 	}
 
 	private clearDraft() {

@@ -30,7 +30,7 @@ export function buildPeriodReport(days = 30): PeriodReport {
 	const bestScore = scores.length ? Math.max(...scores) : 0;
 
 	const tasksCompleted = tasksState.tasks.filter(
-		(t) => t.status === 'done' && t.updated_at >= sinceStr
+		(t) => !!t.completed_at && toISODate(new Date(t.completed_at)) >= sinceStr
 	).length;
 
 	const workouts = fitnessState.logs.filter((l) => l.date >= sinceStr).length;

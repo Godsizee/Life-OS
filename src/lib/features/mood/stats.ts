@@ -53,11 +53,54 @@ export function moodDistribution(entries: MoodLike[]): number[] {
 	return out;
 }
 
+/** Mehrere Einträge eines Tages zu einem Tageswert zusammenfassen (Ø, gerundet 1-5). */
+export function dailyAverages(entries: MoodLike[]): (MoodLike & { score: 1 | 2 | 3 | 4 | 5 })[] {
+	const proTag = new Map<string, { summe: number; n: number; tags: Set<string> }>();
+	for (const e of entries) {
+		const s = validScore(e.score);
+		if (s === null) continue;
+		const acc = proTag.get(e.date) ?? { summe: 0, n: 0, tags: new Set<string>() };
+		acc.summe += s;
+		acc.n++;
+		for (const a of activitiesOf(e)) acc.tags.add(a);
+		proTag.set(e.date, acc);
+	}
+	return [...proTag.entries()]
+		.map(([date, a]) => ({
+			date,
+			score: Math.max(1, Math.min(5, Math.round(a.summe / a.n))) as 1 | 2 | 3 | 4 | 5,
+			activities: [...a.tags]
+		}))
+		.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Ø-Score je Tagesabschnitt (Morgen/Mittag/Abend/Nacht). Index 0: Morgen … 3: Nacht. */
+export function averageByDaypart(entries: (MoodLike & { logged_at?: string })[]): (number | null)[] {
+	const sums = [0, 0, 0, 0];
+	const counts = [0, 0, 0, 0];
+	for (const e of entries) {
+		const s = validScore(e.score);
+		if (s === null || !e.logged_at) continue;
+		const date = new Date(e.logged_at);
+		if (isNaN(date.getTime())) continue;
+		const hour = date.getHours();
+		let idx = 3; // Nacht
+		if (hour >= 5 && hour < 12) idx = 0; // Morgen
+		else if (hour >= 12 && hour < 17) idx = 1; // Mittag
+		else if (hour >= 17 && hour < 23) idx = 2; // Abend
+
+		sums[idx] += s;
+		counts[idx]++;
+	}
+	return sums.map((sum, i) => (counts[i] > 0 ? sum / counts[i] : null));
+}
+
 /** Ø je Wochentag; Index 0 = Montag … 6 = Sonntag. null = keine Daten. */
 export function averageByWeekday(entries: MoodLike[]): (number | null)[] {
+	const aggregated = dailyAverages(entries);
 	const sums = [0, 0, 0, 0, 0, 0, 0];
 	const counts = [0, 0, 0, 0, 0, 0, 0];
-	for (const e of entries) {
+	for (const e of aggregated) {
 		const s = validScore(e.score);
 		const d = fromISODate(e.date);
 		if (s === null || !d) continue;
@@ -126,7 +169,7 @@ export function yearPixels(
 	today: Date = new Date()
 ): PixelMonth[] {
 	const byDate = new Map<string, number>();
-	for (const e of entriesInYear(entries, year)) {
+	for (const e of dailyAverages(entriesInYear(entries, year))) {
 		const s = validScore(e.score);
 		if (s !== null) byDate.set(e.date, s);
 	}

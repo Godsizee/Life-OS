@@ -8,9 +8,11 @@ import type { MoodEntry } from './types';
  *  bestehenden Zeile ueberschreiben und Realtime-Events waeren nicht mehr
  *  zuzuordnen. Die DB vergibt/behaelt die id. */
 export interface MoodUpsert {
+	id?: string;
 	workspace_id: string;
 	user_id: string;
 	date: string;
+	logged_at: string;
 	score: number;
 	note: string | null;
 	activities: string[];
@@ -29,6 +31,7 @@ export async function listMoodEntries(
 			.eq('user_id', userId)
 			.gte('date', sinceDate)
 			.order('date')
+			.order('logged_at')
 			.order('id')
 			.range(from, to)
 	);
@@ -50,6 +53,7 @@ export async function listMoodEntriesInRange(
 			.gte('date', fromDate)
 			.lte('date', toDate)
 			.order('date')
+			.order('logged_at')
 			.order('id')
 			.range(from, to)
 	);
@@ -59,7 +63,7 @@ export async function listMoodEntriesInRange(
 export async function upsertMoodRaw(payload: MoodUpsert): Promise<MoodEntry> {
 	const { data, error } = await supabase
 		.from('mood_entries')
-		.upsert(payload, { onConflict: 'workspace_id,user_id,date' })
+		.upsert(payload, { onConflict: 'workspace_id,user_id,date,logged_at' })
 		.select()
 		.single();
 	if (error) throw error;

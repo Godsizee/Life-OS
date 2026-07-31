@@ -3,7 +3,8 @@ import {
 	checklistProgress,
 	plainTextPreview,
 	renderMarkdownSafe,
-	toggleChecklistLine
+	toggleChecklistLine,
+	toggleLinePrefix
 } from './markdown';
 
 describe('renderMarkdownSafe — Sicherheit', () => {
@@ -151,5 +152,27 @@ describe('plainTextPreview', () => {
 	it('kuerzt mit Auslassungszeichen', () => {
 		expect(plainTextPreview('a'.repeat(200)).endsWith('…')).toBe(true);
 		expect(plainTextPreview('a'.repeat(200)).length).toBe(140);
+	});
+});
+
+describe('toggleLinePrefix', () => {
+	it('setzt ein Präfix am Zeilenanfang', () => {
+		const r = toggleLinePrefix('Hallo\nWelt', 7, '- ');
+		expect(r.text).toBe('Hallo\n- Welt');
+		expect(r.cursor).toBe(9);
+	});
+
+	it('entfernt ein vorhandenes Präfix wieder', () => {
+		const r = toggleLinePrefix('- Welt', 4, '- ');
+		expect(r.text).toBe('Welt');
+	});
+
+	it('greift nur die Zeile unter dem Cursor an', () => {
+		const r = toggleLinePrefix('eins\nzwei\ndrei', 6, '## ');
+		expect(r.text).toBe('eins\n## zwei\ndrei');
+	});
+
+	it('funktioniert in der letzten Zeile ohne Zeilenumbruch', () => {
+		expect(toggleLinePrefix('letzte', 0, '> ').text).toBe('> letzte');
 	});
 });

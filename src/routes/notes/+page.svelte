@@ -2,8 +2,9 @@
 	import { page } from '$app/state';
 	import { Hash, Plus } from 'lucide-svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
-	import { filterNotes, sortNotes, tagUnion } from '$lib/features/notes/filter';
+	import { searchNotes, sortNotes, tagUnion, type NoteSort, NOTE_SORT_LABELS } from '$lib/features/notes/filter';
 	import type { Note } from '$lib/features/notes/types';
+	import { onMount } from 'svelte';
 	import NoteForm from '$lib/features/notes/components/NoteForm.svelte';
 	import NoteList from '$lib/features/notes/components/NoteList.svelte';
 	import NoteDetailSheet from '$lib/features/notes/components/NoteDetailSheet.svelte';
@@ -18,6 +19,19 @@
 	let createOpen = $state(false);
 	let detailOpen = $state(false);
 	let detailNote = $state<Note | null>(null);
+	let sortMode = $state<NoteSort>('updated');
+
+	onMount(() => {
+		const saved = localStorage.getItem('lifeos:notes-sort');
+		if (saved && ['updated', 'created', 'title'].includes(saved)) {
+			sortMode = saved as NoteSort;
+		}
+	});
+
+	function setSort(s: NoteSort) {
+		sortMode = s;
+		localStorage.setItem('lifeos:notes-sort', s);
+	}
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 
@@ -30,9 +44,9 @@
 	});
 
 	const tags = $derived(tagUnion(notesState.notes));
-	const visible = $derived(sortNotes(filterNotes(notesState.notes, search, activeTag)));
-	const pinned = $derived(visible.filter((n) => n.pinned));
-	const rest = $derived(visible.filter((n) => !n.pinned));
+	const visibleMatches = $derived(searchNotes(sortNotes(notesState.notes, sortMode), search, activeTag));
+	const pinnedMatches = $derived(visibleMatches.filter((m) => m.note.pinned));
+	const restMatches = $derived(visibleMatches.filter((m) => !m.note.pinned));
 
 	function open(note: Note) {
 		detailNote = note;
@@ -86,6 +100,15 @@
 	</section>
 {/if}
 
+<div class="mb-4 flex items-center gap-2 text-sm text-text-secondary">
+	<span>Sortieren:</span>
+	<button class="hover:text-text-primary {sortMode === 'updated' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('updated')}>{NOTE_SORT_LABELS.updated}</button>
+	<span>·</span>
+	<button class="hover:text-text-primary {sortMode === 'created' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('created')}>{NOTE_SORT_LABELS.created}</button>
+	<span>·</span>
+	<button class="hover:text-text-primary {sortMode === 'title' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('title')}>{NOTE_SORT_LABELS.title}</button>
+</div>
+
 <section class="flex flex-col gap-6">
 	{#if notesState.loading}
 		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -94,19 +117,19 @@
 			<Skeleton height="7rem" />
 		</div>
 	{:else}
-		{#if pinned.length > 0}
+		{#if pinnedMatches.length > 0}
 			<div class="flex flex-col gap-2">
 				<h2 class="text-xs font-bold uppercase tracking-wide text-text-tertiary">Angepinnt</h2>
-				<NoteList notes={pinned} onopen={open} />
+				<NoteList matches={pinnedMatches} onopen={open} />
 			</div>
 		{/if}
 
 		<div class="flex flex-col gap-2">
-			{#if pinned.length > 0 && rest.length > 0}
+			{#if pinnedMatches.length > 0 && restMatches.length > 0}
 				<h2 class="text-xs font-bold uppercase tracking-wide text-text-tertiary">Weitere</h2>
 			{/if}
 			<NoteList
-				notes={rest}
+				matches={restMatches}
 				onopen={open}
 				emptyHint={search || activeTag
 					? 'Keine Treffer — Suche oder Tag-Filter zurücksetzen.'

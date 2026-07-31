@@ -100,7 +100,7 @@ describe('Anzeige & Fälligkeit', () => {
 		expect(formatReminder({ remind_at: at, rrule: null })).toContain('28.07.2026');
 		expect(formatReminder({ remind_at: at, rrule: 'RRULE:FREQ=DAILY' })).toBe('täglich um 09:00');
 		expect(formatReminder({ remind_at: at, rrule: 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE' })).toBe(
-			'Mo, Mi um 09:00'
+			'wöchentlich, Mo, Mi um 09:00'
 		);
 	});
 	it('erkennt fällige und heutige Erinnerungen', () => {

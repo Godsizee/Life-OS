@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { habitsState } from '../store.svelte';
 	import type { Habit } from '../types';
-	import { isCompleted, isSkipped, calculateStreak, streakLabel } from '../streak';
+	import { isCompleted, isSkipped, calculateStreak, streakLabel, weekProgress } from '../streak';
 	import { Flame, MoreVertical, Bell } from 'lucide-svelte';
 	import HabitProgressButton from './HabitProgressButton.svelte';
 	import HabitActionsSheet from './HabitActionsSheet.svelte';
@@ -39,14 +39,23 @@
 			{habit.name}
 		</span>
 		
-		<!-- W5: Subtitel (Streak + Mengen-Info) -->
-		<div class="mt-0.5 flex items-center gap-2 text-xs font-medium text-text-tertiary">
+		<!-- W5/W7: Subtitel (Streak + Mengen-Info) -->
+		<div class="mt-0.5 flex flex-wrap items-center gap-2 text-xs font-medium text-text-tertiary">
 			{#if currentStreak >= 3}
 				<span class="inline-flex items-center gap-0.5 text-amber-500">
 					<Flame size={12} class="animate-pulse" /> {streakLabel(habit.schedule, currentStreak)}
 				</span>
 			{/if}
-			{#if habit.target_value && habit.target_value > 1 && !done && !skipped}
+			{#if habit.schedule.type === 'weekly_count'}
+				{@const wp = weekProgress(habit, days)}
+				<span class="shrink-0 text-xs font-medium tabular-nums text-text-secondary">
+					{wp.done}/{wp.target} diese Woche
+				</span>
+				<div class="h-1.5 w-12 shrink-0 overflow-hidden rounded-full bg-surface-3 mt-1">
+					<div class="h-full {wp.done >= wp.target ? 'bg-emerald-500' : 'bg-primary-500'}"
+						 style="width: {Math.min(100, (wp.done / Math.max(1, wp.target)) * 100)}%"></div>
+				</div>
+			{:else if habit.target_value && habit.target_value > 1 && !done && !skipped}
 				<span>Ziel: {habit.target_value} {habit.unit ?? 'Stk'}</span>
 			{/if}
 		</div>

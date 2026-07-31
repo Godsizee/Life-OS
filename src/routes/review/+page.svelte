@@ -43,7 +43,7 @@
 
 	const doneTasks = $derived(
 		tasksState.tasks.filter(
-			(t) => t.status === 'done' && t.updated_at >= isoDate(weekStart)
+			(t) => !!t.completed_at && toISODate(new Date(t.completed_at)) >= isoDate(weekStart)
 		)
 	);
 

@@ -163,7 +163,37 @@ describe('calculateStreak — weekly_count (Wochen statt Tage)', () => {
 	});
 });
 
-describe('bestStreak', () => {
+describe('bestStreak — Regressionen zu R-01', () => {
+	it('bricht bei fehlenden Tagen (keine Log-Zeile)', () => {
+		const habit = { schedule: { type: 'daily' } as const, target_value: null };
+		const days = [
+			{ date: '2026-01-01', value: 1, status: 'done' as const },
+			{ date: '2026-01-02', value: 1, status: 'done' as const },
+			// Lücke: 03.–05. gar nicht erfasst
+			{ date: '2026-01-06', value: 1, status: 'done' as const },
+			{ date: '2026-01-07', value: 1, status: 'done' as const }
+		];
+		expect(bestStreak(habit, days, new Date(2026, 0, 8))).toBe(2);
+	});
+
+	it('zählt bei "weekly" nur fällige Wochentage', () => {
+		const habit = { schedule: { type: 'weekly' as const, days: [1, 3, 5] }, target_value: null };
+		// Mo/Mi/Fr erledigt, Dienstag ohne Eintrag → darf nicht brechen
+		const days = [
+			{ date: '2026-01-05', value: 1, status: 'done' as const }, // Mo
+			{ date: '2026-01-07', value: 1, status: 'done' as const }, // Mi
+			{ date: '2026-01-09', value: 1, status: 'done' as const }  // Fr
+		];
+		expect(bestStreak(habit, days, new Date(2026, 0, 10))).toBe(3);
+	});
+
+	it('ist nie kleiner als der aktuelle Streak', () => {
+		const habit = { schedule: { type: 'daily' } as const, target_value: null };
+		const days = ['2026-01-05', '2026-01-06', '2026-01-07'].map((date) => ({ date, value: 1, status: 'done' as const }));
+		const heute = new Date(2026, 0, 7);
+		expect(bestStreak(habit, days, heute)).toBeGreaterThanOrEqual(calculateStreak(habit, days, heute));
+	});
+
 	it('returns 0 without logs', () => {
 		expect(bestStreak(daily, [], today)).toBe(0);
 	});

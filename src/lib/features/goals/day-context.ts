@@ -17,7 +17,7 @@ export function buildDayContext(dateStr: string): DayContext {
 
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
-		const isCompletedToday = t.status === 'done' && t.updated_at?.startsWith(dateStr);
+		const isCompletedToday = !!t.completed_at && toISODate(new Date(t.completed_at)) === dateStr;
 		return isDue || isCompletedToday;
 	});
 	const tasksDone = todaysTasks.filter((t) => t.status === 'done').length;

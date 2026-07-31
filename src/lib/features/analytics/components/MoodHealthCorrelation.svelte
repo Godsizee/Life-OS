@@ -23,11 +23,13 @@
 		return num / den;
 	}
 
-	/** Letzte 30 Tage als ISO-Date-Strings */
-	function last30Days(): string[] {
-		return Array.from({ length: 30 }, (_, i) => {
+	let { days = 30 }: { days?: number } = $props();
+
+	/** Letzte N Tage als ISO-Date-Strings */
+	function lastNDays(n: number): string[] {
+		return Array.from({ length: n }, (_, i) => {
 			const d = new Date();
-			d.setDate(d.getDate() - (29 - i));
+			d.setDate(d.getDate() - (n - 1 - i));
 			return toISODate(d);
 		});
 	}
@@ -42,7 +44,7 @@
 	}
 
 	const points = $derived((): CorrelationPoint[] => {
-		return last30Days()
+		return lastNDays(days)
 			.map((date) => {
 				const mood = moodState.entries.find((e) => e.date === date);
 				const health = healthState.entries.find((e) => e.date === date);

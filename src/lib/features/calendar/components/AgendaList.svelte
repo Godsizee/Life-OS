@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar, Pencil } from 'lucide-svelte';
+	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar, Pencil, Repeat } from 'lucide-svelte';
 	import { calendarState } from '../store.svelte';
 	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { formatRrule } from '../recurrence';
+	import { formatRecurrence } from '../rrule';
 	import { toastState } from '$lib/core/toast.svelte';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
@@ -149,7 +149,7 @@
 								<div class="min-w-0 flex-1">
 									<p class="truncate text-sm font-medium text-text-primary">{item.title}</p>
 									<p class="truncate text-xs text-text-secondary">
-										{timeLabel}{#if item.location} · {item.location}{/if}{#if item.rrule} · {formatRrule(item.rrule)}{/if}
+										{timeLabel}{#if item.location} · {item.location}{/if}{#if item.rrule} · {formatRecurrence(item.rrule)}{/if}
 									</p>
 									{#if attendees.length > 0}
 										<div class="mt-1 flex gap-1">
@@ -224,6 +224,21 @@
 									{/if}
 								</button>
 							{/snippet}
+							{#snippet trailing()}
+								{#if item.rrule}
+									<span class="inline-flex items-center text-xs text-text-tertiary">
+										<Repeat size={10} class="mr-1" />
+										{formatRecurrence(item.rrule)}
+									</span>
+								{/if}
+								<button
+									onclick={() => requestDelete(item)}
+									aria-label="Aufgabe löschen"
+									class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
+								>
+									<Trash2 size={16} />
+								</button>
+							{/snippet}
 							<p class="truncate text-sm font-medium text-text-primary {isCompleted ? 'line-through text-text-tertiary' : ''}">
 								{item.title}
 							</p>
@@ -235,15 +250,6 @@
 									</span>
 								{/if}
 							</p>
-							{#snippet trailing()}
-								<button
-									onclick={() => requestDelete(item)}
-									aria-label="Aufgabe löschen"
-									class="shrink-0 text-text-tertiary hover:text-red-500 active:scale-95 transition-all"
-								>
-									<Trash2 size={16} />
-								</button>
-							{/snippet}
 						</ListRow>
 						</li>
 					{/if}

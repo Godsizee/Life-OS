@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
 	activityStats,
 	availableYears,
+	averageByDaypart,
 	averageByWeekday,
 	averageScore,
+	dailyAverages,
 	daysInMonth,
 	entriesInYear,
 	filterSince,
@@ -191,3 +193,37 @@ describe('Formatierung', () => {
 		expect(formatScore(null)).toBe('—');
 	});
 });
+
+describe('dailyAverages', () => {
+	it('mittelt mehrere Einträge eines Tages', () => {
+		const r = dailyAverages([
+			{ date: '2026-07-31', score: 2, activities: ['arbeit'] },
+			{ date: '2026-07-31', score: 4, activities: ['sport'] }
+		]);
+		const item = r[0];
+		expect(item?.score).toBe(3);
+		expect(item?.activities?.slice().sort()).toEqual(['arbeit', 'sport']);
+	});
+
+	it('lässt ungültige Scores weg', () => {
+		expect(dailyAverages([{ date: '2026-07-31', score: 9 }])).toEqual([]);
+	});
+});
+
+describe('averageByDaypart', () => {
+	it('gruppiert nach Tageszeit (Morgen/Mittag/Abend/Nacht)', () => {
+		const entries = [
+			{ date: '2026-07-31', score: 5, logged_at: '2026-07-31T08:00:00Z' }, // Morgen
+			{ date: '2026-07-31', score: 3, logged_at: '2026-07-31T14:00:00Z' }, // Mittag
+			{ date: '2026-07-31', score: 4, logged_at: '2026-07-31T19:00:00Z' }, // Abend
+			{ date: '2026-07-31', score: 2, logged_at: '2026-07-31T01:00:00Z' }  // Nacht
+		];
+		const res = averageByDaypart(entries);
+		expect(res).toHaveLength(4);
+		expect(res[0]).toBe(5);
+		expect(res[1]).toBe(3);
+		expect(res[2]).toBe(4);
+		expect(res[3]).toBe(2);
+	});
+});
+

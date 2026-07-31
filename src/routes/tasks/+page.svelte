@@ -11,7 +11,12 @@
 	import Sheet from '$lib/ui/Sheet.svelte';
 	import Skeleton from '$lib/ui/Skeleton.svelte';
 	import { Plus, FolderPlus, Kanban, List } from 'lucide-svelte';
-	import { smartViewFilter, labelUnion, type SmartView } from '$lib/features/tasks/utils';
+	import { smartViewFilter, labelUnion, type SmartView, overdueCount, filterTasks } from '$lib/features/tasks/utils';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { authState } from '$lib/core/auth.svelte';
+	import Input from '$lib/ui/Input.svelte';
 
 	let selectedProject = $state<string | null>(null);
 	let createOpen = $state(false);
@@ -23,6 +28,30 @@
 	let detailOpen = $state(false);
 	let view = $state<'list' | 'board'>('list');
 
+	let search = $state($page.url.searchParams.get('q') ?? '');
+	let selectedAssignee = $state<string | 'unassigned' | 'all'>('all');
+	let sortMode = $state<'manual' | 'due' | 'priority' | 'title'>('manual');
+
+	onMount(() => {
+		const saved = localStorage.getItem('lifeos:tasks-sort');
+		if (saved && ['manual', 'due', 'priority', 'title'].includes(saved)) {
+			sortMode = saved as any;
+		}
+
+		const taskId = $page.url.searchParams.get('task');
+		if (taskId) {
+			const task = tasksState.tasks.find(t => t.id === taskId);
+			if (task) {
+				openDetail(task);
+			}
+		}
+	});
+
+	function setSort(s: typeof sortMode) {
+		sortMode = s;
+		localStorage.setItem('lifeos:tasks-sort', s);
+	}
+
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const allLabels = $derived(labelUnion(tasksState.tasks));
 	
@@ -30,12 +59,37 @@
 		let r = tasksState.tasks;
 		if (selectedProject) r = r.filter((t) => t.project_id === selectedProject);
 		if (selectedLabels.length) r = r.filter((t) => selectedLabels.every((l) => t.labels?.includes(l)));
+		
+		if (selectedAssignee === 'unassigned') r = r.filter((t) => t.assignee_id === null);
+		else if (selectedAssignee !== 'all') r = r.filter((t) => t.assignee_id === selectedAssignee);
+		
+		r = filterTasks(r, search);
 		r = smartViewFilter(r, smartView);
 		return r;
 	});
 	
-	const openTasks = $derived(filtered.filter((t) => t.status !== 'done'));
-	const doneTasks = $derived(filtered.filter((t) => t.status === 'done'));
+	const ueberfaellig = $derived(overdueCount(tasksState.tasks));
+
+	function sortTasks(tasks: Task[]) {
+		return [...tasks].sort((a, b) => {
+			if (sortMode === 'due') {
+				const da = a.due_at ?? '9999-12-31';
+				const db = b.due_at ?? '9999-12-31';
+				return da.localeCompare(db) || a.position - b.position;
+			}
+			if (sortMode === 'priority') {
+				const map = { high: 0, medium: 1, low: 2 };
+				return map[a.priority] - map[b.priority] || a.position - b.position;
+			}
+			if (sortMode === 'title') {
+				return a.title.localeCompare(b.title);
+			}
+			return a.position - b.position || a.created_at.localeCompare(b.created_at);
+		});
+	}
+
+	const openTasks = $derived(sortTasks(filtered.filter((t) => t.status !== 'done')));
+	const doneTasks = $derived(sortTasks(filtered.filter((t) => t.status === 'done')));
 	
 	function openDetail(t: Task) {
 		detailTask = t;
@@ -98,13 +152,35 @@
 <TaskDetailSheet bind:open={detailOpen} task={detailTask} />
 
 <div class="mb-4 flex flex-col gap-3">
+	<Input placeholder="Aufgaben durchsuchen…" bind:value={search} />
+
 	<!-- Smart Views -->
 	<section class="flex flex-wrap gap-2">
 		<Chip selected={smartView === 'all'} onclick={() => (smartView = 'all')}>Alle</Chip>
 		<Chip selected={smartView === 'today'} onclick={() => (smartView = 'today')}>Heute</Chip>
+		<Chip selected={smartView === 'overdue'} onclick={() => (smartView = 'overdue')}>
+			Überfällig
+			{#if ueberfaellig > 0}
+				<span class="ml-1 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">{ueberfaellig}</span>
+			{/if}
+		</Chip>
 		<Chip selected={smartView === 'upcoming'} onclick={() => (smartView = 'upcoming')}>Demnächst</Chip>
 		<Chip selected={smartView === 'no_date'} onclick={() => (smartView = 'no_date')}>Ohne Datum</Chip>
 	</section>
+
+	<!-- Wer? -->
+	{#if workspaceState.members.length > 0}
+		<section class="flex flex-wrap gap-2">
+			<Chip selected={selectedAssignee === 'all'} onclick={() => (selectedAssignee = 'all')}>Alle</Chip>
+			<Chip selected={selectedAssignee === authState.user?.id} onclick={() => (selectedAssignee = authState.user?.id ?? 'all')}>Ich</Chip>
+			{#each workspaceState.members.filter(m => m.user_id !== authState.user?.id) as m (m.user_id)}
+				<Chip selected={selectedAssignee === m.user_id} onclick={() => (selectedAssignee = m.user_id)}>
+					{m.profile?.display_name ?? 'Unbekannt'}
+				</Chip>
+			{/each}
+			<Chip selected={selectedAssignee === 'unassigned'} onclick={() => (selectedAssignee = 'unassigned')}>Ohne Zuweisung</Chip>
+		</section>
+	{/if}
 
 	<!-- Projekte -->
 	{#if tasksState.projects.length > 0}
@@ -138,8 +214,10 @@
 		</div>
 	{:else}
 		{#if view === 'board'}
-			<div class="hidden lg:block">
-				<TaskBoard tasks={filtered} onopen={openDetail} />
+			<div class="hidden lg:block w-full overflow-x-auto pb-4">
+				<div class="min-w-fit">
+					<TaskBoard tasks={filtered} onopen={openDetail} />
+				</div>
 			</div>
 			<div class="lg:hidden">
 				<TaskList tasks={openTasks} onopen={openDetail} />
@@ -154,6 +232,16 @@
 			</div>
 		{:else}
 			<div>
+				<div class="flex items-center gap-2 mb-4 text-sm text-text-secondary">
+					<span>Sortieren:</span>
+					<button class="hover:text-text-primary {sortMode === 'manual' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('manual')}>Manuell</button>
+					<span>·</span>
+					<button class="hover:text-text-primary {sortMode === 'due' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('due')}>Fälligkeit</button>
+					<span>·</span>
+					<button class="hover:text-text-primary {sortMode === 'priority' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('priority')}>Priorität</button>
+					<span>·</span>
+					<button class="hover:text-text-primary {sortMode === 'title' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('title')}>Titel</button>
+				</div>
 				<TaskList tasks={openTasks} onopen={openDetail} />
 				{#if doneTasks.length > 0}
 					<details class="mt-4">

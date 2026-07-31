@@ -2,6 +2,7 @@
 // statt im Komponenten-State von routes/fitness/+page.svelte, damit ein Reload oder
 // App-Wechsel sie nicht verwirft. Draft in localStorage, Vorbild focus/store.svelte.ts
 // (kein Shared-Wrapper im Projekt — jedes Feature persistiert selbst).
+import { alarm } from '$lib/core/alert.svelte';
 import { fitnessState } from './store.svelte';
 import { estimateOneRepMax } from './utils/1rm';
 import { announcePRs } from './integration';
@@ -78,8 +79,38 @@ class LiveWorkoutState {
 	}
 
 	// ── Welle F6: Pausen-Timer ────────────────────────────────────────────────
+	private restIntervalId: ReturnType<typeof setInterval> | null = null;
+
+	private ensureRestTimer() {
+		if (typeof window === 'undefined') return;
+		if (this.restIntervalId) return;
+		this.restIntervalId = setInterval(() => {
+			if (this.restEndsAt === null) {
+				this.stopRestTimer();
+				return;
+			}
+			if ((this.restRemainingSec() ?? 0) <= 0) {
+				this.stopRest();
+				void alarm({
+					title: '⏱️ Pause vorbei',
+					body: 'Weiter geht’s!',
+					url: '/fitness',
+					tag: 'lifeos-rest'
+				});
+			}
+		}, 1000);
+	}
+
+	private stopRestTimer() {
+		if (this.restIntervalId) {
+			clearInterval(this.restIntervalId);
+			this.restIntervalId = null;
+		}
+	}
+
 	startRest(durationSec: number) {
 		this.restEndsAt = Date.now() + durationSec * 1000;
+		this.ensureRestTimer();
 	}
 
 	/** ±15s-Anpassung am laufenden Timer; unter 1s Rest wird gestoppt. */
@@ -87,10 +118,12 @@ class LiveWorkoutState {
 		if (this.restEndsAt === null) return;
 		const next = this.restEndsAt + deltaSec * 1000;
 		this.restEndsAt = next - Date.now() < 1000 ? null : next;
+		if (this.restEndsAt === null) this.stopRestTimer();
 	}
 
 	stopRest() {
 		this.restEndsAt = null;
+		this.stopRestTimer();
 	}
 
 	restRemainingSec(): number | null {
@@ -285,6 +318,7 @@ class LiveWorkoutState {
 			this.durationOverrideMin = payload.durationOverrideMin ?? null;
 			const restEndsAt = payload.restEndsAt ?? null;
 			this.restEndsAt = restEndsAt !== null && restEndsAt > Date.now() ? restEndsAt : null;
+			if (this.restEndsAt !== null) this.ensureRestTimer();
 			this.active = true;
 			this.planId = payload.planId;
 			this.startedAt = payload.startedAt;

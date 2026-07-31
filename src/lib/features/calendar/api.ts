@@ -24,6 +24,23 @@ export async function createCalendar(workspaceId: string, name: string): Promise
 	return data;
 }
 
+export async function updateCalendarRaw(patch: Partial<Pick<Calendar, 'name' | 'color' | 'ics_url'>> & { id: string }): Promise<Calendar> {
+	const { id, ...rest } = patch;
+	const { data, error } = await supabase
+		.from('calendars')
+		.update(rest)
+		.eq('id', id)
+		.select()
+		.single();
+	if (error) throw error;
+	return data;
+}
+
+export async function deleteCalendar(id: string): Promise<void> {
+	const { error } = await supabase.from('calendars').delete().eq('id', id);
+	if (error) throw error;
+}
+
 /**
  * Ohne Zeitfenster und bewusst so: eine Serie mit fruehem `start` laeuft bis
  * heute weiter. Ein Filter auf `start >= x` wuerde genau die Termine wegwerfen,

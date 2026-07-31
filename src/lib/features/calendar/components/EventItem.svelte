@@ -4,7 +4,7 @@
 	import type { Event } from '../types';
 	import type { Occurrence } from '../occurrences';
 	import { calendarState } from '../store.svelte';
-	import { formatRrule } from '../recurrence';
+	import { formatRecurrence } from '../rrule';
 	import { linksState } from '$lib/features/links/store.svelte';
 	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
 
@@ -42,7 +42,7 @@
 			<p class="truncate text-xs text-text-secondary">
 				{timeLabel}{#if location}
 					· {location}{/if}{#if event.rrule}
-					· {formatRrule(event.rrule)}{/if}
+					· {formatRecurrence(event.rrule)}{/if}
 			</p>
 		</div>
 		{#if linkedPlanId}

@@ -1,4 +1,5 @@
 import type { Reminder } from './types';
+import { formatRecurrence } from '$lib/features/calendar/rrule';
 
 /** ICS-Wochentagscodes, Index = JS getDay() (0 = So … 6 = Sa). */
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;
@@ -115,14 +116,11 @@ const WEEKDAY_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 export function formatReminder(reminder: Pick<Reminder, 'remind_at' | 'rrule'>): string {
 	const at = new Date(reminder.remind_at);
 	const time = at.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-	const rule = parseReminderRrule(reminder.rrule);
-	if (!rule) {
+	if (!reminder.rrule) {
 		return `${at.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })} um ${time}`;
 	}
-	if (rule.freq === 'DAILY') return `täglich um ${time}`;
-	if (rule.freq === 'MONTHLY') return `monatlich um ${time}`;
-	if (rule.byday) return `${rule.byday.map((d) => WEEKDAY_SHORT[d]).join(', ')} um ${time}`;
-	return `wöchentlich um ${time}`;
+	const recText = formatRecurrence(reminder.rrule);
+	return `${recText} um ${time}`;
 }
 
 /** Fällig = aktiv und Zeitpunkt erreicht. */

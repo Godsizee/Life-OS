@@ -4,6 +4,7 @@ export interface Calendar {
 	name: string;
 	color: string | null;
 	ics_url: string | null;
+	ics_last_synced_at?: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -19,6 +20,7 @@ export interface Event {
 	location: string | null;
 	rrule: string | null;
 	attendee_ids: string[];
+	external_uid?: string | null;
 	created_by: string;
 	created_at: string;
 	updated_at: string;

@@ -6,7 +6,7 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 
 	const moreLinks = modules.filter((m) =>
-		['habits', 'shopping', 'goals', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
+		['habits', 'shopping', 'goals', 'journal', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
 	);
 </script>
 

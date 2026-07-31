@@ -142,12 +142,39 @@ class GoalsState {
 			target_exercise: parsed.target_exercise ?? null,
 			target_value: parsed.target_value ?? null,
 			target_unit: parsed.target_unit ?? null,
+			archived: false,
 			created_by: authState.user!.id,
 			created_at: now,
 			updated_at: now
 		};
 		this.goals = [...this.goals, goal];
 		await outbox.runOrQueue('goals', 'insert', goal, () => goalsApi.insertGoalRaw(goal));
+	}
+
+	async archiveGoal(id: string) {
+		const updated_at = new Date().toISOString();
+		this.goals = this.goals.map((g) => (g.id === id ? { ...g, archived: true, updated_at } : g));
+		await outbox.runOrQueue('goals', 'update', { id, archived: true, updated_at }, () =>
+			goalsApi.updateGoalRaw({ id, archived: true, updated_at })
+		);
+	}
+
+	async unarchiveGoal(id: string) {
+		const updated_at = new Date().toISOString();
+		this.goals = this.goals.map((g) => (g.id === id ? { ...g, archived: false, updated_at } : g));
+		await outbox.runOrQueue('goals', 'update', { id, archived: false, updated_at }, () =>
+			goalsApi.updateGoalRaw({ id, archived: false, updated_at })
+		);
+	}
+
+	async loadArchived() {
+		if (!this.workspaceId) return;
+		const allGoals = await goalsApi.listGoals(this.workspaceId, true);
+		const existingIds = new Set(this.goals.map((g) => g.id));
+		const toAdd = allGoals.filter((g) => !existingIds.has(g.id));
+		if (toAdd.length > 0) {
+			this.goals = [...this.goals, ...toAdd];
+		}
 	}
 
 	async updateProgress(id: string, progress: number) {

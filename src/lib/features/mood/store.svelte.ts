@@ -38,12 +38,17 @@ class MoodState {
 		return toISODate(new Date());
 	}
 
-	get todayEntry(): MoodEntry | null {
-		return this.entryForDate(this.todayKey());
+	get todayEntries(): MoodEntry[] {
+		return this.entriesForDate(this.todayKey());
 	}
 
-	entryForDate(date: string): MoodEntry | null {
-		return this.entries.find((e) => e.date === date) ?? null;
+	get todayEntry(): MoodEntry | null {
+		const list = this.todayEntries;
+		return list.length > 0 ? list[list.length - 1] : null;
+	}
+
+	entriesForDate(date: string): MoodEntry[] {
+		return this.entries.filter((e) => e.date === date).sort((a, b) => a.logged_at.localeCompare(b.logged_at));
 	}
 
 	/** 7-Tage-Sparkline (aelteste links). null = kein Eintrag. */
@@ -52,7 +57,13 @@ class MoodState {
 		const now = new Date();
 		for (let i = 6; i >= 0; i--) {
 			const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-			days.push(this.entryForDate(toISODate(d))?.score ?? null);
+			const dayEntries = this.entriesForDate(toISODate(d));
+			if (dayEntries.length === 0) {
+				days.push(null);
+			} else {
+				const sum = dayEntries.reduce((acc, curr) => acc + curr.score, 0);
+				days.push(Math.round(sum / dayEntries.length));
+			}
 		}
 		return days;
 	}
@@ -106,12 +117,13 @@ class MoodState {
 		});
 	}
 
-	/** Merge nach DATUM, nicht nach id: ein optimistisch angelegter Eintrag traegt
-	 *  bis zur Server-Antwort eine temporaere UUID. Ohne diese Dedupe-Regel
-	 *  stuenden nach dem Realtime-Event zwei Zeilen fuer denselben Tag im State. */
 	private mergeLocal(row: MoodEntry) {
-		const rest = this.entries.filter((e) => e.date !== row.date && e.id !== row.id);
-		this.entries = [...rest, row].sort((a, b) => a.date.localeCompare(b.date));
+		const rest = this.entries.filter(
+			(e) => e.id !== row.id && !(e.date === row.date && e.logged_at === row.logged_at)
+		);
+		this.entries = [...rest, row].sort(
+			(a, b) => a.date.localeCompare(b.date) || a.logged_at.localeCompare(b.logged_at)
+		);
 	}
 
 	unload() {
@@ -127,44 +139,60 @@ class MoodState {
 
 	/** Heutigen Eintrag speichern. `activities` ist optional, damit bestehende
 	 *  Aufrufer (NLP-Dispatch auf dem Dashboard) unveraendert funktionieren. */
-	async save(score: number, note: string | null, activities: string[] = []) {
-		await this.saveFor(this.todayKey(), score, note, activities);
+	async save(score: number, note: string | null, activities: string[] = [], loggedAt?: string) {
+		await this.saveFor(this.todayKey(), score, note, activities, loggedAt);
 	}
 
 	/** Beliebigen Tag speichern (Year in Pixels, Nachtragen). */
-	async saveFor(date: string, score: number, note: string | null, activities: string[] = []) {
+	async saveFor(
+		date: string,
+		score: number,
+		note: string | null,
+		activities: string[] = [],
+		loggedAt?: string
+	) {
 		const wId = workspaceState.workspace?.id;
 		const uId = authState.user?.id;
 		if (!wId || !uId) return;
 
 		const parsed = moodInputSchema.safeParse({
 			date,
+			logged_at: loggedAt,
 			score,
 			note: note && note.trim() ? note.trim() : null,
 			activities: cleanActivities(activities)
 		});
 		if (!parsed.success) return;
 
+		const time =
+			parsed.data.logged_at ||
+			(date === this.todayKey() ? new Date().toISOString() : `${date}T12:00:00.000Z`);
+
 		const payload: moodApi.MoodUpsert = {
 			workspace_id: wId,
 			user_id: uId,
 			date: parsed.data.date,
+			logged_at: time,
 			score: parsed.data.score,
 			note: parsed.data.note,
 			activities: parsed.data.activities
 		};
 
-		// Optimistisch: bestehende id behalten, sonst temporaere UUID.
-		const existing = this.entryForDate(parsed.data.date);
-		this.mergeLocal({
+		const existing = this.entries.find(
+			(e) => e.date === parsed.data.date && e.logged_at === time
+		);
+		const row: MoodEntry = {
 			id: existing?.id ?? crypto.randomUUID(),
 			workspace_id: wId,
 			user_id: uId,
 			date: parsed.data.date,
+			logged_at: time,
 			score: parsed.data.score as MoodEntry['score'],
 			note: parsed.data.note,
 			activities: parsed.data.activities
-		});
+		};
+
+		this.mergeLocal(row);
 
 		const saved = await outbox.runOrQueue(
 			'mood_entries',
@@ -172,8 +200,33 @@ class MoodState {
 			payload,
 			() => moodApi.upsertMoodRaw(payload)
 		);
-		// Online: die echte Server-Zeile (inkl. id) ersetzt die optimistische.
 		if (saved) this.mergeLocal(saved);
+	}
+
+	async renameActivity(von: string, nach: string | null) {
+		const wId = workspaceState.workspace?.id;
+		const uId = authState.user?.id;
+		if (!wId || !uId) return;
+
+		const { renameInList } = await import('./activities');
+		const betroffen = this.entries.filter((e) => (e.activities ?? []).includes(von));
+		for (const e of betroffen) {
+			const updatedActivities = renameInList(e.activities ?? [], von, nach);
+			const payload: moodApi.MoodUpsert = {
+				id: e.id,
+				workspace_id: e.workspace_id,
+				user_id: e.user_id,
+				date: e.date,
+				logged_at: e.logged_at,
+				score: e.score,
+				note: e.note,
+				activities: updatedActivities
+			};
+			this.mergeLocal({ ...e, activities: updatedActivities });
+			await outbox.runOrQueue('mood_entries', 'update', payload, () =>
+				moodApi.upsertMoodRaw(payload)
+			);
+		}
 	}
 
 	async remove(id: string) {

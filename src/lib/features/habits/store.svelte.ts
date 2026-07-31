@@ -10,9 +10,11 @@ import { remindersState } from '$lib/features/reminders/store.svelte';
 
 class HabitsState {
 	habits = $state<Habit[]>([]);
+	archived = $state<Habit[]>([]);
 	logs = $state<HabitLog[]>([]);
 	loading = $state(false);
 	loaded = $state(false);
+	archivedLoaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubscribeHabits: (() => void) | null = null;
 	private unsubscribeLogs: (() => void) | null = null;
@@ -57,9 +59,17 @@ class HabitsState {
 				if (!this.habits.some((h) => h.id === row.id)) this.habits = [...this.habits, row];
 			},
 			onUpdate: (row) => {
-				this.habits = row.archived
-					? this.habits.filter((h) => h.id !== row.id)
-					: this.habits.map((h) => (h.id === row.id ? row : h));
+				if (row.archived) {
+					this.habits = this.habits.filter((h) => h.id !== row.id);
+					if (this.archivedLoaded && !this.archived.some((h) => h.id === row.id)) {
+						this.archived = [...this.archived, row];
+					}
+				} else {
+					this.habits = this.habits.map((h) => (h.id === row.id ? row : h));
+					if (this.archivedLoaded) {
+						this.archived = this.archived.filter((h) => h.id !== row.id);
+					}
+				}
 			},
 			onDelete: ({ id }) => {
 				this.habits = this.habits.filter((h) => h.id !== id);
@@ -85,16 +95,19 @@ class HabitsState {
 		this.unsubscribeLogs?.();
 		this.unsubscribeHabits = null;
 		this.unsubscribeLogs = null;
+		this.unsubscribeLogs = null;
 		this.habits = [];
+		this.archived = [];
 		this.logs = [];
 		this.loaded = false;
+		this.archivedLoaded = false;
 		this.workspaceId = null;
 	}
 
 	// ── Lesen ───────────────────────────────────────────────────────────────
 
 	habitById(id: string): Habit | undefined {
-		return this.habits.find((h) => h.id === id);
+		return this.habits.find((h) => h.id === id) ?? this.archived.find((h) => h.id === id);
 	}
 
 	/** Alle Tages-Einträge einer Routine in der Form, die `streak.ts` erwartet. */
@@ -251,12 +264,35 @@ class HabitsState {
 	}
 
 	async archiveHabit(id: string) {
-		this.habits = this.habits.filter((h) => h.id !== id);
+		const habit = this.habits.find((h) => h.id === id);
+		if (habit) {
+			this.habits = this.habits.filter((h) => h.id !== id);
+			if (this.archivedLoaded) {
+				this.archived = [...this.archived, { ...habit, archived: true }];
+			}
+		}
 		const updated_at = new Date().toISOString();
 		await outbox.runOrQueue('habits', 'update', { id, archived: true, updated_at }, () =>
 			habitsApi.updateRaw({ id, archived: true, updated_at })
 		);
 		await remindersState.removeFor('habit', id);
+	}
+
+	async loadArchived() {
+		if (this.archivedLoaded || !this.workspaceId) return;
+		const alle = await habitsApi.listHabits(this.workspaceId, true);
+		this.archived = alle.filter((h) => h.archived);
+		this.archivedLoaded = true;
+	}
+
+	async unarchiveHabit(id: string) {
+		const habit = this.archived.find((h) => h.id === id);
+		if (!habit) return;
+		this.archived = this.archived.filter((h) => h.id !== id);
+		this.habits = [...this.habits, { ...habit, archived: false }];
+		await outbox.runOrQueue('habits', 'update', { id, archived: false }, () =>
+			habitsApi.updateRaw({ id, archived: false })
+		);
 	}
 }
 

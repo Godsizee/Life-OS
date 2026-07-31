@@ -3,7 +3,7 @@ import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
 import * as calendarApi from './api';
-import { eventInputSchema, type EventInput } from './schema';
+import { eventInputSchema, type EventInput, calendarInputSchema, type CalendarInput } from './schema';
 import type { Calendar, Event, EventOverride, EventOverridePatch } from './types';
 import { remindersState } from '$lib/features/reminders/store.svelte';
 
@@ -22,6 +22,11 @@ class CalendarState {
 			insert: (payload) => calendarApi.insertRaw(payload as Event),
 			update: (payload) => calendarApi.updateRaw(payload as Partial<Event> & { id: string }),
 			delete: (payload) => calendarApi.deleteEvent((payload as { id: string }).id)
+		});
+		outbox.registerExecutor('calendars', {
+			insert: (payload) => calendarApi.createCalendar(this.workspaceId!, (payload as Calendar).name),
+			update: (payload) => calendarApi.updateCalendarRaw(payload as Partial<Calendar> & { id: string }),
+			delete: (payload) => calendarApi.deleteCalendar((payload as { id: string }).id)
 		});
 		outbox.registerExecutor('event_overrides', {
 			insert: (payload) => calendarApi.upsertOverrideRaw(payload as EventOverride),
@@ -99,6 +104,55 @@ class CalendarState {
 
 	get defaultCalendarId(): string | null {
 		return this.calendars[0]?.id ?? null;
+	}
+
+	async addCalendar(input: CalendarInput) {
+		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
+		const parsed = calendarInputSchema.parse(input);
+		const now = new Date().toISOString();
+		const cal: Calendar = {
+			id: crypto.randomUUID(),
+			workspace_id: this.workspaceId,
+			name: parsed.name,
+			color: parsed.color,
+			ics_url: null,
+			ics_last_synced_at: null,
+			created_at: now,
+			updated_at: now
+		};
+		this.calendars = [...this.calendars, cal];
+		await outbox.runOrQueue('calendars', 'insert', cal, () => calendarApi.createCalendar(this.workspaceId!, cal.name).then(async (c) => {
+			if (cal.color) {
+				await calendarApi.updateCalendarRaw({ id: c.id, color: cal.color });
+			}
+		}));
+	}
+
+	async renameCalendar(id: string, name: string) {
+		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, name, updated_at: new Date().toISOString() } : c));
+		await outbox.runOrQueue('calendars', 'update', { id, name }, () => calendarApi.updateCalendarRaw({ id, name }));
+	}
+
+	async setCalendarColor(id: string, color: string) {
+		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, color, updated_at: new Date().toISOString() } : c));
+		await outbox.runOrQueue('calendars', 'update', { id, color }, () => calendarApi.updateCalendarRaw({ id, color }));
+	}
+
+	async updateCalendarUrl(id: string, ics_url: string | null) {
+		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, ics_url, updated_at: new Date().toISOString() } : c));
+		await outbox.runOrQueue('calendars', 'update', { id, ics_url }, () => calendarApi.updateCalendarRaw({ id, ics_url }));
+	}
+
+	async removeCalendar(id: string) {
+		if (this.calendars.length <= 1) {
+			throw new Error('Der letzte Kalender kann nicht gelöscht werden.');
+		}
+		const hasEvents = this.events.some((e) => e.calendar_id === id);
+		if (hasEvents) {
+			throw new Error('Kalender enthält noch Termine und kann daher nicht gelöscht werden.');
+		}
+		this.calendars = this.calendars.filter((c) => c.id !== id);
+		await outbox.runOrQueue('calendars', 'delete', { id }, () => calendarApi.deleteCalendar(id));
 	}
 
 	async addEvent(input: { title: string; start: string; end: string } & Partial<EventInput>) {

@@ -6,9 +6,9 @@
 	import { attachmentsState } from '$lib/features/attachments/store.svelte';
 	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
 
-	let { note, onopen }: { note: Note; onopen: (note: Note) => void } = $props();
+	let { note, snippet = null, onopen }: { note: Note; snippet?: string | null; onopen: (note: Note) => void } = $props();
 
-	const preview = $derived(plainTextPreview(note.body ?? '', 120));
+	const preview = $derived(snippet ?? plainTextPreview(note.body ?? '', 120));
 	const progress = $derived(checklistProgress(note.body ?? ''));
 	const attachmentCount = $derived(attachmentsState.countFor('note', note.id));
 </script>

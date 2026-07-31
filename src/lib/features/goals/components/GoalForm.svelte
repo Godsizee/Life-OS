@@ -25,9 +25,13 @@
 		parent = parentId ?? '';
 	});
 
-	// Genau eine Ebene: nur Wurzelziele dürfen Eltern sein (Plan §5, Regel 6).
+	import { verboteneEltern } from '../checkins';
+
+	// Genau eine Ebene: nur nicht-erledigte, nicht-archivierte Ziele dürfen Eltern sein.
 	const parentOptions = $derived(
-		goalsState.goals.filter((g) => g.parent_id === null && g.status !== 'done')
+		parentId
+			? []
+			: goalsState.goals.filter((g) => g.status !== 'done' && !g.archived && g.parent_id === null)
 	);
 
 	const types: { value: GoalType; label: string }[] = [
@@ -101,7 +105,7 @@
 		<Input type="number" min="1" max="14" placeholder="Trainings/Woche" bind:value={targetValue} />
 	{/if}
 
-	{#if parentOptions.length > 0}
+	{#if !parentId && parentOptions.length > 0}
 		<Field label="Unterziel von" hint="Optional — macht dieses Ziel zum Meilenstein">
 			<Select bind:value={parent}>
 				<option value="">Kein Oberziel</option>
