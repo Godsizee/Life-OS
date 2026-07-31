@@ -1,2 +1,9 @@
+# Ohne diese Zeile erkennt Nixpacks das Repo als Deno-Projekt: die Supabase Edge
+# Functions unter supabase/functions/ importieren von https://deno.land/..., und
+# der Deno-Provider gewinnt die Auto-Detection vor Node. Das Image enthaelt dann
+# gar kein Node/npm, der Build ist nur ein `deno cache` — und der Container
+# stirbt beim Start sofort in einer Restart-Schleife. Nicht entfernen.
+providers = ["node"]
+
 [phases.setup]
 nixpkgsArchive = "f205b5574fd0cb7da5b702a2da51507b7f4fdd1b"
