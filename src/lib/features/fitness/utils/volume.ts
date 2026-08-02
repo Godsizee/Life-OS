@@ -12,6 +12,24 @@ function mondayOf(date: Date): Date {
 	return d;
 }
 
+const BODYWEIGHT_EQUIPMENT = ['körpergewicht', 'body weight', 'none', 'keine'];
+
+export function isBodyweightExercise(equipment: string | null): boolean {
+	const e = (equipment ?? '').trim().toLowerCase();
+	return e === '' || BODYWEIGHT_EQUIPMENT.includes(e);
+}
+
+export function effectiveWeight(
+	set: Pick<WorkoutSetLog, 'weight_kg' | 'exercise_type'>,
+	bodyWeightKg: number | null,
+	isBodyweight: boolean
+): number {
+	if (set.exercise_type !== 'strength') return 0;
+	const w = set.weight_kg ?? 0;
+	if (!isBodyweight) return w;
+	return (bodyWeightKg ?? 0) + w;
+}
+
 export interface MuscleGroupVolume {
 	muscleGroup: string;
 	volumeKg: number;
@@ -20,19 +38,24 @@ export interface MuscleGroupVolume {
 /** Trainingsvolumen (Gewicht × Reps) der laufenden Kalenderwoche (Mo–So), nach Muskelgruppe. */
 export function currentWeekVolumeByMuscleGroup(
 	sets: (WorkoutSetLog & { date: string })[],
-	catalog: ExerciseCatalogEntry[]
+	catalog: ExerciseCatalogEntry[],
+	bodyWeightKg: number | null = null
 ): MuscleGroupVolume[] {
 	const weekStart = toISODate(mondayOf(new Date()));
 	const catalogById = new Map(catalog.map((c) => [c.id, c]));
 	const totals = new Map<string, number>();
 
 	for (const s of sets) {
-		// Warmup-Sätze (F6) zählen nicht ins Arbeitsvolumen.
 		if (s.set_type === 'warmup') continue;
-		if (s.date < weekStart || !s.weight_kg || !s.reps || !s.exercise_id) continue;
+		if (s.date < weekStart || !s.reps || !s.exercise_id) continue;
 		const entry = catalogById.get(s.exercise_id);
 		if (!entry?.muscle_group) continue;
-		const vol = s.weight_kg * s.reps;
+		
+		const isBW = isBodyweightExercise(entry.equipment);
+		const effWeight = effectiveWeight(s, bodyWeightKg, isBW);
+		if (effWeight === 0 && s.exercise_type === 'strength') continue;
+
+		const vol = effWeight * s.reps;
 		totals.set(entry.muscle_group, (totals.get(entry.muscle_group) ?? 0) + vol);
 	}
 

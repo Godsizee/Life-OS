@@ -4,7 +4,11 @@
 // (kein Shared-Wrapper im Projekt — jedes Feature persistiert selbst).
 import { alarm } from '$lib/core/alert.svelte';
 import { fitnessState } from './store.svelte';
+import * as fitnessApi from './api';
 import { estimateOneRepMax } from './utils/1rm';
+import { effectiveWeight, isBodyweightExercise } from './utils/volume';
+import { healthState } from '$lib/features/health/store.svelte';
+import { weightTrend } from '$lib/features/health/stats';
 import { announcePRs } from './integration';
 import type { ActiveSetLog, ExerciseType, PickedExercise, SetType, WorkoutSetLog } from './types';
 
@@ -157,7 +161,8 @@ class LiveWorkoutState {
 					distance_km: e.exercise_type === 'cardio' ? e.default_distance_km : null,
 					rpe: null,
 					set_type: 'normal',
-					completed: false
+					completed: false,
+					superset_group: null
 				});
 			}
 			void this.loadLastValues(e.exercise_id, e.name);
@@ -176,8 +181,33 @@ class LiveWorkoutState {
 		this.startedAt = new Date().toISOString();
 	}
 
+	async startFromLog(logId: string) {
+		const saetze = await fitnessApi.listSetLogs(logId);
+		if (saetze.length === 0) return;
+		this.resetSession();
+		this.planId = null;
+		this.sets = saetze.map((s) => ({
+			id: crypto.randomUUID(),
+			exercise_name: s.exercise_name,
+			exercise_id: s.exercise_id,
+			exercise_type: s.exercise_type,
+			set_index: s.set_index,
+			reps: s.reps,
+			weight_kg: s.weight_kg,
+			duration_min: s.duration_min,
+			distance_km: s.distance_km,
+			rpe: null,
+			set_type: s.set_type,
+			completed: false,
+			superset_group: s.superset_group ?? null
+		}));
+		this.active = true;
+		this.startedAt = new Date().toISOString();
+		this.persist();
+	}
+
 	/** Übung hinzufügen — beim Aufbau eines Freestyle-Workouts oder mitten im laufenden Training. */
-	addExercise(picked: PickedExercise, count = 1) {
+	addExercise(picked: PickedExercise, count = 1, supersetGroup: number | null = null) {
 		const already = this.setsFor(picked.name).length;
 		const additions: ActiveSetLog[] = [];
 		for (let i = 0; i < Math.max(1, count); i++) {
@@ -193,7 +223,8 @@ class LiveWorkoutState {
 				distance_km: null,
 				rpe: null,
 				set_type: 'normal',
-				completed: false
+				completed: false,
+				superset_group: supersetGroup
 			});
 		}
 		this.sets = [...this.sets, ...additions];
@@ -219,9 +250,14 @@ class LiveWorkoutState {
 				distance_km: template.distance_km,
 				rpe: null,
 				set_type: 'normal',
-				completed: false
+				completed: false,
+				superset_group: template.superset_group
 			}
 		];
+	}
+
+	assignSupersetGroup(exerciseName: string, groupId: number) {
+		this.sets = this.sets.map(s => s.exercise_name === exerciseName ? { ...s, superset_group: groupId } : s);
 	}
 
 	removeSet(id: string) {
@@ -256,11 +292,23 @@ class LiveWorkoutState {
 		}
 		const key = set.exercise_name.toLowerCase();
 		if (this.announcedPRs.has(key)) return;
-		const est1rm = estimateOneRepMax(set.weight_kg, set.reps);
+
+		let effW = set.weight_kg;
+		const entry = fitnessState.catalog.find(c => c.id === set.exercise_id);
+		if (entry) {
+			const bodyWeightKg = weightTrend(healthState.entries, 30)?.last ?? null;
+			effW = effectiveWeight(
+				{ weight_kg: set.weight_kg, exercise_type: 'strength' },
+				bodyWeightKg,
+				isBodyweightExercise(entry.equipment)
+			);
+		}
+
+		const est1rm = estimateOneRepMax(effW, set.reps);
 		const existingPR = fitnessState.prFor(set.exercise_name);
 		if (existingPR && est1rm <= existingPR.est_1rm) return;
 		this.announcedPRs.add(key);
-		announcePRs([{ exercise_name: set.exercise_name, weight_kg: set.weight_kg, reps: set.reps, est_1rm: est1rm }]);
+		announcePRs([{ exercise_name: set.exercise_name, weight_kg: effW, reps: set.reps, est_1rm: est1rm }]);
 	}
 
 	elapsedMinutes(): number | null {

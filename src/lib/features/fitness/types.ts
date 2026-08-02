@@ -67,6 +67,7 @@ export interface WorkoutSetLog {
 	distance_km: number | null;
 	rpe: number | null;
 	set_type: SetType;
+	superset_group?: number | null;
 }
 
 // Normalisierte Auswahl aus dem ExercisePicker — genug für Plan-/Log-Formulare,
@@ -93,6 +94,7 @@ export interface ActiveSetLog {
 	rpe: number | null;
 	set_type: SetType;
 	completed: boolean;
+	superset_group?: number | null;
 }
 
 // Ein Datensatz pro Übung — das aktuell beste geschätzte 1RM (Welle 5.3).

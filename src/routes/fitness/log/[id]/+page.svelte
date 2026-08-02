@@ -6,7 +6,9 @@
 	import { bestPerExercise } from '$lib/features/fitness/utils/1rm';
 	import { formatPace } from '$lib/features/fitness/utils/pace';
 	import type { WorkoutSetLog } from '$lib/features/fitness/types';
-	import { ArrowLeft, Calendar, Clock, Edit3, Zap, Trophy, Gauge } from 'lucide-svelte';
+	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
+	import { goto } from '$app/navigation';
+	import { ArrowLeft, Calendar, Clock, Edit3, Zap, Trophy, Gauge, Repeat } from 'lucide-svelte';
 
 	const logId = $derived(page.params.id);
 
@@ -58,7 +60,11 @@
 		Math.round(sets.reduce((sum, s) => sum + (s.completed && s.distance_km ? s.distance_km : 0), 0) * 10) / 10
 	);
 
-	const bestsToday = $derived(bestPerExercise(sets));
+	import { healthState } from '$lib/features/health/store.svelte';
+	import { weightTrend } from '$lib/features/health/stats';
+
+	const bodyWeightKg = $derived(weightTrend(healthState.entries, 30)?.last ?? null);
+	const bestsToday = $derived(bestPerExercise(sets, fitnessState.catalog, bodyWeightKg));
 	function prForExercise(exerciseName: string) {
 		return bestsToday.find((b) => b.exercise_name === exerciseName);
 	}
@@ -89,10 +95,23 @@
 	<div class="space-y-6">
 		<!-- Kopf -->
 		<header class="space-y-2">
-			<h1 class="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2">
-				{#if isFreestyle}<Zap size={18} class="text-primary-active shrink-0" />{/if}
-				<span>{planName}</span>
-			</h1>
+			<div class="flex items-center justify-between gap-4">
+				<h1 class="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2 min-w-0">
+					{#if isFreestyle}<Zap size={18} class="text-primary-active shrink-0" />{/if}
+					<span class="truncate">{planName}</span>
+				</h1>
+				<button
+					onclick={async () => {
+						if (!logId) return;
+						await liveWorkoutState.startFromLog(logId);
+						goto('/fitness');
+					}}
+					class="shrink-0 h-10 px-3 rounded-lg bg-surface-2 hover:bg-primary-500/10 hover:text-primary-active text-text-secondary font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95"
+				>
+					<Repeat size={14} />
+					<span class="hidden sm:inline">Wiederholen</span>
+				</button>
+			</div>
 			<div class="flex flex-wrap gap-4 text-xs font-semibold text-text-secondary">
 				<span class="flex items-center gap-1">
 					<Calendar size={12} />
