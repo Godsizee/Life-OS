@@ -6,6 +6,7 @@ import { goalsState } from '$lib/features/goals/store.svelte';
 import { analyticsState } from './store.svelte';
 import { calculateStreak, streakUnit } from '$lib/features/habits/streak';
 import { toISODate } from '$lib/core/date';
+import type { DBScoreEntry } from './api';
 
 export interface PeriodReport {
 	days: number;
@@ -63,4 +64,19 @@ export function buildPeriodReport(days = 30): PeriodReport {
 		longestStreak,
 		newPRs
 	};
+}
+
+/**
+ * Erzeugt einen CSV-String aus der Historie.
+ */
+export function toCsv(scores: DBScoreEntry[]): string {
+	const lines = ['Datum;Total;Aufgaben;Routinen;Gesundheit;Fitness;Ziele;Tagebuch;Stimmung;Fokus'];
+	const sorted = [...scores].sort((a, b) => b.date.localeCompare(a.date));
+	for (const s of sorted) {
+		const b = s.breakdown;
+		lines.push(
+			`${s.date};${s.total};${b.tasks};${b.habits};${b.health};${b.fitness};${b.goals};${b.journal};${b.mood};${b.focus}`
+		);
+	}
+	return lines.join('\n');
 }

@@ -47,7 +47,7 @@ class AnalyticsState {
 		this.loading = true;
 		const ok = await ladeSicher('Analytics', async () => {
 			const since = new Date();
-			since.setDate(since.getDate() - 30);
+			since.setDate(since.getDate() - 365);
 			this.scores = await analyticsApi.getRecentScores(wId, uId, toISODate(since));
 		});
 		this.loading = false;
@@ -112,6 +112,36 @@ class AnalyticsState {
 			}
 		} catch (err) {
 			console.error('Fehler beim Speichern des Life Scores:', err);
+		}
+	}
+
+	/**
+	 * Rechnet fehlende Tagesscores der letzten `days` Tage nach.
+	 * Läuft einmal nach dem Laden; ohne das entstehen Lücken, sobald die App
+	 * einen Tag lang nicht geöffnet wird.
+	 * 
+	 * Achtung: Nutzt den HEUTIGEN Datenstand (z.B. aktuelle Ziele/Gewichte).
+	 * Ist also eine Näherung.
+	 */
+	async backfillScores(days = 7) {
+		const wId = workspaceState.workspace?.id;
+		const uId = authState.user?.id;
+		if (!wId || !uId) return;
+
+		for (let i = days; i >= 1; i--) {
+			const d = new Date();
+			d.setDate(d.getDate() - i);
+			const iso = toISODate(d);
+			
+			if (this.scores.some((s) => s.date === iso)) continue;
+			
+			try {
+				const berechnet = computeLifeScore(iso);
+				const saved = await analyticsApi.upsertScore(wId, uId, iso, berechnet.total, berechnet.breakdown);
+				this.scores = [...this.scores, saved].sort((a, b) => a.date.localeCompare(b.date));
+			} catch (e) {
+				console.error(`Fehler beim Backfill für ${iso}:`, e);
+			}
 		}
 	}
 }

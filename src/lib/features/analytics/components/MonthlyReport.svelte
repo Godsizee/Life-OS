@@ -25,7 +25,7 @@
 
 <section class="space-y-3">
 	<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
-		Dein Monat in Zahlen ({days} Tage)
+		Rückblick in Zahlen ({days} Tage)
 	</h2>
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 		{#each tiles as tile (tile.label)}

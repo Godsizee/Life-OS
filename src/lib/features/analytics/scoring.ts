@@ -12,6 +12,7 @@ import { toISODate } from '$lib/core/date';
 import { getGoalProgress } from '$lib/features/goals/progress';
 import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
 import { waterMl } from '$lib/features/health/stats';
+import { weightedTotal } from './score-math';
 
 export interface ScoreBreakdown {
 	tasks: number;
@@ -32,7 +33,7 @@ export interface ScoreResult {
 export function computeLifeScore(dateStr: string): ScoreResult {
 	const date = new Date(dateStr);
 
-	// 1. Tasks (25%)
+	// 1. Tasks
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
 		const isCompletedToday = !!t.completed_at && toISODate(new Date(t.completed_at)) === dateStr;
@@ -42,7 +43,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	const tasksScore =
 		todaysTasks.length > 0 ? (completedTasks.length / todaysTasks.length) * 100 : 100;
 
-	// 2. Habits (25%)
+	// 2. Habits
 	const activeHabits = habitsState.habits.filter((h) => !h.archived);
 	const relevant = activeHabits.map((h) => ({ h, days: habitsState.entriesFor(h.id) }));
 	let dueCount = 0;
@@ -57,7 +58,7 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	}
 	const habitsScore = dueCount > 0 ? (doneCount / dueCount) * 100 : 100;
 
-	// 3. Health (13%) — W9: rechnet gegen die Ziele aus profiles.settings
+	// 3. Health — W9: rechnet gegen die Ziele aus profiles.settings
 	//    statt gegen hartkodierte 8 Gläser / 7–9 h.
 	const healthEntry = healthState.entries.find((e) => e.date === dateStr);
 	const waterGoal = profileState.waterGoalMl;
@@ -78,22 +79,22 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	}
 	const healthScore = healthPoints;
 
-	// 4. Mood (10%)
+	// 4. Mood
 	const moodEntry = moodState.entries.find((e) => e.date === dateStr);
 	const moodScore = moodEntry ? (moodEntry.score / 5) * 100 : 0;
 
-	// 5. Goals (10%)
+	// 5. Goals
 	const openGoals = goalsState.goals.filter((g) => g.status === 'open' && !g.archived);
 	const goalsScore =
 		openGoals.length > 0
 			? openGoals.reduce((sum, g) => sum + getGoalProgress(g), 0) / openGoals.length
 			: 100;
 
-	// 6. Journal (10%)
+	// 6. Journal
 	const journalEntry = goalsState.entryForDate(dateStr);
 	const journalScore = journalEntry ? 100 : 0;
 
-	// 7. Focus (5%) — W6: aus time_entries statt localStorage; gilt damit auch für
+	// 7. Focus — W6: aus time_entries statt localStorage; gilt damit auch für
 	//    vergangene Tage und auf jedem Gerät. Tagessoll = Runden x Fokusdauer.
 	const focusScore = focusScoreForDate(
 		timeTrackingState.entries,
@@ -101,31 +102,22 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 		profileState.focusDailyGoalMinutes
 	);
 
-	// 8. Fitness (10%, Welle F4) — Wochenziel-Score, pro-rata über die laufende Woche.
+	// 8. Fitness — Wochenziel-Score, pro-rata über die laufende Woche.
 	const fitnessScore = fitnessFrequencyScore(fitnessState.logs, profileState.weeklyWorkoutGoal, date);
 
-	const total = Math.round(
-		tasksScore * 0.22 +
-		habitsScore * 0.22 +
-		healthScore * 0.13 +
-		fitnessScore * 0.1 +
-		goalsScore * 0.1 +
-		journalScore * 0.1 +
-		moodScore * 0.08 +
-		focusScore * 0.05
-	);
+	const breakdown: ScoreBreakdown = {
+		tasks: Math.round(tasksScore),
+		habits: Math.round(habitsScore),
+		health: Math.round(healthScore),
+		fitness: Math.round(fitnessScore),
+		mood: Math.round(moodScore),
+		goals: Math.round(goalsScore),
+		journal: Math.round(journalScore),
+		focus: Math.round(focusScore)
+	};
 
 	return {
-		total,
-		breakdown: {
-			tasks: Math.round(tasksScore),
-			habits: Math.round(habitsScore),
-			health: Math.round(healthScore),
-			fitness: Math.round(fitnessScore),
-			mood: Math.round(moodScore),
-			goals: Math.round(goalsScore),
-			journal: Math.round(journalScore),
-			focus: Math.round(focusScore)
-		}
+		total: weightedTotal(breakdown),
+		breakdown
 	};
 }
