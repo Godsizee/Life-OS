@@ -5,7 +5,7 @@
 	import { themeState } from '$lib/core/theme.svelte';
 	import { outbox } from '$lib/core/outbox.svelte';
 	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
-	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning } from 'lucide-svelte';
+	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning, Settings } from 'lucide-svelte';
 	import Spinner from '$lib/ui/Spinner.svelte';
 
 	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
@@ -41,10 +41,16 @@
 		{collapsed ? 'w-20' : 'w-64'}"
 	style="view-transition-name: sidebar"
 >
-	<!-- Header / Logo -->
-	<div class="flex h-16 items-center justify-between border-b border-border-color px-4">
+	<!-- Header / Logo.
+	     Eingeklappt bleiben von den 80px Leistenbreite nach px-4 nur 48px uebrig -
+	     Logo (36px) und Umschalter (28px) nebeneinander liefen dort ueber. Deshalb
+	     stehen sie eingeklappt untereinander in einer Spalte. -->
+	<div
+		class="flex h-16 items-center border-b border-border-color px-4
+			{collapsed ? 'justify-center' : 'justify-between'}"
+	>
 		{#if !collapsed}
-			<div class="flex items-center gap-2.5 overflow-hidden">
+			<div class="flex min-w-0 items-center gap-2.5 overflow-hidden">
 				<img src="/favicon.svg" alt="Life OS Logo" class="h-9 w-9 shrink-0 rounded-xl premium-shadow object-cover" />
 				<div class="flex flex-col min-w-0">
 					<span class="truncate text-sm font-bold tracking-tight text-text-primary">Life OS</span>
@@ -53,21 +59,30 @@
 					</span>
 				</div>
 			</div>
-		{:else}
-			<img src="/favicon.svg" alt="Life OS Logo" class="mx-auto h-9 w-9 shrink-0 rounded-xl premium-shadow object-cover" />
-		{/if}
-
-		<button
-			onclick={toggleCollapse}
-			class="hidden items-center justify-center rounded-lg p-1.5 text-text-tertiary hover:bg-surface-2 hover:text-text-primary md:flex"
-			aria-label="Sidebar einklappen"
-		>
-			{#if collapsed}
-				<ChevronRight size={16} />
-			{:else}
+			<button
+				onclick={toggleCollapse}
+				class="hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-text-tertiary hover:bg-surface-2 hover:text-text-primary md:flex"
+				aria-label="Seitenleiste einklappen"
+			>
 				<ChevronLeft size={16} />
-			{/if}
-		</button>
+			</button>
+		{:else}
+			<button
+				onclick={toggleCollapse}
+				class="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-surface-2"
+				aria-label="Seitenleiste ausklappen"
+			>
+				<img
+					src="/favicon.svg"
+					alt=""
+					class="h-9 w-9 rounded-xl premium-shadow object-cover transition-opacity group-hover:opacity-0"
+				/>
+				<ChevronRight
+					size={18}
+					class="absolute text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100"
+				/>
+			</button>
+		{/if}
 	</div>
 
 	<!-- Module Links -->
@@ -78,8 +93,9 @@
 			<a
 				href={item.route}
 				class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative group
-					{active 
-						? 'bg-primary-active-bg text-primary-active font-semibold' 
+					{collapsed ? 'justify-center' : ''}
+					{active
+						? 'bg-primary-active-bg text-primary-active font-semibold'
 						: 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'}"
 			>
 				<!-- Active Indicator Line -->
@@ -111,14 +127,17 @@
 		</div>
 	{/if}
 
-	<!-- Footer -->
+	<!-- Footer.
+	     Die Tooltips im eingeklappten Zustand brauchen `group relative` auf dem
+	     jeweiligen Element - ohne `group` blieben sie dauerhaft unsichtbar, ohne
+	     `relative` haengten sie am oberen Rand der Leiste statt neben ihrem Eintrag. -->
 	<div class="border-t border-border-color p-3 space-y-2">
 		<!-- Settings -->
 		<a
 			href="/settings"
-			class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {currentPath === '/settings' ? 'bg-primary-active-bg text-primary-active font-semibold' : ''}"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed ? 'justify-center' : ''} {currentPath === '/settings' ? 'bg-primary-active-bg text-primary-active font-semibold' : ''}"
 		>
-			<span class="text-xl shrink-0">⚙️</span>
+			<Settings size={20} class="shrink-0 {currentPath === '/settings' ? 'text-primary-active' : 'text-text-tertiary'}" />
 			{#if !collapsed}
 				<span class="truncate">Einstellungen</span>
 			{:else}
@@ -130,18 +149,19 @@
 		<!-- Dark Mode Toggle -->
 		<button
 			onclick={() => themeState.toggle()}
-			class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed ? 'justify-center' : ''}"
 		>
 			{#if themeState.isDark}
 				<Sun size={20} class="shrink-0 text-amber-500" />
-				{#if !collapsed}
-					<span class="truncate">Helles Design</span>
-				{/if}
 			{:else}
 				<Moon size={20} class="shrink-0 text-text-tertiary" />
-				{#if !collapsed}
-					<span class="truncate">Dunkles Design</span>
-				{/if}
+			{/if}
+			{#if !collapsed}
+				<span class="truncate">{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}</span>
+			{:else}
+				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+					{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}
+				</div>
 			{/if}
 		</button>
 
@@ -150,7 +170,7 @@
 			onclick={logout}
 			disabled={logoutState.loading}
 			aria-busy={logoutState.loading}
-			class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20 {collapsed ? 'justify-center' : ''}"
 		>
 			{#if logoutState.loading}
 				<Spinner size={20} />
@@ -159,14 +179,20 @@
 			{/if}
 			{#if !collapsed}
 				<span class="truncate">{logoutState.loading ? 'Melde ab…' : 'Abmelden'}</span>
+			{:else}
+				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+					Abmelden
+				</div>
 			{/if}
 		</button>
 
 		<!-- User Avatar/Info -->
 		{#if authState.user}
-			<div class="flex items-center gap-3 pt-2 px-1">
+			<div class="flex items-center gap-3 pt-2 px-1 {collapsed ? 'justify-center' : ''}">
+				<!-- Zweites `?.`: bei leerer (nicht nur fehlender) E-Mail griff die
+				     Optional-Chain nicht und .toUpperCase() lief auf undefined. -->
 				<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-active-bg text-sm font-bold text-primary-active">
-					{authState.user.email?.[0].toUpperCase() ?? 'U'}
+					{authState.user.email?.[0]?.toUpperCase() ?? 'U'}
 				</div>
 				{#if !collapsed}
 					<div class="flex flex-col min-w-0">

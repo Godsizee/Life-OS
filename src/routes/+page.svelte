@@ -11,6 +11,7 @@
 	import WelcomeModal from '$lib/features/dashboard/components/WelcomeModal.svelte';
 	import QuickAddBar from '$lib/features/dashboard/components/QuickAddBar.svelte';
 	import NextUpCard from '$lib/features/dashboard/components/NextUpCard.svelte';
+	import WeekFocusCard from '$lib/features/dashboard/components/WeekFocusCard.svelte';
 	import StreakBanner from '$lib/features/dashboard/components/StreakBanner.svelte';
 	import HealthTiles from '$lib/features/dashboard/components/HealthTiles.svelte';
 	import FocusMiniCard from '$lib/features/focus/components/FocusMiniCard.svelte';
@@ -26,6 +27,7 @@
 	import { shoppingState } from '$lib/features/shopping/store.svelte';
 	import { healthState } from '$lib/features/health/store.svelte';
 	import { notesState } from '$lib/features/notes/store.svelte';
+	import { goalsState } from '$lib/features/goals/store.svelte';
 	
 	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
 	import HabitList from '$lib/features/habits/components/HabitList.svelte';
@@ -43,7 +45,8 @@
 	});
 
 	const greeting = $derived(greetingFor(now));
-	const isSunday = $derived(now.getDay() === 0);
+	// W10 — Banner ab Samstag statt nur sonntags; verschwindet, sobald der Review erledigt ist.
+	const isReviewSeason = $derived(now.getDay() === 6 || now.getDay() === 0);
 	const todayLabel = $derived(formatDate(now));
 
 	const todayStart = $derived(new Date(now.toDateString()));
@@ -93,15 +96,20 @@
 	<SuggestionCarousel />
 	<StreakBanner />
 
-	{#if isSunday}
+	{#if isReviewSeason && !goalsState.hatReviewDieseWoche}
 		<a href="/review" class="flex items-center gap-3 rounded-2xl border border-primary-active/20 bg-primary-active-bg p-4 text-sm font-medium text-primary-active hover:opacity-90 transition-all premium-shadow">
 			<Sparkles size={18} />
-			<span>Heute ist Sonntag — Zeit für deinen Weekly Review</span>
+			<span>Zeit für deinen Weekly Review</span>
 			<span class="ml-auto">→</span>
+		</a>
+	{:else if goalsState.hatReviewDieseWoche}
+		<a href="/review" class="flex items-center gap-2 text-xs font-medium text-text-tertiary hover:text-text-secondary">
+			<span>✓ Weekly Review erledigt</span>
 		</a>
 	{/if}
 
 	<QuickAddBar />
+	<WeekFocusCard />
 	<NextUpCard />
 
 	<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

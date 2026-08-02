@@ -1,4 +1,5 @@
 import type { Task } from '$lib/features/tasks/types';
+import { weekKey } from '$lib/features/analytics/week-window';
 
 /** Prioritätgewichte */
 const PRIORITY_WEIGHT: Record<string, number> = {
@@ -13,6 +14,11 @@ const PRIORITY_WEIGHT: Record<string, number> = {
  */
 export function scoreTask(task: Task, now: Date = new Date()): number {
 	let score = PRIORITY_WEIGHT[task.priority] ?? 0;
+
+	// W10 — als Weekly-Review-Wochenfokus markierte Aufgaben stehen über allem anderen.
+	if (task.focus_week === weekKey(now)) {
+		score += 100;
+	}
 
 	if (task.due_at) {
 		const msUntilDue = new Date(task.due_at).getTime() - now.getTime();

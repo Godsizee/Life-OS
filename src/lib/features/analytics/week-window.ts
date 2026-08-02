@@ -1,4 +1,4 @@
-import { toISODate } from '$lib/core/date';
+import { fromISODate, toISODate } from '$lib/core/date';
 
 /**
  * Zeitfenster des Weekly Review.
@@ -40,4 +40,18 @@ export function reviewWeek(heute: Date, tage: number = REVIEW_TAGE): WeekWindow 
 	});
 
 	return { start, end, dates };
+}
+
+/** Montag der Woche, in der `date` liegt (DE-Wochenstart). Schlüssel für focus_week. */
+export function weekKey(date: Date): string {
+	const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+	d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+	return toISODate(d);
+}
+
+/** Montag der KOMMENDEN Woche — dafür wählt der Review seine Top-3. */
+export function nextWeekKey(date: Date): string {
+	const d = fromISODate(weekKey(date))!;
+	d.setDate(d.getDate() + 7);
+	return toISODate(d);
 }

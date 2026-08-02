@@ -1,5 +1,6 @@
 import type { Task, TaskStatus } from './types';
 import { toISODate } from '$lib/core/date';
+import { weekKey } from '$lib/features/analytics/week-window';
 
 export interface TaskNode { task: Task; children: Task[]; }
 
@@ -40,10 +41,14 @@ export function completedBetween(tasks: Task[], von: string, bis: string): Task[
 	});
 }
 
-export type SmartView = 'all' | 'today' | 'overdue' | 'upcoming' | 'no_date';
+export type SmartView = 'all' | 'today' | 'overdue' | 'upcoming' | 'no_date' | 'focus_week';
 
 export function smartViewFilter(tasks: Task[], view: SmartView, now: Date = new Date()): Task[] {
 	if (view === 'all') return tasks;
+	if (view === 'focus_week') {
+		const key = weekKey(now);
+		return tasks.filter((t) => t.focus_week === key);
+	}
 	const endOfToday = new Date(now); endOfToday.setHours(23, 59, 59, 999);
 	const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
 	const in7 = new Date(endOfToday); in7.setDate(in7.getDate() + 7);

@@ -220,11 +220,19 @@
 											</div>
 										</div>
 
-										<div class="flex items-center gap-2 pl-10 text-[10px] font-bold uppercase tracking-wider text-text-tertiary">
+										<!--
+											114px = Breite eines StepperInput (2x w-8 + w-12 + 1px Rahmen je
+											Seite). Mit den bisherigen 104px sassen die Spaltentitel 10px
+											neben ihren Feldern. Unterhalb von sm bricht die Satz-Zeile um und
+											die Stepper stauchen sich - dort wuerden die Titel auf die falsche
+											Spalte zeigen, deshalb sind sie erst ab sm sichtbar. Die Felder
+											bleiben ueber Platzhalter und aria-label beschriftet.
+										-->
+										<div class="hidden items-center gap-2 pl-10 text-[10px] font-bold uppercase tracking-wider text-text-tertiary sm:flex">
 											{#if exType === 'strength'}
-												<span class="w-[104px]">Reps</span><span class="w-[104px]">kg</span><span>RPE</span>
+												<span class="w-28.5">Reps</span><span class="w-28.5">kg</span><span>RPE</span>
 											{:else if exType === 'cardio'}
-												<span class="w-[104px]">Min</span><span>km</span>
+												<span class="w-28.5">Min</span><span>km</span>
 											{:else}
 												<span>Min</span>
 											{/if}

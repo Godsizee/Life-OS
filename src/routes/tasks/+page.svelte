@@ -166,6 +166,7 @@
 		</Chip>
 		<Chip selected={smartView === 'upcoming'} onclick={() => (smartView = 'upcoming')}>Demnächst</Chip>
 		<Chip selected={smartView === 'no_date'} onclick={() => (smartView = 'no_date')}>Ohne Datum</Chip>
+		<Chip selected={smartView === 'focus_week'} onclick={() => (smartView = 'focus_week')}>⭐ Wochenfokus</Chip>
 	</section>
 
 	<!-- Wer? -->

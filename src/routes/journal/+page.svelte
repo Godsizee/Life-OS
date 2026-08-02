@@ -11,13 +11,16 @@
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Select from '$lib/ui/Select.svelte';
+	import { page } from '$app/stores';
 
 	let journalSheetOpen = $state(false);
 	let journalDate = $state<string | null>(null);
 	let journalKind = $state<JournalKind>('daily');
 
 	let query = $state('');
-	let selectedKind = $state<JournalKind | null>(null);
+	// Deep-Link vom Weekly Review: /journal?kind=weekly.
+	const kindParam = $page.url.searchParams.get('kind');
+	let selectedKind = $state<JournalKind | null>(kindParam === 'daily' || kindParam === 'weekly' ? kindParam : null);
 	let selectedMonth = $state('');
 
 	const streak = $derived(calculateJournalStreak(goalsState.journalEntries));

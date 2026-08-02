@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Trash2, Repeat, AlignLeft } from 'lucide-svelte';
+	import { Trash2, Repeat, AlignLeft, Star } from 'lucide-svelte';
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { formatRRule } from '../recurrence';
+	import { weekKey } from '$lib/features/analytics/week-window';
 	import ListRow from '$lib/ui/ListRow.svelte';
 	import CheckCircle from '$lib/ui/CheckCircle.svelte';
 	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
@@ -12,6 +13,7 @@
 
 	const isDone = $derived(task.status === 'done');
 	const isOverdue = $derived(!isDone && !!task.due_at && new Date(task.due_at) < new Date());
+	const isFocusWeek = $derived(task.focus_week === weekKey(new Date()));
 	const recurrenceLabel = $derived(formatRRule(task.rrule));
 
 	function toggle() {
@@ -34,6 +36,9 @@
 		>
 			<div class="flex items-center justify-between gap-2">
 				<div class="flex items-center gap-1.5 min-w-0">
+					{#if isFocusWeek}
+						<Star size={12} class="shrink-0 fill-amber-400 text-amber-400" />
+					{/if}
 					{#if task.priority === 'high'}
 						<span class="inline-block h-2 w-2 rounded-full bg-red-500 shrink-0"></span>
 					{:else if task.priority === 'low'}

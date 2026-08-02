@@ -1,274 +1,114 @@
 <script lang="ts">
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { moodState } from '$lib/features/mood/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { calendarState } from '$lib/features/calendar/store.svelte';
-	import { expandEvents } from '$lib/features/calendar/occurrences';
-	import { isCompleted, type HabitDay } from '$lib/features/habits/streak';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-	import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
-	import { notesState } from '$lib/features/notes/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { waterMl, formatMetric } from '$lib/features/health/stats';
-	import { activityLabel } from '$lib/features/mood/activities';
-	import { Calendar, CheckSquare, Flame, Heart, Smile, Target, Notebook, Dumbbell, Zap } from 'lucide-svelte';
+	import { History } from 'lucide-svelte';
 	import PageHeader from '$lib/ui/PageHeader.svelte';
 	import Chip from '$lib/ui/Chip.svelte';
 	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import { toISODate } from '$lib/core/date';
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	import { timelineState } from '$lib/features/timeline/store.svelte';
+	import { groupByDay } from '$lib/features/timeline/build';
+	import { TIMELINE_MODULES } from '$lib/features/timeline/modules';
+	import TimelineDayGroup from '$lib/features/timeline/components/TimelineDayGroup.svelte';
+	import type { TimelineModule } from '$lib/features/timeline/module-ids';
 
-	interface TimelineItem {
-		id: string;
-		date: string;
-		title: string;
-		description?: string;
-		icon: any;
-		color: string;
-		bg: string;
-		module: string;
+	let filterModule = $state<TimelineModule | 'all'>('all');
+	let visibleGroups = $state(20);
+
+	// Wenn sich der Filter ändert, resetten wir die Paginierung
+	$effect(() => {
+		filterModule;
+		visibleGroups = 20;
+	});
+
+	const filteredItems = $derived(
+		filterModule === 'all'
+			? timelineState.items
+			: timelineState.items.filter((i) => i.module === filterModule)
+	);
+
+	const gruppen = $derived(groupByDay(filteredItems));
+	const renderedGroups = $derived(gruppen.slice(0, visibleGroups));
+	const hasMore = $derived(visibleGroups < gruppen.length);
+
+	function counts(mod: string) {
+		if (mod === 'all') return timelineState.items.length;
+		return timelineState.items.filter((i) => i.module === mod).length;
 	}
-
-	// Aggregate activities
-	const timelineItems = $derived.by((): TimelineItem[] => {
-		const items: TimelineItem[] = [];
-
-		// 1. Completed Tasks
-		tasksState.tasks
-			.filter((t) => t.status === 'done' && (t.completed_at || t.updated_at))
-			.forEach((t) => {
-				const date = toISODate(new Date(t.completed_at ?? t.updated_at));
-				items.push({
-					id: `task_${t.id}`,
-					date,
-					title: `Aufgabe abgeschlossen: "${t.title}"`,
-					icon: CheckSquare,
-					color: 'text-blue-500',
-					bg: 'bg-blue-50 dark:bg-blue-950/20',
-					module: 'Tasks'
-				});
-			});
-
-		// 2. Logged Habits
-		habitsState.logs.forEach((log) => {
-			const habit = habitsState.habits.find((h) => h.id === log.habit_id);
-			if (habit && isCompleted(habit, log as unknown as HabitDay)) {
-				items.push({
-					id: `habit_${log.id}`,
-					date: log.date,
-					title: `Routine erledigt: "${habit.name}"`,
-					icon: Flame,
-					color: 'text-pink-500',
-					bg: 'bg-pink-50 dark:bg-pink-950/20',
-					module: 'Habits'
-				});
-			}
-		});
-
-		// 3. Mood Entries
-		moodState.entries.forEach((m) => {
-			const tags = (m.activities ?? []).map((a) => activityLabel(a));
-			const desc = [m.note, tags.length > 0 ? tags.join(' · ') : null]
-				.filter(Boolean)
-				.join(' — ');
-			items.push({
-				id: `mood_${m.id}`,
-				date: m.date,
-				title: `Stimmung eingetragen: ${m.score}/5`,
-				description: desc || undefined,
-				icon: Smile,
-				color: 'text-amber-500',
-				bg: 'bg-amber-50 dark:bg-amber-950/20',
-				module: 'Mood'
-			});
-		});
-
-		// 4. Goals Completed
-		goalsState.goals.forEach((g) => {
-			if (g.status === 'done') {
-				const date = toISODate(new Date(g.updated_at!));
-				items.push({
-					id: `goal_${g.id}`,
-					date,
-					title: `🎯 Ziel erreicht! "${g.title}"`,
-					description: g.description ?? undefined,
-					icon: Target,
-					color: 'text-indigo-500',
-					bg: 'bg-indigo-50 dark:bg-indigo-950/20',
-					module: 'Goals'
-				});
-			}
-		});
-
-		// 6. Fitness Logs (Welle F4)
-		fitnessState.logs.forEach((log) => {
-			const planName = fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training';
-			items.push({
-				id: `fitness_${log.id}`,
-				date: log.date,
-				title: `Workout absolviert: "${planName}"`,
-				description: log.duration_minutes ? `${log.duration_minutes} Min.` : undefined,
-				icon: Dumbbell,
-				color: 'text-orange-500',
-				bg: 'bg-orange-50 dark:bg-orange-950/20',
-				module: 'Fitness'
-			});
-		});
-
-		// 5. Health Logs
-		healthState.entries.forEach((h) => {
-			const details: string[] = [];
-			if (h.weight_kg) details.push(`${h.weight_kg} kg`);
-			if (h.sleep_h) details.push(`${h.sleep_h} Std. Schlaf`);
-			const w = waterMl(h);
-			if (w) details.push(formatMetric('water_ml', w, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl }));
-			if (details.length > 0) {
-				items.push({
-					id: `health_${h.id}`,
-					date: h.date,
-					title: 'Gesundheitswerte erfasst',
-					description: details.join(' · '),
-					icon: Heart,
-					color: 'text-cyan-500',
-					bg: 'bg-cyan-50 dark:bg-cyan-950/20',
-					module: 'Health'
-				});
-			}
-		});
-
-		// 8. Notizen (W7)
-		notesState.notes.forEach((n) => {
-			items.push({
-				id: `note_${n.id}`,
-				date: toISODate(new Date(n.created_at)),
-				title: `Notiz angelegt: "${n.title}"`,
-				description: n.private ? 'Privat' : undefined,
-				icon: Notebook,
-				color: 'text-emerald-500',
-				bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-				module: 'Notes'
-			});
-		});
-
-		// 7. Events
-		const pastEvents = expandEvents(calendarState.events, calendarState.overrides, new Date('2020-01-01'), new Date());
-		pastEvents.forEach((o) => {
-			items.push({
-				id: `event_${o.key}`,
-				date: o.occurrenceDate,
-				title: `Termin: "${o.title}"`,
-				icon: Calendar,
-				color: 'text-purple-500',
-				bg: 'bg-purple-50 dark:bg-purple-950/20',
-				module: 'Calendar'
-			});
-		});
-
-		// 8. Fokuszeit (W6) — pro Tag aggregiert, nicht je Runde.
-		const focusPerDay = new Map<string, number>();
-		timeTrackingState.entries.forEach((e) => {
-			const d = entryDate(e);
-			focusPerDay.set(d, (focusPerDay.get(d) ?? 0) + minutesOf(e));
-		});
-		focusPerDay.forEach((minutes, date) => {
-			if (minutes <= 0) return;
-			const rounds = pomodorosOnDate(timeTrackingState.entries, date);
-			items.push({
-				id: `focus_${date}`,
-				date,
-				title: `${formatMinutes(minutes)} fokussiert`,
-				description: rounds > 0 ? `${rounds} Runde${rounds !== 1 ? 'n' : ''}` : undefined,
-				icon: Zap,
-				color: 'text-yellow-500',
-				bg: 'bg-yellow-50 dark:bg-yellow-950/20',
-				module: 'Focus'
-			});
-		});
-
-		// Sort by Date descending
-		return items.sort((a, b) => b.date.localeCompare(a.date));
-	});
-
-	// Group items by date
-	const groupedTimeline = $derived.by((): { date: string; items: TimelineItem[] }[] => {
-		const raw = timelineItems;
-		const groups: Record<string, TimelineItem[]> = {};
-		
-		raw.forEach((item) => {
-			if (!groups[item.date]) groups[item.date] = [];
-			groups[item.date].push(item);
-		});
-
-		return Object.entries(groups)
-			.map(([date, items]) => ({ date, items }))
-			.sort((a, b) => b.date.localeCompare(a.date));
-	});
-
-	let filterModule = $state<string>('all');
 </script>
 
 <svelte:head>
 	<title>Timeline - Aktivitätenverlauf</title>
 </svelte:head>
 
+{#snippet rangeToggle()}
+	<div class="flex items-center gap-1 rounded-xl bg-surface-2 p-1">
+		{#each [30, 90, 365, 'all'] as z}
+			<button
+				onclick={() => timelineState.setRange(z as any)}
+				class="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-xs font-bold transition-all md:flex-none md:px-3 {timelineState.range ===
+				z
+					? 'bg-surface-0 text-primary-active premium-shadow'
+					: 'text-text-secondary hover:text-text-primary'}"
+				title={z === 'all' ? 'Bei viel Historie kann das einen Moment dauern' : `${z} Tage`}
+			>
+				{z === 'all' ? 'Alles' : `${z} T.`}
+			</button>
+		{/each}
+	</div>
+{/snippet}
+
 <div class="space-y-6">
-	<!-- Header -->
+	<!--
+		Der Range-Toggle ist ~240px breit und liesse im PageHeader-Slot auf schmalen
+		Displays nur Platz fuer wenige Pixel Titel. Deshalb steht er dort erst ab
+		`md` und darunter als eigene Zeile unter dem Header.
+	-->
 	<PageHeader title="Timeline" subtitle="Verfolge all deine Aktivitäten und Fortschritte chronologisch.">
 		{#snippet trailing()}
-			<!-- Filter Chip-row -->
-			<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-				<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>Alles</Chip>
-				{#each ['Tasks', 'Habits', 'Notes', 'Mood', 'Goals', 'Health', 'Fitness', 'Calendar'] as mod (mod)}
-					<Chip selected={filterModule === mod} onclick={() => (filterModule = mod)}>{mod}</Chip>
-				{/each}
+			<div class="hidden md:block">
+				{@render rangeToggle()}
 			</div>
 		{/snippet}
 	</PageHeader>
 
-	<!-- Timeline List -->
-	<div class="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-color">
-		{#each groupedTimeline as group (group.date)}
-			{@const filtered = group.items.filter(item => filterModule === 'all' || item.module === filterModule)}
-			{#if filtered.length > 0}
-				<div class="space-y-4">
-					<!-- Date Bubble Header -->
-					<div class="relative z-10 flex items-center">
-						<span class="rounded-xl bg-surface-3 px-3 py-1 text-xs font-extrabold text-text-primary border border-border-color premium-shadow">
-							{new Date(group.date).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })}
-						</span>
-					</div>
+	<div class="md:hidden">
+		{@render rangeToggle()}
+	</div>
 
-					<!-- Items in group -->
-					<div class="pl-12 space-y-4">
-						{#each filtered as item (item.id)}
-							{@const Icon = item.icon}
-							<div class="glass-card relative flex items-start gap-4 rounded-2xl p-4 premium-shadow">
-								<!-- Left timeline dot connector -->
-								<div class="absolute -left-12 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-surface-0 border-2 border-border-color text-xs">
-									<div class="h-2.5 w-2.5 rounded-full {item.color.replace('text', 'bg')}"></div>
-								</div>
-
-								<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {item.bg} {item.color}">
-									<Icon size={18} />
-								</div>
-								
-								<div class="space-y-1 min-w-0 flex-1">
-									<h4 class="text-sm font-bold text-text-primary">{item.title}</h4>
-									{#if item.description}
-										<p class="text-xs text-text-secondary">{item.description}</p>
-									{/if}
-								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-			{/if}
-		{:else}
-			<EmptyState icon={Notebook} title="Keine Aktivitäten aufgezeichnet" />
+	<!-- Filter Chip-row -->
+	<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+		<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>
+			Alles <span class="ml-1 opacity-60 text-[10px] tabular-nums">({counts('all')})</span>
+		</Chip>
+		{#each TIMELINE_MODULES as meta (meta.id)}
+			<Chip selected={filterModule === meta.id} onclick={() => (filterModule = meta.id)}>
+				{meta.label} <span class="ml-1 opacity-60 text-[10px] tabular-nums">({counts(meta.id)})</span>
+			</Chip>
 		{/each}
 	</div>
+
+	<!-- Timeline List -->
+	{#if gruppen.length === 0}
+		<EmptyState 
+			icon={History} 
+			title={filterModule === 'all' ? 'Noch nichts aufgezeichnet' : 'Keine Einträge in diesem Bereich'} 
+			hint={filterModule === 'all' ? 'Sobald du etwas erledigst, erscheint es hier.' : 'Wähle einen anderen Bereich oder „Alles".'}
+		/>
+	{:else}
+		<div class="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-color">
+			{#each renderedGroups as group (group.date)}
+				<TimelineDayGroup {group} />
+			{/each}
+
+			{#if hasMore}
+				<div class="pt-4 flex justify-center relative z-10">
+					<button
+						onclick={() => (visibleGroups += 20)}
+						class="rounded-xl bg-surface-2 px-4 py-2 text-xs font-bold text-text-secondary hover:text-text-primary hover:bg-surface-3 transition-colors"
+					>
+						Weitere 20 Tage laden
+					</button>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </div>

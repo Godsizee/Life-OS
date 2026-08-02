@@ -9,6 +9,9 @@
 	import { profileState, HEALTH_LIMITS } from '$lib/features/profile/store.svelte';
 	import { HEIGHT_LIMITS, GLASS_SIZE_LIMITS, WATER_GOAL_ML_LIMITS } from '$lib/features/profile/units';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { remindersState } from '$lib/features/reminders/store.svelte';
+	import { reminderAtOnDate } from '$lib/features/reminders/schedule';
+	import { toISODate } from '$lib/core/date';
 	import InviteForm from '$lib/features/workspace/components/InviteForm.svelte';
 	import MemberList from '$lib/features/workspace/components/MemberList.svelte';
 	import FocusSettingsFields from '$lib/features/profile/components/FocusSettingsFields.svelte';
@@ -37,6 +40,44 @@
 			const res = await Notification.requestPermission();
 			timerSignalsPermission = res;
 		}
+	}
+
+	// W10 — Weekly-Review-Erinnerung: aktiv = existiert als eigene Custom-Erinnerung.
+	// Bewusst ohne `r.active`-Filter: eine pausierte Erinnerung ist immer noch da.
+	// Sonst fand der Schalter sie nicht und legte beim Einschalten ein Duplikat an.
+	const weeklyReviewReminder = $derived(
+		remindersState.mine.find((r) => r.entity_type === 'custom' && r.title === 'Weekly Review')
+	);
+
+	/**
+	 * Naechster Sonntag 18:00, der noch in der Zukunft liegt. An einem Sonntag nach
+	 * 18:00 sonst ein Termin in der Vergangenheit — der Dispatch haette ihn beim
+	 * naechsten Lauf sofort (bzw. verspaetet) zugestellt statt in einer Woche.
+	 */
+	function naechsterReviewTerminISO(): string {
+		const d = new Date();
+		d.setDate(d.getDate() + ((7 - d.getDay()) % 7));
+		if (reminderAtOnDate(toISODate(d), '18:00') <= new Date().toISOString()) {
+			d.setDate(d.getDate() + 7);
+		}
+		return toISODate(d);
+	}
+
+	async function toggleWeeklyReviewReminder() {
+		if (weeklyReviewReminder) {
+			await remindersState.remove(weeklyReviewReminder.id);
+			return;
+		}
+		await remindersState.add({
+			entity_type: 'custom',
+			entity_id: null,
+			title: 'Weekly Review',
+			body: 'Nimm dir 10 Minuten für deinen Wochenrückblick.',
+			url: '/review',
+			remind_at: reminderAtOnDate(naechsterReviewTerminISO(), '18:00'),
+			rrule: 'RRULE:FREQ=WEEKLY;BYDAY=SU',
+			offset_minutes: 0
+		});
 	}
 </script>
 
@@ -301,6 +342,17 @@
 						onchange={requestTimerSignals}
 					/>
 				{/if}
+			</SettingRow>
+
+			<SettingRow
+				label="Weekly-Review-Erinnerung"
+				hint="Sonntag 18:00 — eine kurze Erinnerung an deinen Wochenrückblick."
+			>
+				<Switch
+					label="Weekly-Review-Erinnerung"
+					checked={!!weeklyReviewReminder}
+					onchange={toggleWeeklyReviewReminder}
+				/>
 			</SettingRow>
 
 			{#if pushState.supported}

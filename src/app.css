@@ -171,6 +171,19 @@
     -webkit-touch-callout: none;
   }
 
+  /* Waagerecht scrollende Chip-Reihen (Timeline-Filter, Einkaufslisten) sollen
+     wie in einer nativen App wischbar sein, ohne dass auf dem Desktop eine
+     Scrollbar die Reihe optisch zerschneidet. Die Klasse wurde bereits an drei
+     Stellen benutzt, war aber nie definiert. */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Gleich breite Ziffern für alles, was sich laufend ändert (Timer, Life
      Score, Streaks, Gewichte) – sonst springt die Zeile bei jedem Tick. */
   .nums-tabular {

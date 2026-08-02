@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { reviewWeek } from './week-window';
+import { reviewWeek, weekKey, nextWeekKey } from './week-window';
 
 /** Lokale Mitternacht — dieselbe Basis wie toISODate(). */
 function tag(iso: string): Date {
@@ -71,5 +71,20 @@ describe('reviewWeek', () => {
 			'2026-07-28',
 			'2026-07-29'
 		]);
+	});
+});
+
+describe('weekKey / nextWeekKey', () => {
+	it('liefert den Montag der Woche', () => {
+		expect(weekKey(tag('2026-07-31'))).toBe('2026-07-27'); // Freitag → Montag davor
+		expect(weekKey(tag('2026-07-27'))).toBe('2026-07-27'); // Montag → er selbst
+	});
+
+	it('behandelt Sonntag als Wochenende, nicht als Wochenanfang', () => {
+		expect(weekKey(tag('2026-08-02'))).toBe('2026-07-27'); // Sonntag
+	});
+
+	it('nextWeekKey ist genau 7 Tage später', () => {
+		expect(nextWeekKey(tag('2026-07-31'))).toBe('2026-08-03');
 	});
 });

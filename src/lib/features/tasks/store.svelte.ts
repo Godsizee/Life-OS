@@ -3,6 +3,7 @@ import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
 import { toISODate } from '$lib/core/date';
+import { weekKey } from '$lib/features/analytics/week-window';
 import * as tasksApi from './api';
 import { assignColumnPositions } from './utils';
 import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
@@ -198,6 +199,21 @@ class TasksState {
 			tasksApi.updateRaw({ id, ...patch, updated_at })
 		);
 	}
+
+	/** Aufgabe als Wochenfokus markieren (oder Markierung entfernen). */
+	async setFocusWeek(id: string, week: string | null) {
+		const updated_at = new Date().toISOString();
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, focus_week: week, updated_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, focus_week: week, updated_at }, () =>
+			tasksApi.updateRaw({ id, focus_week: week, updated_at })
+		);
+	}
+
+	/** Die Top-3 der laufenden Woche. */
+	focusTasks = $derived.by(() => {
+		const key = weekKey(new Date());
+		return this.tasks.filter((t) => t.focus_week === key);
+	});
 
 	async setAssignee(id: string, assigneeId: string | null) {
 		const updated_at = new Date().toISOString();

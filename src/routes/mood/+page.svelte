@@ -227,13 +227,15 @@
 
 		<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 			<h2 class="mb-3 text-sm font-semibold text-text-primary">Ø nach Tageszeit</h2>
-			<div class="grid grid-cols-4 gap-2">
+			<!-- Vier Spalten lassen bei 320px nur ~42px Innenbreite je Kachel - zu wenig
+			     fuer "Morgen"/"Mittag". Unter 360px stehen sie deshalb zweispaltig. -->
+			<div class="grid grid-cols-2 gap-2 xs:grid-cols-4">
 				{#each daypartLabels as label, i (label)}
 					{@const score = daypartAverages[i]}
 					{@const IconComponent = daypartIcons[i]}
-					<div class="flex flex-col items-center gap-1 rounded-xl bg-surface-1 p-2 text-center">
-						<IconComponent size={16} class="text-text-tertiary" />
-						<span class="text-[11px] text-text-secondary">{label}</span>
+					<div class="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-surface-1 p-2 text-center">
+						<IconComponent size={16} class="shrink-0 text-text-tertiary" />
+						<span class="w-full truncate text-[11px] text-text-secondary">{label}</span>
 						<span class="text-sm font-bold text-text-primary">{formatScore(score)}</span>
 					</div>
 				{/each}

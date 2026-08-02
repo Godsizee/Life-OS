@@ -93,22 +93,37 @@
 	<title>Analytics - Life Score Detail</title>
 </svelte:head>
 
+{#snippet zeitraumToggle()}
+	<div class="flex items-center gap-1 rounded-xl bg-surface-2 p-1">
+		{#each [30, 90, 365] as z}
+			<button
+				onclick={() => { zeitraum = z as any; }}
+				class="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-xs font-bold transition-all md:flex-none md:px-3 {zeitraum ===
+				z
+					? 'bg-surface-0 text-primary-active premium-shadow'
+					: 'text-text-secondary hover:text-text-primary'}"
+			>
+				{z} T.
+			</button>
+		{/each}
+	</div>
+{/snippet}
+
 <div class="space-y-6">
-	<!-- Header -->
+	<!-- Header. Der Zeitraum-Umschalter ist ~184px breit und liesse neben Titel und
+	     Untertitel auf schmalen Displays keine brauchbare Spalte uebrig - darunter
+	     steht er deshalb als eigene Zeile. -->
 	<PageHeader title="Life Score" subtitle="Analysiere dein tägliches Wohlbefinden und Produktivität.">
 		{#snippet trailing()}
-			<div class="flex items-center gap-1 bg-surface-2 p-1 rounded-xl">
-				{#each [30, 90, 365] as z}
-					<button
-						onclick={() => { zeitraum = z as any; }}
-						class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {zeitraum === z ? 'bg-surface-0 text-primary-active premium-shadow' : 'text-text-secondary hover:text-text-primary'}"
-					>
-						{z} T.
-					</button>
-				{/each}
+			<div class="hidden md:block">
+				{@render zeitraumToggle()}
 			</div>
 		{/snippet}
 	</PageHeader>
+
+	<div class="md:hidden">
+		{@render zeitraumToggle()}
+	</div>
 
 	<!-- Core Dashboard -->
 	<div class="grid gap-6 md:grid-cols-3">

@@ -8,6 +8,7 @@ import { attachmentsState } from '$lib/features/attachments/store.svelte';
 import { goalCheckinInputSchema, goalInputSchema, journalEntryInputSchema, type GoalInput } from './schema';
 import type { Goal, GoalCheckin, GoalStatus, JournalEntry, JournalKind, DayContext } from './types';
 import { isValidEntryDate } from './journal-stats';
+import { weekKey } from '$lib/features/analytics/week-window';
 
 class GoalsState {
 	goals = $state<Goal[]>([]);
@@ -204,6 +205,12 @@ class GoalsState {
 	get todayKey(): string {
 		return toISODate(new Date());
 	}
+
+	/** Wurde in der laufenden Woche bereits ein Review abgeschlossen? */
+	hatReviewDieseWoche = $derived.by(() => {
+		const seit = weekKey(new Date());
+		return this.journalEntries.some((j) => j.kind === 'weekly' && j.date >= seit);
+	});
 
 	get todayEntry(): JournalEntry | undefined {
 		return this.entryForDate(this.todayKey);
