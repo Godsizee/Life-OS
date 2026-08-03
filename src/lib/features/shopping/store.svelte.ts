@@ -1,7 +1,9 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
+import { loeschenMitUndo } from '$lib/core/undo';
 import * as shoppingApi from './api';
 import { shoppingItemInputSchema, type ShoppingItemInput } from './schema';
 import type { ShoppingItem, WorkspaceSettings } from './types';
@@ -93,6 +95,12 @@ class ShoppingState {
     );
   }
 
+  /** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+  async reload(workspaceId: string) {
+    this.workspaceId = null;
+    await this.load(workspaceId);
+  }
+
   unload() {
     this.unsubs.forEach((u) => u());
     this.unsubs = [];
@@ -107,7 +115,7 @@ class ShoppingState {
     const parsed = shoppingItemInputSchema.parse(input);
     const now = new Date().toISOString();
     const item: ShoppingItem = {
-      id: crypto.randomUUID(),
+      id: neueId(),
       workspace_id: this.workspaceId,
       name: parsed.name,
       qty: parsed.qty,
@@ -198,6 +206,21 @@ class ShoppingState {
   async removeItem(id: string) {
     this.items = this.items.filter((i) => i.id !== id);
     await outbox.runOrQueue('shopping_items', 'delete', { id }, () => shoppingApi.deleteItem(id));
+  }
+
+  /** Löschen mit Rücknahmefenster — für die Wischgeste. Siehe core/undo.ts. */
+  removeItemWithUndo(id: string) {
+    const item = this.items.find((i) => i.id === id);
+    if (!item) return;
+    loeschenMitUndo({
+      text: `„${item.name}" gelöscht`,
+      ausblenden: () => (this.items = this.items.filter((i) => i.id !== id)),
+      wiederherstellen: () => {
+        if (!this.items.some((i) => i.id === id)) this.items = [...this.items, item];
+      },
+      festschreiben: () =>
+        outbox.runOrQueue('shopping_items', 'delete', { id }, () => shoppingApi.deleteItem(id))
+    });
   }
 
   /** „Abgehakte aufräumen": abgehakte Items endgültig entfernen. Vorschläge (Statistik) bleiben erhalten.

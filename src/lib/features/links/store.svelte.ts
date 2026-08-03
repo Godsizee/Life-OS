@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -45,6 +46,12 @@ class LinksState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsub?.();
 		this.unsub = null;
@@ -83,7 +90,7 @@ class LinksState {
 		);
 		if (dup) return;
 		const link: EntityLink = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			source_type: sourceType,
 			source_id: sourceId,

@@ -3,6 +3,7 @@
  * Die reinen Rechenfunktionen sind bewusst frei von Browser-APIs und getestet
  * (image.test.ts); nur prepareImage() fasst Canvas/ImageBitmap an.
  */
+import { neueId } from '$lib/core/id';
 
 /** Laengste Kante nach der Verkleinerung. */
 export const MAX_EDGE = 1600;
@@ -61,7 +62,7 @@ export function buildStoragePath(
 	entityId: string,
 	mime: string
 ): string {
-	return `${workspaceId}/${entityType}/${entityId}/${crypto.randomUUID()}.${extensionFor(mime)}`;
+	return `${workspaceId}/${entityType}/${entityId}/${neueId()}.${extensionFor(mime)}`;
 }
 
 export interface PreparedImage {

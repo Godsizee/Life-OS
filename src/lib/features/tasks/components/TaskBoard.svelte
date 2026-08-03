@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Task, TaskStatus } from '../types';
 	import { tasksState } from '../store.svelte';
-	import { buildTaskTree, subtaskProgress, assignColumnPositions } from '../utils';
+	import { buildTaskTree, subtaskProgress } from '../utils';
 	import Card from '$lib/ui/Card.svelte';
 	import { Repeat, AlignLeft } from 'lucide-svelte';
 	import { formatRRule } from '../recurrence';
@@ -34,7 +34,7 @@
 		if (!task || task.parent_id) return;
 		if (task.status !== status) await tasksState.setStatus(id, status);
 		const ordered = [...column(status).filter((t) => t.id !== id).map((t) => t.id), id];
-		for (const p of assignColumnPositions(ordered)) await tasksState.moveTask(p.id, { position: p.position });
+		await tasksState.setPositions(ordered);
 	}
 </script>
 

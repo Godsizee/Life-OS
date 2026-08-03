@@ -1,7 +1,7 @@
 // @vitest-environment node
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { outbox } from './outbox.svelte';
+import { istDauerhaft, outbox } from './outbox.svelte';
 
 /**
  * Die Outbox ist ein Singleton. Zwischen den Tests reicht clear() — die
@@ -169,6 +169,91 @@ describe('offline', () => {
 		await outbox.replay();
 
 		expect(gesehen).toEqual([]);
+		expect(outbox.pending).toBe(1);
+	});
+});
+
+describe('istDauerhaft', () => {
+	it('erkennt Integritaetsverletzungen (SQLSTATE 23xxx)', () => {
+		expect(istDauerhaft({ code: '23505' })).toBe(true); // unique_violation
+		expect(istDauerhaft({ code: '23503' })).toBe(true); // foreign_key_violation
+		expect(istDauerhaft({ code: '23502' })).toBe(true); // not_null_violation
+	});
+
+	it('erkennt eine RLS-Ablehnung (SQLSTATE 42501)', () => {
+		expect(istDauerhaft({ code: '42501' })).toBe(true);
+	});
+
+	it('erkennt fachliche 4xx-Antworten', () => {
+		expect(istDauerhaft({ status: 400 })).toBe(true);
+		expect(istDauerhaft({ status: 404 })).toBe(true);
+		expect(istDauerhaft({ status: 422 })).toBe(true);
+	});
+
+	it('behandelt 408 und 429 weiter als wiederholbar', () => {
+		expect(istDauerhaft({ status: 408 })).toBe(false);
+		expect(istDauerhaft({ status: 429 })).toBe(false);
+	});
+
+	it('behandelt 401/403 als wiederholbar — ein Token-Refresh kann sie loesen', () => {
+		expect(istDauerhaft({ status: 401 })).toBe(false);
+		expect(istDauerhaft({ status: 403 })).toBe(false);
+	});
+
+	it('behandelt Serverfehler und Netzfehler als wiederholbar', () => {
+		expect(istDauerhaft({ status: 500 })).toBe(false);
+		expect(istDauerhaft({ status: 503 })).toBe(false);
+		expect(istDauerhaft(new TypeError('Failed to fetch'))).toBe(false);
+		expect(istDauerhaft(null)).toBe(false);
+		expect(istDauerhaft('kaputt')).toBe(false);
+	});
+});
+
+describe('Dead Letter bei dauerhaften Fehlern', () => {
+	it('sortiert sofort aus, statt fuenfmal vergeblich zu versuchen', async () => {
+		let versuche = 0;
+		outbox.registerExecutor('notes', {
+			insert: async () => {
+				versuche++;
+				throw { code: '42501', message: 'new row violates row-level security policy' };
+			}
+		});
+
+		setOnline(false);
+		await outbox.enqueue({ table: 'notes', operation: 'insert', payload: { id: 'rls' } });
+		setOnline(true);
+		await outbox.replay();
+
+		// Vorher lief das fuenf Durchlaeufe lang und blockierte dabei jedes Mal alle
+		// spaeteren Aenderungen derselben Tabelle.
+		expect(versuche).toBe(1);
+		expect(outbox.dead).toBe(1);
+		expect(outbox.pending).toBe(0);
+	});
+
+	it('legt einen dauerhaft gescheiterten Direktschreibvorgang gleich ins Dead Letter', async () => {
+		const ergebnis = await outbox.runOrQueue('tasks', 'insert', { id: 'x' }, async () => {
+			throw { code: '23505', message: 'duplicate key value' };
+		});
+
+		expect(ergebnis).toBeUndefined();
+		// Nicht in die Queue: dort haette er nur gewartet, um dann doch zu scheitern.
+		expect(outbox.pending).toBe(0);
+		expect(outbox.dead).toBe(1);
+		expect(outbox.status).toBe('error');
+
+		const tot = await outbox.getDead();
+		expect(tot[0].table).toBe('tasks');
+		expect(tot[0].lastError).toContain('duplicate key');
+	});
+
+	it('stellt einen Netzfehler beim Direktschreiben weiterhin in die Queue', async () => {
+		const ergebnis = await outbox.runOrQueue('tasks', 'insert', { id: 'y' }, async () => {
+			throw new TypeError('Failed to fetch');
+		});
+
+		expect(ergebnis).toBeUndefined();
+		expect(outbox.dead).toBe(0);
 		expect(outbox.pending).toBe(1);
 	});
 });

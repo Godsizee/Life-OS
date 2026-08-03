@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { toISODate } from '$lib/core/date';
 import { outbox } from '$lib/core/outbox.svelte';
@@ -112,6 +113,12 @@ class GoalsState {
 		);
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribeGoals?.();
 		this.unsubscribeJournal?.();
@@ -131,7 +138,7 @@ class GoalsState {
 		const parsed = goalInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const goal: Goal = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			parent_id: parsed.parent_id ?? null,
 			title: parsed.title,
@@ -229,7 +236,7 @@ class GoalsState {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = goalCheckinInputSchema.parse(input);
 		const row: GoalCheckin = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			goal_id: parsed.goal_id,
 			user_id: authState.user!.id,
@@ -284,7 +291,7 @@ class GoalsState {
 		);
 		const now = new Date().toISOString();
 		const entry: JournalEntry = {
-			id: existing?.id ?? crypto.randomUUID(),
+			id: existing?.id ?? neueId(),
 			workspace_id: this.workspaceId,
 			user_id: authState.user!.id,
 			date: parsed.date,

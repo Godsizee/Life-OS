@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -73,6 +74,12 @@ class AttachmentsState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -137,7 +144,7 @@ class AttachmentsState {
 		}
 
 		const row: Attachment = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			entity_type: entityType,
 			entity_id: entityId,

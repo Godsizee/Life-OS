@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -73,6 +74,12 @@ class TimeTrackingState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload() {
+		this.workspaceId = null;
+		await this.load();
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -122,7 +129,7 @@ class TimeTrackingState {
 		const started = opts.startedAt ?? new Date(Date.now() - rounded * 60000);
 		const ended = new Date(started.getTime() + rounded * 60000);
 		const entry: TimeEntry = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: wId,
 			user_id: uId,
 			task_id: taskId,

@@ -1,7 +1,9 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
+import { loeschenMitUndo } from '$lib/core/undo';
 import { toISODate } from '$lib/core/date';
 import { weekKey } from '$lib/features/analytics/week-window';
 import * as tasksApi from './api';
@@ -25,7 +27,14 @@ class TasksState {
 	constructor() {
 		outbox.registerExecutor('tasks', {
 			insert: (payload) => tasksApi.insertRaw(payload as Task),
-			update: (payload) => tasksApi.updateRaw(payload as Partial<Task> & { id: string }),
+			// Ein Array ist die Stapelvariante aus setPositions(). Bewusst unter
+			// demselben Tabellenschluessel: die Outbox haelt die Reihenfolge nur je
+			// Tabelle ein — mit einem eigenen Schluessel koennte eine Umsortierung
+			// den Insert der Aufgabe ueberholen, die sie sortiert.
+			update: (payload) =>
+				Array.isArray(payload)
+					? tasksApi.upsertManyRaw(payload as Task[])
+					: tasksApi.updateRaw(payload as Partial<Task> & { id: string }),
 			delete: (payload) => tasksApi.deleteTask((payload as { id: string }).id)
 		});
 		outbox.registerExecutor('projects', {
@@ -88,6 +97,12 @@ class TasksState {
 		);
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -104,7 +119,7 @@ class TasksState {
 		const parsed = taskInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const task: Task = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			project_id: parsed.project_id,
 			goal_id: parsed.goal_id,
@@ -223,6 +238,29 @@ class TasksState {
 		);
 	}
 
+	/**
+	 * Setzt die Reihenfolge der uebergebenen Aufgaben in EINEM Schreibvorgang.
+	 *
+	 * Vorher lief pro Geschwister ein eigenes updateTask() — bei 30 Aufgaben in
+	 * einer Board-Spalte 30 Round-Trips fuer einen einzigen Drop, und jeder
+	 * einzelne konnte fuer sich scheitern und die Reihenfolge halb geschrieben
+	 * zuruecklassen.
+	 */
+	async setPositions(orderedIds: string[]) {
+		const updated_at = new Date().toISOString();
+		const neuePosition = new Map(
+			assignColumnPositions(orderedIds).map(({ id, position }) => [id, position])
+		);
+
+		this.tasks = this.tasks.map((t) =>
+			neuePosition.has(t.id) ? { ...t, position: neuePosition.get(t.id)!, updated_at } : t
+		);
+
+		const zeilen = this.tasks.filter((t) => neuePosition.has(t.id));
+		if (zeilen.length === 0) return;
+		await outbox.runOrQueue('tasks', 'update', zeilen, () => tasksApi.upsertManyRaw(zeilen));
+	}
+
 	/** Verschiebt eine Aufgabe innerhalb ihrer Geschwister um eine Position. */
 	async move(id: string, richtung: -1 | 1) {
 		const task = this.tasks.find((t) => t.id === id);
@@ -234,15 +272,35 @@ class TasksState {
 		const j = i + richtung;
 		if (i < 0 || j < 0 || j >= geschwister.length) return;
 		[geschwister[i], geschwister[j]] = [geschwister[j], geschwister[i]];
-		for (const { id: tid, position } of assignColumnPositions(geschwister.map((t) => t.id))) {
-			await this.updateTask(tid, { position } as never);
-		}
+		await this.setPositions(geschwister.map((t) => t.id));
 	}
 
 	async removeTask(id: string) {
 		this.tasks = this.tasks.filter((t) => t.id !== id);
 		await outbox.runOrQueue('tasks', 'delete', { id }, () => tasksApi.deleteTask(id));
 		await remindersState.removeFor('task', id);
+	}
+
+	/**
+	 * Löschen mit Rücknahmefenster — für die Wischgeste in der Liste, die sich
+	 * mobil leicht versehentlich auslöst. Siehe core/undo.ts.
+	 */
+	removeTaskWithUndo(id: string) {
+		const task = this.tasks.find((t) => t.id === id);
+		if (!task) return;
+		loeschenMitUndo({
+			text: 'Aufgabe gelöscht',
+			ausblenden: () => (this.tasks = this.tasks.filter((t) => t.id !== id)),
+			// An die alte Stelle zurück, nicht ans Ende: die Liste sortiert nach
+			// position, ein Anhängen würde die Reihenfolge sichtbar verändern.
+			wiederherstellen: () => {
+				if (!this.tasks.some((t) => t.id === id)) this.tasks = [...this.tasks, task];
+			},
+			festschreiben: async () => {
+				await outbox.runOrQueue('tasks', 'delete', { id }, () => tasksApi.deleteTask(id));
+				await remindersState.removeFor('task', id);
+			}
+		});
 	}
 
 	async updateGoalLink(id: string, goal_id: string | null) {
@@ -259,7 +317,7 @@ class TasksState {
 		// Wie addTask: id im Client, optimistisch anzeigen, über die Outbox schreiben.
 		// Vorher lief das direkt gegen die API und war offline nicht nutzbar.
 		const project: Project = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			name: parsed.name,
 			color: null,

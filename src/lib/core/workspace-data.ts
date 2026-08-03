@@ -35,7 +35,9 @@ import { remindersState } from '$lib/features/reminders/store.svelte';
 import { shoppingState } from '$lib/features/shopping/store.svelte';
 import { tasksState } from '$lib/features/tasks/store.svelte';
 import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { workspaceState } from '$lib/features/workspace/store.svelte';
 import { focusSession } from '$lib/features/focus/session.svelte';
+import { setzeAbgleich } from './resync';
 
 /**
  * Laedt alle Module parallel. Ein einzelner Fehlschlag darf die uebrigen nicht
@@ -65,10 +67,53 @@ export async function loadWorkspaceData(workspaceId: string): Promise<void> {
 	
 	// Nachberechnung fehlender Analytics-Tage, sobald alle relevanten Stores befüllt sind
 	void analyticsState.backfillScores(7);
+
+	// Ab jetzt kann ein Verbindungsabbruch einen Abgleich ausloesen.
+	setzeAbgleich(() => resyncWorkspaceData(workspaceId));
+}
+
+/**
+ * Abgleich mit dem Server, ohne den sichtbaren Zustand vorher zu leeren.
+ *
+ * Spiegelt loadWorkspaceData(), ruft aber `reload()`: das setzt nur die intern
+ * gemerkte `workspaceId` zurueck, damit der Early-Return in `load()` nicht
+ * greift. Die Daten bleiben bis zum Eintreffen der neuen Antwort stehen — ein
+ * `unload()` haette bei jedem Wiederverbinden kurz leere Listen gezeigt.
+ *
+ * `load()` ruft am Ende `subscribe()`, und jedes `subscribe()` raeumt seine
+ * alten Kanaele selbst ab. Der Abgleich stellt damit auch die Realtime-Abos
+ * wieder her — genau das, was nach einem Abbruch fehlt.
+ *
+ * Ausgeloest von: Kanalstatus in core/realtime.ts, `online`-Event und
+ * `visibilitychange` in routes/+layout.svelte.
+ */
+export async function resyncWorkspaceData(workspaceId: string): Promise<void> {
+	// Zuerst der Workspace selbst: Mitglieder koennen sich geaendert haben, und
+	// die Stores ohne eigenen Parameter lesen die Workspace-ID von dort.
+	await workspaceState.reload();
+
+	await Promise.allSettled([
+		tasksState.reload(workspaceId),
+		notesState.reload(workspaceId),
+		habitsState.reload(workspaceId),
+		calendarState.reload(workspaceId),
+		shoppingState.reload(workspaceId),
+		goalsState.reload(workspaceId),
+		fitnessState.reload(workspaceId),
+		linksState.reload(workspaceId),
+		remindersState.reload(workspaceId),
+		attachmentsState.reload(workspaceId),
+		healthState.reload(),
+		moodState.reload(),
+		analyticsState.reload(),
+		timeTrackingState.reload(),
+		profileState.reload()
+	]);
 }
 
 /** Nur beim Logout — alle Abos schliessen und den Zustand verwerfen. */
 export function unloadWorkspaceData(): void {
+	setzeAbgleich(null);
 	tasksState.unload();
 	notesState.unload();
 	habitsState.unload();

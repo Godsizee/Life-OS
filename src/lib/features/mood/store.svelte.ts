@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -126,6 +127,12 @@ class MoodState {
 		);
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload() {
+		this.workspaceId = null;
+		await this.load();
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -182,7 +189,7 @@ class MoodState {
 			(e) => e.date === parsed.data.date && e.logged_at === time
 		);
 		const row: MoodEntry = {
-			id: existing?.id ?? crypto.randomUUID(),
+			id: existing?.id ?? neueId(),
 			workspace_id: wId,
 			user_id: uId,
 			date: parsed.data.date,

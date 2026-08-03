@@ -25,6 +25,9 @@
 	import SegmentedControl from '$lib/ui/SegmentedControl.svelte';
 	import Input from '$lib/ui/Input.svelte';
 	import Switch from '$lib/ui/Switch.svelte';
+	import DeleteAccountSheet from '$lib/features/auth/components/DeleteAccountSheet.svelte';
+
+	let deleteAccountOpen = $state(false);
 
 	let displayNameInput = $state(profileState.displayName ?? '');
 	$effect(() => {
@@ -402,13 +405,7 @@
 			</SettingRow>
 			
 			<SettingRow label="Konto löschen" hint="Alle Daten werden unwiderruflich gelöscht">
-				<Button
-					variant="primary"
-					class="bg-red-600 text-white hover:bg-red-700 active:bg-red-800 border-none focus:ring-red-600/50 focus:ring-offset-2"
-					onclick={() => alert('Bitte per E-Mail anfragen — Selbstbedienung folgt')}
-				>
-					Löschen
-				</Button>
+				<Button variant="danger" onclick={() => (deleteAccountOpen = true)}>Löschen</Button>
 			</SettingRow>
 
 			<div class="pt-4 mt-2">
@@ -425,3 +422,5 @@
 		Übungsdatenbank basiert auf <a href="https://wger.de" class="underline hover:text-text-secondary">wger.de</a> (CC-BY-SA).
 	</p>
 </div>
+
+<DeleteAccountSheet bind:open={deleteAccountOpen} />

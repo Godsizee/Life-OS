@@ -13,7 +13,7 @@
 	const attachmentCount = $derived(attachmentsState.countFor('note', note.id));
 </script>
 
-<SwipeToDelete onDelete={() => notesState.removeNote(note.id)} label="Notiz löschen">
+<SwipeToDelete onDelete={() => notesState.removeNoteWithUndo(note.id)} label="Notiz löschen">
 	<div class="interactive-card flex h-full flex-col gap-2 rounded-2xl border border-border-color bg-surface-0 p-4">
 		<div class="flex items-start gap-2">
 			<button type="button" onclick={() => onopen(note)} class="min-w-0 flex-1 text-left">

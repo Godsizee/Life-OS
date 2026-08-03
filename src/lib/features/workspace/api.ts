@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { supabase } from '$lib/core/supabase';
 import { inviteEmailSchema } from './schema';
 import type { Invite, Workspace, WorkspaceMember } from './types';
@@ -60,7 +61,7 @@ export async function inviteMember(workspaceId: string, email: string): Promise<
 		.insert({
 			workspace_id: workspaceId,
 			email: validEmail,
-			token: crypto.randomUUID(),
+			token: neueId(),
 			expires_at: expiresAt
 		})
 		.select()

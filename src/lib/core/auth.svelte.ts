@@ -1,5 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
+import { toastState } from './toast.svelte';
 
 class AuthState {
 	session = $state<Session | null>(null);
@@ -16,10 +17,35 @@ class AuthState {
 	 */
 	private expectingSignOut = false;
 
+	/** Zweiter init() haengte einen zweiten onAuthStateChange-Listener an. */
+	private initialisiert = false;
+
+	/**
+	 * `loading` MUSS am Ende immer false sein: +layout.svelte zeigt solange
+	 * AuthSplash. Wirft getSession() (korrupter Token im localStorage, Storage im
+	 * Privatmodus gesperrt), blieb die App sonst dauerhaft im Splash haengen —
+	 * ohne Meldung und ohne Ausweg. Ein Fehler heisst hier "keine Sitzung"; der
+	 * Guard im Layout leitet dann regulaer auf /login.
+	 */
 	async init() {
-		const { data } = await supabase.auth.getSession();
-		this.session = data.session;
-		this.loading = false;
+		if (this.initialisiert) return;
+		this.initialisiert = true;
+
+		try {
+			const { data, error } = await supabase.auth.getSession();
+			if (error) throw error;
+			this.session = data.session;
+		} catch (err) {
+			console.error('[auth] Sitzung konnte nicht gelesen werden', err);
+			this.session = null;
+			// getSession() liest nur den lokalen Speicher, kein Netz — ein Fehler
+			// heisst also: der abgelegte Token ist kaputt. Ohne ihn zu entfernen
+			// scheitert auch jeder weitere Start an derselben Stelle.
+			await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+			toastState.error('Anmeldung konnte nicht geprüft werden — bitte neu anmelden');
+		} finally {
+			this.loading = false;
+		}
 
 		supabase.auth.onAuthStateChange((_event, session) => {
 			this.session = session;

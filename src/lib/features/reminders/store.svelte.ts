@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -96,6 +97,12 @@ class RemindersState {
 		}
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsub?.();
 		this.unsub = null;
@@ -121,7 +128,7 @@ class RemindersState {
 		const parsed = reminderInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const reminder: Reminder = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			user_id: userId,
 			entity_type: parsed.entity_type,

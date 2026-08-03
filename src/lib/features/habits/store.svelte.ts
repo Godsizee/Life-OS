@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -90,6 +91,12 @@ class HabitsState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribeHabits?.();
 		this.unsubscribeLogs?.();
@@ -151,7 +158,7 @@ class HabitsState {
 		const parsed = habitInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const habit: Habit = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			name: parsed.name,
 			schedule: parsed.schedule,
@@ -211,7 +218,7 @@ class HabitsState {
 
 		if (status === 'done' && value <= 0) return;
 		const log: HabitLog = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			habit_id: habitId,
 			user_id: authState.user!.id,

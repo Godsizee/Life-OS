@@ -35,7 +35,25 @@
 				   text-sm font-medium {colorMap[toast.type]}"
 		>
 			<Icon size={16} class="mt-0.5 shrink-0" />
-			<span class="flex-1 leading-snug">{toast.message}</span>
+			<span class="flex-1 leading-snug">
+				{toast.message}
+				{#if toast.count > 1}
+					<span class="ml-1 rounded-full bg-black/10 px-1.5 py-0.5 text-xs nums-tabular dark:bg-white/15">
+						{toast.count}×
+					</span>
+				{/if}
+			</span>
+			{#if toast.action}
+				<button
+					onclick={() => {
+						toast.action?.run();
+						toastState.dismiss(toast.id);
+					}}
+					class="min-h-8 shrink-0 rounded-lg px-2 text-sm font-semibold underline underline-offset-2 hover:bg-black/5 dark:hover:bg-white/10"
+				>
+					{toast.action.label}
+				</button>
+			{/if}
 			<button
 				onclick={() => toastState.dismiss(toast.id)}
 				aria-label="Meldung schließen"

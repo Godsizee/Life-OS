@@ -7,17 +7,20 @@
 	import { authState } from '$lib/core/auth.svelte';
 	import { workspaceState } from '$lib/features/workspace/store.svelte';
 	import { loadWorkspaceData, unloadWorkspaceData } from '$lib/core/workspace-data';
+	import { fordereAbgleich } from '$lib/core/resync';
 	import { outbox } from '$lib/core/outbox.svelte';
 	import { installState } from '$lib/core/install.svelte';
 	import { pushState } from '$lib/core/push.svelte';
 	import { themeState } from '$lib/core/theme.svelte';
 	import { keyboardState } from '$lib/core/keyboard.svelte';
+	import { toastState } from '$lib/core/toast.svelte';
 	import { loginUrlFor } from '$lib/features/auth/redirect';
 	import BottomNav from '$lib/ui/BottomNav.svelte';
 	import SidebarNav from '$lib/ui/SidebarNav.svelte';
 	import CommandPalette from '$lib/ui/CommandPalette.svelte';
 	import QuickAddSheet from '$lib/ui/QuickAddSheet.svelte';
 	import ModuleGridSheet from '$lib/ui/ModuleGridSheet.svelte';
+	import SyncIssuesSheet from '$lib/ui/SyncIssuesSheet.svelte';
 	import Toaster from '$lib/ui/Toaster.svelte';
 	import AuthSplash from '$lib/features/auth/components/AuthSplash.svelte';
 	let { children } = $props();
@@ -25,6 +28,7 @@
 	let paletteOpen = $state(false);
 	let quickAddOpen = $state(false);
 	let moduleGridOpen = $state(false);
+	let syncIssuesOpen = $state(false);
 
 	const publicPaths = ['/login', '/register', '/invite'];
 	// Anmeldung und Onboarding bringen ihren eigenen Rahmen mit (AuthShell);
@@ -47,13 +51,29 @@
 		window.addEventListener('online', () => {
 			online = true;
 			outbox.replay();
+			// Waehrend der Offline-Zeit gemachte Fremdaenderungen hat Realtime nicht
+			// zugestellt — ohne Abgleich blieben sie bis zum naechsten Reload unsichtbar.
+			fordereAbgleich('online');
 		});
 		window.addEventListener('offline', () => (online = false));
+		// Der haeufigste Fall auf dem Handy: App lag im Hintergrund, das System hat
+		// den Socket stillgelegt. Beim Zurueckkehren kommt kein Fehlerstatus,
+		// deshalb hier aktiv nachfassen. fordereAbgleich() drosselt selbst.
+		document.addEventListener('visibilitychange', () => {
+			if (document.visibilityState === 'visible') fordereAbgleich('sichtbar');
+		});
 		window.addEventListener('keydown', (e: KeyboardEvent) => {
 			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 				e.preventDefault();
 				paletteOpen = !paletteOpen;
 			}
+		});
+		// hooks.client.ts faengt nur, was beim Navigieren/Rendern hochblubbert.
+		// Ein nicht-awaitetes Store-Promise landet dagegen hier — vorher als
+		// stumme Konsolenzeile, die im Betrieb niemand sieht.
+		window.addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => {
+			console.error('[app] Unbehandelte Rejection', e.reason);
+			toastState.error('Eine Aktion ist fehlgeschlagen');
 		});
 	});
 
@@ -118,8 +138,8 @@
 	interface SyncBanner {
 		text: string;
 		class: string;
-		/** true = Tippen verwirft die unzustellbaren Änderungen statt neu zu senden. */
-		verwerfen: boolean;
+		/** true = Tippen öffnet die Liste der unzustellbaren Änderungen. */
+		zeigeProbleme: boolean;
 	}
 
 	const syncBanner = $derived.by<SyncBanner | null>(() => {
@@ -128,30 +148,30 @@
 			return {
 				text: `Offline – Änderungen werden offline gespeichert${wartend}`,
 				class: 'bg-surface-3 text-text-primary',
-				verwerfen: false
+				zeigeProbleme: false
 			};
 		}
 		if (outbox.status === 'syncing') {
 			return {
 				text: `Synchronisiere…${wartend}`,
 				class: 'bg-primary-700 text-white',
-				verwerfen: false
+				zeigeProbleme: false
 			};
 		}
 		if (outbox.status === 'error') {
 			return {
 				text: `Sync fehlgeschlagen${wartend} – tippen für erneuten Versuch`,
 				class: 'bg-red-600 text-white',
-				verwerfen: false
+				zeigeProbleme: false
 			};
 		}
 		// Unzustellbares bleibt sichtbar, statt still verloren zu gehen.
 		if (outbox.dead > 0) {
 			const mehrzahl = outbox.dead !== 1;
 			return {
-				text: `${outbox.dead} Änderung${mehrzahl ? 'en' : ''} konnte${mehrzahl ? 'n' : ''} nicht gespeichert werden – tippen zum Verwerfen`,
+				text: `${outbox.dead} Änderung${mehrzahl ? 'en' : ''} konnte${mehrzahl ? 'n' : ''} nicht gespeichert werden – tippen für Details`,
 				class: 'bg-amber-600 text-white',
-				verwerfen: true
+				zeigeProbleme: true
 			};
 		}
 		return null;
@@ -161,6 +181,7 @@
 <CommandPalette bind:open={paletteOpen} />
 <QuickAddSheet bind:open={quickAddOpen} />
 <ModuleGridSheet bind:open={moduleGridOpen} currentPath={page.url.pathname} />
+<SyncIssuesSheet bind:open={syncIssuesOpen} />
 <Toaster />
 
 {#if authState.loading}
@@ -178,7 +199,7 @@
 	>
 		{#if syncBanner}
 			<button
-				onclick={() => (syncBanner.verwerfen ? outbox.clearDead() : outbox.replay())}
+				onclick={() => (syncBanner.zeigeProbleme ? (syncIssuesOpen = true) : outbox.replay())}
 				style="view-transition-name: sync-banner"
 				class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium {syncBanner.class}"
 			>

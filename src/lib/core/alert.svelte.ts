@@ -46,16 +46,35 @@ export async function alarm(opts: AlertOptions): Promise<void> {
 	}
 }
 
+/**
+ * Ein einziger Kontext für die gesamte Laufzeit.
+ *
+ * Vorher legte jeder Alarm einen neuen an und schloss ihn nie. Browser deckeln
+ * bei etwa sechs gleichzeitigen Kontexten — nach sechs Pomodoro-Runden blieb der
+ * Ton stumm, ohne Fehlermeldung.
+ */
+let audioCtx: AudioContext | null = null;
+
+function holeAudioContext(): AudioContext | null {
+	if (audioCtx) return audioCtx;
+	const AudioCtx =
+		typeof window !== 'undefined'
+			? window.AudioContext ||
+			  (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+			: null;
+	if (!AudioCtx) return null;
+	audioCtx = new AudioCtx();
+	return audioCtx;
+}
+
 /** Kurzer Zweiklang über Web Audio. Braucht keine Assetdatei. */
 function playChime(): void {
 	try {
-		const AudioCtx =
-			typeof window !== 'undefined'
-				? window.AudioContext ||
-				  (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-				: null;
-		if (!AudioCtx) return;
-		const ctx = new AudioCtx();
+		const ctx = holeAudioContext();
+		if (!ctx) return;
+		// Ohne Nutzergeste startet der Kontext 'suspended' und bleibt es auch,
+		// nachdem die Geste erfolgt ist — er muss aktiv geweckt werden.
+		if (ctx.state === 'suspended') void ctx.resume();
 		const now = ctx.currentTime;
 
 		const osc1 = ctx.createOscillator();

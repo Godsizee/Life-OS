@@ -1,7 +1,6 @@
 import { tasksState } from '$lib/features/tasks/store.svelte';
 import { habitsState } from '$lib/features/habits/store.svelte';
 import { healthState } from '$lib/features/health/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
 import { goalsState } from '$lib/features/goals/store.svelte';
 import { fitnessState } from '$lib/features/fitness/store.svelte';
 import { getGoalProgress } from '$lib/features/goals/progress';
@@ -146,22 +145,18 @@ export function getSuggestions(): Suggestion[] {
 	}
 
 	// 7. Einkaufsliste voll (> 12 unbesorgte Gegenstände)
-	// Wait, check if shoppingState is loaded and has items.
-	// ShoppingState has a loading property and stores items. Let's make sure it's present.
-	try {
-		const pendingItems = shoppingState.items.filter((item) => !item.checked);
-		if (pendingItems.length > 12) {
-			list.push({
-				id: 'shopping_full',
-				title: '🛒 Einkauf fällig?',
-				description: `Deine Einkaufsliste hat ${pendingItems.length} unbesorgte Dinge.`,
-				icon: '🛒',
-				type: 'info',
-				actionText: 'Öffnen',
-				actionRoute: '/shopping'
-			});
-		}
-	} catch {}
+	const pendingItems = shoppingState.items.filter((item) => !item.checked);
+	if (pendingItems.length > 12) {
+		list.push({
+			id: 'shopping_full',
+			title: '🛒 Einkauf fällig?',
+			description: `Deine Einkaufsliste hat ${pendingItems.length} unbesorgte Dinge.`,
+			icon: '🛒',
+			type: 'info',
+			actionText: 'Öffnen',
+			actionRoute: '/shopping'
+		});
+	}
 
 	// 8. Ziel-Deadline naht / hinterher (W8)
 	for (const g of goalsState.goals) {

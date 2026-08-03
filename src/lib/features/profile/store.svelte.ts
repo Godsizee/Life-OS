@@ -1,4 +1,6 @@
 import { authState } from '$lib/core/auth.svelte';
+import { outbox } from '$lib/core/outbox.svelte';
+import { ladeSicher } from '$lib/core/store-load';
 import * as profileApi from './api';
 import type { ProfileSettings } from './types';
 import {
@@ -36,11 +38,31 @@ export type HealthSettingKey = keyof typeof HEALTH_LIMITS;
 export const DEFAULT_WATER_UNIT: WaterUnit = 'glasses';
 export const DEFAULT_WEIGHT_UNIT: WeightUnit = 'kg';
 
+/**
+ * Beide Schreibwege gehen auf dieselbe Tabelle, treffen aber verschiedene
+ * Spalten — die Outbox schluesselt nur nach Tabellenname, deshalb hier
+ * unterscheidbar gemacht.
+ */
+type ProfileMutation =
+	| { kind: 'settings'; patch: Partial<ProfileSettings> }
+	| { kind: 'display_name'; userId: string; value: string };
+
 class ProfileState {
 	settings = $state<ProfileSettings>({});
 	displayName = $state<string | null>(null);
 	loading = $state(false);
 	private userId: string | null = null;
+
+	constructor() {
+		outbox.registerExecutor('profiles', {
+			update: (payload) => {
+				const m = payload as ProfileMutation;
+				return m.kind === 'settings'
+					? profileApi.mergeSettings(m.patch)
+					: profileApi.updateDisplayName(m.userId, m.value);
+			}
+		});
+	}
 
 	weeklyWorkoutGoal = $derived(this.settings.weekly_workout_goal ?? DEFAULT_WEEKLY_WORKOUT_GOAL);
 	restTimerSeconds = $derived(this.settings.rest_timer_seconds ?? DEFAULT_REST_TIMER_SECONDS);
@@ -75,13 +97,22 @@ class ProfileState {
 		if (!uId || this.userId === uId) return;
 		this.userId = uId;
 		this.loading = true;
-		try {
+		// Ohne ladeSicher flog der Fehler in das Promise.allSettled von
+		// loadWorkspaceData() und verschwand dort. Der Nutzer sah still die
+		// Standardwerte (8 Gläser, 25 min) statt seiner eigenen Ziele.
+		const ok = await ladeSicher('Einstellungen', async () => {
 			const profile = await profileApi.getProfile(uId);
 			this.settings = profile.settings;
 			this.displayName = profile.display_name;
-		} finally {
-			this.loading = false;
-		}
+		});
+		this.loading = false;
+		if (!ok) this.userId = null; // naechster Aufruf versucht es erneut
+	}
+
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload() {
+		this.userId = null;
+		await this.load();
 	}
 
 	unload() {
@@ -90,11 +121,21 @@ class ProfileState {
 		this.userId = null;
 	}
 
+	/**
+	 * Einstellungen aendern — optimistisch lokal, dann ueber die Outbox.
+	 *
+	 * Vorher schrieb jede Aenderung direkt gegen die API: offline ging sie
+	 * ersatzlos verloren, obwohl die App ein Offline-Banner zeigt. Und weil
+	 * dabei das komplette Objekt rausging, ueberschrieben zwei Geraete
+	 * gegenseitig ihre Aenderungen. Jetzt wandert nur der Patch raus und wird
+	 * serverseitig zusammengefuehrt (siehe api.mergeSettings).
+	 */
 	async setSettings(partial: Partial<ProfileSettings>) {
-		const uId = authState.user?.id;
-		if (!uId) return;
+		if (!authState.user?.id) return;
 		this.settings = { ...this.settings, ...partial };
-		await profileApi.updateSettings(uId, this.settings);
+		await outbox.runOrQueue('profiles', 'update', { kind: 'settings', patch: partial }, () =>
+			profileApi.mergeSettings(partial)
+		);
 	}
 
 	async setNumber(
@@ -102,12 +143,9 @@ class ProfileState {
 		value: number,
 		limits: { min: number; max: number; step: number }
 	) {
-		const uId = authState.user?.id;
-		if (!uId) return;
 		const snapped = Math.round(value / limits.step) * limits.step;
 		const clamped = Math.max(limits.min, Math.min(limits.max, snapped));
-		this.settings = { ...this.settings, [key]: clamped };
-		await profileApi.updateSettings(uId, this.settings);
+		await this.setSettings({ [key]: clamped });
 	}
 
 	async setWeeklyWorkoutGoal(goal: number) {
@@ -127,36 +165,32 @@ class ProfileState {
 	}
 
 	async setWeightGoal(kg: number | null) {
-		const uId = authState.user?.id;
-		if (!uId) return;
 		const value =
 			kg === null || !Number.isFinite(kg) || kg <= 0
 				? null
 				: Math.round(Math.min(500, kg) * 10) / 10;
-		this.settings = { ...this.settings, weight_goal_kg: value };
-		await profileApi.updateSettings(uId, this.settings);
+		await this.setSettings({ weight_goal_kg: value });
 	}
 
 	async setWaterUnit(unit: WaterUnit) {
-		const uId = authState.user?.id;
-		if (!uId) return;
-		this.settings = { ...this.settings, water_unit: unit };
-		await profileApi.updateSettings(uId, this.settings);
+		await this.setSettings({ water_unit: unit });
 	}
 
 	async setWeightUnit(unit: WeightUnit) {
-		const uId = authState.user?.id;
-		if (!uId) return;
-		this.settings = { ...this.settings, weight_unit: unit };
-		await profileApi.updateSettings(uId, this.settings);
+		await this.setSettings({ weight_unit: unit });
 	}
 
 	async setDisplayName(name: string) {
 		const uId = authState.user?.id;
 		const trimmed = name.trim();
 		if (!uId || trimmed.length === 0 || trimmed.length > 60) return;
-		await profileApi.updateDisplayName(uId, trimmed);
 		this.displayName = trimmed;
+		await outbox.runOrQueue(
+			'profiles',
+			'update',
+			{ kind: 'display_name', userId: uId, value: trimmed },
+			() => profileApi.updateDisplayName(uId, trimmed)
+		);
 	}
 }
 

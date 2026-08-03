@@ -46,6 +46,22 @@ export async function updateRaw(patch: Partial<Task> & { id: string }): Promise<
 	return data;
 }
 
+/**
+ * Mehrere Aufgaben in EINEM Request schreiben.
+ *
+ * Umsortieren erzeugte vorher einen Request pro Geschwister — bei 30 Aufgaben
+ * in einer Board-Spalte also 30 Round-Trips fuer einen einzigen Drop.
+ *
+ * Bewusst vollstaendige Zeilen: `upsert` ist ein INSERT mit ON CONFLICT, ein
+ * Teilobjekt wuerde an den NOT-NULL-Spalten scheitern. Die Zeilen liegen im
+ * Store ohnehin vollstaendig vor.
+ */
+export async function upsertManyRaw(tasks: Task[]): Promise<void> {
+	if (tasks.length === 0) return;
+	const { error } = await supabase.from('tasks').upsert(tasks);
+	if (error) throw error;
+}
+
 export async function deleteTask(id: string): Promise<void> {
 	const { error } = await supabase.from('tasks').delete().eq('id', id);
 	if (error) throw error;

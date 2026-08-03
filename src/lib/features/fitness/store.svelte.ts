@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -146,6 +147,12 @@ class FitnessState {
 		);
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribePlans?.();
 		this.unsubscribeLogs?.();
@@ -210,7 +217,7 @@ class FitnessState {
 		const parsed = customExerciseInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const entry: ExerciseCatalogEntry = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			name_de: parsed.name_de,
 			name_en: parsed.name_en,
@@ -244,7 +251,7 @@ class FitnessState {
 	async addPlan(input: WorkoutPlanInput): Promise<string> {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = workoutPlanInputSchema.parse(input);
-		const id = crypto.randomUUID();
+		const id = neueId();
 		const now = new Date().toISOString();
 		const plan: WorkoutPlan = {
 			id,
@@ -268,7 +275,7 @@ class FitnessState {
 
 	async addExercise(planId: string, input: WorkoutExerciseInput) {
 		const parsed = workoutExerciseInputSchema.parse(input);
-		const id = crypto.randomUUID();
+		const id = neueId();
 		const exercise: WorkoutExercise = {
 			id,
 			plan_id: planId,
@@ -307,7 +314,7 @@ class FitnessState {
 		alreadyAnnounced: Set<string> = new Set()
 	) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
-		const logId = crypto.randomUUID();
+		const logId = neueId();
 		const now = new Date().toISOString();
 		const todayStr = now.split('T')[0];
 
@@ -323,7 +330,7 @@ class FitnessState {
 		};
 
 		const setLogs: WorkoutSetLog[] = sets.map((s) => ({
-			id: crypto.randomUUID(),
+			id: neueId(),
 			log_id: logId,
 			exercise_name: s.exercise_name,
 			set_index: s.set_index,
@@ -374,7 +381,7 @@ class FitnessState {
 			const existing = this.prFor(best.exercise_name);
 			if (existing && existing.est_1rm >= best.est_1rm) continue;
 			const record: PersonalRecord = {
-				id: existing?.id ?? crypto.randomUUID(),
+				id: existing?.id ?? neueId(),
 				workspace_id: this.workspaceId,
 				user_id: uid,
 				exercise_name: best.exercise_name,

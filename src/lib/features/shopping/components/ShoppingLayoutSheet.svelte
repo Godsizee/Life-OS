@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { neueId } from '$lib/core/id';
   import { shoppingState } from '../store.svelte';
   import Sheet from '$lib/ui/Sheet.svelte';
   import { CATEGORY_LABELS } from '../categories';
@@ -23,7 +24,7 @@
   function addList() {
     if (!newListName.trim()) return;
     const lists = shoppingState.settings.shopping_lists ?? [{ id: 'default', name: 'Einkauf', icon: '🛒' }];
-    shoppingState.setLists([...lists, { id: crypto.randomUUID(), name: newListName.trim(), icon: newListIcon.trim() || '🛒' }]);
+    shoppingState.setLists([...lists, { id: neueId(), name: newListName.trim(), icon: newListIcon.trim() || '🛒' }]);
     newListName = '';
   }
 

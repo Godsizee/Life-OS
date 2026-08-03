@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
@@ -90,6 +91,12 @@ class CalendarState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -111,7 +118,7 @@ class CalendarState {
 		const parsed = calendarInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const cal: Calendar = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			name: parsed.name,
 			color: parsed.color,
@@ -162,7 +169,7 @@ class CalendarState {
 		const parsed = eventInputSchema.parse({ ...input, calendar_id: calendarId });
 		const now = new Date().toISOString();
 		const event: Event = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			calendar_id: parsed.calendar_id,
 			title: parsed.title,
@@ -192,7 +199,7 @@ class CalendarState {
 		const existing = this.overrides.find((o) => o.event_id === eventId && o.occurrence_date === occurrenceDate);
 		const now = new Date().toISOString();
 		const row: EventOverride = {
-			id: existing?.id ?? crypto.randomUUID(),
+			id: existing?.id ?? neueId(),
 			workspace_id: this.workspaceId,
 			event_id: eventId,
 			occurrence_date: occurrenceDate,
@@ -212,7 +219,7 @@ class CalendarState {
 		const existing = this.overrides.find((o) => o.event_id === eventId && o.occurrence_date === occurrenceDate);
 		const now = new Date().toISOString();
 		const row: EventOverride = {
-			id: existing?.id ?? crypto.randomUUID(),
+			id: existing?.id ?? neueId(),
 			workspace_id: this.workspaceId,
 			event_id: eventId,
 			occurrence_date: occurrenceDate,

@@ -1,8 +1,10 @@
+import { neueId } from '$lib/core/id';
 import { authState } from '$lib/core/auth.svelte';
 import { attachmentsState } from '$lib/features/attachments/store.svelte';
 import { outbox } from '$lib/core/outbox.svelte';
 import { subscribeToTable } from '$lib/core/realtime';
 import { ladeSicher } from '$lib/core/store-load';
+import { loeschenMitUndo } from '$lib/core/undo';
 import * as notesApi from './api';
 import { noteInputSchema } from './schema';
 import type { Note } from './types';
@@ -60,6 +62,12 @@ class NotesState {
 		});
 	}
 
+	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
+	async reload(workspaceId: string) {
+		this.workspaceId = null;
+		await this.load(workspaceId);
+	}
+
 	unload() {
 		this.unsubscribe?.();
 		this.unsubscribe = null;
@@ -73,7 +81,7 @@ class NotesState {
 		const parsed = noteInputSchema.parse(input);
 		const now = new Date().toISOString();
 		const note: Note = {
-			id: crypto.randomUUID(),
+			id: neueId(),
 			workspace_id: this.workspaceId,
 			title: parsed.title,
 			body: parsed.body,
@@ -118,6 +126,24 @@ class NotesState {
 		// Polymorphe Anhaenge haben keinen FK-Cascade -> explizit mitloeschen.
 		await attachmentsState.removeForEntity('note', id);
 		await outbox.runOrQueue('notes', 'delete', { id }, () => notesApi.deleteNote(id));
+	}
+
+	/** Löschen mit Rücknahmefenster — für die Wischgeste. Siehe core/undo.ts. */
+	removeNoteWithUndo(id: string) {
+		const note = this.notes.find((n) => n.id === id);
+		if (!note) return;
+		loeschenMitUndo({
+			text: 'Notiz gelöscht',
+			ausblenden: () => (this.notes = this.notes.filter((n) => n.id !== id)),
+			wiederherstellen: () => {
+				if (!this.notes.some((n) => n.id === id)) this.notes = [...this.notes, note];
+			},
+			// Anhänge erst hier: eine Rücknahme soll sie nicht neu hochladen müssen.
+			festschreiben: async () => {
+				await attachmentsState.removeForEntity('note', id);
+				await outbox.runOrQueue('notes', 'delete', { id }, () => notesApi.deleteNote(id));
+			}
+		});
 	}
 }
 

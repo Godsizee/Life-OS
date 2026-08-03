@@ -39,6 +39,19 @@ export async function signOut(): Promise<void> {
 }
 
 /**
+ * Konto und alle Daten löschen (DSGVO Art. 17).
+ *
+ * Läuft über eine Edge Function, weil `auth.admin.deleteUser` den Service-Role-
+ * Key braucht — der darf niemals in den Client. Die Function identifiziert den
+ * Nutzer ausschließlich über sein eigenes Zugriffstoken; es gibt bewusst keinen
+ * Parameter, mit dem sich ein fremdes Konto angeben ließe.
+ */
+export async function deleteAccount(): Promise<void> {
+	const { error } = await supabase.functions.invoke('lifeos-account-delete', { method: 'POST' });
+	if (error) throw error;
+}
+
+/**
  * Passkey-Wege sind absichtlich hinter der Fähigkeitsprüfung verriegelt: Ohne
  * sie wirft das SDK bei abgeschaltetem Flag bzw. der Server 404, und der Nutzer
  * sähe einen Fehler für einen Knopf, der nie hätte erscheinen dürfen.

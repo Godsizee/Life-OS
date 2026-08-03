@@ -28,28 +28,49 @@ function nextWeekday(target: number, weekOffset: number = 0): Date {
 	return d;
 }
 
+/**
+ * Wortgrenze, die auch Umlaute versteht.
+ *
+ * `\b` arbeitet ASCII-basiert: zwischen Zeichenkettenanfang und \u201e\u00fc" liegt f\u00fcr
+ * die Regex-Engine KEINE Wortgrenze, weil \u201e\u00fc" dort nicht als Wortzeichen z\u00e4hlt.
+ * `/\b(\u00fcbermorgen)\b/` traf deshalb nie auf eine Eingabe, die mit \u201e\u00fcbermorgen"
+ * beginnt \u2014 nur auf eine, in der ein Wortzeichen davorstand. Genau deshalb
+ * landete \u201e\u00fcbermorgen Zahnarzt" ohne Datum in der Aufgabenliste, w\u00e4hrend
+ * \u201e\u00fcber\u00fcbermorgen" versehentlich als \u201e\u00fcbermorgen" durchging.
+ */
+function wortRegex(alternativen: string): RegExp {
+	return new RegExp(`(?<![\\p{L}\\p{N}])(?:${alternativen})(?![\\p{L}\\p{N}])`, 'iu');
+}
+
+const RE_IN_3_TAGEN = wortRegex('\u00fcber\u00fcbermorgen|in 3 tagen');
+const RE_UEBERMORGEN = wortRegex('\u00fcbermorgen|day after tomorrow');
+const RE_MORGEN = wortRegex('morgen|tomorrow');
+const RE_HEUTE = wortRegex('heute|today');
+const RE_NAECHSTE_WOCHE = wortRegex('n\u00e4chste\\s*woche|next\\s*week|kommende\\s*woche');
+const RE_WOCHENENDE = wortRegex('am\\s*wochenende|wochenende|weekend');
+
 export function parseRelativeDate(lower: string): Date | null {
 	const now = new Date();
 
-	if (/\b(\u00fcber\u00fcbermorgen|in 3 tagen)\b/.test(lower)) {
+	if (RE_IN_3_TAGEN.test(lower)) {
 		const d = new Date(now); d.setDate(d.getDate() + 3); return d;
 	}
-	if (/\b(\u00fcbermorgen|day after tomorrow)\b/.test(lower)) {
+	if (RE_UEBERMORGEN.test(lower)) {
 		const d = new Date(now); d.setDate(d.getDate() + 2); return d;
 	}
-	if (/\b(morgen|tomorrow)\b/.test(lower)) {
+	if (RE_MORGEN.test(lower)) {
 		const d = new Date(now); d.setDate(d.getDate() + 1); return d;
 	}
-	if (/\b(heute|today)\b/.test(lower)) {
+	if (RE_HEUTE.test(lower)) {
 		return new Date(now);
 	}
-	if (/\b(n\u00e4chste\s*woche|next\s*week|kommende\s*woche)\b/.test(lower)) {
+	if (RE_NAECHSTE_WOCHE.test(lower)) {
 		return nextWeekday(1);
 	}
-	if (/\b(am\s*wochenende|wochenende|weekend)\b/.test(lower)) {
+	if (RE_WOCHENENDE.test(lower)) {
 		return nextWeekday(6); // Returns next Saturday
 	}
-	
+
 	const inDays = lower.match(/\bin\s*(\d+)\s*tag(?:en)?\b/);
 	if (inDays) {
 		const d = new Date(now); d.setDate(d.getDate() + parseInt(inDays[1])); return d;
@@ -73,17 +94,26 @@ export function parseRelativeDate(lower: string): Date | null {
 		if (re.test(lower)) return nextWeekday(val);
 	}
 
-	const dmMatch = lower.match(/\b(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?\b/);
-	if (dmMatch) {
-		const year = dmMatch[3] ? (dmMatch[3].length === 2 ? 2000 + parseInt(dmMatch[3]) : parseInt(dmMatch[3])) : now.getFullYear();
-		const d = new Date(year, parseInt(dmMatch[2]) - 1, parseInt(dmMatch[1]));
-		if (d < now && !dmMatch[3]) d.setFullYear(d.getFullYear() + 1);
-		return d;
-	}
-
+	// ISO ZUERST: Das Tag/Monat-Muster unten passt sonst auf den hinteren Teil
+	// eines ISO-Datums. Aus „2027-03-15" wurde ueber `03-15` der 3. Tag im
+	// 15. Monat — also stillschweigend der 3. Maerz 2027.
 	const isoMatch = lower.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
 	if (isoMatch) {
 		return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
+	}
+
+	const dmMatch = lower.match(/\b(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?\b/);
+	if (dmMatch) {
+		const tag = parseInt(dmMatch[1]);
+		const monat = parseInt(dmMatch[2]);
+		// Ohne diese Pruefung rollt new Date() ueber: Monat 15 wurde klaglos zum
+		// Maerz des Folgejahres, statt die Eingabe als kein Datum zu behandeln.
+		if (tag >= 1 && tag <= 31 && monat >= 1 && monat <= 12) {
+			const year = dmMatch[3] ? (dmMatch[3].length === 2 ? 2000 + parseInt(dmMatch[3]) : parseInt(dmMatch[3])) : now.getFullYear();
+			const d = new Date(year, monat - 1, tag);
+			if (d < now && !dmMatch[3]) d.setFullYear(d.getFullYear() + 1);
+			return d;
+		}
 	}
 
 	return null;
@@ -193,8 +223,17 @@ export function parseNLPInput(text: string): ParsedInput {
 		trimmed.match(/\b(?:geschlafen|schlaf(?:dauer)?|sleep|nachtruhe|gepennt)[:\s]*(\d+(?:[.,]\d+)?)\b/i) ||
 		trimmed.match(/\bheute\s+(?:nacht\s+)?(\d+(?:[.,]\d+)?)\s*(?:h|std|stunden?)\b/i);
 
+	/**
+	 * Die Einheit steht in einer eigenen Gruppe, statt sie nachtraeglich aus dem
+	 * Treffertext zu raten.
+	 *
+	 * Vorher entschied `treffer[0].includes('l')` ueber Liter oder Glas — und
+	 * „3 gläser wasser" enthaelt ein „l" in „gläser". Aus drei Glaesern wurden
+	 * so drei Liter, also 3000 ml statt 750.
+	 */
+	const waterEinheitMatch = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(ml|liter|l)\b\s*(?:wasser|water|getrunken|flüssigkeit)?/i);
 	const waterMatch =
-		trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:l|liter|ml)\s*(?:wasser|water|getrunken|fl\u00fcssigkeit)?\b/i) ||
+		waterEinheitMatch ||
 		trimmed.match(/(\d+)\s*(?:💧|gl\u00e4ser?|glasses?|glas|flaschen?|tassen?)\b/i) ||
 		trimmed.match(/\b(?:wasser|water|getrunken|trinken|hydration|getr\u00e4nk)[:\s]*(\d+(?:[.,]\d+)?)\b/i) ||
 		trimmed.match(/\b(\d+)\s*(?:wasser|water|trinken)\b/i);
@@ -234,11 +273,13 @@ export function parseNLPInput(text: string): ParsedInput {
 
 	if (weightMatch || sleepMatch || waterMatch || energyMatch || energyWordScore || stepsMatch || distanceMatch || pulseMatch) {
 		let water = waterMatch ? parseFloat2(waterMatch) : null;
-		if (water !== null && waterMatch) {
-			const str = waterMatch[0].toLowerCase();
-			if (str.includes('l') && !str.includes('ml')) water = Math.round(water * 1000); // 1L = 1000ml
-			else if (!str.includes('ml')) water = Math.round(water * 250); // Assumed glasses, 250ml = 1 Glass
-			else water = Math.round(water); // already ml
+		if (water !== null) {
+			// Einheit aus der Fanggruppe, nicht aus dem Treffertext: „gläser"
+			// enthaelt selbst ein „l" und wurde vorher als Liter gelesen.
+			const einheit = waterEinheitMatch?.[2]?.toLowerCase() ?? null;
+			if (einheit === 'ml') water = Math.round(water);
+			else if (einheit) water = Math.round(water * 1000); // l / liter
+			else water = Math.round(water * 250); // Glaeser, 250 ml je Glas
 		}
 
 		let distance = distanceMatch ? parseFloat2(distanceMatch) : null;
@@ -331,12 +372,16 @@ export function parseNLPInput(text: string): ParsedInput {
 			.replace(/\b\d{4}-\d{2}-\d{2}\b/g, '')
 			.replace(/@\d{1,2}(?::\d{2})?/g, '')
 			.replace(/\b\d{1,2}[:.]\d{2}\b/g, '')
-			.replace(/\b\d{1,2}\s*(?:uhr|am|pm|h)\b/gi, '')
 			.replace(/\bum\s+\d{1,2}(?:\s*uhr|:\d{2})?\b/gi, '')
+			.replace(/\b\d{1,2}\s*(?:uhr|am|pm|h)\b/gi, '')
 			.replace(/\bhalb\s+(eins|zwei|drei|vier|f\u00fcnf|sechs|sieben|acht|neun|zehn|elf|zw\u00f6lf|\d{1,2})\b/gi, '')
 			.replace(/\bviertel\s+(?:vor|nach)\s+(eins|zwei|drei|vier|f\u00fcnf|sechs|sieben|acht|neun|zehn|elf|zw\u00f6lf|\d{1,2})\b/gi, '')
 			.replace(/\b(jeden|every|w\u00f6chentlich|weekly|t\u00e4glich|daily|monatlich|j\u00e4hrlich)\b/gi, '')
-			.replace(/\s+/g, ' ').trim();
+			.replace(/\s+/g, ' ')
+			// Praepositionen, deren Bezugswort gerade entfernt wurde, bleiben sonst
+			// als Rest stehen — aus „Zahnarzt am Freitag um 9 uhr" wurde „Zahnarzt um".
+			.replace(/\s+(?:um|am|at|on|gegen|ab)$/i, '')
+			.trim();
 
 		return { type: 'event', parsed: { title: title || trimmed, due_at: due_at.toISOString(), recurring: isRecurring } };
 	}

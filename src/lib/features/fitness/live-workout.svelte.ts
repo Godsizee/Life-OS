@@ -1,3 +1,4 @@
+import { neueId } from '$lib/core/id';
 // Welle F2 — Live-Workout 2.0: die laufende (noch ungespeicherte) Session lebt hier
 // statt im Komponenten-State von routes/fitness/+page.svelte, damit ein Reload oder
 // App-Wechsel sie nicht verwirft. Draft in localStorage, Vorbild focus/store.svelte.ts
@@ -150,7 +151,7 @@ class LiveWorkoutState {
 		exs.forEach((e) => {
 			for (let i = 0; i < e.default_sets; i++) {
 				sets.push({
-					id: crypto.randomUUID(),
+					id: neueId(),
 					exercise_name: e.name,
 					exercise_id: e.exercise_id,
 					exercise_type: e.exercise_type,
@@ -187,7 +188,7 @@ class LiveWorkoutState {
 		this.resetSession();
 		this.planId = null;
 		this.sets = saetze.map((s) => ({
-			id: crypto.randomUUID(),
+			id: neueId(),
 			exercise_name: s.exercise_name,
 			exercise_id: s.exercise_id,
 			exercise_type: s.exercise_type,
@@ -212,7 +213,7 @@ class LiveWorkoutState {
 		const additions: ActiveSetLog[] = [];
 		for (let i = 0; i < Math.max(1, count); i++) {
 			additions.push({
-				id: crypto.randomUUID(),
+				id: neueId(),
 				exercise_name: picked.name,
 				exercise_id: picked.exercise_id,
 				exercise_type: picked.exercise_type,
@@ -239,7 +240,7 @@ class LiveWorkoutState {
 		this.sets = [
 			...this.sets,
 			{
-				id: crypto.randomUUID(),
+				id: neueId(),
 				exercise_name: template.exercise_name,
 				exercise_id: template.exercise_id,
 				exercise_type: template.exercise_type,

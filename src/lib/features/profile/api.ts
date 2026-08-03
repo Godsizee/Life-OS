@@ -19,11 +19,6 @@ export async function getProfile(userId: string): Promise<ProfileRow> {
 	};
 }
 
-export async function getSettings(userId: string): Promise<ProfileSettings> {
-	const p = await getProfile(userId);
-	return p.settings;
-}
-
 /** Der Trigger `handle_new_user` setzt anfangs die E-Mail als Anzeigename — das Onboarding ersetzt sie. */
 export async function updateDisplayName(userId: string, displayName: string): Promise<void> {
 	const { error } = await supabase
@@ -33,7 +28,15 @@ export async function updateDisplayName(userId: string, displayName: string): Pr
 	if (error) throw error;
 }
 
-export async function updateSettings(userId: string, settings: ProfileSettings): Promise<void> {
-	const { error } = await supabase.from('profiles').update({ settings }).eq('user_id', userId);
+/**
+ * Nur die uebergebenen Keys setzen, der Rest bleibt stehen.
+ *
+ * Vorher ging hier das komplette settings-Objekt raus. Zwei Geraete kurz
+ * nacheinander — oder eine spaet abgespielte Outbox-Mutation — machten damit
+ * fremde Aenderungen rueckgaengig. Die Zusammenfuehrung passiert serverseitig
+ * (Migration 32), weil nur dort der aktuelle Stand bekannt ist.
+ */
+export async function mergeSettings(patch: Partial<ProfileSettings>): Promise<void> {
+	const { error } = await supabase.rpc('merge_profile_settings', { patch });
 	if (error) throw error;
 }

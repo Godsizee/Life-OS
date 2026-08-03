@@ -24,6 +24,15 @@ class WorkspaceState {
 		}
 	}
 
+	/**
+	 * Erneut laden — Abgleich nach Verbindungsabbruch (core/resync.ts).
+	 * Fehler werden hier geschluckt: der Abgleich laeuft im Hintergrund, ein
+	 * gescheiterter Versuch darf die uebrigen Stores nicht mitreissen.
+	 */
+	async reload() {
+		await this.load().catch(() => {});
+	}
+
 	reset() {
 		this.workspace = null;
 		this.members = [];

@@ -21,7 +21,7 @@
 	}
 </script>
 
-<SwipeToDelete onDelete={() => tasksState.removeTask(task.id)} label="Aufgabe löschen">
+<SwipeToDelete onDelete={() => tasksState.removeTaskWithUndo(task.id)} label="Aufgabe löschen">
 	<ListRow>
 		{#snippet leading()}
 			<CheckCircle checked={isDone} ontoggle={toggle} />

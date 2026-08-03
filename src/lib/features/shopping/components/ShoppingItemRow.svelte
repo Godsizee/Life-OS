@@ -10,7 +10,7 @@
   let { item, onopen }: { item: ShoppingItem; onopen?: (item: ShoppingItem) => void } = $props();
 </script>
 
-<SwipeToDelete onDelete={() => shoppingState.removeItem(item.id)} label="Artikel löschen">
+<SwipeToDelete onDelete={() => shoppingState.removeItemWithUndo(item.id)} label="Artikel löschen">
   <ListRow>
     {#snippet leading()}
       <CheckCircle checked={item.checked} ontoggle={() => shoppingState.toggleChecked(item.id)} />

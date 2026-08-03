@@ -96,6 +96,38 @@ function req<T>(request: IDBRequest<T>): Promise<T> {
 	});
 }
 
+/**
+ * Ist der Fehler durch Wiederholen nicht zu beheben?
+ *
+ * HINTERGRUND: Bisher wanderte JEDER Fehler in die Queue und wurde fuenfmal
+ * versucht. Bei einer abgelehnten RLS-Pruefung oder einer Constraint-Verletzung
+ * ist das sinnlos — die Mutation blockiert dabei fuenf Durchlaeufe lang alle
+ * spaeteren Aenderungen derselben Tabelle (siehe `blockiert` in durchlauf()),
+ * und der Nutzer erfaehrt erst nach dem fuenften Versuch davon.
+ *
+ * Vorsichtig gewaehlt: nur was eindeutig fachlich ist. Alles Unklare bleibt bei
+ * der Wiederholung — ein faelschlich verworfener Schreibvorgang waere teurer als
+ * ein paar vergebliche Versuche.
+ */
+export function istDauerhaft(err: unknown): boolean {
+	if (!err || typeof err !== 'object') return false;
+	const e = err as { code?: unknown; status?: unknown };
+
+	const code = typeof e.code === 'string' ? e.code : '';
+	// Postgres-SQLSTATE: 23xxx = Integritaetsverletzung (unique, foreign key,
+	// not null, check), 42501 = insufficient_privilege, also RLS.
+	if (code.startsWith('23') || code === '42501') return true;
+	// PGRST301 = JWT abgelaufen. Das laesst sich nicht durch Wiederholen loesen,
+	// aber der Refresh im Client kann es — daher NICHT als dauerhaft werten.
+
+	const status = typeof e.status === 'number' ? e.status : null;
+	if (status === null) return false;
+	// 408 Timeout und 429 Rate Limit sind ausdruecklich zum Wiederholen gedacht,
+	// 401/403 dagegen koennen nach einem Token-Refresh gutgehen.
+	if (status === 408 || status === 429 || status === 401 || status === 403) return false;
+	return status >= 400 && status < 500;
+}
+
 function fehlertext(err: unknown): string {
 	if (err instanceof Error) return err.message;
 	if (typeof err === 'object' && err && 'message' in err) return String(err.message);
@@ -212,6 +244,23 @@ class Outbox {
 		this.merken(mutation.table, -1);
 	}
 
+	/** Dead Letter fuer eine Mutation, die nie in der Queue war (siehe runOrQueue). */
+	private async direktInsDeadLetter(
+		mutation: Omit<Mutation, 'seq' | 'createdAt' | 'attempts'>,
+		grund: string
+	) {
+		const db = await openDb();
+		const tx = db.transaction(DEAD_STORE, 'readwrite');
+		tx.objectStore(DEAD_STORE).add({
+			...mutation,
+			createdAt: new Date().toISOString(),
+			attempts: 1,
+			lastError: grund
+		});
+		await txDone(tx);
+		this.dead += 1;
+	}
+
 	private async zaehleVersuch(mutation: Mutation, grund: string) {
 		const db = await openDb();
 		const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -280,7 +329,7 @@ class Outbox {
 					const grund = fehlertext(err);
 					fehler = true;
 					blockiert.add(mutation.table);
-					if (mutation.attempts + 1 >= MAX_ATTEMPTS) {
+					if (istDauerhaft(err) || mutation.attempts + 1 >= MAX_ATTEMPTS) {
 						await this.insDeadLetter(mutation, grund);
 					} else {
 						await this.zaehleVersuch(mutation, grund);
@@ -310,7 +359,16 @@ class Outbox {
 		if (navigator.onLine && !wartetSchon) {
 			try {
 				return await apiFn();
-			} catch {
+			} catch (err) {
+				// Ein fachlicher Fehler (RLS, Constraint) wird durch Warten nicht
+				// besser. Frueher landete er trotzdem in der Queue, blockierte dort
+				// fuenf Durchlaeufe lang alle spaeteren Aenderungen derselben Tabelle
+				// und tauchte erst danach im Banner auf.
+				if (istDauerhaft(err)) {
+					await this.direktInsDeadLetter({ table, operation, payload }, fehlertext(err));
+					this.status = 'error';
+					return undefined;
+				}
 				await this.enqueue({ table, operation, payload });
 				return undefined;
 			}
