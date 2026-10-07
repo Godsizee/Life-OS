@@ -244,7 +244,7 @@
 					value={resolveNavModules(profileState.settings.nav_module_ids)[0].id}
 					onchange={(e) => {
 						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
-							(m) => m.id
+							(m): string => m.id
 						);
 						current[0] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
@@ -261,7 +261,7 @@
 					value={resolveNavModules(profileState.settings.nav_module_ids)[1].id}
 					onchange={(e) => {
 						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
-							(m) => m.id
+							(m): string => m.id
 						);
 						current[1] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
@@ -278,7 +278,7 @@
 					value={resolveNavModules(profileState.settings.nav_module_ids)[2].id}
 					onchange={(e) => {
 						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
-							(m) => m.id
+							(m): string => m.id
 						);
 						current[2] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
@@ -295,7 +295,7 @@
 					value={resolveNavModules(profileState.settings.nav_module_ids)[3].id}
 					onchange={(e) => {
 						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
-							(m) => m.id
+							(m): string => m.id
 						);
 						current[3] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });

@@ -12,4 +12,10 @@ describe('resolveNavModules', () => {
 	it('liefert die Standardliste ohne Einstellung', () => {
 		expect(resolveNavModules(undefined).map((m) => m.id)).toEqual([...bottomNavModuleIds]);
 	});
+	it('überspringt abgeschaltete Module und füllt mit aktiven auf', () => {
+		const ids = resolveNavModules(['fitness', 'notes'], (id) => id !== 'notes').map((m) => m.id);
+		expect(ids).toHaveLength(4);
+		expect(ids).not.toContain('notes');
+		expect(ids[0]).toBe('fitness');
+	});
 });
