@@ -11,6 +11,8 @@ const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SHARED_TOKEN = Deno.env.get('LIFEOS_INTAKE_TOKEN') ?? '';
 const VAPID_KEYS_JWK = Deno.env.get('VAPID_KEYS_JWK') ?? '';
 const VAPID_CONTACT = Deno.env.get('VAPID_CONTACT') ?? 'mailto:admin@life-os.local';
+// Absolute Ziel-URL fuer deklarativen Push (Safari 18.4+ oeffnet sie ohne Service Worker).
+const APP_ORIGIN = Deno.env.get('LIFEOS_APP_ORIGIN') ?? 'https://life.2.godsize.info';
 
 interface ReminderRow {
 	id: string;
@@ -135,10 +137,20 @@ Deno.serve(async (req) => {
 	let sent = 0;
 	const stale: string[] = [];
 	for (const reminder of reminders) {
+		// Beide Formen in EINER Nutzlast: Das alte {title, body, url} lesen bestehende
+		// Service Worker, {web_push: 8030, notification} zeigt Safari 18.4+ deklarativ an
+		// (Format: webkit.org/blog/16535, web_push als Zahl).
 		const payload = {
 			title: reminder.title,
 			body: reminder.body ?? '',
-			url: reminder.url || '/'
+			url: reminder.url || '/',
+			web_push: 8030,
+			notification: {
+				title: reminder.title,
+				body: reminder.body ?? '',
+				navigate: new URL(reminder.url || '/', APP_ORIGIN).href,
+				tag: `reminder-${reminder.id}`
+			}
 		};
 		for (const sub of byUser.get(reminder.user_id) ?? []) {
 			const result = await sendPush(sub, payload);

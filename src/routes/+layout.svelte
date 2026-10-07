@@ -23,6 +23,8 @@
 	import SyncIssuesSheet from '#lib/ui/SyncIssuesSheet.svelte';
 	import Toaster from '#lib/ui/Toaster.svelte';
 	import AuthSplash from '#lib/features/auth/components/AuthSplash.svelte';
+	import UpdateBand from '#lib/system/components/UpdateBand.svelte';
+	import { starteAppBadge } from '#lib/system/badge.svelte.js';
 	let { children } = $props();
 
 	let paletteOpen = $state(false);
@@ -75,6 +77,7 @@
 			console.error('[app] Unbehandelte Rejection', e.reason);
 			toastState.error('Eine Aktion ist fehlgeschlagen');
 		});
+		return starteAppBadge();
 	});
 
 	$effect(() => {
@@ -209,6 +212,7 @@
 				{syncBanner.text}
 			</button>
 			{/if}
+			<UpdateBand />
 			<main
 			class="mx-auto w-full flex-1 {showNav ? 'p-4 md:p-8' : ''} {wideRoute
 				? 'max-w-6xl'
