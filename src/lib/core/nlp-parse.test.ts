@@ -1,19 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Der Parser fragt die geladenen Routinen ab, um „erledigt Sport" als
-// Routinen-Eintrag zu erkennen. Hier fest verdrahtet, damit die Tests nicht am
-// Supabase-Client haengen.
-vi.mock('#lib/features/habits/store.svelte.js', () => ({
-	habitsState: {
-		habits: [
-			{ id: 'h1', name: 'Sport', archived: false },
-			{ id: 'h2', name: 'Meditation', archived: false },
-			{ id: 'h3', name: 'Tagebuch', archived: true }
-		]
-	}
-}));
+import { parseNLPInput, parseRelativeDate, setzeRoutinenQuelle } from './nlp-parse';
 
-const { parseNLPInput, parseRelativeDate } = await import('./nlp-parse');
+// Der Parser fragt die geladenen Routinen ab, um „erledigt Sport“ als
+// Routinen-Eintrag zu erkennen. Hier fest verdrahtet statt über den Store.
+setzeRoutinenQuelle(() => [
+	{ id: 'h1', name: 'Sport', archived: false },
+	{ id: 'h2', name: 'Meditation', archived: false },
+	{ id: 'h3', name: 'Tagebuch', archived: true }
+]);
 
 /** Mittwoch, 12:00 Uhr Ortszeit — feste Basis für alle relativen Angaben. */
 const JETZT = new Date(2026, 5, 10, 12, 0, 0);

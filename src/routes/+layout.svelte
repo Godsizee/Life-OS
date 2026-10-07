@@ -11,16 +11,16 @@
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
-	import { pushState } from '#lib/core/push.svelte.js';
+	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { keyboardState } from '#lib/core/keyboard.svelte.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 	import { loginUrlFor } from '#lib/features/auth/redirect.js';
-	import BottomNav from '#lib/ui/BottomNav.svelte';
-	import SidebarNav from '#lib/ui/SidebarNav.svelte';
-	import CommandPalette from '#lib/ui/CommandPalette.svelte';
-	import QuickAddSheet from '#lib/ui/QuickAddSheet.svelte';
-	import ModuleGridSheet from '#lib/ui/ModuleGridSheet.svelte';
+	import UntereLeiste from '#lib/system/components/UntereLeiste.svelte';
+	import Seitenleiste from '#lib/system/components/Seitenleiste.svelte';
+	import Suche from '#lib/system/components/Suche.svelte';
+	import Erfassen from '#lib/system/components/Erfassen.svelte';
+	import AlleModule from '#lib/system/components/AlleModule.svelte';
 	import SyncIssuesSheet from '#lib/ui/SyncIssuesSheet.svelte';
 	import Toaster from '#lib/ui/Toaster.svelte';
 	import AuthSplash from '#lib/features/auth/components/AuthSplash.svelte';
@@ -184,9 +184,9 @@
 	});
 </script>
 
-<CommandPalette bind:open={paletteOpen} />
-<QuickAddSheet bind:open={quickAddOpen} />
-<ModuleGridSheet bind:open={moduleGridOpen} currentPath={page.url.pathname} />
+<Suche bind:open={paletteOpen} />
+<Erfassen bind:open={quickAddOpen} />
+<AlleModule bind:open={moduleGridOpen} currentPath={page.url.pathname} />
 <SyncIssuesSheet bind:open={syncIssuesOpen} />
 <Toaster />
 
@@ -197,7 +197,7 @@
 		class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300"
 	>
 		{#if showNav}
-			<SidebarNav currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
+			<Seitenleiste currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 		{/if}
 
 		<div
@@ -223,7 +223,7 @@
 				{@render children()}
 			</main>
 			{#if showNav}
-				<BottomNav
+				<UntereLeiste
 					currentPath={page.url.pathname}
 					onQuickAdd={() => (quickAddOpen = true)}
 					onMore={() => (moduleGridOpen = true)}

@@ -64,7 +64,7 @@ class AuthState {
 	}
 }
 
-// Abmelden liegt bewusst nicht hier, sondern in features/auth/logout.ts:
+// Abmelden liegt bewusst nicht hier, sondern im Auth-Feature (logout.svelte.ts):
 // es muss zusaetzlich Workspace-Daten und Outbox aufraeumen, und core darf
 // nicht auf features zugreifen.
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Modal from './Modal.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { notesState } from '#lib/features/notes/store.svelte.js';
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';

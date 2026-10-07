@@ -4,7 +4,7 @@ import { outbox } from '#lib/core/outbox.svelte.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { toastState } from '#lib/core/toast.svelte.js';
 import { ladeSicher } from '#lib/core/store-load.js';
-import { pushState } from '#lib/core/push.svelte.js';
+import { pushState } from './push.svelte.js';
 import * as remindersApi from './api';
 import { reminderInputSchema, type ReminderInput } from './schema';
 import { firstFutureOccurrence, isDue, isOnDay, reminderAtFromAnchor } from './schedule';

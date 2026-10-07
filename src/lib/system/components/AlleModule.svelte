@@ -2,7 +2,7 @@
 	import { Settings } from '@lucide/svelte';
 	import { modules } from '#lib/config/modules.js';
 	import { haptic } from '#lib/core/haptics.js';
-	import Sheet from './Sheet.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 
 	let { open = $bindable(false), currentPath = '/' }: { open?: boolean; currentPath?: string } =
 		$props();

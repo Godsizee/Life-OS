@@ -9,7 +9,7 @@ import { authErrorText } from './errors';
 
 /**
  * Abmelden inklusive Aufräumen — bis dahin stand derselbe Ablauf doppelt in
- * `routes/more/+page.svelte` und `ui/SidebarNav.svelte`.
+ * `routes/more/+page.svelte` und `system/components/Seitenleiste.svelte`.
  *
  * Die Outbox wird bewusst geleert: Sie enthält Änderungen des abgemeldeten
  * Kontos und würde sonst beim nächsten Login in einen fremden Workspace laufen.

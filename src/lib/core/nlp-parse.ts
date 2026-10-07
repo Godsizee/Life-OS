@@ -1,4 +1,17 @@
-import { habitsState } from '#lib/features/habits/store.svelte.js';
+interface RoutinenEintrag {
+	id: string;
+	name: string;
+	archived: boolean;
+}
+
+/**
+ * Register statt Store-Import (Zielbild C4: core importiert keine Features). Die
+ * Routinen für „erledigt Sport“ hinterlegt system/start.ts beim App-Start.
+ */
+let routinenQuelle: () => RoutinenEintrag[] = () => [];
+export function setzeRoutinenQuelle(fn: () => RoutinenEintrag[]): void {
+	routinenQuelle = fn;
+}
 
 export interface ParsedInput {
 	type: 'task' | 'event' | 'shopping' | 'health' | 'habit' | 'mood' | 'note' | 'goal';
@@ -671,7 +684,7 @@ export function parseNLPInput(text: string): ParsedInput {
 		/^(?:erledigt|gemacht|done|logged?|geloggt|abgehakt|\u2713|\u2705|habe|hab|abgeschlossen|fertig|check)\s+/i;
 	const habitSearch = lower.replace(HABIT_PREFIX, '').trim();
 
-	const matchedHabit = habitsState.habits.find(
+	const matchedHabit = routinenQuelle().find(
 		(h) => !h.archived && habitSearch.includes(h.name.toLowerCase())
 	);
 	if (matchedHabit) {

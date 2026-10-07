@@ -3,7 +3,7 @@ import { fetchAllPages } from '#lib/core/query.js';
 import type { Reminder } from './types';
 
 // ── Push-Subscriptions (Zustellkanal der Erinnerungen) ──────────────────────
-// Liegt hier statt in core/push.svelte.ts: der Supabase-Client gehoert laut
+// Liegt hier statt in reminders/push.svelte.ts: der Supabase-Client gehoert laut
 // AGENTS.md ausschliesslich in die api.ts des Features.
 
 export interface PushSubscriptionRow {

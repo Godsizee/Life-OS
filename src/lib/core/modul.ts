@@ -123,7 +123,7 @@ export interface VerknuepfbarDef {
 	alle(): { id: string; titel: string }[];
 }
 
-/** Aus features/timeline/types.ts hierher verschoben (Vertrag statt Feature-Typ). */
+/** Aus dem Timeline-Feature (types.ts) hierher verschoben (Vertrag statt Feature-Typ). */
 export interface TimelineEintrag {
 	id: string;
 	modul: ModulId;

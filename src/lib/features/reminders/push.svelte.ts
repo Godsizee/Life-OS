@@ -1,6 +1,6 @@
 import { VITE_VAPID_PUBLIC_KEY } from '$app/env/public';
-import { supabase } from './supabase';
-import * as remindersApi from '#lib/features/reminders/api.js';
+import { supabase } from '#lib/core/supabase.js';
+import * as remindersApi from './api.js';
 
 const VAPID_PUBLIC_KEY = VITE_VAPID_PUBLIC_KEY || '';
 

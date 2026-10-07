@@ -13,9 +13,9 @@
 	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
-	import Sheet from './Sheet.svelte';
-	import Input from './Input.svelte';
-	import Button from './Button.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Button from '#lib/ui/Button.svelte';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
 

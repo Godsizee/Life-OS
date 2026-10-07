@@ -4,7 +4,7 @@
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import { resetWelcome } from '#lib/features/dashboard/welcome.js';
 	import { installState } from '#lib/core/install.svelte.js';
-	import { pushState } from '#lib/core/push.svelte.js';
+	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { profileState, HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
 	import {
