@@ -11,7 +11,7 @@ import {
 	type CalendarInput
 } from './schema';
 import type { Calendar, Event, EventOverride, EventOverridePatch } from './types';
-import { remindersState } from '#lib/features/reminders/store.svelte.js';
+import { emit } from '#lib/core/ereignisse.js';
 
 class CalendarState {
 	calendars = $state<Calendar[]>([]);
@@ -215,8 +215,8 @@ class CalendarState {
 	async removeEvent(id: string) {
 		this.events = this.events.filter((e) => e.id !== id);
 		this.overrides = this.overrides.filter((o) => o.event_id !== id);
+		emit('termin.geloescht', { id });
 		await outbox.runOrQueue('events', 'delete', { id }, () => calendarApi.deleteEvent(id));
-		await remindersState.removeFor('event', id);
 	}
 
 	async cancelOccurrence(eventId: string, occurrenceDate: string) {
@@ -285,10 +285,10 @@ class CalendarState {
 	) {
 		const updated_at = new Date().toISOString();
 		this.events = this.events.map((e) => (e.id === id ? { ...e, ...patch, updated_at } : e));
+		if ('start' in patch) emit('termin.startGeaendert', { id, start: patch.start ?? null });
 		await outbox.runOrQueue('events', 'update', { id, ...patch, updated_at }, () =>
 			calendarApi.updateRaw({ id, ...patch, updated_at })
 		);
-		if ('start' in patch) await remindersState.syncAnchor('event', id, patch.start ?? null);
 	}
 }
 

@@ -7,6 +7,11 @@ interface TableHandlers<T> {
 	onDelete?: (row: { id: string }) => void;
 }
 
+/**
+ * Handler (onInsert/onUpdate/onDelete) dürfen NIE emit() aufrufen — sonst läuft jede
+ * Automation einmal je offenem Gerät (Falle F11). Ereignisse kommen nur aus lokalen
+ * Nutzeraktionen.
+ */
 export function subscribeToTable<T>(
 	table: string,
 	workspaceId: string,

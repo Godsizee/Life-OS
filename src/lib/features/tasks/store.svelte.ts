@@ -12,7 +12,7 @@ import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
 import { habitsState } from '#lib/features/habits/store.svelte.js';
-import { remindersState } from '#lib/features/reminders/store.svelte.js';
+import { emit } from '#lib/core/ereignisse.js';
 
 class TasksState {
 	tasks = $state<Task[]>([]);
@@ -153,11 +153,17 @@ class TasksState {
 		this.tasks = this.tasks.map((t) =>
 			t.id === id ? { ...t, status, updated_at, completed_at } : t
 		);
+		if (status === 'done') {
+			emit('aufgabe.erledigt', {
+				id,
+				titel: task?.title ?? '',
+				projektId: task?.project_id ?? null,
+				zielId: task?.goal_id ?? null
+			});
+		}
 		await outbox.runOrQueue('tasks', 'update', { id, status, updated_at, completed_at }, () =>
 			tasksApi.updateRaw({ id, status, updated_at, completed_at })
 		);
-
-		if (status === 'done') await remindersState.deactivateFor('task', id);
 
 		if (status === 'done' && task) {
 			const matchedHabit = habitsState.habits.find(
@@ -217,10 +223,10 @@ class TasksState {
 	) {
 		const updated_at = new Date().toISOString();
 		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
+		if ('due_at' in patch) emit('aufgabe.fristGeaendert', { id, dueAt: patch.due_at ?? null });
 		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
 			tasksApi.updateRaw({ id, ...patch, updated_at })
 		);
-		if ('due_at' in patch) await remindersState.syncAnchor('task', id, patch.due_at ?? null);
 	}
 
 	async moveTask(id: string, patch: { status?: TaskStatus; position?: number }) {
@@ -295,8 +301,8 @@ class TasksState {
 
 	async removeTask(id: string) {
 		this.tasks = this.tasks.filter((t) => t.id !== id);
+		emit('aufgabe.geloescht', { id });
 		await outbox.runOrQueue('tasks', 'delete', { id }, () => tasksApi.deleteTask(id));
-		await remindersState.removeFor('task', id);
 	}
 
 	/**
@@ -315,8 +321,9 @@ class TasksState {
 				if (!this.tasks.some((t) => t.id === id)) this.tasks = [...this.tasks, task];
 			},
 			festschreiben: async () => {
+				// Erst hier, nicht beim Ausblenden: bis zum Ablauf des Fensters ist das Löschen umkehrbar.
+				emit('aufgabe.geloescht', { id });
 				await outbox.runOrQueue('tasks', 'delete', { id }, () => tasksApi.deleteTask(id));
-				await remindersState.removeFor('task', id);
 			}
 		});
 	}
