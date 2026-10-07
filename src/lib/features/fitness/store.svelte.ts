@@ -21,7 +21,9 @@ import type {
 	ExerciseCatalogEntry,
 	PickedExercise
 } from './types';
+import { emit } from '#lib/core/ereignisse.js';
 import { bestPerExercise, type ExerciseBest } from './utils/1rm';
+import { workoutsThisWeek } from './utils/frequency';
 import {
 	autoLogTrainingHabit,
 	applyPRsToGoals,
@@ -382,6 +384,16 @@ class FitnessState {
 			if (toAnnounce.length > 0) announcePRs(toAnnounce);
 			applyPRsToGoals(newPRs);
 		}
+
+		// Erst hier, weil neueRekorde die PR-Erkennung braucht (läuft nach dem Server-Insert).
+		emit('training.beendet', {
+			logId,
+			planId,
+			datum: todayStr,
+			dauerMin: duration,
+			neueRekorde: newPRs.map((pr) => ({ uebung: pr.exercise_name, e1rmKg: pr.est_1rm })),
+			trainingstageDieseWoche: workoutsThisWeek(this.logs)
+		});
 	}
 
 	private async detectAndPersistPRs(

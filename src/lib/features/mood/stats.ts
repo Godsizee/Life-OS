@@ -169,6 +169,23 @@ export interface PixelMonth {
 	days: (PixelDay | null)[];
 }
 
+/**
+ * Tage in Folge bis einschließlich `heute`, deren Tageswert (dailyAverages) ≤ 2 ist.
+ * Ein Tag ohne Eintrag oder mit höherem Wert beendet die Reihe; ist `heute` selbst nicht tief, ist es 0.
+ */
+export function tiefeTageInFolge(entries: MoodLike[], heute: string): number {
+	const proTag = new Map(dailyAverages(entries).map((e) => [e.date, e.score]));
+	const tag = fromISODate(heute);
+	if (!tag) return 0;
+	let n = 0;
+	for (;;) {
+		const score = proTag.get(toISODate(tag));
+		if (score === undefined || score > 2) return n;
+		n++;
+		tag.setDate(tag.getDate() - 1);
+	}
+}
+
 export function daysInMonth(year: number, month: number): number {
 	return new Date(year, month + 1, 0).getDate();
 }

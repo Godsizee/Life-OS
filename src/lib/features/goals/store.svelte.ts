@@ -2,6 +2,7 @@ import { neueId } from '#lib/core/id.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { toISODate } from '#lib/core/date.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
+import { emit } from '#lib/core/ereignisse.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as goalsApi from './api';
@@ -240,6 +241,7 @@ class GoalsState {
 			created_at: new Date().toISOString()
 		};
 		this.checkins = [row, ...this.checkins];
+		emit('ziel.checkin', { zielId: row.goal_id, wert: row.value });
 		// Ein Check-in ist Fortschritt: das Ziel gilt ab jetzt als "in Arbeit".
 		const goal = this.goals.find((g) => g.id === parsed.goal_id);
 		if (goal?.status === 'open') void this.setStatus(goal.id, 'in_progress');
@@ -300,6 +302,8 @@ class GoalsState {
 		this.journalEntries = existing
 			? this.journalEntries.map((j) => (j.id === entry.id ? entry : j))
 			: [entry, ...this.journalEntries];
+		// ensureEntry() legt leere Platzhalter für Anhänge an — die zählen nicht als Tagebucheintrag.
+		if (entry.body.trim()) emit('tagebuch.gespeichert', { datum: entry.date, art: entry.kind });
 		await outbox.runOrQueue('journal_entries', existing ? 'update' : 'insert', entry, () =>
 			goalsApi.upsertJournalEntry(entry)
 		);

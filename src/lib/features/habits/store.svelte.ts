@@ -216,6 +216,7 @@ class HabitsState {
 			}
 			const patch = { id: existing.id, value, status };
 			this.logs = this.logs.map((l) => (l.id === existing.id ? { ...l, value, status } : l));
+			this.meldeTag(habitId, dateStr, value, status);
 			await outbox.runOrQueue('habit_logs', 'update', patch, () => habitsApi.updateLog(patch));
 			return;
 		}
@@ -232,7 +233,19 @@ class HabitsState {
 			created_at: new Date().toISOString()
 		};
 		this.logs = [...this.logs, log];
+		this.meldeTag(habitId, dateStr, value, status);
 		await outbox.runOrQueue('habit_logs', 'insert', log, () => habitsApi.insertLog(log));
+	}
+
+	/** Meldet „erledigt" nur, wenn der Tag danach wirklich erledigt ist (Mengen-Routine: Ziel erreicht). */
+	private meldeTag(habitId: string, datum: string, value: number, status: HabitLogStatus) {
+		if (status === 'skipped') {
+			emit('routine.uebersprungen', { habitId, datum });
+			return;
+		}
+		if (value >= this.targetOf(habitId)) {
+			emit('routine.erledigt', { habitId, datum, wert: value });
+		}
 	}
 
 	private targetOf(habitId: string): number {

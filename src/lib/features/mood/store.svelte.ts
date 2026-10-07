@@ -8,7 +8,9 @@ import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as moodApi from './api';
 import { cleanActivities } from './activities';
 import { moodInputSchema } from './schema';
+import { tiefeTageInFolge } from './stats';
 import type { MoodEntry } from './types';
+import { emit } from '#lib/core/ereignisse.js';
 
 /** 400 Tage: deckt das laufende Kalenderjahr (Year in Pixels) an jedem Tag ab,
  *  ohne beim Start die ganze Historie zu ziehen. Aeltere Jahre kommen ueber
@@ -195,6 +197,13 @@ class MoodState {
 		};
 
 		this.mergeLocal(row);
+		emit('stimmung.erfasst', {
+			id: row.id,
+			datum: row.date,
+			wert: row.score,
+			aktivitaeten: row.activities ?? [],
+			tiefeTageInFolge: tiefeTageInFolge(this.entries, row.date)
+		});
 
 		const saved = await outbox.runOrQueue(
 			'mood_entries',

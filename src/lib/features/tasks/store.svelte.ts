@@ -140,6 +140,7 @@ class TasksState {
 			focus_week: null
 		};
 		this.tasks = [...this.tasks, task];
+		emit('aufgabe.erstellt', { id: task.id, titel: task.title });
 		await outbox.runOrQueue('tasks', 'insert', task, () => tasksApi.insertRaw(task));
 	}
 

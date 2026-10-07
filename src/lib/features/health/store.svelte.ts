@@ -7,7 +7,11 @@ import { ladeSicher } from '#lib/core/store-load.js';
 import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as healthApi from './api';
 import { healthInputSchema } from './schema';
+import { num, waterMl } from './stats';
 import type { HealthEntry, HealthValues } from './types';
+import { emit } from '#lib/core/ereignisse.js';
+
+const FELDER = ['weight_kg', 'sleep_h', 'water_ml', 'energy'] as const;
 
 /** 400 Tage: deckt Jahresansicht und "An diesem Tag" ohne Nachladen ab. */
 const WINDOW_DAYS = 400;
@@ -121,7 +125,7 @@ class HealthState {
 		};
 
 		const existing = this.entryForDate(parsed.data.date);
-		this.mergeLocal({
+		const row: HealthEntry = {
 			id: existing?.id ?? neueId(),
 			workspace_id: wId,
 			user_id: uId,
@@ -131,7 +135,17 @@ class HealthState {
 			water_ml: parsed.data.water_ml as HealthEntry['water_ml'],
 			water_glasses: existing?.water_glasses ?? null,
 			energy: parsed.data.energy as HealthEntry['energy']
-		});
+		};
+		this.mergeLocal(row);
+
+		const felder = FELDER.filter((f) => num(row[f]) !== null && num(row[f]) !== num(existing?.[f]));
+		if (felder.length > 0) {
+			emit('gesundheit.erfasst', {
+				datum: row.date,
+				felder,
+				wasserMlDelta: (waterMl(row) ?? 0) - (existing ? (waterMl(existing) ?? 0) : 0)
+			});
+		}
 
 		const saved = await outbox.runOrQueue(
 			'health_entries',

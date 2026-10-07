@@ -1,6 +1,7 @@
 import { neueId } from '#lib/core/id.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
+import { emit } from '#lib/core/ereignisse.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import { toISODate } from '#lib/core/date.js';
@@ -141,6 +142,7 @@ class TimeTrackingState {
 			created_at: new Date().toISOString()
 		};
 		this.entries = [entry, ...this.entries];
+		if (entry.source === 'pomodoro') emit('fokus.beendet', { aufgabeId: taskId, minuten: rounded });
 		await outbox.runOrQueue('time_entries', 'insert', entry, () =>
 			timeApi.insertTimeEntryRaw(entry)
 		);

@@ -1,6 +1,7 @@
 import { neueId } from '#lib/core/id.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
+import { emit } from '#lib/core/ereignisse.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import { loeschenMitUndo } from '#lib/core/undo.js';
@@ -150,6 +151,7 @@ class ShoppingState {
 		this.items = this.items.map((i) =>
 			i.id === id ? { ...i, checked, checked_at, updated_at } : i
 		);
+		if (checked) emit('einkauf.abgehakt', { id, name: item.name });
 
 		if (checked && this.workspaceId) {
 			this.settings = {

@@ -13,6 +13,7 @@ import {
 	formatScore,
 	moodDistribution,
 	mostFrequentActivities,
+	tiefeTageInFolge,
 	topActivities,
 	validScore,
 	yearPixels,
@@ -211,6 +212,34 @@ describe('dailyAverages', () => {
 
 	it('lässt ungültige Scores weg', () => {
 		expect(dailyAverages([{ date: '2026-07-31', score: 9 }])).toEqual([]);
+	});
+});
+
+describe('tiefeTageInFolge', () => {
+	it('0, wenn heute nichts oder etwas Gutes erfasst ist', () => {
+		expect(tiefeTageInFolge([], '2026-10-07')).toBe(0);
+		expect(tiefeTageInFolge([E('2026-10-07', 4), E('2026-10-06', 1)], '2026-10-07')).toBe(0);
+	});
+
+	it('1 bei nur einem tiefen Tag', () => {
+		expect(tiefeTageInFolge([E('2026-10-07', 2)], '2026-10-07')).toBe(1);
+	});
+
+	it('zählt drei tiefe Tage in Folge, auch über den Monatswechsel', () => {
+		const e = [E('2026-09-30', 1), E('2026-10-01', 2), E('2026-10-02', 2)];
+		expect(tiefeTageInFolge(e, '2026-10-02')).toBe(3);
+	});
+
+	it('bricht an einer Lücke und an einem guten Tag ab', () => {
+		const luecke = [E('2026-10-04', 1), E('2026-10-06', 2), E('2026-10-07', 2)];
+		expect(tiefeTageInFolge(luecke, '2026-10-07')).toBe(2);
+		const gut = [E('2026-10-05', 1), E('2026-10-06', 4), E('2026-10-07', 2)];
+		expect(tiefeTageInFolge(gut, '2026-10-07')).toBe(1);
+	});
+
+	it('nimmt den Tagesdurchschnitt, nicht den einzelnen Eintrag', () => {
+		expect(tiefeTageInFolge([E('2026-10-07', 1), E('2026-10-07', 5)], '2026-10-07')).toBe(0);
+		expect(tiefeTageInFolge([E('2026-10-07', 1), E('2026-10-07', 3)], '2026-10-07')).toBe(1);
 	});
 });
 
