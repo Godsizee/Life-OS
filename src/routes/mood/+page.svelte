@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { moodState } from '$lib/features/mood/store.svelte';
-	import MoodPicker from '$lib/features/mood/components/MoodPicker.svelte';
-	import ActivityPicker from '$lib/features/mood/components/ActivityPicker.svelte';
-	import YearInPixels from '$lib/features/mood/components/YearInPixels.svelte';
-	import MoodEntrySheet from '$lib/features/mood/components/MoodEntrySheet.svelte';
-	import MoodActivityStats from '$lib/features/mood/components/MoodActivityStats.svelte';
-	import WeekdayAverages from '$lib/features/mood/components/WeekdayAverages.svelte';
-	import MoodDistribution from '$lib/features/mood/components/MoodDistribution.svelte';
-	import ActivityManagerSheet from '$lib/features/mood/components/ActivityManagerSheet.svelte';
-	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
-	import { MOOD_LABELS, MOOD_EMOJIS } from '$lib/features/mood/types';
-	import { MOOD_CLASSES } from '$lib/features/mood/colors';
-	import { activityLabel } from '$lib/features/mood/activities';
+	import { moodState } from '#lib/features/mood/store.svelte.js';
+	import MoodPicker from '#lib/features/mood/components/MoodPicker.svelte';
+	import ActivityPicker from '#lib/features/mood/components/ActivityPicker.svelte';
+	import YearInPixels from '#lib/features/mood/components/YearInPixels.svelte';
+	import MoodEntrySheet from '#lib/features/mood/components/MoodEntrySheet.svelte';
+	import MoodActivityStats from '#lib/features/mood/components/MoodActivityStats.svelte';
+	import WeekdayAverages from '#lib/features/mood/components/WeekdayAverages.svelte';
+	import MoodDistribution from '#lib/features/mood/components/MoodDistribution.svelte';
+	import ActivityManagerSheet from '#lib/features/mood/components/ActivityManagerSheet.svelte';
+	import MoodHealthCorrelation from '#lib/features/analytics/components/MoodHealthCorrelation.svelte';
+	import { MOOD_LABELS, MOOD_EMOJIS } from '#lib/features/mood/types.js';
+	import { MOOD_CLASSES } from '#lib/features/mood/colors.js';
+	import { activityLabel } from '#lib/features/mood/activities.js';
 	import {
 		availableYears,
 		averageByDaypart,
@@ -20,11 +20,11 @@
 		filterSince,
 		formatScore,
 		yearPixels
-	} from '$lib/features/mood/stats';
-	import { formatDate, toISODate } from '$lib/core/date';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
+	} from '#lib/features/mood/stats.js';
+	import { formatDate, toISODate } from '#lib/core/date.js';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
 	import { Settings, Trash2, Sun, Sunset, Moon, Sunrise } from 'lucide-svelte';
 
 	// ── Heute erfassen ──────────────────────────────────────────────

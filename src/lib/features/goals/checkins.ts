@@ -1,6 +1,6 @@
 // W8 — reine Ableitungen für Zielwert-Ziele und die On-Track-Anzeige.
 // Keine Store-/Svelte-Abhängigkeit, damit die Logik in vitest (Node) testbar ist.
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 
 const MS_PER_DAY = 86_400_000;
 

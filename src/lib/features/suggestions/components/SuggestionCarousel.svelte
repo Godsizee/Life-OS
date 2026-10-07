@@ -2,7 +2,7 @@
 	import { getSuggestions, type Suggestion } from '../engine';
 	import { goto } from '$app/navigation';
 	import { Sparkles, ArrowRight, Check } from 'lucide-svelte';
-	import Spinner from '$lib/ui/Spinner.svelte';
+	import Spinner from '#lib/ui/Spinner.svelte';
 
 	let suggestions = $derived(getSuggestions());
 

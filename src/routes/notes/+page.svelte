@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Hash, Plus } from 'lucide-svelte';
-	import { notesState } from '$lib/features/notes/store.svelte';
-	import { searchNotes, sortNotes, tagUnion, type NoteSort, NOTE_SORT_LABELS } from '$lib/features/notes/filter';
-	import type { Note } from '$lib/features/notes/types';
+	import { notesState } from '#lib/features/notes/store.svelte.js';
+	import { searchNotes, sortNotes, tagUnion, type NoteSort, NOTE_SORT_LABELS } from '#lib/features/notes/filter.js';
+	import type { Note } from '#lib/features/notes/types.js';
 	import { onMount } from 'svelte';
-	import NoteForm from '$lib/features/notes/components/NoteForm.svelte';
-	import NoteList from '$lib/features/notes/components/NoteList.svelte';
-	import NoteDetailSheet from '$lib/features/notes/components/NoteDetailSheet.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
+	import NoteForm from '#lib/features/notes/components/NoteForm.svelte';
+	import NoteList from '#lib/features/notes/components/NoteList.svelte';
+	import NoteDetailSheet from '#lib/features/notes/components/NoteDetailSheet.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
 
 	let search = $state('');
 	let activeTag = $state<string | null>(null);

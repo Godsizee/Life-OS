@@ -1,11 +1,11 @@
 // Welle 5.1 — Auflösung von Entitäten für Universal-Links.
 // Liest die bereits geladenen Feature-Stores; keine eigene Persistenz.
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { notesState } from '$lib/features/notes/store.svelte';
-import { calendarState } from '$lib/features/calendar/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { notesState } from '#lib/features/notes/store.svelte.js';
+import { calendarState } from '#lib/features/calendar/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 import { CheckSquare, Notebook, Calendar, Target, Repeat, Dumbbell, type Icon } from 'lucide-svelte';
 import type { LinkEntityType, LinkableEntity } from './types';
 

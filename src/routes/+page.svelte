@@ -1,42 +1,42 @@
 <script lang="ts">
-	import { formatDate } from '$lib/core/date';
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { formatDate } from '#lib/core/date.js';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	
-	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import SuggestionCarousel from '$lib/features/suggestions/components/SuggestionCarousel.svelte';
-	import DailyBrief from '$lib/features/dashboard/components/DailyBrief.svelte';
-	import WelcomeModal from '$lib/features/dashboard/components/WelcomeModal.svelte';
-	import QuickAddBar from '$lib/features/dashboard/components/QuickAddBar.svelte';
-	import NextUpCard from '$lib/features/dashboard/components/NextUpCard.svelte';
-	import WeekFocusCard from '$lib/features/dashboard/components/WeekFocusCard.svelte';
-	import StreakBanner from '$lib/features/dashboard/components/StreakBanner.svelte';
-	import HealthTiles from '$lib/features/dashboard/components/HealthTiles.svelte';
-	import FocusMiniCard from '$lib/features/focus/components/FocusMiniCard.svelte';
-	import DashboardCard from '$lib/features/dashboard/components/DashboardCard.svelte';
-	import WorkoutMiniCard from '$lib/features/fitness/components/WorkoutMiniCard.svelte';
+	import ScoreRing from '#lib/features/analytics/components/ScoreRing.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import SuggestionCarousel from '#lib/features/suggestions/components/SuggestionCarousel.svelte';
+	import DailyBrief from '#lib/features/dashboard/components/DailyBrief.svelte';
+	import WelcomeModal from '#lib/features/dashboard/components/WelcomeModal.svelte';
+	import QuickAddBar from '#lib/features/dashboard/components/QuickAddBar.svelte';
+	import NextUpCard from '#lib/features/dashboard/components/NextUpCard.svelte';
+	import WeekFocusCard from '#lib/features/dashboard/components/WeekFocusCard.svelte';
+	import StreakBanner from '#lib/features/dashboard/components/StreakBanner.svelte';
+	import HealthTiles from '#lib/features/dashboard/components/HealthTiles.svelte';
+	import FocusMiniCard from '#lib/features/focus/components/FocusMiniCard.svelte';
+	import DashboardCard from '#lib/features/dashboard/components/DashboardCard.svelte';
+	import WorkoutMiniCard from '#lib/features/fitness/components/WorkoutMiniCard.svelte';
 	
 	import { Sparkles, Calendar, Flame, ShoppingCart, Activity, Notebook, Lock } from 'lucide-svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
 	
-	import { calendarState } from '$lib/features/calendar/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { shoppingState } from '$lib/features/shopping/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { notesState } from '$lib/features/notes/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
+	import { calendarState } from '#lib/features/calendar/store.svelte.js';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { shoppingState } from '#lib/features/shopping/store.svelte.js';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { notesState } from '#lib/features/notes/store.svelte.js';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	
-	import EventItem from '$lib/features/calendar/components/EventItem.svelte';
-	import HabitList from '$lib/features/habits/components/HabitList.svelte';
-	import ShoppingList from '$lib/features/shopping/components/ShoppingList.svelte';
+	import EventItem from '#lib/features/calendar/components/EventItem.svelte';
+	import HabitList from '#lib/features/habits/components/HabitList.svelte';
+	import ShoppingList from '#lib/features/shopping/components/ShoppingList.svelte';
 	
-	import { isOpenToday } from '$lib/features/habits/streak';
-	import { checklistProgress } from '$lib/features/notes/markdown';
-	import { expandEvents } from '$lib/features/calendar/occurrences';
-	import { greetingFor } from '$lib/features/dashboard/greeting';
+	import { isOpenToday } from '#lib/features/habits/streak.js';
+	import { checklistProgress } from '#lib/features/notes/markdown.js';
+	import { expandEvents } from '#lib/features/calendar/occurrences.js';
+	import { greetingFor } from '#lib/features/dashboard/greeting.js';
 
 	let now = $state(new Date());
 	$effect(() => {

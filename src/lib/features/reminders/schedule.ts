@@ -1,5 +1,5 @@
 import type { Reminder } from './types';
-import { formatRecurrence } from '$lib/features/calendar/rrule';
+import { formatRecurrence } from '#lib/features/calendar/rrule.js';
 
 /** ICS-Wochentagscodes, Index = JS getDay() (0 = So … 6 = Sa). */
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;

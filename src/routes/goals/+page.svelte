@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
-	import GoalList from '$lib/features/goals/components/GoalList.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import GoalForm from '#lib/features/goals/components/GoalForm.svelte';
+	import GoalList from '#lib/features/goals/components/GoalList.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import { Plus, BookOpen } from 'lucide-svelte';
 
 	let createOpen = $state(false);
 
 	$effect(() => {
 		if (page.url.searchParams.get('tab') === 'journal') {
-			goto('/journal', { replaceState: true });
+			goto('/journal', { replace: true });
 		}
 	});
 </script>

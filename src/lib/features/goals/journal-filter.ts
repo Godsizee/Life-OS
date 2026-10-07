@@ -1,5 +1,5 @@
 import type { JournalEntry, JournalKind } from './types';
-import { bodySnippet } from '$lib/core/text';
+import { bodySnippet } from '#lib/core/text.js';
 
 export interface JournalFilter {
 	query: string;

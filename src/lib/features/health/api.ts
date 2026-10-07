@@ -1,5 +1,5 @@
-import { supabase } from '$lib/core/supabase';
-import { fetchAllPages } from '$lib/core/query';
+import { supabase } from '#lib/core/supabase.js';
+import { fetchAllPages } from '#lib/core/query.js';
 import type { HealthEntry } from './types';
 
 /** Ohne `id` — gleiche Begruendung wie bei mood/api.ts (Unique-Key statt PK). */

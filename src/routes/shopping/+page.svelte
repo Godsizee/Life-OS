@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { shoppingState } from '$lib/features/shopping/store.svelte';
-  import { authState } from '$lib/core/auth.svelte';
-  import type { ShoppingItem } from '$lib/features/shopping/types';
-  import ShoppingForm from '$lib/features/shopping/components/ShoppingForm.svelte';
-  import ShoppingGroupedList from '$lib/features/shopping/components/ShoppingGroupedList.svelte';
-  import ShoppingItemSheet from '$lib/features/shopping/components/ShoppingItemSheet.svelte';
-  import ShoppingLayoutSheet from '$lib/features/shopping/components/ShoppingLayoutSheet.svelte';
-  import Button from '$lib/ui/Button.svelte';
-  import Chip from '$lib/ui/Chip.svelte';
-  import PageHeader from '$lib/ui/PageHeader.svelte';
-  import Sheet from '$lib/ui/Sheet.svelte';
-  import Skeleton from '$lib/ui/Skeleton.svelte';
+  import { shoppingState } from '#lib/features/shopping/store.svelte.js';
+  import { authState } from '#lib/core/auth.svelte.js';
+  import type { ShoppingItem } from '#lib/features/shopping/types.js';
+  import ShoppingForm from '#lib/features/shopping/components/ShoppingForm.svelte';
+  import ShoppingGroupedList from '#lib/features/shopping/components/ShoppingGroupedList.svelte';
+  import ShoppingItemSheet from '#lib/features/shopping/components/ShoppingItemSheet.svelte';
+  import ShoppingLayoutSheet from '#lib/features/shopping/components/ShoppingLayoutSheet.svelte';
+  import Button from '#lib/ui/Button.svelte';
+  import Chip from '#lib/ui/Chip.svelte';
+  import PageHeader from '#lib/ui/PageHeader.svelte';
+  import Sheet from '#lib/ui/Sheet.svelte';
+  import Skeleton from '#lib/ui/Skeleton.svelte';
   import { Plus, SlidersHorizontal, RotateCcw } from 'lucide-svelte';
-  import { suggestions, recentlyBought } from '$lib/features/shopping/categories';
+  import { suggestions, recentlyBought } from '#lib/features/shopping/categories.js';
 
   let createOpen = $state(false);
   let layoutOpen = $state(false);

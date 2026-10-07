@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { haptic } from '$lib/core/haptics';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		checked = $bindable(false),

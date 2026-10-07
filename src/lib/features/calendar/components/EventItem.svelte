@@ -5,8 +5,8 @@
 	import type { Occurrence } from '../occurrences';
 	import { calendarState } from '../store.svelte';
 	import { formatRecurrence } from '../rrule';
-	import { linksState } from '$lib/features/links/store.svelte';
-	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
+	import { linksState } from '#lib/features/links/store.svelte.js';
+	import LinkedItems from '#lib/features/links/components/LinkedItems.svelte';
 
 	let { event, occurrence }: { event: Event; occurrence?: Occurrence } = $props();
 

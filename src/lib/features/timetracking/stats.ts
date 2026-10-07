@@ -1,6 +1,6 @@
 // W6 — reine Auswertung über time_entries. Keine Store-/Svelte-Abhängigkeit, damit
 // die Logik in vitest (Node-Umgebung) getestet werden kann.
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { TimeSource } from './types';
 
 /** Minimalform eines Eintrags — hält die Auswertung von der DB-Zeile unabhängig. */

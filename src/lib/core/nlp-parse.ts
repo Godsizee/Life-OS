@@ -1,4 +1,4 @@
-import { habitsState } from '$lib/features/habits/store.svelte';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
 
 export interface ParsedInput {
 	type: 'task' | 'event' | 'shopping' | 'health' | 'habit' | 'mood' | 'note' | 'goal';

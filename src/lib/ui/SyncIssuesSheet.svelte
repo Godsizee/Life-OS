@@ -6,9 +6,9 @@
 	// angezeigte Zeile, die es serverseitig nie gab, blieb bis zum naechsten Reload
 	// stehen. Deshalb hier beides: die Liste und ein Abgleich mit dem Server.
 	import { AlertTriangle, CheckCircle2 } from 'lucide-svelte';
-	import { outbox } from '$lib/core/outbox.svelte';
-	import { abgleichJetzt } from '$lib/core/resync';
-	import { toastState } from '$lib/core/toast.svelte';
+	import { outbox } from '#lib/core/outbox.svelte.js';
+	import { abgleichJetzt } from '#lib/core/resync.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
 	import Badge from './Badge.svelte';
 	import Button from './Button.svelte';
 	import EmptyState from './EmptyState.svelte';

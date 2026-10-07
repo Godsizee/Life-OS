@@ -2,13 +2,13 @@
 	import { Archive } from 'lucide-svelte';
 	import type { Goal, GoalStatus } from '../types';
 	import { goalsState } from '../store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { calculateHabitProgress30Days } from '#lib/features/habits/streak.js';
 	import { getGoalProgress, usesManualProgress } from '../progress';
 	import { evaluateTrack, formatTargetProgress, sumCheckins } from '../checkins';
 	import OnTrackBadge from './OnTrackBadge.svelte';
-	import ListRow from '$lib/ui/ListRow.svelte';
+	import ListRow from '#lib/ui/ListRow.svelte';
 
 	let { goal }: { goal: Goal } = $props();
 

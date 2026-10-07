@@ -1,5 +1,5 @@
 // Welle F4 — Trainingsfrequenz-Score fürs Life-Score-Fitness-Feld und Frequenz-Ziele.
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { WorkoutLog } from '../types';
 
 function mondayOf(date: Date): Date {

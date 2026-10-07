@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
+	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
 	import { Timer } from 'lucide-svelte';
 
 	let restTick = $state(0);

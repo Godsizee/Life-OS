@@ -1,12 +1,12 @@
 <script lang="ts">
 	// Welle F3 — Log-Detail: alle Sätze, Gesamtvolumen, PRs des Workouts.
 	import { page } from '$app/state';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import * as fitnessApi from '$lib/features/fitness/api';
-	import { bestPerExercise } from '$lib/features/fitness/utils/1rm';
-	import { formatPace } from '$lib/features/fitness/utils/pace';
-	import type { WorkoutSetLog } from '$lib/features/fitness/types';
-	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import * as fitnessApi from '#lib/features/fitness/api.js';
+	import { bestPerExercise } from '#lib/features/fitness/utils/1rm.js';
+	import { formatPace } from '#lib/features/fitness/utils/pace.js';
+	import type { WorkoutSetLog } from '#lib/features/fitness/types.js';
+	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
 	import { goto } from '$app/navigation';
 	import { ArrowLeft, Calendar, Clock, Edit3, Zap, Trophy, Gauge, Repeat } from 'lucide-svelte';
 
@@ -60,8 +60,8 @@
 		Math.round(sets.reduce((sum, s) => sum + (s.completed && s.distance_km ? s.distance_km : 0), 0) * 10) / 10
 	);
 
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { weightTrend } from '$lib/features/health/stats';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { weightTrend } from '#lib/features/health/stats.js';
 
 	const bodyWeightKg = $derived(weightTrend(healthState.entries, 30)?.last ?? null);
 	const bestsToday = $derived(bestPerExercise(sets, fitnessState.catalog, bodyWeightKg));

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Button from '#lib/ui/Button.svelte';
 	import { customActivitiesWithCounts, activityLabel, normalizeActivity } from '../activities';
 	import { moodState } from '../store.svelte';
 	import { Edit2, Trash2, Check, X } from 'lucide-svelte';

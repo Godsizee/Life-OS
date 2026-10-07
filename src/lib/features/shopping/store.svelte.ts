@@ -1,9 +1,9 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
-import { loeschenMitUndo } from '$lib/core/undo';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
+import { loeschenMitUndo } from '#lib/core/undo.js';
 import * as shoppingApi from './api';
 import { shoppingItemInputSchema, type ShoppingItemInput } from './schema';
 import type { ShoppingItem, WorkspaceSettings } from './types';

@@ -1,6 +1,6 @@
 // Welle F3 — Wochen-Volumen pro Muskelgruppe + Cardio-Wochenstatistik.
 // Muskelgruppen-Zuordnung erst über exercise_id/Katalog möglich (Freitext-Sätze zählen nicht mit).
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { ExerciseCatalogEntry, WorkoutSetLog } from '../types';
 
 function mondayOf(date: Date): Date {

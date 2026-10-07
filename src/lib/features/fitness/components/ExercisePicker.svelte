@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Search, Clock, Plus } from 'lucide-svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 	import { fitnessState } from '../store.svelte';
 	import CustomExerciseForm from './CustomExerciseForm.svelte';
 	import type { ExerciseCatalogEntry, ExerciseType, PickedExercise } from '../types';

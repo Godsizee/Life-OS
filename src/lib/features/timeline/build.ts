@@ -1,9 +1,9 @@
 import type { TimelineFenster, TimelineGroup, TimelineItem, TimelineQuellen } from './types';
-import { toISODate, fromISODate } from '$lib/core/date';
-import { isCompleted, type HabitDay } from '$lib/features/habits/streak';
-import { activityLabel } from '$lib/features/mood/activities';
-import { expandEvents } from '$lib/features/calendar/occurrences';
-import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '$lib/features/timetracking/stats';
+import { toISODate, fromISODate } from '#lib/core/date.js';
+import { isCompleted, type HabitDay } from '#lib/features/habits/streak.js';
+import { activityLabel } from '#lib/features/mood/activities.js';
+import { expandEvents } from '#lib/features/calendar/occurrences.js';
+import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '#lib/features/timetracking/stats.js';
 
 /** Baut die Einträge im Fenster, absteigend nach Datum. Keine Store-Zugriffe. */
 export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineItem[] {

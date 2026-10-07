@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Task } from '$lib/features/tasks/types';
+	import type { Task } from '#lib/features/tasks/types.js';
 
 	let {
 		openTasks,

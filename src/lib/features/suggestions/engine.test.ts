@@ -20,14 +20,14 @@ const z = vi.hoisted(() => ({
 	shoppingItems: [] as any[]
 }));
 
-vi.mock('$lib/features/tasks/store.svelte', () => ({
+vi.mock('#lib/features/tasks/store.svelte.js', () => ({
 	tasksState: {
 		get tasks() {
 			return z.tasks;
 		}
 	}
 }));
-vi.mock('$lib/features/habits/store.svelte', () => ({
+vi.mock('#lib/features/habits/store.svelte.js', () => ({
 	habitsState: {
 		get habits() {
 			return z.habits;
@@ -36,7 +36,7 @@ vi.mock('$lib/features/habits/store.svelte', () => ({
 		toggleToday: vi.fn()
 	}
 }));
-vi.mock('$lib/features/health/store.svelte', () => ({
+vi.mock('#lib/features/health/store.svelte.js', () => ({
 	healthState: {
 		get entries() {
 			return z.healthEntries;
@@ -47,7 +47,7 @@ vi.mock('$lib/features/health/store.svelte', () => ({
 		addWater: vi.fn()
 	}
 }));
-vi.mock('$lib/features/goals/store.svelte', () => ({
+vi.mock('#lib/features/goals/store.svelte.js', () => ({
 	goalsState: {
 		get goals() {
 			return z.goals;
@@ -60,7 +60,7 @@ vi.mock('$lib/features/goals/store.svelte', () => ({
 		}
 	}
 }));
-vi.mock('$lib/features/fitness/store.svelte', () => ({
+vi.mock('#lib/features/fitness/store.svelte.js', () => ({
 	fitnessState: {
 		get plans() {
 			return z.plans;
@@ -71,17 +71,17 @@ vi.mock('$lib/features/fitness/store.svelte', () => ({
 		prFor: () => null
 	}
 }));
-vi.mock('$lib/features/shopping/store.svelte', () => ({
+vi.mock('#lib/features/shopping/store.svelte.js', () => ({
 	shoppingState: {
 		get items() {
 			return z.shoppingItems;
 		}
 	}
 }));
-vi.mock('$lib/features/profile/store.svelte', () => ({
+vi.mock('#lib/features/profile/store.svelte.js', () => ({
 	profileState: { glassSizeMl: 250 }
 }));
-vi.mock('$lib/features/analytics/store.svelte', () => ({
+vi.mock('#lib/features/analytics/store.svelte.js', () => ({
 	analyticsState: { saveTodayScore: vi.fn() }
 }));
 

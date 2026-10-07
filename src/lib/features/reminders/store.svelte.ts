@@ -1,10 +1,10 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { toastState } from '$lib/core/toast.svelte';
-import { ladeSicher } from '$lib/core/store-load';
-import { pushState } from '$lib/core/push.svelte';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { toastState } from '#lib/core/toast.svelte.js';
+import { ladeSicher } from '#lib/core/store-load.js';
+import { pushState } from '#lib/core/push.svelte.js';
 import * as remindersApi from './api';
 import { reminderInputSchema, type ReminderInput } from './schema';
 import { firstFutureOccurrence, isDue, isOnDay, reminderAtFromAnchor } from './schedule';

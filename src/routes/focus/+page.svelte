@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-	import { focusSession } from '$lib/features/focus/session.svelte';
-	import { phaseLabel, roundLabel } from '$lib/features/focus/session-logic';
-	import { formatMinutes } from '$lib/features/timetracking/stats';
-	import { rankTasks } from '$lib/features/dashboard/scoring';
-	import { filterTasks } from '$lib/features/tasks/utils';
-	import FocusRing from '$lib/features/focus/components/FocusRing.svelte';
-	import FocusSettingsSheet from '$lib/features/focus/components/FocusSettingsSheet.svelte';
-	import TimeEntryForm from '$lib/features/timetracking/components/TimeEntryForm.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
+	import { focusSession } from '#lib/features/focus/session.svelte.js';
+	import { phaseLabel, roundLabel } from '#lib/features/focus/session-logic.js';
+	import { formatMinutes } from '#lib/features/timetracking/stats.js';
+	import { rankTasks } from '#lib/features/dashboard/scoring.js';
+	import { filterTasks } from '#lib/features/tasks/utils.js';
+	import FocusRing from '#lib/features/focus/components/FocusRing.svelte';
+	import FocusSettingsSheet from '#lib/features/focus/components/FocusSettingsSheet.svelte';
+	import TimeEntryForm from '#lib/features/timetracking/components/TimeEntryForm.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 	import {
 		Check,
 		ChevronRight,

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { healthState } from '../store.svelte';
 	import { waterMl } from '../stats';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { kgToLb, lbToKg } from '$lib/features/profile/units';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { kgToLb, lbToKg } from '#lib/features/profile/units.js';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Button from '#lib/ui/Button.svelte';
 
 	let {
 		date = healthState.todayKey(),

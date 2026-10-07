@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Flame } from 'lucide-svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { calculateStreak } from '$lib/features/habits/streak';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { calculateStreak } from '#lib/features/habits/streak.js';
 
 	const longestStreak = $derived(
 		habitsState.habits.reduce((max, h) => {

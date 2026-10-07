@@ -1,6 +1,6 @@
 import type { Task, TaskStatus } from './types';
-import { toISODate } from '$lib/core/date';
-import { weekKey } from '$lib/features/analytics/week-window';
+import { toISODate } from '#lib/core/date.js';
+import { weekKey } from '#lib/features/analytics/week-window.js';
 
 export interface TaskNode { task: Task; children: Task[]; }
 

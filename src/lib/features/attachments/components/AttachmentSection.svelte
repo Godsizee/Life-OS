@@ -2,11 +2,11 @@
 	import { attachmentsState } from '../store.svelte';
 	import type { AttachmentEntityType } from '../types';
 	import { formatBytes } from '../image';
-	import AttachmentGrid from '$lib/ui/AttachmentGrid.svelte';
-	import AttachmentPicker from '$lib/ui/AttachmentPicker.svelte';
-	import ImageLightbox from '$lib/ui/ImageLightbox.svelte';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { haptic } from '$lib/core/haptics';
+	import AttachmentGrid from '#lib/ui/AttachmentGrid.svelte';
+	import AttachmentPicker from '#lib/ui/AttachmentPicker.svelte';
+	import ImageLightbox from '#lib/ui/ImageLightbox.svelte';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		entityType,

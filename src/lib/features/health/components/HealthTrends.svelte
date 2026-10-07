@@ -1,9 +1,9 @@
 <script lang="ts">
 	// W9 — 30-Tage-Trends je Metrik. Nutzt TrendChart aus F3 wieder
 	// (kein Chart-Framework im Projekt).
-	import TrendChart from '$lib/features/fitness/components/TrendChart.svelte';
+	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
 	import { healthState } from '../store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import {
 		formatMetric,
 		goalHitDays,

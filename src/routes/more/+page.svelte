@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
-	import { modules } from '$lib/config/modules';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
+	import { modules } from '#lib/config/modules.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import Button from '#lib/ui/Button.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
 
 	const moreLinks = modules.filter((m) =>
 		['habits', 'shopping', 'goals', 'journal', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)

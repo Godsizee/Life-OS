@@ -1,13 +1,13 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
 import * as habitsApi from './api';
 import { habitInputSchema, habitPatchSchema, type HabitInput, type HabitPatch } from './schema';
 import { isCompleted, isSkipped, toHabitDays, toISODate, type HabitDay } from './streak';
 import type { Habit, HabitLog, HabitLogStatus } from './types';
-import { remindersState } from '$lib/features/reminders/store.svelte';
+import { remindersState } from '#lib/features/reminders/store.svelte.js';
 
 class HabitsState {
 	habits = $state<Habit[]>([]);

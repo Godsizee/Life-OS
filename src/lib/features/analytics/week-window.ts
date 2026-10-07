@@ -1,4 +1,4 @@
-import { fromISODate, toISODate } from '$lib/core/date';
+import { fromISODate, toISODate } from '#lib/core/date.js';
 
 /**
  * Zeitfenster des Weekly Review.

@@ -5,10 +5,10 @@
 	import { Flame, MoreVertical, Bell } from 'lucide-svelte';
 	import HabitProgressButton from './HabitProgressButton.svelte';
 	import HabitActionsSheet from './HabitActionsSheet.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
-	import { buildRrule } from '$lib/features/reminders/schedule';
-	import { remindersState } from '$lib/features/reminders/store.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import ReminderSection from '#lib/features/reminders/components/ReminderSection.svelte';
+	import { buildRrule } from '#lib/features/reminders/schedule.js';
+	import { remindersState } from '#lib/features/reminders/store.svelte.js';
 
 	interface Props {
 		habit: Habit;

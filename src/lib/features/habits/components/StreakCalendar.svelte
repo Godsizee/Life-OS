@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { toISODate } from '$lib/core/date';
-	import { isDueOn, isSkipped, isCompleted, type HabitDay } from '$lib/features/habits/streak';
-	import type { Habit } from '$lib/features/habits/types';
-	import { themeState } from '$lib/core/theme.svelte';
+	import { toISODate } from '#lib/core/date.js';
+	import { isDueOn, isSkipped, isCompleted, type HabitDay } from '#lib/features/habits/streak.js';
+	import type { Habit } from '#lib/features/habits/types.js';
+	import { themeState } from '#lib/core/theme.svelte.js';
 
 	let {
 		habits,

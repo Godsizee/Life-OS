@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Modal from '$lib/ui/Modal.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
 	import { linksState } from '../store.svelte';
 	import { searchEntities, entityMeta } from '../registry';
 	import type { LinkEntityType } from '../types';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import SettingRow from '$lib/ui/SettingRow.svelte';
-	import NumberSetting from '$lib/ui/NumberSetting.svelte';
-	import { FOCUS_LIMITS, profileState } from '$lib/features/profile/store.svelte';
+	import SettingRow from '#lib/ui/SettingRow.svelte';
+	import NumberSetting from '#lib/ui/NumberSetting.svelte';
+	import { FOCUS_LIMITS, profileState } from '#lib/features/profile/store.svelte.js';
 </script>
 
 <div class="flex flex-col divide-y divide-border-color/50">

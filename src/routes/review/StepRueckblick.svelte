@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Kennzahl } from '$lib/features/analytics/week-compare';
-	import type { Task } from '$lib/features/tasks/types';
-	import type { Goal, JournalEntry } from '$lib/features/goals/types';
-	import { evaluateTrack } from '$lib/features/goals/checkins';
-	import { getGoalProgress } from '$lib/features/goals/progress';
-	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
-	import StatCard from '$lib/features/analytics/components/StatCard.svelte';
+	import type { Kennzahl } from '#lib/features/analytics/week-compare.js';
+	import type { Task } from '#lib/features/tasks/types.js';
+	import type { Goal, JournalEntry } from '#lib/features/goals/types.js';
+	import { evaluateTrack } from '#lib/features/goals/checkins.js';
+	import { getGoalProgress } from '#lib/features/goals/progress.js';
+	import OnTrackBadge from '#lib/features/goals/components/OnTrackBadge.svelte';
+	import StatCard from '#lib/features/analytics/components/StatCard.svelte';
 
 	let {
 		kennzahlen,

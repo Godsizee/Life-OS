@@ -1,5 +1,5 @@
-import { supabase } from '$lib/core/supabase';
-import { fetchAllPages } from '$lib/core/query';
+import { supabase } from '#lib/core/supabase.js';
+import { fetchAllPages } from '#lib/core/query.js';
 import type { Goal, GoalCheckin, JournalEntry } from './types';
 
 export async function listGoals(workspaceId: string, includeArchived = false): Promise<Goal[]> {

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Select from '$lib/ui/Select.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import ReminderSection from '#lib/features/reminders/components/ReminderSection.svelte';
 	import { calendarState } from '../store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import type { Event } from '../types';
 	import RecurrenceEditor from './RecurrenceEditor.svelte';
 	import { type RecurrenceForm, LEERE_REGEL, parseRrule, buildRrule } from '../rrule';

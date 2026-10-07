@@ -1,9 +1,9 @@
 // W6 — Fokus-Session. Rechnet timestamp-basiert (Endzeitpunkt statt Sekunden-Zähler)
 // und lebt im Store statt im Komponenten-State: damit überlebt sie Reload, Navigation
 // und App-Wechsel. Draft in localStorage. Vorbild: fitness/live-workout.svelte.ts (F2/F6).
-import { alarm } from '$lib/core/alert.svelte';
-import { profileState } from '$lib/features/profile/store.svelte';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { alarm } from '#lib/core/alert.svelte.js';
+import { profileState } from '#lib/features/profile/store.svelte.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 import {
 	bookableMinutes,
 	formatClock,

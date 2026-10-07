@@ -1,4 +1,4 @@
-import { parseRelativeDate } from '$lib/core/nlp-parse';
+import { parseRelativeDate } from '#lib/core/nlp-parse.js';
 
 export interface ParsedTaskInput {
 	title: string;

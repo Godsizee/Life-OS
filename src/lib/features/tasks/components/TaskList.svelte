@@ -3,8 +3,8 @@
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import TaskItem from './TaskItem.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
 	import type { Task } from '../types';
 	import { buildTaskTree, subtaskProgress } from '../utils';
 

@@ -1,13 +1,13 @@
 <script lang="ts">
 	// W9/W10 — beliebigen Tag erfassen/aendern/loeschen mit Uhrzeit.
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
-	import Input from '$lib/ui/Input.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
+	import Input from '#lib/ui/Input.svelte';
 	import MoodPicker from './MoodPicker.svelte';
 	import ActivityPicker from './ActivityPicker.svelte';
 	import { moodState } from '../store.svelte';
-	import { formatDate } from '$lib/core/date';
+	import { formatDate } from '#lib/core/date.js';
 	import { MOOD_EMOJIS, MOOD_LABELS, type MoodEntry } from '../types';
 	import { activityLabel } from '../activities';
 	import { Trash2 } from 'lucide-svelte';

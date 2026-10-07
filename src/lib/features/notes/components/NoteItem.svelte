@@ -3,8 +3,8 @@
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
 	import { checklistProgress, plainTextPreview } from '../markdown';
-	import { attachmentsState } from '$lib/features/attachments/store.svelte';
-	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
+	import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
+	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
 
 	let { note, snippet = null, onopen }: { note: Note; snippet?: string | null; onopen: (note: Note) => void } = $props();
 

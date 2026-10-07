@@ -1,16 +1,16 @@
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { notesState } from '$lib/features/notes/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { calendarState } from '$lib/features/calendar/store.svelte';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { moodState } from '#lib/features/mood/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { notesState } from '#lib/features/notes/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { calendarState } from '#lib/features/calendar/store.svelte.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 
 import { buildTimeline } from './build';
 import type { TimelineFenster, TimelineItem } from './types';
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 
 class TimelineState {
 	range = $state<30 | 90 | 365 | 'all'>(90);

@@ -1,4 +1,4 @@
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { ScoreBreakdown } from './scoring';
 
 export type ScoreKey = keyof ScoreBreakdown;

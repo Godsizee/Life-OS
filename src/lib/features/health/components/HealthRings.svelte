@@ -3,7 +3,7 @@
 	import { Droplet, Moon, Scale, Zap } from 'lucide-svelte';
 	import MetricRing from './MetricRing.svelte';
 	import { healthState } from '../store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { formatMetric, goalPercent, num, weightToGoal, waterMl, weightTrend, weightGoalPercent } from '../stats';
 
 	const entry = $derived(healthState.todayEntry);

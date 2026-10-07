@@ -6,15 +6,15 @@
 	// GitHub-Repository-Löschung.
 	import { AlertTriangle } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
-	import { authState } from '$lib/core/auth.svelte';
-	import { outbox } from '$lib/core/outbox.svelte';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { unloadWorkspaceData } from '$lib/core/workspace-data';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
+	import { authState } from '#lib/core/auth.svelte.js';
+	import { outbox } from '#lib/core/outbox.svelte.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { unloadWorkspaceData } from '#lib/core/workspace-data.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import Button from '#lib/ui/Button.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 	import { deleteAccount } from '../api';
 	import { authErrorText } from '../errors';
 

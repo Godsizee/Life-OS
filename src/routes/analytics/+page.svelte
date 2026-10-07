@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { moodState } from '$lib/features/mood/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import ScoreRing from '$lib/features/analytics/components/ScoreRing.svelte';
-	import WeekSparkline from '$lib/features/analytics/components/WeekSparkline.svelte';
-	import MoodHealthCorrelation from '$lib/features/analytics/components/MoodHealthCorrelation.svelte';
-	import MoodActivityStats from '$lib/features/mood/components/MoodActivityStats.svelte';
-	import { filterSince } from '$lib/features/mood/stats';
-	import FocusStatsCard from '$lib/features/timetracking/components/FocusStatsCard.svelte';
-	import MonthlyReport from '$lib/features/analytics/components/MonthlyReport.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { moodState } from '#lib/features/mood/store.svelte.js';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import ScoreRing from '#lib/features/analytics/components/ScoreRing.svelte';
+	import WeekSparkline from '#lib/features/analytics/components/WeekSparkline.svelte';
+	import MoodHealthCorrelation from '#lib/features/analytics/components/MoodHealthCorrelation.svelte';
+	import MoodActivityStats from '#lib/features/mood/components/MoodActivityStats.svelte';
+	import { filterSince } from '#lib/features/mood/stats.js';
+	import FocusStatsCard from '#lib/features/timetracking/components/FocusStatsCard.svelte';
+	import MonthlyReport from '#lib/features/analytics/components/MonthlyReport.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus, Download } from 'lucide-svelte';
-	import { APP_LOCALE } from '$lib/core/locale';
-	import { toISODate } from '$lib/core/date';
-	import { SCORE_WEIGHTS, SCORE_LABELS, weightLabel, scoreSeries, type ScoreKey } from '$lib/features/analytics/score-math';
-	import { toCsv } from '$lib/features/analytics/report';
+	import { APP_LOCALE } from '#lib/core/locale.js';
+	import { toISODate } from '#lib/core/date.js';
+	import { SCORE_WEIGHTS, SCORE_LABELS, weightLabel, scoreSeries, type ScoreKey } from '#lib/features/analytics/score-math.js';
+	import { toCsv } from '#lib/features/analytics/report.js';
 
 	let zeitraum = $state<30 | 90 | 365>(30);
 	let showAllHistory = $state(false);

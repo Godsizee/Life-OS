@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import WorkoutFrequencyHeatmap from '$lib/features/fitness/components/WorkoutFrequencyHeatmap.svelte';
-	import MuscleGroupVolumeChart from '$lib/features/fitness/components/MuscleGroupVolumeChart.svelte';
-	import TrendChart from '$lib/features/fitness/components/TrendChart.svelte';
-	import { currentWeekVolumeByMuscleGroup, weeklyCardioStats } from '$lib/features/fitness/utils/volume';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { weightTrend } from '$lib/features/health/stats';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import WorkoutFrequencyHeatmap from '#lib/features/fitness/components/WorkoutFrequencyHeatmap.svelte';
+	import MuscleGroupVolumeChart from '#lib/features/fitness/components/MuscleGroupVolumeChart.svelte';
+	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import { currentWeekVolumeByMuscleGroup, weeklyCardioStats } from '#lib/features/fitness/utils/volume.js';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { weightTrend } from '#lib/features/health/stats.js';
 
 	const bodyWeightKg = $derived(weightTrend(healthState.entries, 30)?.last ?? null);
 

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { wochenKennzahlen, type WochenQuellen } from './week-stats';
 import { reviewWeek } from './week-window';
-import type { Task } from '$lib/features/tasks/types';
-import type { Habit } from '$lib/features/habits/types';
-import type { HabitDay } from '$lib/features/habits/streak';
-import type { DatedSetLog } from '$lib/features/fitness/api';
+import type { Task } from '#lib/features/tasks/types.js';
+import type { Habit } from '#lib/features/habits/types.js';
+import type { HabitDay } from '#lib/features/habits/streak.js';
+import type { DatedSetLog } from '#lib/features/fitness/api.js';
 
 function tag(iso: string): Date {
 	const [y, m, d] = iso.split('-').map(Number);

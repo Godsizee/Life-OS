@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Der Parser fragt die geladenen Routinen ab, um „erledigt Sport" als
 // Routinen-Eintrag zu erkennen. Hier fest verdrahtet, damit die Tests nicht am
 // Supabase-Client haengen.
-vi.mock('$lib/features/habits/store.svelte', () => ({
+vi.mock('#lib/features/habits/store.svelte.js', () => ({
 	habitsState: {
 		habits: [
 			{ id: 'h1', name: 'Sport', archived: false },

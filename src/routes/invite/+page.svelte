@@ -3,14 +3,14 @@
 	import { page } from '$app/state';
 	import { scale } from 'svelte/transition';
 	import { Check } from 'lucide-svelte';
-	import Alert from '$lib/ui/Alert.svelte';
-	import Spinner from '$lib/ui/Spinner.svelte';
-	import { DURATION, EASE_STANDARD_CSS, motionDuration } from '$lib/ui/motion';
-	import { haptic } from '$lib/core/haptics';
-	import { authState } from '$lib/core/auth.svelte';
-	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
-	import { acceptInvite } from '$lib/features/workspace/api';
-	import { loginUrlFor, safeNextPath } from '$lib/features/auth/redirect';
+	import Alert from '#lib/ui/Alert.svelte';
+	import Spinner from '#lib/ui/Spinner.svelte';
+	import { DURATION, EASE_STANDARD_CSS, motionDuration } from '#lib/ui/motion.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import { authState } from '#lib/core/auth.svelte.js';
+	import AuthShell from '#lib/features/auth/components/AuthShell.svelte';
+	import { acceptInvite } from '#lib/features/workspace/api.js';
+	import { loginUrlFor, safeNextPath } from '#lib/features/auth/redirect.js';
 
 	const REDIRECT_MS = 1500;
 

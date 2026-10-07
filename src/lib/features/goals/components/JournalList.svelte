@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { formatShortDate } from '$lib/core/date';
+	import { formatShortDate } from '#lib/core/date.js';
 	import type { JournalEntry, JournalKind } from '../types';
 	import DayContextStrip from './DayContextStrip.svelte';
-	import AttachmentSection from '$lib/features/attachments/components/AttachmentSection.svelte';
+	import AttachmentSection from '#lib/features/attachments/components/AttachmentSection.svelte';
 
 	import { journalSnippet } from '../journal-filter';
 

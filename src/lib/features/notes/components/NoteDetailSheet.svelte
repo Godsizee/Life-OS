@@ -3,18 +3,18 @@
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
 	import { checklistProgress, renderMarkdownSafe, toggleChecklistLine, MARKDOWN_WERKZEUGE, toggleLinePrefix, type MarkdownWerkzeug } from '../markdown';
-	import { authState } from '$lib/core/auth.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import { haptic } from '$lib/core/haptics';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import AttachmentSection from '$lib/features/attachments/components/AttachmentSection.svelte';
-	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
-	import { formatDate } from '$lib/core/date';
+	import { authState } from '#lib/core/auth.svelte.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import AttachmentSection from '#lib/features/attachments/components/AttachmentSection.svelte';
+	import LinkedItems from '#lib/features/links/components/LinkedItems.svelte';
+	import { formatDate } from '#lib/core/date.js';
 
 	let { note, open = $bindable(false) }: { note: Note | null; open?: boolean } = $props();
 

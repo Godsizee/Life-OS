@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import * as fitnessApi from '$lib/features/fitness/api';
-	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { swipe } from '$lib/ui/actions/swipe';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import * as fitnessApi from '#lib/features/fitness/api.js';
+	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { swipe } from '#lib/ui/actions/swipe.js';
 	import { Dumbbell } from 'lucide-svelte';
 	
-	import LiveWorkoutPanel from '$lib/features/fitness/components/LiveWorkoutPanel.svelte';
-	import PlansPanel from '$lib/features/fitness/components/PlansPanel.svelte';
-	import HistoryPanel from '$lib/features/fitness/components/HistoryPanel.svelte';
-	import StatsPanel from '$lib/features/fitness/components/StatsPanel.svelte';
-	import ExerciseLibrary from '$lib/features/fitness/components/ExerciseLibrary.svelte';
+	import LiveWorkoutPanel from '#lib/features/fitness/components/LiveWorkoutPanel.svelte';
+	import PlansPanel from '#lib/features/fitness/components/PlansPanel.svelte';
+	import HistoryPanel from '#lib/features/fitness/components/HistoryPanel.svelte';
+	import StatsPanel from '#lib/features/fitness/components/StatsPanel.svelte';
+	import ExerciseLibrary from '#lib/features/fitness/components/ExerciseLibrary.svelte';
 
 	$effect(() => {
 		liveWorkoutState.restore();
@@ -23,7 +23,7 @@
 		if (!startPlanId || liveWorkoutState.active) return;
 		if (!fitnessState.plans.some((p) => p.id === startPlanId)) return;
 		liveWorkoutState.startFromPlan(startPlanId);
-		goto('/fitness', { replaceState: true });
+		goto('/fitness', { replace: true });
 	});
 
 	$effect(() => {

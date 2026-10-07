@@ -2,10 +2,10 @@
 	// Welle F3 — Übungs-Detail: Verlauf + 1RM-/Volumen-/Pace-Progression.
 	// Kein Chart-Framework im Projekt (F1-Recherche) — Muster: handgerolltes Inline-SVG (TrendChart).
 	import { page } from '$app/state';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { exerciseProgression } from '$lib/features/fitness/utils/progression';
-	import TrendChart from '$lib/features/fitness/components/TrendChart.svelte';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { exerciseProgression } from '#lib/features/fitness/utils/progression.js';
+	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
 	import { ArrowLeft, Trophy, Scale } from 'lucide-svelte';
 
 	const exerciseId = $derived(page.params.id);

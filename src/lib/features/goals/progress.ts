@@ -1,8 +1,8 @@
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
-import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { calculateHabitProgress30Days } from '#lib/features/habits/streak.js';
+import { fitnessFrequencyScore } from '#lib/features/fitness/utils/frequency.js';
 import { goalsState } from './store.svelte';
 import { milestonePercent, sumCheckins, targetPercent } from './checkins';
 import type { Goal } from './types';

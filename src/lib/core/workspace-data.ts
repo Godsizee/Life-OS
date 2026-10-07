@@ -20,23 +20,23 @@
  * Ausdruecklich NICHT hier: fitnessState.loadAllSetLogs() — bewusst lazy und
  * gecacht, wird von den Auswertungsseiten selbst angestossen.
  */
-import { analyticsState } from '$lib/features/analytics/store.svelte';
-import { attachmentsState } from '$lib/features/attachments/store.svelte';
-import { calendarState } from '$lib/features/calendar/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { linksState } from '$lib/features/links/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
-import { notesState } from '$lib/features/notes/store.svelte';
-import { profileState } from '$lib/features/profile/store.svelte';
-import { remindersState } from '$lib/features/reminders/store.svelte';
-import { shoppingState } from '$lib/features/shopping/store.svelte';
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-import { workspaceState } from '$lib/features/workspace/store.svelte';
-import { focusSession } from '$lib/features/focus/session.svelte';
+import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
+import { calendarState } from '#lib/features/calendar/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { linksState } from '#lib/features/links/store.svelte.js';
+import { moodState } from '#lib/features/mood/store.svelte.js';
+import { notesState } from '#lib/features/notes/store.svelte.js';
+import { profileState } from '#lib/features/profile/store.svelte.js';
+import { remindersState } from '#lib/features/reminders/store.svelte.js';
+import { shoppingState } from '#lib/features/shopping/store.svelte.js';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
+import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+import { focusSession } from '#lib/features/focus/session.svelte.js';
 import { setzeAbgleich } from './resync';
 
 /**

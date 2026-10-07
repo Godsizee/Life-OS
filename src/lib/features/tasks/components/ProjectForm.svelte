@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
-	import Input from '$lib/ui/Input.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
 	import { tasksState } from '../store.svelte';
 
 	let { onsubmitted }: { onsubmitted?: () => void } = $props();

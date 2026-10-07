@@ -1,7 +1,7 @@
 <script lang="ts">
 	// W8 — Zielwert-Ziel auf einen Blick: Stand, kumulativer Verlauf, Check-in-Historie.
 	import { Plus, Trash2, Target, ChevronDown, ChevronUp } from 'lucide-svelte';
-	import TrendChart from '$lib/features/fitness/components/TrendChart.svelte';
+	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
 	import GoalCheckinSheet from './GoalCheckinSheet.svelte';
 	import { goalsState } from '../store.svelte';
 	import {
@@ -14,7 +14,7 @@
 		targetPercent
 	} from '../checkins';
 	import { getGoalProgress } from '../progress';
-	import { formatShortDate } from '$lib/core/date';
+	import { formatShortDate } from '#lib/core/date.js';
 	import type { Goal } from '../types';
 
 	let { goal }: { goal: Goal } = $props();

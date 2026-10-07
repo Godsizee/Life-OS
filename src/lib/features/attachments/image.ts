@@ -3,7 +3,7 @@
  * Die reinen Rechenfunktionen sind bewusst frei von Browser-APIs und getestet
  * (image.test.ts); nur prepareImage() fasst Canvas/ImageBitmap an.
  */
-import { neueId } from '$lib/core/id';
+import { neueId } from '#lib/core/id.js';
 
 /** Laengste Kante nach der Verkleinerung. */
 export const MAX_EDGE = 1600;

@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Modal from './Modal.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { notesState } from '$lib/features/notes/store.svelte';
-	import { calendarState } from '$lib/features/calendar/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { modules } from '$lib/config/modules';
-	import { parseNLPInput } from '$lib/core/nlp-parse';
-	import { dispatchNLP } from '$lib/features/dashboard/nlp-dispatch';
-	import { toastState } from '$lib/core/toast.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { notesState } from '#lib/features/notes/store.svelte.js';
+	import { calendarState } from '#lib/features/calendar/store.svelte.js';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { modules } from '#lib/config/modules.js';
+	import { parseNLPInput } from '#lib/core/nlp-parse.js';
+	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
 

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { neueId } from '$lib/core/id';
+	import { neueId } from '#lib/core/id.js';
   import { shoppingState } from '../store.svelte';
-  import Sheet from '$lib/ui/Sheet.svelte';
+  import Sheet from '#lib/ui/Sheet.svelte';
   import { CATEGORY_LABELS } from '../categories';
   import { CATEGORY_ICONS } from '../category-icons';
   import { ChevronUp, ChevronDown, Plus, Trash2 } from 'lucide-svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Button from '$lib/ui/Button.svelte';
+  import Input from '#lib/ui/Input.svelte';
+  import Button from '#lib/ui/Button.svelte';
 
   let { open = $bindable(false) }: { open?: boolean } = $props();
 

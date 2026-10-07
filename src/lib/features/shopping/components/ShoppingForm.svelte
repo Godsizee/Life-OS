@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Button from '$lib/ui/Button.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Select from '$lib/ui/Select.svelte';
+  import Button from '#lib/ui/Button.svelte';
+  import Input from '#lib/ui/Input.svelte';
+  import Select from '#lib/ui/Select.svelte';
   import { shoppingState } from '../store.svelte';
   import { guessCategoryWithHistory, CATEGORY_IDS, CATEGORY_LABELS, UNITS } from '../categories';
 

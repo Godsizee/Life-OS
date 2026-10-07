@@ -1,5 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from '$lib/core/supabase';
+import { supabase } from '#lib/core/supabase.js';
 import { passkeyAvailable } from './capabilities';
 import { credentialsSchema, loginCredentialsSchema } from './schema';
 

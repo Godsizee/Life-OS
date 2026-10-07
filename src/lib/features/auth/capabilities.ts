@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY } from '$app/env/public';
 
 /**
  * Passkeys hängen an zwei Bedingungen, die beide zur Laufzeit gelten müssen:
@@ -36,8 +36,8 @@ function writeCache(value: boolean): void {
 }
 
 async function probeServer(): Promise<boolean> {
-	const url = env.VITE_SUPABASE_URL;
-	const key = env.VITE_SUPABASE_ANON_KEY;
+	const url = VITE_SUPABASE_URL;
+	const key = VITE_SUPABASE_ANON_KEY;
 	if (!url || !key) return false;
 
 	try {

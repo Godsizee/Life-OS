@@ -1,10 +1,10 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { workspaceState } from '$lib/features/workspace/store.svelte';
-import { toISODate } from '$lib/core/date';
-import { ladeSicher } from '$lib/core/store-load';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+import { toISODate } from '#lib/core/date.js';
+import { ladeSicher } from '#lib/core/store-load.js';
 import * as timeApi from './api';
 import { timeEntryInputSchema, type TimeEntryInput } from './schema';
 import { minutesOf, minutesOnDate, minutesThisWeek, pomodorosOnDate } from './stats';

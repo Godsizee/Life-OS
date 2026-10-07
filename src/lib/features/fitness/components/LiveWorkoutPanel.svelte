@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import type { ActiveSetLog, PickedExercise } from '$lib/features/fitness/types';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import type { ActiveSetLog, PickedExercise } from '#lib/features/fitness/types.js';
 	import RestTimerBar from './RestTimerBar.svelte';
 	import PlateCalculator from './PlateCalculator.svelte';
 	import ExercisePicker from './ExercisePicker.svelte';
 	import StepperInput from './StepperInput.svelte';
-	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
-	import { formatPace } from '$lib/features/fitness/utils/pace';
+	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
+	import { formatPace } from '#lib/features/fitness/utils/pace.js';
 	import { Check, Zap, Timer, X, Calculator, Minus, ListPlus, Save, Gauge, Plus, Link } from 'lucide-svelte';
-	import Input from '$lib/ui/Input.svelte';
+	import Input from '#lib/ui/Input.svelte';
 
 	interface Props {
 		elapsedDisplay: number | null;

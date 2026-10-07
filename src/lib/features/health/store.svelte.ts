@@ -1,10 +1,10 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { toISODate } from '$lib/core/date';
-import { ladeSicher } from '$lib/core/store-load';
-import { workspaceState } from '$lib/features/workspace/store.svelte';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { toISODate } from '#lib/core/date.js';
+import { ladeSicher } from '#lib/core/store-load.js';
+import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as healthApi from './api';
 import { healthInputSchema } from './schema';
 import type { HealthEntry, HealthValues } from './types';

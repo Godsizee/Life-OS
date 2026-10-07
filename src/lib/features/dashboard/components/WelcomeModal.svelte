@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Hammer, MessageCircle, Rocket } from 'lucide-svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Modal from '$lib/ui/Modal.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
 	import { hasSeenWelcome, markWelcomeSeen } from '../welcome';
 
 	let open = $state(false);

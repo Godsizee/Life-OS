@@ -1,5 +1,5 @@
-import { supabase } from '$lib/core/supabase';
-import { fetchAllPages } from '$lib/core/query';
+import { supabase } from '#lib/core/supabase.js';
+import { fetchAllPages } from '#lib/core/query.js';
 import type { Project, Task } from './types';
 
 export async function listTasks(workspaceId: string): Promise<Task[]> {

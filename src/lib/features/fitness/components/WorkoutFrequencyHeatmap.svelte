@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Welle F3 — Trainingsfrequenz-Heatmap, adaptiert von habits/components/StreakCalendar.svelte
 	// (gleiches Grid-/Farb-/Tooltip-Muster, aber binär: Training ja/nein statt Habit-Quote).
-	import { toISODate } from '$lib/core/date';
-	import { themeState } from '$lib/core/theme.svelte';
+	import { toISODate } from '#lib/core/date.js';
+	import { themeState } from '#lib/core/theme.svelte.js';
 
 	let { logDates }: { logDates: string[] } = $props();
 	const loggedSet = $derived(new Set(logDates));

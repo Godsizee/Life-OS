@@ -1,5 +1,5 @@
-import type { Task } from '$lib/features/tasks/types';
-import { weekKey } from '$lib/features/analytics/week-window';
+import type { Task } from '#lib/features/tasks/types.js';
+import { weekKey } from '#lib/features/analytics/week-window.js';
 
 /** Prioritätgewichte */
 const PRIORITY_WEIGHT: Record<string, number> = {

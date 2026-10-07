@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import HealthForm from '$lib/features/health/components/HealthForm.svelte';
-	import HealthRings from '$lib/features/health/components/HealthRings.svelte';
-	import HealthTrends from '$lib/features/health/components/HealthTrends.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
-	import { formatDate } from '$lib/core/date';
-	import { formatMetric, goalPercent, num, waterMl } from '$lib/features/health/stats';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import HealthForm from '#lib/features/health/components/HealthForm.svelte';
+	import HealthRings from '#lib/features/health/components/HealthRings.svelte';
+	import HealthTrends from '#lib/features/health/components/HealthTrends.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
+	import { formatDate } from '#lib/core/date.js';
+	import { formatMetric, goalPercent, num, waterMl } from '#lib/features/health/stats.js';
 	import { Pencil, Settings, Calendar } from 'lucide-svelte';
-	import HealthGoalsSheet from '$lib/features/health/components/HealthGoalsSheet.svelte';
-	import SleepEnergyCard from '$lib/features/health/components/SleepEnergyCard.svelte';
+	import HealthGoalsSheet from '#lib/features/health/components/HealthGoalsSheet.svelte';
+	import SleepEnergyCard from '#lib/features/health/components/SleepEnergyCard.svelte';
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Textarea from '$lib/ui/Textarea.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
 
 	let {
 		reflGood = $bindable(''),

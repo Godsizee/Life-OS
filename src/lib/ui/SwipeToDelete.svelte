@@ -6,7 +6,7 @@
 	// erst der Tap löscht (verhindert versehentliches Löschen). Der Papierkorb-Button
 	// im Inhalt bleibt zusätzlich erhalten — für Maus/Desktop ohne Wischgeste.
 	import { Trash2 } from 'lucide-svelte';
-	import { haptic } from '$lib/core/haptics';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		onDelete,

@@ -1,22 +1,30 @@
 <script lang="ts">
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import type { Task } from '$lib/features/tasks/types';
-	import TaskForm from '$lib/features/tasks/components/TaskForm.svelte';
-	import TaskList from '$lib/features/tasks/components/TaskList.svelte';
-	import TaskBoard from '$lib/features/tasks/components/TaskBoard.svelte';
-	import TaskDetailSheet from '$lib/features/tasks/components/TaskDetailSheet.svelte';
-	import ProjectForm from '$lib/features/tasks/components/ProjectForm.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import type { Task } from '#lib/features/tasks/types.js';
+	import TaskForm from '#lib/features/tasks/components/TaskForm.svelte';
+	import TaskList from '#lib/features/tasks/components/TaskList.svelte';
+	import TaskBoard from '#lib/features/tasks/components/TaskBoard.svelte';
+	import TaskDetailSheet from '#lib/features/tasks/components/TaskDetailSheet.svelte';
+	import ProjectForm from '#lib/features/tasks/components/ProjectForm.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import { Plus, FolderPlus, Kanban, List } from 'lucide-svelte';
-	import { smartViewFilter, labelUnion, type SmartView, overdueCount, filterTasks } from '$lib/features/tasks/utils';
-	import { page } from '$app/stores';
+
+	import {
+		smartViewFilter,
+		labelUnion,
+		type SmartView,
+		overdueCount,
+		filterTasks
+	} from '#lib/features/tasks/utils.js';
+
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import { authState } from '$lib/core/auth.svelte';
-	import Input from '$lib/ui/Input.svelte';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import { authState } from '#lib/core/auth.svelte.js';
+	import Input from '#lib/ui/Input.svelte';
 
 	let selectedProject = $state<string | null>(null);
 	let createOpen = $state(false);
@@ -28,7 +36,7 @@
 	let detailOpen = $state(false);
 	let view = $state<'list' | 'board'>('list');
 
-	let search = $state($page.url.searchParams.get('q') ?? '');
+	let search = $state(page.url.searchParams.get('q') ?? '');
 	let selectedAssignee = $state<string | 'unassigned' | 'all'>('all');
 	let sortMode = $state<'manual' | 'due' | 'priority' | 'title'>('manual');
 
@@ -38,9 +46,9 @@
 			sortMode = saved as any;
 		}
 
-		const taskId = $page.url.searchParams.get('task');
+		const taskId = page.url.searchParams.get('task');
 		if (taskId) {
-			const task = tasksState.tasks.find(t => t.id === taskId);
+			const task = tasksState.tasks.find((t) => t.id === taskId);
 			if (task) {
 				openDetail(task);
 			}
@@ -98,7 +106,7 @@
 	
 	function toggleLabel(l: string) {
 		if (selectedLabels.includes(l)) {
-			selectedLabels = selectedLabels.filter(x => x !== l);
+			selectedLabels = selectedLabels.filter((x) => x !== l);
 		} else {
 			selectedLabels = [...selectedLabels, l];
 		}
@@ -128,7 +136,7 @@
 			</button>
 		</div>
 		<button
-			onclick={() => (createOpen = true)}
+			onclick={() => createOpen = true}
 			aria-label="Neue Aufgabe"
 			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
 		>
@@ -137,18 +145,8 @@
 	{/snippet}
 </PageHeader>
 
-<Sheet bind:open={createOpen} title="Neue Aufgabe">
-	<div class="p-4">
-		<TaskForm onsubmitted={() => (createOpen = false)} />
-	</div>
-</Sheet>
-
-<Sheet bind:open={projectSheetOpen} title="Neues Projekt">
-	<div class="p-4">
-		<ProjectForm onsubmitted={() => (projectSheetOpen = false)} />
-	</div>
-</Sheet>
-
+<Sheet bind:open={createOpen} title="Neue Aufgabe"><div class="p-4"><TaskForm onsubmitted={() => createOpen = false} /></div></Sheet>
+<Sheet bind:open={projectSheetOpen} title="Neues Projekt"><div class="p-4"><ProjectForm onsubmitted={() => projectSheetOpen = false} /></div></Sheet>
 <TaskDetailSheet bind:open={detailOpen} task={detailTask} />
 
 <div class="mb-4 flex flex-col gap-3">
@@ -156,30 +154,66 @@
 
 	<!-- Smart Views -->
 	<section class="flex flex-wrap gap-2">
-		<Chip selected={smartView === 'all'} onclick={() => (smartView = 'all')}>Alle</Chip>
-		<Chip selected={smartView === 'today'} onclick={() => (smartView = 'today')}>Heute</Chip>
-		<Chip selected={smartView === 'overdue'} onclick={() => (smartView = 'overdue')}>
-			Überfällig
+		<Chip
+			selected={smartView === 'all'}
+			onclick={() => smartView = 'all'}
+		>Alle</Chip>
+
+		<Chip
+			selected={smartView === 'today'}
+			onclick={() => smartView = 'today'}
+		>Heute</Chip>
+
+		<Chip
+			selected={smartView === 'overdue'}
+			onclick={() => smartView = 'overdue'}
+		>
+			Überfällig 
 			{#if ueberfaellig > 0}
 				<span class="ml-1 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">{ueberfaellig}</span>
 			{/if}
 		</Chip>
-		<Chip selected={smartView === 'upcoming'} onclick={() => (smartView = 'upcoming')}>Demnächst</Chip>
-		<Chip selected={smartView === 'no_date'} onclick={() => (smartView = 'no_date')}>Ohne Datum</Chip>
-		<Chip selected={smartView === 'focus_week'} onclick={() => (smartView = 'focus_week')}>⭐ Wochenfokus</Chip>
+
+		<Chip
+			selected={smartView === 'upcoming'}
+			onclick={() => smartView = 'upcoming'}
+		>Demnächst</Chip>
+
+		<Chip
+			selected={smartView === 'no_date'}
+			onclick={() => smartView = 'no_date'}
+		>Ohne Datum</Chip>
+
+		<Chip
+			selected={smartView === 'focus_week'}
+			onclick={() => smartView = 'focus_week'}
+		>⭐ Wochenfokus</Chip>
 	</section>
 
 	<!-- Wer? -->
 	{#if workspaceState.members.length > 0}
 		<section class="flex flex-wrap gap-2">
-			<Chip selected={selectedAssignee === 'all'} onclick={() => (selectedAssignee = 'all')}>Alle</Chip>
-			<Chip selected={selectedAssignee === authState.user?.id} onclick={() => (selectedAssignee = authState.user?.id ?? 'all')}>Ich</Chip>
-			{#each workspaceState.members.filter(m => m.user_id !== authState.user?.id) as m (m.user_id)}
-				<Chip selected={selectedAssignee === m.user_id} onclick={() => (selectedAssignee = m.user_id)}>
-					{m.profile?.display_name ?? 'Unbekannt'}
-				</Chip>
+			<Chip
+				selected={selectedAssignee === 'all'}
+				onclick={() => selectedAssignee = 'all'}
+			>Alle</Chip>
+
+			<Chip
+				selected={selectedAssignee === authState.user?.id}
+				onclick={() => selectedAssignee = authState.user?.id ?? 'all'}
+			>Ich</Chip>
+
+			{#each workspaceState.members.filter((m) => m.user_id !== authState.user?.id) as m (m.user_id)}
+				<Chip
+					selected={selectedAssignee === m.user_id}
+					onclick={() => selectedAssignee = m.user_id}
+				>{m.profile?.display_name ?? 'Unbekannt'}</Chip>
 			{/each}
-			<Chip selected={selectedAssignee === 'unassigned'} onclick={() => (selectedAssignee = 'unassigned')}>Ohne Zuweisung</Chip>
+
+			<Chip
+				selected={selectedAssignee === 'unassigned'}
+				onclick={() => selectedAssignee = 'unassigned'}
+			>Ohne Zuweisung</Chip>
 		</section>
 	{/if}
 
@@ -187,9 +221,10 @@
 	{#if tasksState.projects.length > 0}
 		<section class="flex flex-wrap gap-2">
 			{#each tasksState.projects as project (project.id)}
-				<Chip selected={selectedProject === project.id} onclick={() => (selectedProject = selectedProject === project.id ? null : project.id)}>
-					{project.name}
-				</Chip>
+				<Chip
+					selected={selectedProject === project.id}
+					onclick={() => selectedProject = selectedProject === project.id ? null : project.id}
+				>{project.name}</Chip>
 			{/each}
 		</section>
 	{/if}
@@ -257,7 +292,7 @@
 	{/if}
 	
 	<button
-		onclick={() => (projectSheetOpen = true)}
+		onclick={() => projectSheetOpen = true}
 		class="flex min-h-12 items-center gap-2 self-start text-sm font-medium text-text-secondary hover:text-text-primary"
 	>
 		<FolderPlus size={16} />

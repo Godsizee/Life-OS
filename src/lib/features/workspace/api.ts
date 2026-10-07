@@ -1,5 +1,5 @@
-import { neueId } from '$lib/core/id';
-import { supabase } from '$lib/core/supabase';
+import { neueId } from '#lib/core/id.js';
+import { supabase } from '#lib/core/supabase.js';
 import { inviteEmailSchema } from './schema';
 import type { Invite, Workspace, WorkspaceMember } from './types';
 

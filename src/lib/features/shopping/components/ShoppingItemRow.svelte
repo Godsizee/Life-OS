@@ -2,10 +2,10 @@
   import { Trash2, AlignLeft } from 'lucide-svelte';
   import type { ShoppingItem } from '../types';
   import { shoppingState } from '../store.svelte';
-  import ListRow from '$lib/ui/ListRow.svelte';
-  import CheckCircle from '$lib/ui/CheckCircle.svelte';
-  import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
-  import MemberAvatar from '$lib/features/workspace/components/MemberAvatar.svelte';
+  import ListRow from '#lib/ui/ListRow.svelte';
+  import CheckCircle from '#lib/ui/CheckCircle.svelte';
+  import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
+  import MemberAvatar from '#lib/features/workspace/components/MemberAvatar.svelte';
 
   let { item, onopen }: { item: ShoppingItem; onopen?: (item: ShoppingItem) => void } = $props();
 </script>

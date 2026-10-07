@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { HEALTH_LIMITS } from '$lib/features/profile/store.svelte';
-	import { kgToLb, lbToKg } from '$lib/features/profile/units';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
+	import { kgToLb, lbToKg } from '#lib/features/profile/units.js';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Button from '#lib/ui/Button.svelte';
 
 	let { open = $bindable(false) } = $props();
 

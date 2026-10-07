@@ -1,4 +1,4 @@
-import type { HandleClientError } from '@sveltejs/kit';
+import type { HandleClientError } from '@sveltejs/kit/hooks';
 
 /**
  * Letzte Instanz fuer Fehler, die beim Navigieren oder Rendern hochblubbern.
@@ -6,18 +6,18 @@ import type { HandleClientError } from '@sveltejs/kit';
  * Ohne diesen Haken zeigt SvelteKit seine eigene Fehlerseite: englisch, ohne
  * Navigation, ohne Weg zurueck. Die zurueckgegebene `message` landet in
  * `page.error` und damit in `routes/+error.svelte`.
+ *
+ * Kit 3 reicht auch erwartete Fehler (`kind: 'framework'`, z. B. 404) hierher.
  */
-export const handleError: HandleClientError = ({ error, event, status, message }) => {
+export const handleError: HandleClientError = ({ kind, error, event }) => {
 	// 404 ist erwartbar und kein Defekt — nicht als Absturz protokollieren.
-	if (status !== 404) {
-		console.error('[app] Unbehandelter Fehler', {
-			pfad: event.url.pathname,
-			status,
-			error
-		});
-	}
+	if (kind === 'framework' && error.status === 404) return;
 
-	return {
-		message: status === 404 ? message : 'Die Seite konnte nicht geladen werden.'
-	};
+	console.error('[app] Unbehandelter Fehler', {
+		pfad: event.url.pathname,
+		art: kind,
+		error
+	});
+
+	return { message: 'Die Seite konnte nicht geladen werden.' };
 };

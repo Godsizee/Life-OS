@@ -2,7 +2,7 @@
 	// W9 — Ø-Stimmung je Wochentag. Reine Balken, kein SVG noetig.
 	import { averageByWeekday, formatScore, WEEKDAY_SHORT, type MoodLike } from '../stats';
 	import { moodHex } from '../colors';
-	import { themeState } from '$lib/core/theme.svelte';
+	import { themeState } from '#lib/core/theme.svelte.js';
 
 	let { entries }: { entries: MoodLike[] } = $props();
 

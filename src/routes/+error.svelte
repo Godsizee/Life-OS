@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { AlertTriangle } from 'lucide-svelte';
 	import { page } from '$app/state';
-	import Button from '$lib/ui/Button.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
 
 	// 404 ist kein Defekt, sondern ein Tippfehler in der Adresse — dafuer eine
 	// andere Ansprache als fuer einen echten Absturz.

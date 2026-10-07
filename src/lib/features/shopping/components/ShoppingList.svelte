@@ -3,8 +3,8 @@
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import ShoppingItemRow from './ShoppingItemRow.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
 	import type { ShoppingItem } from '../types';
 
 	let { items }: { items: ShoppingItem[] } = $props();

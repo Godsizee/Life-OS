@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Plus, LayoutGrid } from 'lucide-svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { resolveNavModules } from '$lib/config/nav';
-	import { keyboardState } from '$lib/core/keyboard.svelte';
-	import { haptic } from '$lib/core/haptics';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { resolveNavModules } from '#lib/config/nav.js';
+	import { keyboardState } from '#lib/core/keyboard.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		currentPath = '/',

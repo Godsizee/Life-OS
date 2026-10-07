@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Select from '$lib/ui/Select.svelte';
+	import Select from '#lib/ui/Select.svelte';
 	import { formatRRule } from '../recurrence';
 
 	let { id, value, onchange }: { id?: string; value: string | null; onchange: (next: string | null) => void } = $props();

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Lock, LockOpen } from 'lucide-svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Textarea from '$lib/ui/Textarea.svelte';
-	import Field from '$lib/ui/Field.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
+	import Field from '#lib/ui/Field.svelte';
 	import { notesState } from '../store.svelte';
 
 	let { onsubmitted }: { onsubmitted?: () => void } = $props();

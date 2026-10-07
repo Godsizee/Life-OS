@@ -1,18 +1,18 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
-import { loeschenMitUndo } from '$lib/core/undo';
-import { toISODate } from '$lib/core/date';
-import { weekKey } from '$lib/features/analytics/week-window';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
+import { loeschenMitUndo } from '#lib/core/undo.js';
+import { toISODate } from '#lib/core/date.js';
+import { weekKey } from '#lib/features/analytics/week-window.js';
 import * as tasksApi from './api';
 import { assignColumnPositions } from './utils';
 import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { remindersState } from '$lib/features/reminders/store.svelte';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { remindersState } from '#lib/features/reminders/store.svelte.js';
 
 class TasksState {
 	tasks = $state<Task[]>([]);

@@ -2,19 +2,19 @@
 	import { goto } from '$app/navigation';
 	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar, Pencil, Repeat } from 'lucide-svelte';
 	import { calendarState } from '../store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { formatRecurrence } from '../rrule';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { linksState } from '$lib/features/links/store.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
-	import ListRow from '$lib/ui/ListRow.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { linksState } from '#lib/features/links/store.svelte.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import LinkedItems from '#lib/features/links/components/LinkedItems.svelte';
+	import ListRow from '#lib/ui/ListRow.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Button from '#lib/ui/Button.svelte';
 	import EventForm from './EventForm.svelte';
 	import { fade } from 'svelte/transition';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
 
 	function linkedPlanIdFor(eventId: string): string | null {
 		return (

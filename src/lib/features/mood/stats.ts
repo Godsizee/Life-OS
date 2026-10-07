@@ -1,6 +1,6 @@
 // W9 Stimmung — reine Auswertungen (Daylio-Niveau).
 // Keine Svelte-/Store-/lucide-Abhaengigkeit, damit alles in vitest (Node) laeuft.
-import { fromISODate, toISODate } from '$lib/core/date';
+import { fromISODate, toISODate } from '#lib/core/date.js';
 import { isCatalogActivity } from './activities';
 
 export interface MoodLike {

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Droplet, Moon } from 'lucide-svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { profileState } from '$lib/features/profile/store.svelte';
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { haptic } from '$lib/core/haptics';
-	import { waterMl, goalPercent } from '$lib/features/health/stats';
-	import { formatWater } from '$lib/features/profile/units';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { profileState } from '#lib/features/profile/store.svelte.js';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import { waterMl, goalPercent } from '#lib/features/health/stats.js';
+	import { formatWater } from '#lib/features/profile/units.js';
 
 	const waterValMl = $derived(healthState.todayEntry ? waterMl(healthState.todayEntry) ?? 0 : 0);
 	const targetMl = $derived(profileState.waterGoalMl);

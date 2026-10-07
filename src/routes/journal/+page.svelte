@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import JournalList from '$lib/features/goals/components/JournalList.svelte';
-	import JournalPromptBar from '$lib/features/goals/components/JournalPromptBar.svelte';
-	import JournalStreakBadge from '$lib/features/goals/components/JournalStreakBadge.svelte';
-	import JournalOnThisDay from '$lib/features/goals/components/JournalOnThisDay.svelte';
-	import JournalEntrySheet from '$lib/features/goals/components/JournalEntrySheet.svelte';
-	import { calculateJournalStreak, getOnThisDay } from '$lib/features/goals/journal-stats';
-	import { filterJournal, monthsWithEntries } from '$lib/features/goals/journal-filter';
-	import type { JournalKind } from '$lib/features/goals/types';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Select from '$lib/ui/Select.svelte';
-	import { page } from '$app/stores';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import JournalList from '#lib/features/goals/components/JournalList.svelte';
+	import JournalPromptBar from '#lib/features/goals/components/JournalPromptBar.svelte';
+	import JournalStreakBadge from '#lib/features/goals/components/JournalStreakBadge.svelte';
+	import JournalOnThisDay from '#lib/features/goals/components/JournalOnThisDay.svelte';
+	import JournalEntrySheet from '#lib/features/goals/components/JournalEntrySheet.svelte';
+	import { calculateJournalStreak, getOnThisDay } from '#lib/features/goals/journal-stats.js';
+	import { filterJournal, monthsWithEntries } from '#lib/features/goals/journal-filter.js';
+	import type { JournalKind } from '#lib/features/goals/types.js';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
+	import { page } from '$app/state';
 
 	let journalSheetOpen = $state(false);
 	let journalDate = $state<string | null>(null);
@@ -19,7 +19,7 @@
 
 	let query = $state('');
 	// Deep-Link vom Weekly Review: /journal?kind=weekly.
-	const kindParam = $page.url.searchParams.get('kind');
+	const kindParam = page.url.searchParams.get('kind');
 	let selectedKind = $state<JournalKind | null>(kindParam === 'daily' || kindParam === 'weekly' ? kindParam : null);
 	let selectedMonth = $state('');
 
@@ -49,7 +49,7 @@
 
 <PageHeader title="Tagebuch">
 	{#snippet trailing()}
-		<JournalStreakBadge {streak} />
+		<JournalStreakBadge streak={streak} />
 	{/snippet}
 </PageHeader>
 
@@ -81,7 +81,7 @@
 	<!-- Art-Filter -->
 	<div class="flex gap-2">
 		<button
-			onclick={() => (selectedKind = null)}
+			onclick={() => selectedKind = null}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === null
 				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
@@ -89,7 +89,7 @@
 			Alle
 		</button>
 		<button
-			onclick={() => (selectedKind = 'daily')}
+			onclick={() => selectedKind = 'daily'}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === 'daily'
 				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
@@ -97,7 +97,7 @@
 			Täglich
 		</button>
 		<button
-			onclick={() => (selectedKind = 'weekly')}
+			onclick={() => selectedKind = 'weekly'}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === 'weekly'
 				? 'bg-primary-600 text-white'
 				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
@@ -108,7 +108,11 @@
 </section>
 
 <section>
-	<JournalList entries={filteredEntries} {query} onEdit={openJournal} />
+	<JournalList
+		entries={filteredEntries}
+		query={query}
+		onEdit={openJournal}
+	/>
 </section>
 
 <JournalEntrySheet

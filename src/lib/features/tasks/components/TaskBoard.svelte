@@ -2,7 +2,7 @@
 	import type { Task, TaskStatus } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { buildTaskTree, subtaskProgress } from '../utils';
-	import Card from '$lib/ui/Card.svelte';
+	import Card from '#lib/ui/Card.svelte';
 	import { Repeat, AlignLeft } from 'lucide-svelte';
 	import { formatRRule } from '../recurrence';
 

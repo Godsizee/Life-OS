@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { authState } from '$lib/core/auth.svelte';
+	import { authState } from '#lib/core/auth.svelte.js';
 	import { scale } from 'svelte/transition';
 	import { Check } from 'lucide-svelte';
-	import Alert from '$lib/ui/Alert.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
-	import { haptic } from '$lib/core/haptics';
-	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
-	import { authErrorText } from '$lib/features/auth/errors';
-	import { safeNextPath } from '$lib/features/auth/redirect';
-	import { onboardingSchema } from '$lib/features/auth/schema';
-	import { updateDisplayName } from '$lib/features/profile/api';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
+	import Alert from '#lib/ui/Alert.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import AuthShell from '#lib/features/auth/components/AuthShell.svelte';
+	import { authErrorText } from '#lib/features/auth/errors.js';
+	import { safeNextPath } from '#lib/features/auth/redirect.js';
+	import { onboardingSchema } from '#lib/features/auth/schema.js';
+	import { updateDisplayName } from '#lib/features/profile/api.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 
 	let displayName = $state('');
 	let workspaceName = $state('');
@@ -80,7 +80,8 @@
 			done = true;
 			haptic(15);
 			await new Promise((resolve) => setTimeout(resolve, motionDuration(DURATION.base)));
-			await goto(next);
+			// Kit 3: goto() verwirft Ziele ohne passende Route — dann aufs Dashboard.
+		await goto(next).catch(() => goto('/'));
 		} catch (error) {
 			formError = authErrorText(error);
 			saving = false;

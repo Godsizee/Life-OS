@@ -1,8 +1,8 @@
 // Welle 5.3 — Fitness verbindet sich mit Habits & Goals.
 // Wird nach dem Loggen eines Workouts aus dem Fitness-Store aufgerufen.
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { toastState } from '$lib/core/toast.svelte';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { toastState } from '#lib/core/toast.svelte.js';
 import type { ExerciseBest } from './utils/1rm';
 import { fitnessFrequencyScore } from './utils/frequency';
 import type { WorkoutLog } from './types';

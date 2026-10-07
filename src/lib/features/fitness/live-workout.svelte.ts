@@ -1,15 +1,15 @@
-import { neueId } from '$lib/core/id';
+import { neueId } from '#lib/core/id.js';
 // Welle F2 — Live-Workout 2.0: die laufende (noch ungespeicherte) Session lebt hier
 // statt im Komponenten-State von routes/fitness/+page.svelte, damit ein Reload oder
 // App-Wechsel sie nicht verwirft. Draft in localStorage, Vorbild focus/store.svelte.ts
 // (kein Shared-Wrapper im Projekt — jedes Feature persistiert selbst).
-import { alarm } from '$lib/core/alert.svelte';
+import { alarm } from '#lib/core/alert.svelte.js';
 import { fitnessState } from './store.svelte';
 import * as fitnessApi from './api';
 import { estimateOneRepMax } from './utils/1rm';
 import { effectiveWeight, isBodyweightExercise } from './utils/volume';
-import { healthState } from '$lib/features/health/store.svelte';
-import { weightTrend } from '$lib/features/health/stats';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { weightTrend } from '#lib/features/health/stats.js';
 import { announcePRs } from './integration';
 import type { ActiveSetLog, ExerciseType, PickedExercise, SetType, WorkoutSetLog } from './types';
 

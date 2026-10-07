@@ -3,8 +3,8 @@
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import NoteItem from './NoteItem.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
 	import type { Note } from '../types';
 	import type { NoteMatch } from '../filter';
 

@@ -21,7 +21,7 @@ export function expandNextOccurrence(task: Task): Date | null {
 	return null;
 }
 
-import { formatRecurrence } from '$lib/features/calendar/rrule';
+import { formatRecurrence } from '#lib/features/calendar/rrule.js';
 
 export function formatRRule(rrule: string | null): string | null {
 	if (!rrule) return null;

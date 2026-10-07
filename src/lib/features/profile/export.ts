@@ -1,18 +1,18 @@
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import { profileState } from './store.svelte';
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { notesState } from '$lib/features/notes/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { calendarState } from '$lib/features/calendar/store.svelte';
-import { shoppingState } from '$lib/features/shopping/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { linksState } from '$lib/features/links/store.svelte';
-import { remindersState } from '$lib/features/reminders/store.svelte';
-import { attachmentsState } from '$lib/features/attachments/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { notesState } from '#lib/features/notes/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { calendarState } from '#lib/features/calendar/store.svelte.js';
+import { shoppingState } from '#lib/features/shopping/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { linksState } from '#lib/features/links/store.svelte.js';
+import { remindersState } from '#lib/features/reminders/store.svelte.js';
+import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { moodState } from '#lib/features/mood/store.svelte.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 
 /**
  * Sammelt alle bereits geladenen Stores zu einem JSON-Dokument.

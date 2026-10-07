@@ -1,11 +1,11 @@
-import { authState } from '$lib/core/auth.svelte';
-import { workspaceState } from '$lib/features/workspace/store.svelte';
+import { authState } from '#lib/core/auth.svelte.js';
+import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as analyticsApi from './api';
 import { computeLifeScore } from './scoring';
-import { toISODate } from '$lib/core/date';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
-import { toastState } from '$lib/core/toast.svelte';
+import { toISODate } from '#lib/core/date.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
+import { toastState } from '#lib/core/toast.svelte.js';
 
 /**
  * Merkt sich, für welchen Kalendertag der Backfill schon lief — je Konto, damit

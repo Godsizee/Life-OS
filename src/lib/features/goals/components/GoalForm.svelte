@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Select from '$lib/ui/Select.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Select from '#lib/ui/Select.svelte';
 	import { goalsState } from '../store.svelte';
 	import type { GoalType } from '../types';
 

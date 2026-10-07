@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Check } from 'lucide-svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { formatShortDate } from '$lib/core/date';
-	import { rankTasks } from '$lib/features/dashboard/scoring';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { formatShortDate } from '#lib/core/date.js';
+	import { rankTasks } from '#lib/features/dashboard/scoring.js';
 
 	const nextTask = $derived(rankTasks(tasksState.tasks)[0] ?? null);
 </script>

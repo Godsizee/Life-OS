@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { modules } from '$lib/config/modules';
-	import { authState } from '$lib/core/auth.svelte';
-	import { workspaceState } from '$lib/features/workspace/store.svelte';
-	import { themeState } from '$lib/core/theme.svelte';
-	import { outbox } from '$lib/core/outbox.svelte';
-	import { logout, logoutState } from '$lib/features/auth/logout.svelte';
+	import { modules } from '#lib/config/modules.js';
+	import { authState } from '#lib/core/auth.svelte.js';
+	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
+	import { themeState } from '#lib/core/theme.svelte.js';
+	import { outbox } from '#lib/core/outbox.svelte.js';
+	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning, Settings } from 'lucide-svelte';
-	import Spinner from '$lib/ui/Spinner.svelte';
+	import Spinner from '#lib/ui/Spinner.svelte';
 
 	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
 

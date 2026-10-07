@@ -1,24 +1,24 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { goalsState } from '$lib/features/goals/store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { getGoalProgress } from '$lib/features/goals/progress';
-	import { calculateHabitProgress30Days } from '$lib/features/habits/streak';
-	import { workoutsThisWeek } from '$lib/features/fitness/utils/frequency';
-	import { evaluateTrack } from '$lib/features/goals/checkins';
-	import LinkedItems from '$lib/features/links/components/LinkedItems.svelte';
-	import GoalTargetCard from '$lib/features/goals/components/GoalTargetCard.svelte';
-	import GoalForm from '$lib/features/goals/components/GoalForm.svelte';
-	import OnTrackBadge from '$lib/features/goals/components/OnTrackBadge.svelte';
-	import CheckCircle from '$lib/ui/CheckCircle.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import { getGoalProgress } from '#lib/features/goals/progress.js';
+	import { calculateHabitProgress30Days } from '#lib/features/habits/streak.js';
+	import { workoutsThisWeek } from '#lib/features/fitness/utils/frequency.js';
+	import { evaluateTrack } from '#lib/features/goals/checkins.js';
+	import LinkedItems from '#lib/features/links/components/LinkedItems.svelte';
+	import GoalTargetCard from '#lib/features/goals/components/GoalTargetCard.svelte';
+	import GoalForm from '#lib/features/goals/components/GoalForm.svelte';
+	import OnTrackBadge from '#lib/features/goals/components/OnTrackBadge.svelte';
+	import CheckCircle from '#lib/ui/CheckCircle.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck, Archive, ArchiveRestore } from 'lucide-svelte';
-	import Select from '$lib/ui/Select.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import type { GoalStatus } from '$lib/features/goals/types';
+	import Select from '#lib/ui/Select.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import type { GoalStatus } from '#lib/features/goals/types.js';
 
 	const goalId = $derived(page.params.id);
 

@@ -1,13 +1,13 @@
 <script lang="ts">
 	// W8 — „+ Check-in": Zuwachs, Datum, optionale Notiz. Werte sind additiv.
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import StepperInput from '$lib/features/fitness/components/StepperInput.svelte';
-	import { toISODate } from '$lib/core/date';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { haptic } from '$lib/core/haptics';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import StepperInput from '#lib/features/fitness/components/StepperInput.svelte';
+	import { toISODate } from '#lib/core/date.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
 	import { goalsState } from '../store.svelte';
 	import type { Goal } from '../types';
 

@@ -1,8 +1,8 @@
 <script lang="ts">
 	// W8 — Formular-Sheet für Tagebuch-Einträge (neu anlegen oder bearbeiten).
-	import Sheet from '$lib/ui/Sheet.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
 	import JournalEntryForm from './JournalEntryForm.svelte';
-	import { formatShortDate } from '$lib/core/date';
+	import { formatShortDate } from '#lib/core/date.js';
 
 	let {
 		date,

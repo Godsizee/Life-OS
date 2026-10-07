@@ -1,5 +1,5 @@
-import { supabase } from '$lib/core/supabase';
-import { fetchAllPages, seitTagen, VERLAUF_TAGE } from '$lib/core/query';
+import { supabase } from '#lib/core/supabase.js';
+import { fetchAllPages, seitTagen, VERLAUF_TAGE } from '#lib/core/query.js';
 import type { Habit, HabitLog } from './types';
 
 export async function listHabits(workspaceId: string, includeArchived = false): Promise<Habit[]> {

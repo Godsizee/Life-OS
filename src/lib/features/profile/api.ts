@@ -1,4 +1,4 @@
-import { supabase } from '$lib/core/supabase';
+import { supabase } from '#lib/core/supabase.js';
 import type { ProfileSettings } from './types';
 
 export interface ProfileRow {

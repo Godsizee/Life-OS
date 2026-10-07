@@ -17,7 +17,7 @@ import {
 	type CheckinLike,
 	type TrackableGoal
 } from './checkins';
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 
 // Mittwoch, 15.07.2026, 10:00 lokal
 const today = new Date(2026, 6, 15, 10, 0, 0);

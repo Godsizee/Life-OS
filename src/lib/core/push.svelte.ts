@@ -1,11 +1,11 @@
-import { env } from '$env/dynamic/public';
+import { VITE_VAPID_PUBLIC_KEY } from '$app/env/public';
 import { supabase } from './supabase';
-import * as remindersApi from '$lib/features/reminders/api';
+import * as remindersApi from '#lib/features/reminders/api.js';
 
-const VAPID_PUBLIC_KEY = env.VITE_VAPID_PUBLIC_KEY || '';
+const VAPID_PUBLIC_KEY = VITE_VAPID_PUBLIC_KEY || '';
 
 function urlBase64ToUint8Array(base64: string): Uint8Array {
-	const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+	const padding = ('=').repeat((4 - base64.length % 4) % 4);
 	const normalized = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
 	const raw = atob(normalized);
 	return Uint8Array.from([...raw].map((char) => char.charCodeAt(0)));

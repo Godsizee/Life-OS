@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { bestStreak, calculateStreak, completionRate, isCompleted, isSkipped, streakUnit, totalCompleted, weekProgress } from '$lib/features/habits/streak';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
-	import HabitActionsSheet from '$lib/features/habits/components/HabitActionsSheet.svelte';
-	import HabitProgressButton from '$lib/features/habits/components/HabitProgressButton.svelte';
-	import ReminderSection from '$lib/features/reminders/components/ReminderSection.svelte';
-	import { buildRrule } from '$lib/features/reminders/schedule';
-	import Card from '$lib/ui/Card.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { bestStreak, calculateStreak, completionRate, isCompleted, isSkipped, streakUnit, totalCompleted, weekProgress } from '#lib/features/habits/streak.js';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import StreakCalendar from '#lib/features/habits/components/StreakCalendar.svelte';
+	import HabitActionsSheet from '#lib/features/habits/components/HabitActionsSheet.svelte';
+	import HabitProgressButton from '#lib/features/habits/components/HabitProgressButton.svelte';
+	import ReminderSection from '#lib/features/reminders/components/ReminderSection.svelte';
+	import { buildRrule } from '#lib/features/reminders/schedule.js';
+	import Card from '#lib/ui/Card.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
 	import { Flame, Trophy, Calendar, CheckSquare, Ban, ArrowLeft, MoreVertical, Activity } from 'lucide-svelte';
-	import { toISODate } from '$lib/core/date';
+	import { toISODate } from '#lib/core/date.js';
 
 	const id = $derived(page.params.id as string);
 

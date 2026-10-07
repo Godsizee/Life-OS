@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends string">
-	import { haptic } from '$lib/core/haptics';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		value = $bindable(),

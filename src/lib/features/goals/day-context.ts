@@ -1,15 +1,15 @@
 // Welle 5.5 — „Tag in Zahlen": aggregiert den Tages-Snapshot aus allen Modulen.
 // Wird über dem Journal-Freitext angezeigt und beim Speichern eingefroren.
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-import { minutesOnDate } from '$lib/features/timetracking/stats';
-import { isDueOn, isCompleted, isSkipped, type HabitCore } from '$lib/features/habits/streak';
-import { toISODate } from '$lib/core/date';
-import { waterMl } from '$lib/features/health/stats';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { moodState } from '#lib/features/mood/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
+import { minutesOnDate } from '#lib/features/timetracking/stats.js';
+import { isDueOn, isCompleted, isSkipped, type HabitCore } from '#lib/features/habits/streak.js';
+import { toISODate } from '#lib/core/date.js';
+import { waterMl } from '#lib/features/health/stats.js';
 import type { DayContext } from './types';
 
 export function buildDayContext(dateStr: string): DayContext {

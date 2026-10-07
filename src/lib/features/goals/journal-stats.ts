@@ -1,4 +1,4 @@
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { JournalEntry } from './types';
 
 export function isValidEntryDate(date: string): boolean {

@@ -1,6 +1,6 @@
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { ladeSicher } from '$lib/core/store-load';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { ladeSicher } from '#lib/core/store-load.js';
 import * as profileApi from './api';
 import type { ProfileSettings } from './types';
 import {

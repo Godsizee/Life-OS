@@ -1,8 +1,8 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
 import * as attachmentsApi from './api';
 import {
 	buildStoragePath,

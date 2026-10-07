@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { habitsState } from '$lib/features/habits/store.svelte';
-	import { calculateStreak, bestStreak } from '$lib/features/habits/streak';
-	import HabitForm from '$lib/features/habits/components/HabitForm.svelte';
-	import HabitList from '$lib/features/habits/components/HabitList.svelte';
-	import StreakCalendar from '$lib/features/habits/components/StreakCalendar.svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Sheet from '$lib/ui/Sheet.svelte';
-	import Skeleton from '$lib/ui/Skeleton.svelte';
+	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import { calculateStreak, bestStreak } from '#lib/features/habits/streak.js';
+	import HabitForm from '#lib/features/habits/components/HabitForm.svelte';
+	import HabitList from '#lib/features/habits/components/HabitList.svelte';
+	import StreakCalendar from '#lib/features/habits/components/StreakCalendar.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import { Plus } from 'lucide-svelte';
 
 	let createOpen = $state(false);

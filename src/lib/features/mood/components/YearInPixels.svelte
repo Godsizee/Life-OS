@@ -2,10 +2,10 @@
 	// W9 — Daylio „Year in Pixels": 12 Monatsspalten x 31 Tageszeilen.
 	// Handgerolltes Inline-SVG (kein Chart-Framework im Projekt),
 	// Muster: fitness/components/WorkoutFrequencyHeatmap.svelte.
-	import { themeState } from '$lib/core/theme.svelte';
+	import { themeState } from '#lib/core/theme.svelte.js';
 	import { moodHex } from '../colors';
 	import { MOOD_LABELS } from '../types';
-	import { formatDate } from '$lib/core/date';
+	import { formatDate } from '#lib/core/date.js';
 	import type { PixelMonth } from '../stats';
 
 	let {

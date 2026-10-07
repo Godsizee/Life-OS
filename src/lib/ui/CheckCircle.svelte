@@ -2,7 +2,7 @@
 	import { Check } from 'lucide-svelte';
 	import { scale } from 'svelte/transition';
 	import { DURATION, motionDuration } from './motion';
-	import { haptic } from '$lib/core/haptics';
+	import { haptic } from '#lib/core/haptics.js';
 
 	let {
 		checked = false,

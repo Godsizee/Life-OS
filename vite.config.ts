@@ -1,5 +1,4 @@
 import tailwindcss from '@tailwindcss/vite';
-import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
@@ -13,73 +12,17 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-
-			// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-			// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-			// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 			adapter: adapter(),
-			env: {
-				publicPrefix: 'VITE_'
-			}
-		}),
-		SvelteKitPWA({
-			registerType: 'autoUpdate',
-			strategies: 'injectManifest',
-			srcDir: 'src',
-			filename: 'service-worker.ts',
-			manifest: {
-				id: '/',
-				lang: 'de',
-				start_url: '/',
-				name: 'Life OS',
-				short_name: 'Life',
-				description: 'Midweight Life OS',
-				// Bewusst fest auf Hell: Manifeste kennen keine Media Queries, ein
-				// dunkler Wert waere im Light Mode genauso falsch. Massgeblich zur
-				// Laufzeit ist ohnehin themeState.apply() zusammen mit dem Inline-
-				// Skript in src/app.html — der Wert hier faerbt nur den Splash beim
-				// Start vom Homescreen. Nicht "reparieren".
-				theme_color: '#F6F6F8',
-				background_color: '#F6F6F8',
-				display: 'standalone',
-				icons: [
-					{
-						src: 'pwa-192x192.png',
-						sizes: '192x192',
-						type: 'image/png',
-						purpose: 'any'
-					},
-					{
-						src: 'pwa-512x512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'any'
-					},
-					{
-						src: 'pwa-maskable-512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'maskable'
-					}
-				],
-				shortcuts: [
-					{
-						name: 'Fokus',
-						url: '/focus',
-						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
-					},
-					{
-						name: 'Aufgaben',
-						url: '/tasks',
-						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
-					},
-					{
-						name: 'Kalender',
-						url: '/calendar',
-						icons: [{ src: 'pwa-96x96.png', sizes: '96x96', type: 'image/png' }]
-					}
-				]
-			}
+			paths: {
+				// adapter-node 6: ORIGIN-Umgebungsvariable entfällt.
+				origin: process.env.APP_ORIGIN ?? 'https://life.2.godsize.info',
+				// Der Service Worker liefert offline EINE gecachte Hülle für jede Route.
+				// Relative Pfade (`../../_app/…`) wären darin nur für die Route gültig,
+				// unter der sie gecacht wurde.
+				relative: false
+			},
+			// Alle 5 Minuten nach neuer Version fragen → `updated` in $app/state (T103).
+			version: { pollInterval: 300_000 }
 		})
 	],
 	test: {

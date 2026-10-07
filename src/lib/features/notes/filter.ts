@@ -56,5 +56,5 @@ export function searchNotes(notes: Note[], query: string, tag: string | null): N
 	}));
 }
 
-import { bodySnippet } from '$lib/core/text';
+import { bodySnippet } from '#lib/core/text.js';
 export { bodySnippet };

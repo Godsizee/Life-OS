@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Select from '$lib/ui/Select.svelte';
+	import Select from '#lib/ui/Select.svelte';
 	import { workspaceState } from '../store.svelte';
 
 	let { value, onchange, emptyLabel = 'Niemand zugewiesen' }: {

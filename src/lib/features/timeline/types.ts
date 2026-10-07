@@ -1,13 +1,13 @@
 import type { TimelineModule } from './module-ids';
-import type { Task } from '$lib/features/tasks/types';
-import type { HabitLog, Habit } from '$lib/features/habits/types';
-import type { MoodEntry } from '$lib/features/mood/types';
-import type { Goal, GoalCheckin, JournalEntry } from '$lib/features/goals/types';
-import type { HealthEntry } from '$lib/features/health/types';
-import type { Note } from '$lib/features/notes/types';
-import type { WorkoutLog, WorkoutPlan } from '$lib/features/fitness/types';
-import type { Event, EventOverride } from '$lib/features/calendar/types';
-import type { TimeEntryLike } from '$lib/features/timetracking/stats';
+import type { Task } from '#lib/features/tasks/types.js';
+import type { HabitLog, Habit } from '#lib/features/habits/types.js';
+import type { MoodEntry } from '#lib/features/mood/types.js';
+import type { Goal, GoalCheckin, JournalEntry } from '#lib/features/goals/types.js';
+import type { HealthEntry } from '#lib/features/health/types.js';
+import type { Note } from '#lib/features/notes/types.js';
+import type { WorkoutLog, WorkoutPlan } from '#lib/features/fitness/types.js';
+import type { Event, EventOverride } from '#lib/features/calendar/types.js';
+import type { TimeEntryLike } from '#lib/features/timetracking/stats.js';
 
 export interface TimelineItem {
 	id: string;

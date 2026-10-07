@@ -1,15 +1,15 @@
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { getGoalProgress } from '$lib/features/goals/progress';
-import { evaluateTrack } from '$lib/features/goals/checkins';
-import { calculateStreak, toISODate, isOpenToday, streakLabel } from '$lib/features/habits/streak';
-import { shoppingState } from '$lib/features/shopping/store.svelte';
-import { waterMl } from '$lib/features/health/stats';
-import { profileState } from '$lib/features/profile/store.svelte';
-import { analyticsState } from '$lib/features/analytics/store.svelte';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { getGoalProgress } from '#lib/features/goals/progress.js';
+import { evaluateTrack } from '#lib/features/goals/checkins.js';
+import { calculateStreak, toISODate, isOpenToday, streakLabel } from '#lib/features/habits/streak.js';
+import { shoppingState } from '#lib/features/shopping/store.svelte.js';
+import { waterMl } from '#lib/features/health/stats.js';
+import { profileState } from '#lib/features/profile/store.svelte.js';
+import { analyticsState } from '#lib/features/analytics/store.svelte.js';
 
 export interface Suggestion {
 	id: string;

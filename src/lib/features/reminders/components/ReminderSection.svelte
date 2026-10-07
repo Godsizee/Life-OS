@@ -8,13 +8,13 @@
 		reminderAtOnDate
 	} from '../schedule';
 	import type { ReminderEntityType } from '../types';
-	import { toISODate } from '$lib/core/date';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { haptic } from '$lib/core/haptics';
-	import Button from '$lib/ui/Button.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
+	import { toISODate } from '#lib/core/date.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import Button from '#lib/ui/Button.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
 
 	let {
 		entityType,

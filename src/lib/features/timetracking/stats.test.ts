@@ -12,7 +12,7 @@ import {
 	startOfWeek,
 	type TimeEntryLike
 } from './stats';
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 
 // Mittwoch, 24.06.2026, 10:00 lokal
 const today = new Date(2026, 5, 24, 10, 0, 0);

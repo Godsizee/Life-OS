@@ -1,7 +1,7 @@
 // W9 Gesundheit — reine Auswertungen (Apple-Health-Muster, manuelles Tracking).
 // Keine Svelte-/Store-/lucide-Abhaengigkeit, damit alles in vitest (Node) laeuft.
-import { toISODate } from '$lib/core/date';
-import { formatWater, formatWeight } from '$lib/features/profile/units';
+import { toISODate } from '#lib/core/date.js';
+import { formatWater, formatWeight } from '#lib/features/profile/units.js';
 import type { HealthMetric } from './types';
 
 export interface HealthLike {

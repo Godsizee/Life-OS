@@ -3,14 +3,14 @@
 	// Kein Sheet-Wrapper: die Komponente wird inline (TaskDetailSheet) UND in einem
 	// Sheet (Fokus-Seite) verwendet — Sheets dürfen nicht verschachtelt werden.
 	import { timeTrackingState } from '../store.svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { toISODate } from '$lib/core/date';
-	import { toastState } from '$lib/core/toast.svelte';
-	import StepperInput from '$lib/features/fitness/components/StepperInput.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Select from '$lib/ui/Select.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { toISODate } from '#lib/core/date.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import StepperInput from '#lib/features/fitness/components/StepperInput.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
+	import Button from '#lib/ui/Button.svelte';
 
 	let {
 		taskId = null,

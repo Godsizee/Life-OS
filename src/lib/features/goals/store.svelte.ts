@@ -1,15 +1,15 @@
-import { neueId } from '$lib/core/id';
-import { authState } from '$lib/core/auth.svelte';
-import { toISODate } from '$lib/core/date';
-import { outbox } from '$lib/core/outbox.svelte';
-import { subscribeToTable } from '$lib/core/realtime';
-import { ladeSicher } from '$lib/core/store-load';
+import { neueId } from '#lib/core/id.js';
+import { authState } from '#lib/core/auth.svelte.js';
+import { toISODate } from '#lib/core/date.js';
+import { outbox } from '#lib/core/outbox.svelte.js';
+import { subscribeToTable } from '#lib/core/realtime.js';
+import { ladeSicher } from '#lib/core/store-load.js';
 import * as goalsApi from './api';
-import { attachmentsState } from '$lib/features/attachments/store.svelte';
+import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
 import { goalCheckinInputSchema, goalInputSchema, journalEntryInputSchema, type GoalInput } from './schema';
 import type { Goal, GoalCheckin, GoalStatus, JournalEntry, JournalKind, DayContext } from './types';
 import { isValidEntryDate } from './journal-stats';
-import { weekKey } from '$lib/features/analytics/week-window';
+import { weekKey } from '#lib/features/analytics/week-window.js';
 
 class GoalsState {
 	goals = $state<Goal[]>([]);

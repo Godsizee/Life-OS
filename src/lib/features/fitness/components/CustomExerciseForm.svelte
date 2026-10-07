@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Plus } from 'lucide-svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Select from '$lib/ui/Select.svelte';
-	import Button from '$lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
+	import Button from '#lib/ui/Button.svelte';
 	import { fitnessState } from '../store.svelte';
 	import type { ExerciseType, PickedExercise } from '../types';
 

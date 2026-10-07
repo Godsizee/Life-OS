@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { liveWorkoutState } from '$lib/features/fitness/live-workout.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
+	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 	import { Dumbbell, Timer } from 'lucide-svelte';
 
 	let tick = $state(0);

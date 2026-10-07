@@ -1,4 +1,4 @@
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { Event, EventOverride, EventOverridePatch } from './types';
 
 /** Eine konkrete Ausprägung eines (ggf. wiederkehrenden) Termins an einem Tag. */

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { APP_LOCALE } from '$lib/core/locale';
+	import { APP_LOCALE } from '#lib/core/locale.js';
 	import { TIMELINE_MODULES } from '../modules';
 	import type { TimelineGroup } from '../types';
 

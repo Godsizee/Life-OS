@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { ShoppingItem } from '../types';
   import { shoppingState } from '../store.svelte';
-  import Sheet from '$lib/ui/Sheet.svelte';
-  import Input from '$lib/ui/Input.svelte';
-  import Select from '$lib/ui/Select.svelte';
-  import Button from '$lib/ui/Button.svelte';
-  import Field from '$lib/ui/Field.svelte';
-  import Switch from '$lib/ui/Switch.svelte';
-  import MemberSelect from '$lib/features/workspace/components/MemberSelect.svelte';
+  import Sheet from '#lib/ui/Sheet.svelte';
+  import Input from '#lib/ui/Input.svelte';
+  import Select from '#lib/ui/Select.svelte';
+  import Button from '#lib/ui/Button.svelte';
+  import Field from '#lib/ui/Field.svelte';
+  import Switch from '#lib/ui/Switch.svelte';
+  import MemberSelect from '#lib/features/workspace/components/MemberSelect.svelte';
   import { CATEGORY_IDS, CATEGORY_LABELS, UNITS } from '../categories';
 
   let { item, open = $bindable(false) }: { item: ShoppingItem | null; open?: boolean } = $props();

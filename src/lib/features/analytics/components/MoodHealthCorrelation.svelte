@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { moodState } from '$lib/features/mood/store.svelte';
-	import { healthState } from '$lib/features/health/store.svelte';
-	import { fitnessState } from '$lib/features/fitness/store.svelte';
-	import { waterMl } from '$lib/features/health/stats';
-	import { toISODate } from '$lib/core/date';
+	import { moodState } from '#lib/features/mood/store.svelte.js';
+	import { healthState } from '#lib/features/health/store.svelte.js';
+	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+	import { waterMl } from '#lib/features/health/stats.js';
+	import { toISODate } from '#lib/core/date.js';
 
 	/**
 	 * Berechnet den Pearson-Korrelationskoeffizient zwischen zwei gleich langen Arrays.

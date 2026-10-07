@@ -1,20 +1,20 @@
 // W10 — Kennzahlen des Weekly Review, extrahiert aus routes/review/+page.svelte (W-05).
 // Rein: alle Daten kommen als Parameter, nichts liest direkt aus einem Store — testbar in vitest.
-import { fromISODate } from '$lib/core/date';
+import { fromISODate } from '#lib/core/date.js';
 import type { WeekWindow } from './week-window';
 import type { Kennzahl } from './week-compare';
-import type { Task } from '$lib/features/tasks/types';
-import { completedBetween } from '$lib/features/tasks/utils';
-import type { Habit } from '$lib/features/habits/types';
-import { isDueOn, isCompleted, isSkipped, type HabitDay } from '$lib/features/habits/streak';
-import type { WorkoutLog } from '$lib/features/fitness/types';
-import type { DatedSetLog } from '$lib/features/fitness/api';
-import type { MoodLike } from '$lib/features/mood/stats';
-import { averageScore } from '$lib/features/mood/stats';
-import type { HealthLike } from '$lib/features/health/stats';
-import { metricAverage, goalHitDays } from '$lib/features/health/stats';
-import type { TimeEntryLike } from '$lib/features/timetracking/stats';
-import { minutesOnDate, formatMinutes } from '$lib/features/timetracking/stats';
+import type { Task } from '#lib/features/tasks/types.js';
+import { completedBetween } from '#lib/features/tasks/utils.js';
+import type { Habit } from '#lib/features/habits/types.js';
+import { isDueOn, isCompleted, isSkipped, type HabitDay } from '#lib/features/habits/streak.js';
+import type { WorkoutLog } from '#lib/features/fitness/types.js';
+import type { DatedSetLog } from '#lib/features/fitness/api.js';
+import type { MoodLike } from '#lib/features/mood/stats.js';
+import { averageScore } from '#lib/features/mood/stats.js';
+import type { HealthLike } from '#lib/features/health/stats.js';
+import { metricAverage, goalHitDays } from '#lib/features/health/stats.js';
+import type { TimeEntryLike } from '#lib/features/timetracking/stats.js';
+import { minutesOnDate, formatMinutes } from '#lib/features/timetracking/stats.js';
 
 export interface WochenQuellen {
 	tasks: Task[];

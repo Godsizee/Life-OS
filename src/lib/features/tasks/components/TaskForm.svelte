@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Button from '$lib/ui/Button.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import Select from '$lib/ui/Select.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
 	import { tasksState } from '../store.svelte';
-	import { goalsState } from '$lib/features/goals/store.svelte';
+	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import { parseTaskInput } from '../quick-add';
-	import Chip from '$lib/ui/Chip.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
 	import RecurrenceField from './RecurrenceField.svelte';
 
 	let { onsubmitted }: { onsubmitted?: () => void } = $props();

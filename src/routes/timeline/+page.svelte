@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { History } from 'lucide-svelte';
-	import PageHeader from '$lib/ui/PageHeader.svelte';
-	import Chip from '$lib/ui/Chip.svelte';
-	import EmptyState from '$lib/ui/EmptyState.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
 
-	import { timelineState } from '$lib/features/timeline/store.svelte';
-	import { groupByDay } from '$lib/features/timeline/build';
-	import { TIMELINE_MODULES } from '$lib/features/timeline/modules';
-	import TimelineDayGroup from '$lib/features/timeline/components/TimelineDayGroup.svelte';
-	import type { TimelineModule } from '$lib/features/timeline/module-ids';
+	import { timelineState } from '#lib/features/timeline/store.svelte.js';
+	import { groupByDay } from '#lib/features/timeline/build.js';
+	import { TIMELINE_MODULES } from '#lib/features/timeline/modules.js';
+	import TimelineDayGroup from '#lib/features/timeline/components/TimelineDayGroup.svelte';
+	import type { TimelineModule } from '#lib/features/timeline/module-ids.js';
 
 	let filterModule = $state<TimelineModule | 'all'>('all');
 	let visibleGroups = $state(20);

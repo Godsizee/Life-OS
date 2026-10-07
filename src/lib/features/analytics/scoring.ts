@@ -1,17 +1,17 @@
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { healthState } from '$lib/features/health/store.svelte';
-import { moodState } from '$lib/features/mood/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { profileState } from '$lib/features/profile/store.svelte';
-import { isDueOn, isCompleted, isSkipped } from '$lib/features/habits/streak';
-import { timeTrackingState } from '$lib/features/timetracking/store.svelte';
-import { focusScoreForDate } from '$lib/features/timetracking/stats';
-import { toISODate } from '$lib/core/date';
-import { getGoalProgress } from '$lib/features/goals/progress';
-import { fitnessFrequencyScore } from '$lib/features/fitness/utils/frequency';
-import { waterMl } from '$lib/features/health/stats';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { healthState } from '#lib/features/health/store.svelte.js';
+import { moodState } from '#lib/features/mood/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { profileState } from '#lib/features/profile/store.svelte.js';
+import { isDueOn, isCompleted, isSkipped } from '#lib/features/habits/streak.js';
+import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
+import { focusScoreForDate } from '#lib/features/timetracking/stats.js';
+import { toISODate } from '#lib/core/date.js';
+import { getGoalProgress } from '#lib/features/goals/progress.js';
+import { fitnessFrequencyScore } from '#lib/features/fitness/utils/frequency.js';
+import { waterMl } from '#lib/features/health/stats.js';
 import { weightedTotal } from './score-math';
 
 export interface ScoreBreakdown {

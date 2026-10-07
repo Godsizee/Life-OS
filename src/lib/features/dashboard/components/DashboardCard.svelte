@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Card from '$lib/ui/Card.svelte';
+	import Card from '#lib/ui/Card.svelte';
 	import type { Snippet } from 'svelte';
 
 	let {

@@ -2,9 +2,9 @@
 	// W10 — macht die im Weekly Review gewählten Top-3 sichtbar und abhakbar,
 	// statt sie im Tagebuch versanden zu lassen.
 	import { Check, Star } from 'lucide-svelte';
-	import { tasksState } from '$lib/features/tasks/store.svelte';
-	import { analyticsState } from '$lib/features/analytics/store.svelte';
-	import { toastState } from '$lib/core/toast.svelte';
+	import { tasksState } from '#lib/features/tasks/store.svelte.js';
+	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
 
 	const focusTasks = $derived(tasksState.focusTasks);
 </script>

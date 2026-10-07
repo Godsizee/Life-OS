@@ -3,11 +3,11 @@
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { formatRRule } from '../recurrence';
-	import { weekKey } from '$lib/features/analytics/week-window';
-	import ListRow from '$lib/ui/ListRow.svelte';
-	import CheckCircle from '$lib/ui/CheckCircle.svelte';
-	import SwipeToDelete from '$lib/ui/SwipeToDelete.svelte';
-	import MemberAvatar from '$lib/features/workspace/components/MemberAvatar.svelte';
+	import { weekKey } from '#lib/features/analytics/week-window.js';
+	import ListRow from '#lib/ui/ListRow.svelte';
+	import CheckCircle from '#lib/ui/CheckCircle.svelte';
+	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
+	import MemberAvatar from '#lib/features/workspace/components/MemberAvatar.svelte';
 
 	let { task, onopen, progress }: { task: Task; onopen?: (task: Task) => void; progress?: { done: number; total: number } } = $props();
 

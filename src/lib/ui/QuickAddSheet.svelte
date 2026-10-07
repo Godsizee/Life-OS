@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Activity, Calendar, CheckSquare, Flame, Notebook, ShoppingCart, Target } from 'lucide-svelte';
-	import { parseNLPInput } from '$lib/core/nlp-parse';
-	import { dispatchNLP } from '$lib/features/dashboard/nlp-dispatch';
-	import { toastState } from '$lib/core/toast.svelte';
-	import { haptic } from '$lib/core/haptics';
+	import { parseNLPInput } from '#lib/core/nlp-parse.js';
+	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { haptic } from '#lib/core/haptics.js';
 	import Sheet from './Sheet.svelte';
 	import Input from './Input.svelte';
 	import Button from './Button.svelte';

@@ -4,20 +4,20 @@
 	import { page } from '$app/state';
 	import { fade, scale } from 'svelte/transition';
 	import { Check, Fingerprint } from 'lucide-svelte';
-	import Alert from '$lib/ui/Alert.svelte';
-	import Button from '$lib/ui/Button.svelte';
-	import Field from '$lib/ui/Field.svelte';
-	import Input from '$lib/ui/Input.svelte';
-	import { DURATION, motionDuration } from '$lib/ui/motion';
-	import { haptic } from '$lib/core/haptics';
-	import AuthShell from '$lib/features/auth/components/AuthShell.svelte';
-	import PasswordField from '$lib/features/auth/components/PasswordField.svelte';
-	import { signInWithPasskey, signInWithPassword } from '$lib/features/auth/api';
-	import { passkeyAvailable } from '$lib/features/auth/capabilities';
-	import { SESSION_EXPIRED_MESSAGE, authErrorText } from '$lib/features/auth/errors';
-	import { authErrorCode, focusTargetFor } from '$lib/features/auth/feedback';
-	import { safeNextPath } from '$lib/features/auth/redirect';
-	import { emailSchema } from '$lib/features/auth/schema';
+	import Alert from '#lib/ui/Alert.svelte';
+	import Button from '#lib/ui/Button.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import { DURATION, motionDuration } from '#lib/ui/motion.js';
+	import { haptic } from '#lib/core/haptics.js';
+	import AuthShell from '#lib/features/auth/components/AuthShell.svelte';
+	import PasswordField from '#lib/features/auth/components/PasswordField.svelte';
+	import { signInWithPasskey, signInWithPassword } from '#lib/features/auth/api.js';
+	import { passkeyAvailable } from '#lib/features/auth/capabilities.js';
+	import { SESSION_EXPIRED_MESSAGE, authErrorText } from '#lib/features/auth/errors.js';
+	import { authErrorCode, focusTargetFor } from '#lib/features/auth/feedback.js';
+	import { safeNextPath } from '#lib/features/auth/redirect.js';
+	import { emailSchema } from '#lib/features/auth/schema.js';
 
 	let email = $state('');
 	let password = $state('');
@@ -94,7 +94,8 @@
 		phase = 'success';
 		haptic(15);
 		await new Promise((resolve) => setTimeout(resolve, motionDuration(DURATION.base)));
-		await goto(next);
+		// Kit 3: goto() verwirft Ziele ohne passende Route — dann aufs Dashboard.
+		await goto(next).catch(() => goto('/'));
 	}
 
 	async function submit(event: SubmitEvent) {

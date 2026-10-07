@@ -1,4 +1,4 @@
-import { toISODate } from '$lib/core/date';
+import { toISODate } from '#lib/core/date.js';
 import type { Habit, HabitLog, HabitLogStatus, HabitSchedule } from './types';
 
 export { toISODate };

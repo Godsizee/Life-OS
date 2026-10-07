@@ -1,11 +1,11 @@
 // Welle 5.7 — „Dein Monat in Zahlen": aggregiert die letzten N Tage aus allen Modulen.
-import { tasksState } from '$lib/features/tasks/store.svelte';
-import { habitsState } from '$lib/features/habits/store.svelte';
-import { fitnessState } from '$lib/features/fitness/store.svelte';
-import { goalsState } from '$lib/features/goals/store.svelte';
+import { tasksState } from '#lib/features/tasks/store.svelte.js';
+import { habitsState } from '#lib/features/habits/store.svelte.js';
+import { fitnessState } from '#lib/features/fitness/store.svelte.js';
+import { goalsState } from '#lib/features/goals/store.svelte.js';
 import { analyticsState } from './store.svelte';
-import { calculateStreak, streakUnit } from '$lib/features/habits/streak';
-import { toISODate } from '$lib/core/date';
+import { calculateStreak, streakUnit } from '#lib/features/habits/streak.js';
+import { toISODate } from '#lib/core/date.js';
 import type { DBScoreEntry } from './api';
 
 export interface PeriodReport {
