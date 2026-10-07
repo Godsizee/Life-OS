@@ -190,7 +190,7 @@ function parseTime(text: string): [number, number] | null {
 			elf: 11,
 			'zw\u00f6lf': 12
 		};
-		let targetHour = map[half[1].toLowerCase()] || parseInt(half[1]);
+		const targetHour = map[half[1].toLowerCase()] || parseInt(half[1]);
 		let h = targetHour - 1;
 		if (h <= 0) h += 12;
 		return [h, 30];
@@ -214,7 +214,7 @@ function parseTime(text: string): [number, number] | null {
 			elf: 11,
 			'zw\u00f6lf': 12
 		};
-		let targetHour = map[viertelNach[1].toLowerCase()] || parseInt(viertelNach[1]);
+		const targetHour = map[viertelNach[1].toLowerCase()] || parseInt(viertelNach[1]);
 		return [targetHour, 15];
 	}
 
@@ -236,7 +236,7 @@ function parseTime(text: string): [number, number] | null {
 			elf: 11,
 			'zw\u00f6lf': 12
 		};
-		let targetHour = map[viertelVor[1].toLowerCase()] || parseInt(viertelVor[1]);
+		const targetHour = map[viertelVor[1].toLowerCase()] || parseInt(viertelVor[1]);
 		let h = targetHour - 1;
 		if (h <= 0) h += 12;
 		return [h, 45];
@@ -626,7 +626,7 @@ export function parseNLPInput(text: string): ParsedInput {
 		const DAY_NAMES =
 			'montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|monday|tuesday|wednesday|thursday|friday|saturday|sunday|mo|di|mi|do|fr|sa|so';
 
-		let title = trimmed
+		const title = trimmed
 			.replace(
 				/(\u00fcber\u00fcbermorgen|\u00fcbermorgen|tomorrow|morgen|heute|today|n\u00e4chste\s*woche|next\s*week|kommende\s*woche|am\s*wochenende|wochenende)/gi,
 				''

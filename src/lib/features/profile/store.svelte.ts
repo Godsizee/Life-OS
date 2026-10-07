@@ -3,15 +3,7 @@ import { outbox } from '#lib/core/outbox.svelte.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as profileApi from './api';
 import type { ProfileSettings } from './types';
-import {
-	DEFAULT_GLASS_SIZE_ML,
-	GLASS_SIZE_LIMITS,
-	HEIGHT_LIMITS,
-	WATER_GOAL_ML_LIMITS,
-	glassesToMl,
-	type WaterUnit,
-	type WeightUnit
-} from './units';
+import { DEFAULT_GLASS_SIZE_ML, glassesToMl, type WaterUnit, type WeightUnit } from './units';
 
 export const DEFAULT_WEEKLY_WORKOUT_GOAL = 3;
 export const DEFAULT_REST_TIMER_SECONDS = 90;

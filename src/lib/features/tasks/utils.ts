@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from './types';
+import type { Task } from './types';
 import { toISODate } from '#lib/core/date.js';
 import { weekKey } from '#lib/features/analytics/week-window.js';
 

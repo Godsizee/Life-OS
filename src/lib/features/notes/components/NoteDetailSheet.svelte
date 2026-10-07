@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Eye, Hash, ListChecks, Lock, LockOpen, Pen, Pin, Trash2 } from '@lucide/svelte';
+	import { Eye, Hash, Lock, LockOpen, Pen, Pin, Trash2 } from '@lucide/svelte';
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
 	import {
@@ -186,9 +186,9 @@
 						/>
 					</Field>
 				{:else}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div class="markdown-body min-h-24" onchange={onPreviewChange}>
 						{#if body.trim()}
+							<!-- eslint-disable-next-line svelte/no-at-html-tags -- html stammt aus renderMarkdownSafe -->
 							{@html html}
 						{:else}
 							<p class="text-text-tertiary">Noch kein Inhalt.</p>

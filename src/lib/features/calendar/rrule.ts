@@ -59,19 +59,21 @@ export function parseRrule(rrule: string | null): RecurrenceForm {
 		if (!key || !value) continue;
 
 		switch (key) {
-			case 'FREQ':
+			case 'FREQ': {
 				const freqLower = value.toLowerCase();
 				if (freqLower === 'daily' || freqLower === 'weekly' || freqLower === 'monthly') {
 					form.freq = freqLower as Freq;
 				}
 				break;
+			}
 			case 'INTERVAL':
 				form.interval = parseInt(value, 10) || 1;
 				break;
-			case 'BYDAY':
+			case 'BYDAY': {
 				const days = value.split(',');
 				form.byday = days.map((d) => DAY_CODES.indexOf(d as any)).filter((i) => i !== -1);
 				break;
+			}
 			case 'UNTIL':
 				if (value.length >= 8) {
 					form.ende = 'am';

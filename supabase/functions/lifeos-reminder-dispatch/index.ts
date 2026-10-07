@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
 	}
 	if (!VAPID_KEYS_JWK) return json({ error: 'VAPID_KEYS_JWK missing' }, 500);
 
-	let options: { limit?: number; cleanup?: boolean } = {};
+	let options: { limit?: number; cleanup?: boolean };
 	try {
 		options = await req.json();
 	} catch {

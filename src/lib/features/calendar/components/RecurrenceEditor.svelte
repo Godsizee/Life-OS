@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RecurrenceForm, Freq, Ende } from '../rrule';
+	import type { RecurrenceForm } from '../rrule';
 	import { formatRecurrence, buildRrule } from '../rrule';
 	import Chip from '#lib/ui/Chip.svelte';
 

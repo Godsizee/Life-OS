@@ -19,7 +19,7 @@
 	import InviteForm from '#lib/features/workspace/components/InviteForm.svelte';
 	import MemberList from '#lib/features/workspace/components/MemberList.svelte';
 	import FocusSettingsFields from '#lib/features/profile/components/FocusSettingsFields.svelte';
-	import { modules, bottomNavModuleIds } from '#lib/config/modules.js';
+	import { modules } from '#lib/config/modules.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
 	import { downloadExport } from '#lib/features/profile/export.js';
 	import Button from '#lib/ui/Button.svelte';

@@ -192,8 +192,8 @@
 					rows={4}
 				/>
 				{#if description}
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div class="markdown-body mt-2" onchange={onDescriptionPreviewChange}>
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -- renderMarkdownSafe bereinigt selbst -->
 						{@html renderMarkdownSafe(description)}
 					</div>
 				{/if}

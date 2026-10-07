@@ -113,8 +113,6 @@ export function offsetLabel(minutes: number): string {
 	return minutes === 1440 ? '1 Tag vorher' : `${minutes / 1440} Tage vorher`;
 }
 
-const WEEKDAY_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-
 /** Anzeigetext: „Mo, Mi um 07:30" bzw. „28.07.2026 um 09:00". */
 export function formatReminder(reminder: Pick<Reminder, 'remind_at' | 'rrule'>): string {
 	const at = new Date(reminder.remind_at);

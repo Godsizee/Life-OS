@@ -32,7 +32,7 @@
 			>{linkText} →</a
 		>
 	</Card>
-	{#snippet failed(error, reset)}
+	{#snippet failed(_error, reset)}
 		<div
 			class="premium-shadow flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-red-500/20 bg-surface-0 text-center"
 		>

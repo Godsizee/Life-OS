@@ -25,8 +25,6 @@
 		parent = parentId ?? '';
 	});
 
-	import { verboteneEltern } from '../checkins';
-
 	// Genau eine Ebene: nur nicht-erledigte, nicht-archivierte Ziele dürfen Eltern sein.
 	const parentOptions = $derived(
 		parentId

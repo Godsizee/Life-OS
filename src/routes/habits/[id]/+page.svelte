@@ -30,7 +30,6 @@
 		MoreVertical,
 		Activity
 	} from '@lucide/svelte';
-	import { toISODate } from '#lib/core/date.js';
 
 	const id = $derived(page.params.id as string);
 

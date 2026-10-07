@@ -20,7 +20,6 @@
 		ChevronLeft,
 		ChevronRight
 	} from '@lucide/svelte';
-	import IconButton from '#lib/ui/IconButton.svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';

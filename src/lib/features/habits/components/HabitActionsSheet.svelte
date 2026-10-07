@@ -2,7 +2,7 @@
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import type { Habit } from '../types';
 	import { habitsState } from '../store.svelte';
-	import { CheckSquare, Ban, Edit2, Archive, Activity } from '@lucide/svelte';
+	import { Ban, Edit2, Archive, Activity } from '@lucide/svelte';
 	import HabitForm from './HabitForm.svelte';
 	import { isSkipped } from '../streak';
 

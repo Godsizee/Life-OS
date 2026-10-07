@@ -6,7 +6,6 @@ import { habitsState } from '#lib/features/habits/store.svelte.js';
 import { calendarState } from '#lib/features/calendar/store.svelte.js';
 import { shoppingState } from '#lib/features/shopping/store.svelte.js';
 import { goalsState } from '#lib/features/goals/store.svelte.js';
-import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 import { linksState } from '#lib/features/links/store.svelte.js';
 import { remindersState } from '#lib/features/reminders/store.svelte.js';
 import { attachmentsState } from '#lib/features/attachments/store.svelte.js';

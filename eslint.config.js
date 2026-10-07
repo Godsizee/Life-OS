@@ -34,8 +34,29 @@ export default defineConfig(
 		}
 	},
 	{
-		// Override or add rule settings here, such as:
-		// 'svelte/button-has-type': 'error'
-		rules: {}
+		rules: {
+			// Leere catch-Blöcke sind hier Absicht: localStorage wirft im privaten Modus,
+			// und ohne gespeicherten Wert gilt einfach der Standard.
+			'no-empty': ['error', { allowEmptyCatch: true }],
+			// `_` markiert bewusst ungenutzte Parameter (z. B. `{#each Array(n) as _, i}`).
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }
+			],
+			// Massenhaft im Bestand (Stand T105). Abgebaut beim Modul-Umbau in P7, bis dahin
+			// sichtbar, aber nicht blockierend. Neue Stellen nicht hinzufügen.
+			'svelte/require-each-key': 'warn', // AGENTS.md verlangt Keys — P7-Pflichtenheft
+			'svelte/no-useless-children-snippet': 'warn',
+			'svelte/prefer-svelte-reactivity': 'warn',
+			'svelte/prefer-writable-derived': 'warn',
+			'@typescript-eslint/no-explicit-any': 'warn'
+		}
+	},
+	{
+		files: ['**/*.svelte', '**/*.svelte.ts'],
+		rules: {
+			// `tick;` in $derived/$effect ist das Svelte-Muster, um eine Abhängigkeit zu lesen.
+			'@typescript-eslint/no-unused-expressions': 'off'
+		}
 	}
 );

@@ -31,7 +31,7 @@ function parseIcs(icsData: string) {
 		const colonIdx = line.indexOf(':');
 		if (colonIdx === -1) continue;
 
-		let keyRaw = line.substring(0, colonIdx);
+		const keyRaw = line.substring(0, colonIdx);
 		const value = line.substring(colonIdx + 1);
 
 		// Remove parameters from key (e.g., DTSTART;TZID=Europe/Berlin)

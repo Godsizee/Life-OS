@@ -3,7 +3,6 @@ import {
 	ACTIVITY_CATALOG,
 	activityLabel,
 	cleanActivities,
-	customActivities,
 	customActivitiesWithCounts,
 	groupedCatalog,
 	isCatalogActivity,

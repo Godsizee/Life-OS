@@ -29,7 +29,6 @@ export interface Suggestion {
 
 export function getSuggestions(): Suggestion[] {
 	const list: Suggestion[] = [];
-	const todayStr = toISODate(new Date());
 
 	// 1. Streak in Gefahr (Streak >= 3 + heute ungeloggt)
 	for (const habit of habitsState.habits.filter((h) => !h.archived)) {
@@ -52,7 +51,6 @@ export function getSuggestions(): Suggestion[] {
 	}
 
 	// 2. Überfällige Tasks (>2 Tage überfällig, ≥2 Tasks)
-	const now = new Date();
 	const twoDaysAgo = new Date();
 	twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 	const overdueTasks = tasksState.tasks.filter((t) => {

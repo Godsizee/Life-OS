@@ -18,15 +18,7 @@
 	import DashboardCard from '#lib/features/dashboard/components/DashboardCard.svelte';
 	import WorkoutMiniCard from '#lib/features/fitness/components/WorkoutMiniCard.svelte';
 
-	import {
-		Sparkles,
-		Calendar,
-		Flame,
-		ShoppingCart,
-		Activity,
-		Notebook,
-		Lock
-	} from '@lucide/svelte';
+	import { Sparkles, Calendar, Flame, ShoppingCart, Notebook, Lock } from '@lucide/svelte';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 

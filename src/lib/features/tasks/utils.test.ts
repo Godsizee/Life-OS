@@ -6,7 +6,6 @@ import {
 	labelUnion,
 	assignColumnPositions,
 	completedOn,
-	completedBetween,
 	filterTasks
 } from './utils';
 import type { Task } from './types';
