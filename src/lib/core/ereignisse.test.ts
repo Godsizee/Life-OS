@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { _alleHandlerEntfernen, emit, MAX_TIEFE, on } from './ereignisse';
+import { _alleHandlerEntfernen, emit, herkunftVon, MAX_TIEFE, NUTZER, on } from './ereignisse';
 
 const warte = () => new Promise((r) => setTimeout(r, 0));
 
@@ -55,5 +55,21 @@ describe('Ereignis-Bus', () => {
 		emit('einkauf.abgehakt', { id: 's1', name: 'Milch' });
 		await warte();
 		expect(fn).not.toHaveBeenCalled();
+	});
+});
+
+describe('herkunftVon', () => {
+	it("liefert 'manual' für den Nutzer", () => {
+		expect(herkunftVon(NUTZER)).toBe('manual');
+	});
+
+	it("liefert 'automation:<regelId>' für eine Automation", () => {
+		expect(herkunftVon({ art: 'automation', regelId: 'sys:training-routine', tiefe: 1 })).toBe(
+			'automation:sys:training-routine'
+		);
+	});
+
+	it("fällt ohne regelId auf 'manual' zurück (die Spalte erlaubt nur diese zwei Formen)", () => {
+		expect(herkunftVon({ art: 'automation', tiefe: 1 })).toBe('manual');
 	});
 });

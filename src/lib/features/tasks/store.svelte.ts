@@ -11,7 +11,6 @@ import { assignColumnPositions } from './utils';
 import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
-import { habitsState } from '#lib/features/habits/store.svelte.js';
 import { emit } from '#lib/core/ereignisse.js';
 
 class TasksState {
@@ -165,15 +164,6 @@ class TasksState {
 		await outbox.runOrQueue('tasks', 'update', { id, status, updated_at, completed_at }, () =>
 			tasksApi.updateRaw({ id, status, updated_at, completed_at })
 		);
-
-		if (status === 'done' && task) {
-			const matchedHabit = habitsState.habits.find(
-				(h) => !h.archived && h.name.toLowerCase() === task.title.toLowerCase()
-			);
-			if (matchedHabit && !habitsState.isDoneToday(matchedHabit.id)) {
-				await habitsState.toggleToday(matchedHabit.id);
-			}
-		}
 
 		if (status === 'done' && task?.rrule) {
 			const nextDate = expandNextOccurrence(task);

@@ -91,3 +91,15 @@ describe('Aktion', () => {
 		expect(run).toHaveBeenCalledOnce();
 	});
 });
+
+describe('zweite Aktion', () => {
+	it('liefert Haupt- und Zweitaktion am selben Toast und fasst sie nicht zusammen', () => {
+		const rueck = { label: 'Rückgängig', run: vi.fn() };
+		const warum = { label: 'Warum?', run: vi.fn() };
+		toastState.withAction('success', 'Routine abgehakt', rueck, 8000, warum);
+		toastState.withAction('success', 'Routine abgehakt', rueck, 8000, warum);
+		expect(toastState.toasts).toHaveLength(2);
+		expect(toastState.toasts[0].action?.label).toBe('Rückgängig');
+		expect(toastState.toasts[0].zweiteAktion?.label).toBe('Warum?');
+	});
+});

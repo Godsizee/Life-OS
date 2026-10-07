@@ -1,4 +1,5 @@
 import { defineModul } from '#lib/core/modul.js';
+import { habitsAktionen } from './aktionen.js';
 import { habitsState } from './store.svelte.js';
 
 export const habitsModul = defineModul({
@@ -7,5 +8,6 @@ export const habitsModul = defineModul({
 		laden: (ws) => habitsState.load(ws),
 		neuLaden: (ws) => habitsState.reload(ws),
 		entladen: () => habitsState.unload()
-	}
+	},
+	aktionen: habitsAktionen
 });

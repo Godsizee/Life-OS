@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fitnessFrequencyScore, workoutsThisWeek } from './frequency';
+import { fitnessFrequencyScore, frequenzScoreAusAnzahl, workoutsThisWeek } from './frequency';
 import type { WorkoutLog } from '../types';
 
 function log(date: string): WorkoutLog {
@@ -50,5 +50,27 @@ describe('fitnessFrequencyScore', () => {
 
 	it('treats a non-positive weekly goal as always satisfied', () => {
 		expect(fitnessFrequencyScore([], 0, thursday)).toBe(100);
+	});
+});
+
+describe('frequenzScoreAusAnzahl', () => {
+	it('liefert für 0–7 Trainingstage an jedem Wochentag denselben Wert wie fitnessFrequencyScore', () => {
+		for (let wochentag = 0; wochentag < 7; wochentag++) {
+			const jetzt = new Date(2026, 5, 22 + wochentag); // Mo … So
+			for (let tage = 0; tage <= 7; tage++) {
+				const logs = Array.from({ length: tage }, (_, i) =>
+					log(`2026-06-${String(22 + i).padStart(2, '0')}`)
+				);
+				for (const ziel of [1, 3, 5]) {
+					expect(frequenzScoreAusAnzahl(workoutsThisWeek(logs, jetzt), ziel, jetzt)).toBe(
+						fitnessFrequencyScore(logs, ziel, jetzt)
+					);
+				}
+			}
+		}
+	});
+
+	it('behandelt ein Wochenziel ≤ 0 als erfüllt', () => {
+		expect(frequenzScoreAusAnzahl(0, 0)).toBe(100);
 	});
 });

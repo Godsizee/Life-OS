@@ -26,10 +26,21 @@ export function fitnessFrequencyScore(
 	weeklyGoal: number,
 	now: Date = new Date()
 ): number {
+	return frequenzScoreAusAnzahl(workoutsThisWeek(logs, now), weeklyGoal, now);
+}
+
+/**
+ * Derselbe Score aus einer fertig gezählten Anzahl. Die Automation `goals.frequenzSetzen`
+ * bekommt nur die Zahl aus dem Ereignis, keine Logs — eine zweite Formel würde auseinanderlaufen.
+ */
+export function frequenzScoreAusAnzahl(
+	trainingstage: number,
+	weeklyGoal: number,
+	now: Date = new Date()
+): number {
 	if (weeklyGoal <= 0) return 100;
 	const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
 	const proRataGoal = (weeklyGoal * dayOfWeek) / 7;
 	if (proRataGoal <= 0) return 100;
-	const done = workoutsThisWeek(logs, now);
-	return Math.min(100, Math.round((done / proRataGoal) * 100));
+	return Math.min(100, Math.round((trainingstage / proRataGoal) * 100));
 }

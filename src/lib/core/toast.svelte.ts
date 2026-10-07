@@ -14,6 +14,8 @@ export interface Toast {
 	/** Wie oft dieselbe Meldung zusammengefasst wurde. 1 = einmalig. */
 	count: number;
 	action?: ToastAction;
+	/** Zweiter Link neben der Hauptaktion, z. B. „Warum?" neben „Rückgängig". */
+	zweiteAktion?: ToastAction;
 }
 
 /**
@@ -45,7 +47,13 @@ function createToastStore() {
 		);
 	}
 
-	function add(type: ToastType, message: string, action?: ToastAction, dauerMs?: number) {
+	function add(
+		type: ToastType,
+		message: string,
+		action?: ToastAction,
+		dauerMs?: number,
+		zweiteAktion?: ToastAction
+	) {
 		// Dieselbe Meldung mehrfach (z. B. sechs Stores scheitern beim Start am
 		// selben Netzfehler) wird gezaehlt statt gestapelt.
 		const vorhanden = toasts.find((t) => t.type === type && t.message === message && !t.action);
@@ -63,7 +71,7 @@ function createToastStore() {
 				toasts.find((t) => t.type !== 'error' && t.type !== 'warning' && !t.action) ?? toasts[0];
 			dismiss(opfer.id);
 		}
-		toasts = [...toasts, { id, type, message, count: 1, action }];
+		toasts = [...toasts, { id, type, message, count: 1, action, zweiteAktion }];
 		planeAusblenden(id, dauerMs ?? DAUER_MS[type]);
 		return id;
 	}
@@ -86,8 +94,13 @@ function createToastStore() {
 		 * Meldung mit einer Aktion, z. B. „Rückgängig". Wird nicht zusammengefasst:
 		 * jede Aktion gehoert zu genau einem Vorgang.
 		 */
-		withAction: (type: ToastType, msg: string, action: ToastAction, dauerMs?: number) =>
-			add(type, msg, action, dauerMs),
+		withAction: (
+			type: ToastType,
+			msg: string,
+			action: ToastAction,
+			dauerMs?: number,
+			zweiteAktion?: ToastAction
+		) => add(type, msg, action, dauerMs, zweiteAktion),
 		dismiss
 	};
 }

@@ -19,6 +19,13 @@ type Handler<T extends LifeEventType> = (e: LifeEvent<T>) => void | Promise<void
 export const MAX_TIEFE = 3;
 export const NUTZER: Ursache = { art: 'nutzer', tiefe: 0 };
 
+/** Herkunft am Datensatz: 'manual' oder 'automation:<regelId>' (Migration 037). */
+export function herkunftVon(ursache: Ursache): string {
+	return ursache.art === 'automation' && ursache.regelId
+		? `automation:${ursache.regelId}`
+		: 'manual';
+}
+
 const handler = new Map<LifeEventType, Set<Handler<LifeEventType>>>();
 
 export function on<T extends LifeEventType>(typ: T, fn: Handler<T>): () => void {

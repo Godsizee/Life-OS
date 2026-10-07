@@ -1,5 +1,6 @@
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
+import { registriereSpeicher } from '#lib/core/einstellungen.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as profileApi from './api';
 import type { ProfileSettings } from './types';
@@ -45,9 +46,12 @@ type ProfileMutation =
 	| { kind: 'display_name'; userId: string; value: string };
 
 class ProfileState {
-	settings = $state<ProfileSettings>({});
+	/** Bestandsschlüssel typisiert; neue Module legen flache Schlüssel '<modul>.<name>' dazu (Zielbild C8). */
+	settings = $state<ProfileSettings & Record<string, unknown>>({});
 	displayName = $state<string | null>(null);
 	loading = $state(false);
+	/** true erst nach erfolgreichem Laden — wer Einstellungen fortschreibt, darf nicht auf einem leeren Stand arbeiten. */
+	loaded = $state(false);
 	private userId: string | null = null;
 
 	constructor() {
@@ -58,6 +62,11 @@ class ProfileState {
 					? profileApi.mergeSettings(m.patch)
 					: profileApi.updateDisplayName(m.userId, m.value);
 			}
+		});
+		// Typisierter Zugriff für Module (core/einstellungen.ts): lesen reaktiv, schreiben über die Outbox.
+		registriereSpeicher('nutzer', {
+			lesen: (k) => this.settings[k],
+			schreiben: (patch) => this.setSettings(patch as Partial<ProfileSettings>)
 		});
 	}
 
@@ -99,11 +108,15 @@ class ProfileState {
 		// Standardwerte (8 Gläser, 25 min) statt seiner eigenen Ziele.
 		const ok = await ladeSicher('Einstellungen', async () => {
 			const profile = await profileApi.getProfile(uId);
-			this.settings = profile.settings;
+			this.settings = { ...profile.settings };
 			this.displayName = profile.display_name;
 		});
 		this.loading = false;
-		if (!ok) this.userId = null; // naechster Aufruf versucht es erneut
+		if (!ok) {
+			this.userId = null; // naechster Aufruf versucht es erneut
+			return;
+		}
+		this.loaded = true;
 	}
 
 	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
@@ -115,6 +128,7 @@ class ProfileState {
 	unload() {
 		this.settings = {};
 		this.displayName = null;
+		this.loaded = false;
 		this.userId = null;
 	}
 

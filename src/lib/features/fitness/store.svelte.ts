@@ -1,4 +1,6 @@
 import { neueId } from '#lib/core/id.js';
+import { toISODate } from '#lib/core/date.js';
+import { toastState } from '#lib/core/toast.svelte.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
@@ -24,12 +26,13 @@ import type {
 import { emit } from '#lib/core/ereignisse.js';
 import { bestPerExercise, type ExerciseBest } from './utils/1rm';
 import { workoutsThisWeek } from './utils/frequency';
-import {
-	autoLogTrainingHabit,
-	applyPRsToGoals,
-	applyFrequencyToGoals,
-	announcePRs
-} from './integration';
+
+/** Feuert Toasts für neue persönliche Rekorde (Modul-UI; die Folgen für Ziele laufen über die Regeln). */
+export function announcePRs(prs: ExerciseBest[]): void {
+	for (const pr of prs) {
+		toastState.success(`🎉 Neuer PR: ${pr.exercise_name} — ${pr.est_1rm} kg (geschätztes 1RM)`);
+	}
+}
 
 class FitnessState {
 	plans = $state<WorkoutPlan[]>([]);
@@ -331,7 +334,8 @@ class FitnessState {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const logId = neueId();
 		const now = new Date().toISOString();
-		const todayStr = now.split('T')[0];
+		// Lokaler Kalendertag, nicht der UTC-Tag: ein Training nach Mitternacht (Ortszeit) gehört zum neuen Tag.
+		const todayStr = toISODate(new Date());
 
 		const log: WorkoutLog = {
 			id: logId,
@@ -373,17 +377,10 @@ class FitnessState {
 			this.allSetLogs = [...this.allSetLogs, ...completed];
 		}
 
-		// ── Welle 5.3: PR-Erkennung + Cross-Modul-Integration ────────────────
+		// ── Welle 5.3: PR-Erkennung. Routinen und Ziele reagieren über Regeln auf training.beendet (T205). ──
 		const newPRs = await this.detectAndPersistPRs(setLogs, now);
-		autoLogTrainingHabit();
-		applyFrequencyToGoals(this.logs);
-		if (newPRs.length > 0) {
-			const toAnnounce = newPRs.filter(
-				(pr) => !alreadyAnnounced.has(pr.exercise_name.toLowerCase())
-			);
-			if (toAnnounce.length > 0) announcePRs(toAnnounce);
-			applyPRsToGoals(newPRs);
-		}
+		const toAnnounce = newPRs.filter((pr) => !alreadyAnnounced.has(pr.exercise_name.toLowerCase()));
+		if (toAnnounce.length > 0) announcePRs(toAnnounce);
 
 		// Erst hier, weil neueRekorde die PR-Erkennung braucht (läuft nach dem Server-Insert).
 		emit('training.beendet', {

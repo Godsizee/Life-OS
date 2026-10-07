@@ -7,6 +7,7 @@ import { ladeSicher } from '#lib/core/store-load.js';
 import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as moodApi from './api';
 import { cleanActivities } from './activities';
+import { checkinAnfrage } from './checkin-anfrage.svelte.js';
 import { moodInputSchema } from './schema';
 import { tiefeTageInFolge } from './stats';
 import type { MoodEntry } from './types';
@@ -197,6 +198,8 @@ class MoodState {
 		};
 
 		this.mergeLocal(row);
+		// Wer seine Stimmung einträgt, hat die Bitte um einen Check-in damit erfüllt.
+		checkinAnfrage.loesche();
 		emit('stimmung.erfasst', {
 			id: row.id,
 			datum: row.date,

@@ -4,13 +4,12 @@ import { neueId } from '#lib/core/id.js';
 // App-Wechsel sie nicht verwirft. Draft in localStorage, Vorbild focus/store.svelte.ts
 // (kein Shared-Wrapper im Projekt — jedes Feature persistiert selbst).
 import { alarm } from '#lib/core/alert.svelte.js';
-import { fitnessState } from './store.svelte';
+import { fitnessState, announcePRs } from './store.svelte';
 import * as fitnessApi from './api';
 import { estimateOneRepMax } from './utils/1rm';
 import { effectiveWeight, isBodyweightExercise } from './utils/volume';
 import { healthState } from '#lib/features/health/store.svelte.js';
 import { weightTrend } from '#lib/features/health/stats.js';
-import { announcePRs } from './integration';
 import type { ActiveSetLog, ExerciseType, PickedExercise, SetType, WorkoutSetLog } from './types';
 
 const DRAFT_KEY = 'lifeos:fitness:draft';

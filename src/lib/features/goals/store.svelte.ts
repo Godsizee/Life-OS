@@ -2,7 +2,7 @@ import { neueId } from '#lib/core/id.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { toISODate } from '#lib/core/date.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
-import { emit } from '#lib/core/ereignisse.js';
+import { emit, NUTZER, type Ursache } from '#lib/core/ereignisse.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as goalsApi from './api';
@@ -227,7 +227,11 @@ class GoalsState {
 		return this.checkins.filter((c) => c.goal_id === goalId);
 	}
 
-	async addCheckin(input: { goal_id: string; date: string; value: number; note?: string | null }) {
+	async addCheckin(
+		input: { goal_id: string; date: string; value: number; note?: string | null },
+		herkunft = 'manual',
+		ursache: Ursache = NUTZER
+	) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = goalCheckinInputSchema.parse(input);
 		const row: GoalCheckin = {
@@ -238,10 +242,11 @@ class GoalsState {
 			date: parsed.date,
 			value: parsed.value,
 			note: parsed.note ?? null,
+			source: herkunft,
 			created_at: new Date().toISOString()
 		};
 		this.checkins = [row, ...this.checkins];
-		emit('ziel.checkin', { zielId: row.goal_id, wert: row.value });
+		emit('ziel.checkin', { zielId: row.goal_id, wert: row.value }, ursache);
 		// Ein Check-in ist Fortschritt: das Ziel gilt ab jetzt als "in Arbeit".
 		const goal = this.goals.find((g) => g.id === parsed.goal_id);
 		if (goal?.status === 'open') void this.setStatus(goal.id, 'in_progress');
@@ -278,7 +283,8 @@ class GoalsState {
 		mood: string | null,
 		body: string,
 		context: DayContext | null = null,
-		kind: JournalKind = 'daily'
+		kind: JournalKind = 'daily',
+		ursache: Ursache = NUTZER
 	) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const parsed = journalEntryInputSchema.parse({ date, mood, body, kind });
@@ -303,7 +309,9 @@ class GoalsState {
 			? this.journalEntries.map((j) => (j.id === entry.id ? entry : j))
 			: [entry, ...this.journalEntries];
 		// ensureEntry() legt leere Platzhalter für Anhänge an — die zählen nicht als Tagebucheintrag.
-		if (entry.body.trim()) emit('tagebuch.gespeichert', { datum: entry.date, art: entry.kind });
+		if (entry.body.trim()) {
+			emit('tagebuch.gespeichert', { datum: entry.date, art: entry.kind }, ursache);
+		}
 		await outbox.runOrQueue('journal_entries', existing ? 'update' : 'insert', entry, () =>
 			goalsApi.upsertJournalEntry(entry)
 		);

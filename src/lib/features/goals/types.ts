@@ -35,6 +35,8 @@ export interface GoalCheckin {
 	/** numeric in Postgres — kann als String ankommen, immer über checkinValue() lesen. */
 	value: number;
 	note: string | null;
+	/** 'manual' oder 'automation:<regelId>' (Migration 037). Wird bei jedem Schreiben mitgesendet. */
+	source: string;
 	created_at: string;
 }
 

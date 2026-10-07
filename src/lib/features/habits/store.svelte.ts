@@ -7,7 +7,7 @@ import * as habitsApi from './api';
 import { habitInputSchema, habitPatchSchema, type HabitInput, type HabitPatch } from './schema';
 import { isCompleted, isSkipped, toHabitDays, toISODate, type HabitDay } from './streak';
 import type { Habit, HabitLog, HabitLogStatus } from './types';
-import { emit } from '#lib/core/ereignisse.js';
+import { emit, NUTZER, type Ursache } from '#lib/core/ereignisse.js';
 
 class HabitsState {
 	habits = $state<Habit[]>([]);
@@ -196,13 +196,29 @@ class HabitsState {
 		await this.updateHabit(id, { goal_id });
 	}
 
+	/** Der Eintrag einer Routine an einem Tag (nur der eigene Nutzer, es gibt höchstens einen). */
+	logAm(habitId: string, datum: string): HabitLog | undefined {
+		return this.logs.find((l) => l.habit_id === habitId && l.date === datum);
+	}
+
 	/**
 	 * Einziger Schreibpfad für Tages-Logs.
 	 * value <= 0 && status === 'done'  -> Log löschen (Tag ist wieder „nichts").
 	 * Es gibt genau EINE Zeile je (habit, user, date) — deshalb update statt insert,
 	 * sobald eine existiert (DB-Constraint `unique (habit_id, user_id, date)`).
+	 *
+	 * `herkunft` wird bei JEDEM Schreiben mitgesendet (Migration 037): Der Default der
+	 * Spalte greift nur beim Insert — ohne das bliebe nach einer manuellen Änderung
+	 * 'automation:…' stehen.
 	 */
-	private async writeDay(habitId: string, dateStr: string, value: number, status: HabitLogStatus) {
+	async writeDay(
+		habitId: string,
+		dateStr: string,
+		value: number,
+		status: HabitLogStatus,
+		herkunft = 'manual',
+		ursache: Ursache = NUTZER
+	) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
 		const existing = this.logs.find((l) => l.habit_id === habitId && l.date === dateStr);
 
@@ -214,9 +230,11 @@ class HabitsState {
 				);
 				return;
 			}
-			const patch = { id: existing.id, value, status };
-			this.logs = this.logs.map((l) => (l.id === existing.id ? { ...l, value, status } : l));
-			this.meldeTag(habitId, dateStr, value, status);
+			const patch = { id: existing.id, value, status, source: herkunft };
+			this.logs = this.logs.map((l) =>
+				l.id === existing.id ? { ...l, value, status, source: herkunft } : l
+			);
+			this.meldeTag(habitId, dateStr, value, status, ursache);
 			await outbox.runOrQueue('habit_logs', 'update', patch, () => habitsApi.updateLog(patch));
 			return;
 		}
@@ -230,61 +248,68 @@ class HabitsState {
 			date: dateStr,
 			value,
 			status,
+			source: herkunft,
 			created_at: new Date().toISOString()
 		};
 		this.logs = [...this.logs, log];
-		this.meldeTag(habitId, dateStr, value, status);
+		this.meldeTag(habitId, dateStr, value, status, ursache);
 		await outbox.runOrQueue('habit_logs', 'insert', log, () => habitsApi.insertLog(log));
 	}
 
 	/** Meldet „erledigt" nur, wenn der Tag danach wirklich erledigt ist (Mengen-Routine: Ziel erreicht). */
-	private meldeTag(habitId: string, datum: string, value: number, status: HabitLogStatus) {
+	private meldeTag(
+		habitId: string,
+		datum: string,
+		value: number,
+		status: HabitLogStatus,
+		ursache: Ursache
+	) {
 		if (status === 'skipped') {
-			emit('routine.uebersprungen', { habitId, datum });
+			emit('routine.uebersprungen', { habitId, datum }, ursache);
 			return;
 		}
 		if (value >= this.targetOf(habitId)) {
-			emit('routine.erledigt', { habitId, datum, wert: value });
+			emit('routine.erledigt', { habitId, datum, wert: value }, ursache);
 		}
 	}
 
-	private targetOf(habitId: string): number {
+	targetOf(habitId: string): number {
 		const t = this.habitById(habitId)?.target_value ?? null;
 		return t && t > 0 ? t : 1;
 	}
 
 	/** Häkchen-Verhalten: erledigt <-> nicht erledigt (auch für Mengen-Routinen nutzbar). */
-	async toggleToday(habitId: string) {
+	async toggleToday(habitId: string, herkunft = 'manual') {
 		const today = toISODate(new Date());
 		if (this.isDoneToday(habitId)) {
-			await this.writeDay(habitId, today, 0, 'done');
+			await this.writeDay(habitId, today, 0, 'done', herkunft);
 			return;
 		}
-		await this.writeDay(habitId, today, this.targetOf(habitId), 'done');
+		await this.writeDay(habitId, today, this.targetOf(habitId), 'done', herkunft);
 	}
 
 	/** Mengen-Routine: +delta (Standard +1), gedeckelt auf den Zielwert. */
-	async incrementToday(habitId: string, delta = 1) {
+	async incrementToday(habitId: string, delta = 1, herkunft = 'manual') {
 		const today = toISODate(new Date());
 		const target = this.targetOf(habitId);
 		const current = this.isSkippedToday(habitId) ? 0 : this.valueToday(habitId);
 		const next = Math.max(0, Math.min(target, current + delta));
-		await this.writeDay(habitId, today, next, 'done');
+		await this.writeDay(habitId, today, next, 'done', herkunft);
 	}
 
-	async setValueToday(habitId: string, value: number) {
+	async setValueToday(habitId: string, value: number, herkunft = 'manual') {
 		const today = toISODate(new Date());
-		await this.writeDay(habitId, today, Math.max(0, value), 'done');
+		await this.writeDay(habitId, today, Math.max(0, value), 'done', herkunft);
 	}
 
 	/** Skip hält den Streak, zählt aber nicht als erledigt. Erneutes Aufrufen hebt ihn auf. */
-	async toggleSkipToday(habitId: string) {
+	async toggleSkipToday(habitId: string, herkunft = 'manual') {
 		const today = toISODate(new Date());
 		if (this.isSkippedToday(habitId)) {
-			await this.writeDay(habitId, today, 0, 'done'); // -> löscht die Zeile
+			await this.writeDay(habitId, today, 0, 'done', herkunft); // -> löscht die Zeile
 			return;
 		}
-		await this.writeDay(habitId, today, 0, 'skipped');
+		await this.writeDay(habitId, today, 0, 'skipped', herkunft);
 	}
 
 	async archiveHabit(id: string) {

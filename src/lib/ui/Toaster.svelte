@@ -59,6 +59,17 @@
 					{toast.action.label}
 				</button>
 			{/if}
+			{#if toast.zweiteAktion}
+				<button
+					onclick={() => {
+						toast.zweiteAktion?.run();
+						toastState.dismiss(toast.id);
+					}}
+					class="min-h-8 shrink-0 rounded-lg px-2 text-sm font-semibold underline underline-offset-2 hover:bg-black/5 dark:hover:bg-white/10"
+				>
+					{toast.zweiteAktion.label}
+				</button>
+			{/if}
 			<button
 				onclick={() => toastState.dismiss(toast.id)}
 				aria-label="Meldung schließen"

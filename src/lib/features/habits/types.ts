@@ -32,5 +32,7 @@ export interface HabitLog {
 	value: number | null;
 	/** W5: 'skipped' hält den Streak, zählt aber nicht als erledigt. */
 	status: HabitLogStatus;
+	/** 'manual' oder 'automation:<regelId>' (Migration 037). Wird bei jedem Schreiben mitgesendet. */
+	source: string;
 	created_at: string;
 }

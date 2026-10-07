@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { moodState } from '#lib/features/mood/store.svelte.js';
+	import { checkinAnfrage } from '#lib/features/mood/checkin-anfrage.svelte.js';
+	import Alert from '#lib/ui/Alert.svelte';
 	import MoodPicker from '#lib/features/mood/components/MoodPicker.svelte';
 	import ActivityPicker from '#lib/features/mood/components/ActivityPicker.svelte';
 	import YearInPixels from '#lib/features/mood/components/YearInPixels.svelte';
@@ -88,6 +90,22 @@
 </svelte:head>
 
 <PageHeader title="Wie geht's dir?" subtitle={formatDate(new Date())} />
+
+{#if checkinAnfrage.anlass}
+	<div class="mb-4">
+		<Alert variant="info">
+			Wie fühlst du dich? Anlass: {checkinAnfrage.anlass}.
+			{#snippet action()}
+				<button
+					onclick={() => checkinAnfrage.loesche()}
+					class="min-h-8 rounded-lg px-1 text-sm font-semibold underline underline-offset-2"
+				>
+					Später
+				</button>
+			{/snippet}
+		</Alert>
+	</div>
+{/if}
 
 <div class="flex flex-col gap-4 pb-8">
 	<!-- Heute -->

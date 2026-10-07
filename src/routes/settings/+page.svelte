@@ -401,6 +401,22 @@
 		</div>
 	</section>
 
+	<!-- Verknüpfungen -->
+	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
+		<h2 class="mb-3 text-sm font-semibold text-text-primary">Verknüpfungen</h2>
+		<SettingRow
+			label="Module verbinden"
+			hint="z. B. Training hakt eine Routine ab. Sichtbar, abschaltbar, mit Rückgängig."
+		>
+			<a
+				href="/settings/automationen"
+				class="inline-flex min-h-10 items-center text-sm font-semibold text-primary-700 underline underline-offset-2 dark:text-primary-300"
+			>
+				Öffnen
+			</a>
+		</SettingRow>
+	</section>
+
 	<!-- Haushalt -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<h2 class="mb-3 text-sm font-semibold text-text-primary">

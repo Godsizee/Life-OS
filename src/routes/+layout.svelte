@@ -8,6 +8,7 @@
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import { ladeAlles, entladeAlles } from '#lib/system/daten.js';
 	import { starteSystem } from '#lib/system/start.js';
+	import { richteAutomationenEin } from '#lib/system/automationen.js';
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
@@ -112,7 +113,10 @@
 				.load()
 				.then(async () => {
 					const id = workspaceState.workspace?.id;
-					if (id) await ladeAlles(id);
+					if (id) {
+						await ladeAlles(id);
+						await richteAutomationenEin();
+					}
 					await outbox.replay();
 				})
 				// Ohne catch blieb hier eine unbehandelte Rejection stehen und das
