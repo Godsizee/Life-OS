@@ -258,7 +258,9 @@ class LiveWorkoutState {
 	}
 
 	assignSupersetGroup(exerciseName: string, groupId: number) {
-		this.sets = this.sets.map(s => s.exercise_name === exerciseName ? { ...s, superset_group: groupId } : s);
+		this.sets = this.sets.map((s) =>
+			s.exercise_name === exerciseName ? { ...s, superset_group: groupId } : s
+		);
 	}
 
 	removeSet(id: string) {
@@ -295,7 +297,7 @@ class LiveWorkoutState {
 		if (this.announcedPRs.has(key)) return;
 
 		let effW = set.weight_kg;
-		const entry = fitnessState.catalog.find(c => c.id === set.exercise_id);
+		const entry = fitnessState.catalog.find((c) => c.id === set.exercise_id);
 		if (entry) {
 			const bodyWeightKg = weightTrend(healthState.entries, 30)?.last ?? null;
 			effW = effectiveWeight(
@@ -309,7 +311,9 @@ class LiveWorkoutState {
 		const existingPR = fitnessState.prFor(set.exercise_name);
 		if (existingPR && est1rm <= existingPR.est_1rm) return;
 		this.announcedPRs.add(key);
-		announcePRs([{ exercise_name: set.exercise_name, weight_kg: effW, reps: set.reps, est_1rm: est1rm }]);
+		announcePRs([
+			{ exercise_name: set.exercise_name, weight_kg: effW, reps: set.reps, est_1rm: est1rm }
+		]);
 	}
 
 	elapsedMinutes(): number | null {

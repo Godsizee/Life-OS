@@ -1,12 +1,7 @@
 <script lang="ts">
 	import { Bell, Trash2 } from '@lucide/svelte';
 	import { remindersState } from '../store.svelte';
-	import {
-		formatReminder,
-		offsetLabel,
-		reminderAtFromAnchor,
-		reminderAtOnDate
-	} from '../schedule';
+	import { formatReminder, offsetLabel, reminderAtFromAnchor, reminderAtOnDate } from '../schedule';
 	import type { ReminderEntityType } from '../types';
 	import { toISODate } from '#lib/core/date.js';
 	import { toastState } from '#lib/core/toast.svelte.js';

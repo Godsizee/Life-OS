@@ -14,16 +14,16 @@ für Navigation und Plan-Gating registriert (OCP).
 
 ## v1 — Module
 
-| Modul | Kern-Funktion v1 | Geteilt / Persönlich |
-|---|---|---|
-| **Heute** | Aggregiert fällige Aufgaben, heutige Termine, offene Gewohnheiten, Einkaufs-Highlights | abgeleitet |
-| **Aufgaben & Projekte** | CRUD, Status, Priorität, Fälligkeit, Zuweisung, Wiederholung (rrule), Sortierung | geteilt |
-| **Notizen** | Schnellerfassung, Tags, Pinnen, Markdown-Body, Volltextsuche | geteilt |
-| **Gewohnheiten** | Tages-/Wochen-Routinen, Ziel-Mengen, Skips, **Streaks**, Verlauf | geteilt (Logs je Person) |
-| **Kalender** | Termine, All-Day/Recurrence, **ICS-Abo** (read), Erinnerungen | geteilt |
-| **Einkauf & Haushalt** | Gemeinsame Liste in Echtzeit, Mengen, Abhaken, Auto-Aufräumen | geteilt |
-| **Ziele & Tagebuch** | Ziele/OKRs mit Fortschritt + persönliches Journal & Stimmungs-Check-in | Ziele geteilt, Tagebuch **persönlich** |
-| **Fokus-Modus & Zeiterfassung** | Timestamp-basierter Pomodoro-Timer, konfigurierbare Dauern, Pausen-Verkettung, Zeit-Auswertung, manuelle Zeiteinträge | **persönlich** |
+| Modul                           | Kern-Funktion v1                                                                                                      | Geteilt / Persönlich                   |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **Heute**                       | Aggregiert fällige Aufgaben, heutige Termine, offene Gewohnheiten, Einkaufs-Highlights                                | abgeleitet                             |
+| **Aufgaben & Projekte**         | CRUD, Status, Priorität, Fälligkeit, Zuweisung, Wiederholung (rrule), Sortierung                                      | geteilt                                |
+| **Notizen**                     | Schnellerfassung, Tags, Pinnen, Markdown-Body, Volltextsuche                                                          | geteilt                                |
+| **Gewohnheiten**                | Tages-/Wochen-Routinen, Ziel-Mengen, Skips, **Streaks**, Verlauf                                                      | geteilt (Logs je Person)               |
+| **Kalender**                    | Termine, All-Day/Recurrence, **ICS-Abo** (read), Erinnerungen                                                         | geteilt                                |
+| **Einkauf & Haushalt**          | Gemeinsame Liste in Echtzeit, Mengen, Abhaken, Auto-Aufräumen                                                         | geteilt                                |
+| **Ziele & Tagebuch**            | Ziele/OKRs mit Fortschritt + persönliches Journal & Stimmungs-Check-in                                                | Ziele geteilt, Tagebuch **persönlich** |
+| **Fokus-Modus & Zeiterfassung** | Timestamp-basierter Pomodoro-Timer, konfigurierbare Dauern, Pausen-Verkettung, Zeit-Auswertung, manuelle Zeiteinträge | **persönlich**                         |
 
 > [!note] Wiederholungslogik
 > rrule-Auswertung für Aufgaben/Gewohnheiten lebt **serverseitig** (Edge Function).
@@ -34,13 +34,13 @@ für Navigation und Plan-Gating registriert (OCP).
 ```ts
 // lib/config/modules.ts
 export const modules = [
-  { id: 'dashboard', label: 'Heute',     icon: Home,     route: '/',          plan: 'free' },
-  { id: 'tasks',     label: 'Aufgaben',  icon: CheckSq,  route: '/tasks',     plan: 'free' },
-  { id: 'notes',     label: 'Notizen',   icon: FileText, route: '/notes',     plan: 'free' },
-  { id: 'habits',    label: 'Routinen',  icon: Repeat,   route: '/habits',    plan: 'free' },
-  { id: 'calendar',  label: 'Kalender',  icon: Calendar, route: '/calendar',  plan: 'free' },
-  { id: 'shopping',  label: 'Einkauf',   icon: Cart,     route: '/shopping',  plan: 'free' },
-  { id: 'goals',     label: 'Ziele',     icon: Target,   route: '/goals',     plan: 'free' },
+	{ id: 'dashboard', label: 'Heute', icon: Home, route: '/', plan: 'free' },
+	{ id: 'tasks', label: 'Aufgaben', icon: CheckSq, route: '/tasks', plan: 'free' },
+	{ id: 'notes', label: 'Notizen', icon: FileText, route: '/notes', plan: 'free' },
+	{ id: 'habits', label: 'Routinen', icon: Repeat, route: '/habits', plan: 'free' },
+	{ id: 'calendar', label: 'Kalender', icon: Calendar, route: '/calendar', plan: 'free' },
+	{ id: 'shopping', label: 'Einkauf', icon: Cart, route: '/shopping', plan: 'free' },
+	{ id: 'goals', label: 'Ziele', icon: Target, route: '/goals', plan: 'free' }
 ] as const;
 ```
 

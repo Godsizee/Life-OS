@@ -22,12 +22,12 @@
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
 		if (!title.trim()) return;
-		
+
 		const p = parseTaskInput(title);
 		const project = p.project_name
 			? tasksState.projects.find((pr) => pr.name.toLowerCase() === p.project_name!.toLowerCase())
 			: null;
-		
+
 		await tasksState.addTask({
 			title: p.title,
 			priority: p.priority,
@@ -47,9 +47,9 @@
 <form onsubmit={submit} class="flex flex-col gap-2">
 	<Input placeholder="Neue Aufgabe…" bind:value={title} required />
 	{#if title.trim()}
-		<div class="flex flex-wrap gap-1 mt-1">
+		<div class="mt-1 flex flex-wrap gap-1">
 			{#if parsed.priority === 'high'}
-				<Chip><span class="text-red-500 font-bold">Wichtig</span></Chip>
+				<Chip><span class="font-bold text-red-500">Wichtig</span></Chip>
 			{/if}
 			{#if parsed.priority === 'low'}
 				<Chip><span class="text-slate-400">Später</span></Chip>
@@ -69,16 +69,16 @@
 		</div>
 	{/if}
 
-	<button 
-		type="button" 
-		class="text-left text-sm text-primary-600 hover:underline flex items-center"
-		onclick={() => showMore = !showMore}
+	<button
+		type="button"
+		class="flex items-center text-left text-sm text-primary-600 hover:underline"
+		onclick={() => (showMore = !showMore)}
 	>
 		{showMore ? 'Weniger Optionen ▲' : 'Mehr Optionen ▼'}
 	</button>
 
 	{#if showMore}
-		<div class="flex flex-col gap-2 p-2 bg-surface-2 rounded-lg border border-border-color">
+		<div class="flex flex-col gap-2 rounded-lg border border-border-color bg-surface-2 p-2">
 			{#if tasksState.projects.length > 0}
 				<Select bind:value={projectId}>
 					<option value="">Kein Projekt</option>
@@ -96,8 +96,10 @@
 				</Select>
 			{/if}
 			<div class="text-sm">
-				<label for="task-recurrence" class="block mb-1 text-text-secondary">Wiederholung (falls nicht getippt):</label>
-				<RecurrenceField id="task-recurrence" value={rrule} onchange={(v) => rrule = v} />
+				<label for="task-recurrence" class="mb-1 block text-text-secondary"
+					>Wiederholung (falls nicht getippt):</label
+				>
+				<RecurrenceField id="task-recurrence" value={rrule} onchange={(v) => (rrule = v)} />
 			</div>
 		</div>
 	{/if}

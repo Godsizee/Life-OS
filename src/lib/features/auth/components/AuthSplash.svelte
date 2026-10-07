@@ -9,7 +9,7 @@
 -->
 <div class="flex min-h-dvh flex-col items-center justify-center gap-3 px-4">
 	<div class="auth-enter flex flex-col items-center gap-3" style="--stagger: 180ms">
-		<img src="/favicon.svg" alt="" class="h-14 w-14 rounded-2xl elevation-1 animate-pulse-subtle" />
+		<img src="/favicon.svg" alt="" class="elevation-1 animate-pulse-subtle h-14 w-14 rounded-2xl" />
 		<span class="text-sm text-text-secondary">Life OS wird geladen…</span>
 	</div>
 </div>

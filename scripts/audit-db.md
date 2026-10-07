@@ -1,16 +1,16 @@
 # DB-Audit — Ausführung und Einordnung
 
 `scripts/audit-db.sql` im Supabase-SQL-Editor ausführen (**Dashboard → SQL Editor → New query**,
-Inhalt einfügen, *Run*). Das Skript ist read-only.
+Inhalt einfügen, _Run_). Das Skript ist read-only.
 
 Es liefert bewusst **ein einziges Ergebnis** mit den Spalten `bereich`, `objekt`, `status`,
 `befund` — der SQL-Editor zeigt sonst nur die letzte Anweisung an. Sortiert ist nach `status`:
 
-| `status` | Bedeutung |
-|---|---|
+| `status`  | Bedeutung                                        |
+| --------- | ------------------------------------------------ |
 | `PROBLEM` | Muss behoben werden, Einordnung je Bereich unten |
-| `hinweis` | Unkritisch, aber erwähnenswert |
-| `ok` | Wie erwartet |
+| `hinweis` | Unkritisch, aber erwähnenswert                   |
+| `ok`      | Wie erwartet                                     |
 
 **Alles in Ordnung, wenn keine Zeile `PROBLEM` zeigt.**
 
@@ -22,12 +22,12 @@ Hintergrund und Fundstellen: Plan „Life OS — Gesamt-Review", Teil A und C.
 
 Eine Zeile je Tabelle, die der Client benutzt (31 Stück).
 
-| `befund` | Bedeutung | Konsequenz |
-|---|---|---|
+| `befund`                       | Bedeutung                                                                 | Konsequenz                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `FEHLT — Migration nachziehen` | Tabelle ist in keiner Migration angelegt und existiert auch nicht in Prod | Modul ist tot. Erwartet für `life_scores`, `workout_*` **nur dann**, wenn sie auch live nie existierten |
-| `Tabelle FEHLT` | existiert nicht in Prod | Modul ist tot |
-| `RLS AUS` | Tabelle existiert, aber ohne Row Level Security | **Jeder eingeloggte Nutzer liest alle Workspaces.** Sofort beheben |
-| `RLS an, aber KEINE Policy` | RLS aktiv, keine Policy definiert | Tabelle ist für alle Clients dicht — Feature liefert leere Listen |
+| `Tabelle FEHLT`                | existiert nicht in Prod                                                   | Modul ist tot                                                                                           |
+| `RLS AUS`                      | Tabelle existiert, aber ohne Row Level Security                           | **Jeder eingeloggte Nutzer liest alle Workspaces.** Sofort beheben                                      |
+| `RLS an, aber KEINE Policy`    | RLS aktiv, keine Policy definiert                                         | Tabelle ist für alle Clients dicht — Feature liefert leere Listen                                       |
 
 **Der entscheidende Punkt:** Haben `workout_plans`, `workout_exercises`, `workout_logs`,
 `workout_set_logs` und `life_scores` RLS **und** mindestens eine Policy? Diese fünf Tabellen sind in
@@ -54,11 +54,11 @@ DO-Guards wie in Migration 17) ablegen.
 
 Eine Zeile je Tabelle, die ein Store per `subscribeToTable()` abonniert (22 Stück).
 
-| `befund` | Bedeutung |
-|---|---|
-| `NICHT publiziert` | Der Channel wird aufgebaut, es kommt nie ein Event. Kein Live-Sync für dieses Modul |
-| `replica identity = d` | INSERT/UPDATE funktionieren, DELETE nicht: Postgres schreibt bei `default` nur den Primärschlüssel ins WAL, der Filter `workspace_id=eq.<id>` in `src/lib/core/realtime.ts:18` verwirft das Event deshalb |
-| `publiziert + replica identity full` | wie gewünscht |
+| `befund`                             | Bedeutung                                                                                                                                                                                                 |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NICHT publiziert`                   | Der Channel wird aufgebaut, es kommt nie ein Event. Kein Live-Sync für dieses Modul                                                                                                                       |
+| `replica identity = d`               | INSERT/UPDATE funktionieren, DELETE nicht: Postgres schreibt bei `default` nur den Primärschlüssel ins WAL, der Filter `workspace_id=eq.<id>` in `src/lib/core/realtime.ts:18` verwirft das Event deshalb |
+| `publiziert + replica identity full` | wie gewünscht                                                                                                                                                                                             |
 
 `replica identity = default` ist der Auslieferungszustand jeder Tabelle — vor Migration 20 war
 das der Normalfall und bestätigt Befund A2. **Nach Migration 20 muss hier jede Zeile `ok` sein.**
@@ -73,11 +73,11 @@ abonniert (z. B. `calendars`, `personal_records`). Unkritisch, kostet nur WAL-Ba
 PostgREST kappt Antworten bei `max-rows` (Supabase-Default **1000**) und meldet dabei **keinen
 Fehler** — der Client bekommt einfach weniger Zeilen als es gibt.
 
-| `status` | Bedeutung |
-|---|---|
+| `status`          | Bedeutung                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `PROBLEM` ab 1000 | Der Datenverlust **war aktiv**: Streaks, Year-in-Pixels, Analytics-Historie und Weekly Review rechneten mit unvollständigen Daten |
-| `PROBLEM` ab 900 | Innerhalb weniger Wochen betroffen |
-| `ok` | unkritisch |
+| `PROBLEM` ab 900  | Innerhalb weniger Wochen betroffen                                                                                                |
+| `ok`              | unkritisch                                                                                                                        |
 
 Am schnellsten wachsen `habit_logs` (Anzahl Routinen × Tage), `workout_set_logs` und
 `time_entries`. `exercise_catalog` startet bereits bei 821 Zeilen (wger-Seed).
@@ -114,11 +114,11 @@ curl -X POST "https://<project-id>.supabase.co/functions/v1/lifeos-reminder-disp
   -d '{"limit":10}'
 ```
 
-| Antwort | Bedeutung |
-|---|---|
-| `404` | Function nicht deployed — Erinnerungen feuern nie |
-| `401` | deployed, aber `LIFEOS_INTAKE_TOKEN` stimmt nicht |
-| `{"claimed":0,"sent":0,"removed":0,"cleaned":0}` | Function läuft |
+| Antwort                                          | Bedeutung                                         |
+| ------------------------------------------------ | ------------------------------------------------- |
+| `404`                                            | Function nicht deployed — Erinnerungen feuern nie |
+| `401`                                            | deployed, aber `LIFEOS_INTAKE_TOKEN` stimmt nicht |
+| `{"claimed":0,"sent":0,"removed":0,"cleaned":0}` | Function läuft                                    |
 
 Auch wenn die Function antwortet: Es braucht einen **Auslöser**. Ohne `pg_cron`-Job oder n8n-Schedule
 wird sie nie von selbst aufgerufen. Prüfen mit:

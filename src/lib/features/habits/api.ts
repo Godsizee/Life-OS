@@ -39,12 +39,7 @@ export async function insertRaw(habit: Habit): Promise<Habit> {
 
 export async function updateRaw(patch: Partial<Habit> & { id: string }): Promise<Habit> {
 	const { id, ...rest } = patch;
-	const { data, error } = await supabase
-		.from('habits')
-		.update(rest)
-		.eq('id', id)
-		.select()
-		.single();
+	const { data, error } = await supabase.from('habits').update(rest).eq('id', id).select().single();
 	if (error) throw error;
 	return data;
 }

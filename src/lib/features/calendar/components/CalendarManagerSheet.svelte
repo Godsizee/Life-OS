@@ -5,10 +5,7 @@
 	import { calendarState } from '../store.svelte';
 	import { Trash2, Link as LinkIcon } from '@lucide/svelte';
 
-	let {
-		open = $bindable(false),
-		hiddenCalendarIds = $bindable<string[]>([])
-	} = $props();
+	let { open = $bindable(false), hiddenCalendarIds = $bindable<string[]>([]) } = $props();
 
 	const CALENDAR_COLORS = [
 		'#6366f1',
@@ -31,7 +28,7 @@
 
 	function toggleHidden(id: string) {
 		if (hiddenCalendarIds.includes(id)) {
-			hiddenCalendarIds = hiddenCalendarIds.filter(x => x !== id);
+			hiddenCalendarIds = hiddenCalendarIds.filter((x) => x !== id);
 		} else {
 			hiddenCalendarIds = [...hiddenCalendarIds, id];
 		}
@@ -60,7 +57,7 @@
 							onchange={() => toggleHidden(cal.id)}
 							aria-label="Kalender einblenden"
 						/>
-						
+
 						<div class="flex-1">
 							<Input
 								value={cal.name}
@@ -68,7 +65,7 @@
 								class="!border-transparent !bg-transparent !p-0 !text-base font-semibold hover:!bg-surface-1 focus:!bg-surface-0"
 							/>
 						</div>
-						
+
 						<button
 							class="flex h-8 w-8 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-1 hover:text-red-500"
 							aria-label="Löschen"
@@ -84,7 +81,8 @@
 							<button
 								class="h-6 w-6 rounded-full border-2 transition-all"
 								class:border-surface-0={cal.color !== c}
-								class:border-text-primary={cal.color === c || (!cal.color && c === CALENDAR_COLORS[0])}
+								class:border-text-primary={cal.color === c ||
+									(!cal.color && c === CALENDAR_COLORS[0])}
 								style="background-color: {c}"
 								aria-label="Farbe {c}"
 								onclick={() => calendarState.setCalendarColor(cal.id, c)}
@@ -95,12 +93,15 @@
 					<div class="mt-2 pl-8">
 						<div class="flex items-center gap-2">
 							<LinkIcon size={14} class="text-text-tertiary" />
-							<span class="text-xs font-medium uppercase tracking-wider text-text-tertiary">ICS-Abo (Nur Lesen)</span>
+							<span class="text-xs font-medium tracking-wider text-text-tertiary uppercase"
+								>ICS-Abo (Nur Lesen)</span
+							>
 						</div>
 						<Input
 							placeholder="https://..."
 							value={cal.ics_url || ''}
-							onchange={(v) => calendarState.updateCalendarUrl(cal.id, v.currentTarget.value || null)}
+							onchange={(v) =>
+								calendarState.updateCalendarUrl(cal.id, v.currentTarget.value || null)}
 							class="mt-1 !py-1 text-sm text-text-secondary"
 						/>
 						{#if cal.ics_last_synced_at}
@@ -108,9 +109,7 @@
 								Zuletzt synchronisiert: {new Date(cal.ics_last_synced_at).toLocaleString('de-DE')}
 							</p>
 						{:else if cal.ics_url}
-							<p class="mt-1 text-xs text-text-tertiary">
-								Abgleich folgt demnächst...
-							</p>
+							<p class="mt-1 text-xs text-text-tertiary">Abgleich folgt demnächst...</p>
 						{/if}
 					</div>
 				</div>

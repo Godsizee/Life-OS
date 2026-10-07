@@ -58,7 +58,9 @@
 		}
 	});
 	const sessionTask = $derived(
-		focusSession.taskId ? (tasksState.tasks.find((t) => t.id === focusSession.taskId) ?? null) : null
+		focusSession.taskId
+			? (tasksState.tasks.find((t) => t.id === focusSession.taskId) ?? null)
+			: null
 	);
 
 	// ── Sekunden-Tick (für UI-Anzeige) ─────────────────────────────────
@@ -87,7 +89,7 @@
 					breakMinutes: profileState.focusBreakMinutes,
 					longBreakMinutes: profileState.focusLongBreakMinutes,
 					roundsUntilLongBreak: profileState.focusRoundsUntilLongBreak
-			  })
+				})
 			: ''
 	);
 
@@ -122,7 +124,7 @@
 
 	const pendingNoteTask = $derived(
 		focusSession.pendingNoteTaskId
-			? tasksState.tasks.find((t) => t.id === focusSession.pendingNoteTaskId) ?? null
+			? (tasksState.tasks.find((t) => t.id === focusSession.pendingNoteTaskId) ?? null)
 			: null
 	);
 
@@ -209,7 +211,7 @@
 	<!-- Kopfzeile: Statistik + Tagesziel + Einstellungen -->
 	<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 		<div class="min-w-0 flex-1">
-			<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+			<p class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
 				{phaseLabel(focusSession.phase)}
 			</p>
 			<p class="truncate text-sm text-text-secondary">
@@ -274,16 +276,11 @@
 				{/if}
 			</div>
 
-			<FocusRing
-				{progress}
-				{clock}
-				{caption}
-				accent={focusSession.isBreak ? 'break' : 'focus'}
-			/>
+			<FocusRing {progress} {clock} {caption} accent={focusSession.isBreak ? 'break' : 'focus'} />
 
 			<!-- Aufgaben-Karte -->
 			<div
-				class="mt-8 w-full max-w-sm rounded-2xl border border-border-color bg-surface-0 p-5 premium-shadow"
+				class="premium-shadow mt-8 w-full max-w-sm rounded-2xl border border-border-color bg-surface-0 p-5"
 			>
 				{#if sessionTask ?? currentTask}
 					{@const task = sessionTask ?? currentTask}
@@ -292,7 +289,7 @@
 							🎯 {linkedGoal.title}
 						</p>
 					{/if}
-					<h2 class="text-xl font-semibold leading-snug text-text-primary">{task?.title}</h2>
+					<h2 class="text-xl leading-snug font-semibold text-text-primary">{task?.title}</h2>
 					<div class="mt-3 flex flex-wrap items-center gap-3">
 						{#if task}
 							<span class="text-xs font-medium {priorityColor[task.priority]}">
@@ -382,15 +379,18 @@
 				<kbd
 					class="rounded border border-border-color bg-surface-2 px-1.5 py-0.5 font-mono text-text-secondary"
 					>Space</kbd
-				> Start/Pause ·
+				>
+				Start/Pause ·
 				<kbd
 					class="rounded border border-border-color bg-surface-2 px-1.5 py-0.5 font-mono text-text-secondary"
 					>Enter</kbd
-				> Erledigt ·
+				>
+				Erledigt ·
 				<kbd
 					class="rounded border border-border-color bg-surface-2 px-1.5 py-0.5 font-mono text-text-secondary"
 					>→</kbd
-				> Nächste ·
+				>
+				Nächste ·
 				<kbd
 					class="rounded border border-border-color bg-surface-2 px-1.5 py-0.5 font-mono text-text-secondary"
 					>Esc</kbd
@@ -399,21 +399,21 @@
 		</section>
 
 		<!-- ── Queue-Spalte mit Suche & Freiem Fokus (F-03) ── -->
-		<aside class="hidden lg:block space-y-3">
+		<aside class="hidden space-y-3 lg:block">
 			<div class="flex items-center justify-between">
-				<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+				<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
 					Warteschlange ({filteredQueue.length})
 				</h2>
 			</div>
 
 			<!-- Suchfeld (F-03 #1) -->
 			<div class="relative">
-				<Search size={15} class="absolute left-3 top-3 text-text-tertiary" />
+				<Search size={15} class="absolute top-3 left-3 text-text-tertiary" />
 				<input
 					type="text"
 					bind:value={searchQuery}
 					placeholder="Aufgaben filtern…"
-					class="w-full min-h-10 rounded-xl border border-border-color bg-surface-0 pl-9 pr-3 text-sm text-text-primary focus:border-primary-500 focus:outline-none"
+					class="min-h-10 w-full rounded-xl border border-border-color bg-surface-0 pr-3 pl-9 text-sm text-text-primary focus:border-primary-500 focus:outline-none"
 				/>
 			</div>
 
@@ -433,7 +433,9 @@
 				</li>
 
 				{#if filteredQueue.length === 0 && searchQuery}
-					<p class="rounded-xl border border-border-color bg-surface-0 p-4 text-sm text-text-secondary">
+					<p
+						class="rounded-xl border border-border-color bg-surface-0 p-4 text-sm text-text-secondary"
+					>
 						Keine passenden Aufgaben gefunden.
 					</p>
 				{:else}
@@ -446,7 +448,7 @@
 									? 'bg-primary-50 font-medium text-primary-800 dark:bg-primary-950/30 dark:text-primary-200'
 									: 'text-text-secondary hover:bg-surface-1'}"
 							>
-								<span class="w-4 shrink-0 text-xs tabular-nums text-text-tertiary">{i + 1}</span>
+								<span class="w-4 shrink-0 text-xs text-text-tertiary tabular-nums">{i + 1}</span>
 								<span class="min-w-0 flex-1 truncate">{task.title}</span>
 								{#if timeTrackingState.totalForTask(task.id) > 0}
 									<span class="shrink-0 text-xs text-text-tertiary">
@@ -461,7 +463,7 @@
 					{#if filteredQueue.length > 10}
 						<button
 							onclick={() => (showAllQueue = !showAllQueue)}
-							class="mt-1 w-full text-center text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400 py-1"
+							class="mt-1 w-full py-1 text-center text-xs font-semibold text-primary-600 hover:underline dark:text-primary-400"
 						>
 							{showAllQueue
 								? 'Weniger anzeigen'
@@ -475,11 +477,8 @@
 </div>
 
 <!-- Session-Notiz Sheet (F-04) -->
-<Sheet
-	bind:open={isNoteOpen}
-	title="Was hast du geschafft?"
->
-	<div class="px-4 pb-6 space-y-4">
+<Sheet bind:open={isNoteOpen} title="Was hast du geschafft?">
+	<div class="space-y-4 px-4 pb-6">
 		{#if pendingNoteTask}
 			<p class="text-xs font-semibold text-primary-600 dark:text-primary-400">
 				🎯 Aufgabe: {pendingNoteTask.title}
@@ -491,19 +490,19 @@
 				bind:value={noteText}
 				rows="3"
 				placeholder="Kurze Zusammenfassung für die Aufgaben-Beschreibung…"
-				class="w-full rounded-xl border border-border-color bg-surface-0 p-3 text-sm text-text-primary focus:outline-none focus:border-primary-500"
+				class="w-full rounded-xl border border-border-color bg-surface-0 p-3 text-sm text-text-primary focus:border-primary-500 focus:outline-none"
 			></textarea>
 		</label>
 		<div class="flex gap-2">
 			<button
 				onclick={handleSaveNote}
-				class="flex-1 min-h-11 rounded-xl bg-primary-700 font-bold text-white hover:bg-primary-800 text-sm active:scale-95"
+				class="min-h-11 flex-1 rounded-xl bg-primary-700 text-sm font-bold text-white hover:bg-primary-800 active:scale-95"
 			>
 				Notiz speichern
 			</button>
 			<button
 				onclick={handleSkipNote}
-				class="min-h-11 px-4 rounded-xl border border-border-color bg-surface-1 font-medium text-text-secondary text-sm active:scale-95"
+				class="min-h-11 rounded-xl border border-border-color bg-surface-1 px-4 text-sm font-medium text-text-secondary active:scale-95"
 			>
 				Überspringen
 			</button>

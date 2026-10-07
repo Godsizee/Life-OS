@@ -35,7 +35,7 @@
 		saving = true;
 		try {
 			await profileState.setHealthSetting('sleep_goal_h', parseFloat(sleepGoal));
-			
+
 			const parsedWater = parseInt(waterGoal);
 			if (profileState.waterUnit === 'ml') {
 				await profileState.setHealthSetting('water_goal_ml', parsedWater);
@@ -61,14 +61,32 @@
 <Sheet bind:open title="Gesundheits-Ziele">
 	<div class="flex flex-col gap-4 p-4">
 		<Field label="Schlafziel ({profileState.sleepGoalH} h)">
-			<Input type="number" bind:value={sleepGoal} min={HEALTH_LIMITS.sleep_goal_h.min} max={HEALTH_LIMITS.sleep_goal_h.max} step={HEALTH_LIMITS.sleep_goal_h.step} />
+			<Input
+				type="number"
+				bind:value={sleepGoal}
+				min={HEALTH_LIMITS.sleep_goal_h.min}
+				max={HEALTH_LIMITS.sleep_goal_h.max}
+				step={HEALTH_LIMITS.sleep_goal_h.step}
+			/>
 		</Field>
 
 		<Field label="Wasserziel ({profileState.waterUnit === 'ml' ? 'ml' : 'Gläser'})">
 			{#if profileState.waterUnit === 'ml'}
-				<Input type="number" bind:value={waterGoal} min={HEALTH_LIMITS.water_goal_ml.min} max={HEALTH_LIMITS.water_goal_ml.max} step={HEALTH_LIMITS.water_goal_ml.step} />
+				<Input
+					type="number"
+					bind:value={waterGoal}
+					min={HEALTH_LIMITS.water_goal_ml.min}
+					max={HEALTH_LIMITS.water_goal_ml.max}
+					step={HEALTH_LIMITS.water_goal_ml.step}
+				/>
 			{:else}
-				<Input type="number" bind:value={waterGoal} min={HEALTH_LIMITS.water_goal_glasses.min} max={HEALTH_LIMITS.water_goal_glasses.max} step={HEALTH_LIMITS.water_goal_glasses.step} />
+				<Input
+					type="number"
+					bind:value={waterGoal}
+					min={HEALTH_LIMITS.water_goal_glasses.min}
+					max={HEALTH_LIMITS.water_goal_glasses.max}
+					step={HEALTH_LIMITS.water_goal_glasses.step}
+				/>
 			{/if}
 		</Field>
 

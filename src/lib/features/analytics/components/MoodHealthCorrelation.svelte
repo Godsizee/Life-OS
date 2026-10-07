@@ -16,8 +16,7 @@
 		const my = ys.reduce((a, b) => a + b, 0) / n;
 		const num = xs.reduce((s, x, i) => s + (x - mx) * (ys[i] - my), 0);
 		const den = Math.sqrt(
-			xs.reduce((s, x) => s + (x - mx) ** 2, 0) *
-			ys.reduce((s, y) => s + (y - my) ** 2, 0)
+			xs.reduce((s, x) => s + (x - mx) ** 2, 0) * ys.reduce((s, y) => s + (y - my) ** 2, 0)
 		);
 		if (den === 0) return null;
 		return num / den;
@@ -61,67 +60,95 @@
 			.filter((p): p is CorrelationPoint => p !== null);
 	});
 
-	const correlations = $derived((): { label: string; r: number | null; color: string; hint: string }[] => {
-		const ps = points();
-		const moodVals = ps.map((p) => p.mood);
+	const correlations = $derived(
+		(): { label: string; r: number | null; color: string; hint: string }[] => {
+			const ps = points();
+			const moodVals = ps.map((p) => p.mood);
 
-		const sleepPts = ps.filter((p) => p.sleep !== null);
-		const energyPts = ps.filter((p) => p.energy !== null);
-		const waterPts = ps.filter((p) => p.water !== null);
+			const sleepPts = ps.filter((p) => p.sleep !== null);
+			const energyPts = ps.filter((p) => p.energy !== null);
+			const waterPts = ps.filter((p) => p.water !== null);
 
-		const rSleep = pearson(sleepPts.map((p) => p.sleep!), sleepPts.map((p) => p.mood));
-		const rEnergy = pearson(energyPts.map((p) => p.energy!), energyPts.map((p) => p.mood));
-		const rWater = pearson(waterPts.map((p) => p.water!), waterPts.map((p) => p.mood));
-		const rTraining = fitnessState.logs.length > 0 ? pearson(ps.map((p) => p.trained), moodVals) : null;
+			const rSleep = pearson(
+				sleepPts.map((p) => p.sleep!),
+				sleepPts.map((p) => p.mood)
+			);
+			const rEnergy = pearson(
+				energyPts.map((p) => p.energy!),
+				energyPts.map((p) => p.mood)
+			);
+			const rWater = pearson(
+				waterPts.map((p) => p.water!),
+				waterPts.map((p) => p.mood)
+			);
+			const rTraining =
+				fitnessState.logs.length > 0
+					? pearson(
+							ps.map((p) => p.trained),
+							moodVals
+						)
+					: null;
 
-		function color(r: number | null) {
-			if (r === null) return 'text-text-tertiary';
-			if (r >= 0.4) return 'text-primary-500';
-			if (r <= -0.4) return 'text-red-500';
-			return 'text-amber-500';
+			function color(r: number | null) {
+				if (r === null) return 'text-text-tertiary';
+				if (r >= 0.4) return 'text-primary-500';
+				if (r <= -0.4) return 'text-red-500';
+				return 'text-amber-500';
+			}
+
+			function hint(label: string, r: number | null): string {
+				if (r === null) return 'Zu wenig Daten (mind. 3 Tage)';
+				if (r >= 0.6) return `Mehr ${label} → deutlich bessere Stimmung`;
+				if (r >= 0.3) return `Mehr ${label} → tendenziell besser Stimmung`;
+				if (r <= -0.6) return `Mehr ${label} → tendenziell schlechtere Stimmung`;
+				if (r <= -0.3) return `Mehr ${label} → leicht schlechtere Stimmung`;
+				return `Kein klarer Zusammenhang`;
+			}
+
+			return [
+				{ label: 'Schlaf', r: rSleep, color: color(rSleep), hint: hint('Schlaf', rSleep) },
+				{ label: 'Energie', r: rEnergy, color: color(rEnergy), hint: hint('Energie', rEnergy) },
+				{ label: 'Wasser', r: rWater, color: color(rWater), hint: hint('Wasser', rWater) },
+				{
+					label: 'Training',
+					r: rTraining,
+					color: color(rTraining),
+					hint: hint('Training', rTraining)
+				}
+			];
 		}
-
-		function hint(label: string, r: number | null): string {
-			if (r === null) return 'Zu wenig Daten (mind. 3 Tage)';
-			if (r >= 0.6) return `Mehr ${label} → deutlich bessere Stimmung`;
-			if (r >= 0.3) return `Mehr ${label} → tendenziell besser Stimmung`;
-			if (r <= -0.6) return `Mehr ${label} → tendenziell schlechtere Stimmung`;
-			if (r <= -0.3) return `Mehr ${label} → leicht schlechtere Stimmung`;
-			return `Kein klarer Zusammenhang`;
-		}
-
-		return [
-			{ label: 'Schlaf', r: rSleep, color: color(rSleep), hint: hint('Schlaf', rSleep) },
-			{ label: 'Energie', r: rEnergy, color: color(rEnergy), hint: hint('Energie', rEnergy) },
-			{ label: 'Wasser', r: rWater, color: color(rWater), hint: hint('Wasser', rWater) },
-			{ label: 'Training', r: rTraining, color: color(rTraining), hint: hint('Training', rTraining) }
-		];
-	});
+	);
 
 	const hasData = $derived(points().length >= 3);
 </script>
 
 <section class="space-y-3">
-	<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Stimmung ↔ Gesundheit</h2>
+	<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
+		Stimmung ↔ Gesundheit
+	</h2>
 
 	{#if !hasData}
-		<div class="glass-card rounded-2xl p-5 premium-shadow flex items-center gap-3 text-sm text-text-secondary">
+		<div
+			class="glass-card premium-shadow flex items-center gap-3 rounded-2xl p-5 text-sm text-text-secondary"
+		>
 			<span class="text-2xl">🔬</span>
 			<span>Logg mindestens 3 Tage Stimmung + Gesundheit, um Korrelationen zu sehen.</span>
 		</div>
 	{:else}
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 			{#each correlations() as corr}
-				<div class="glass-card rounded-2xl p-4 premium-shadow flex flex-col gap-1">
-					<span class="text-xs font-bold uppercase tracking-wider text-text-tertiary">{corr.label}</span>
+				<div class="glass-card premium-shadow flex flex-col gap-1 rounded-2xl p-4">
+					<span class="text-xs font-bold tracking-wider text-text-tertiary uppercase"
+						>{corr.label}</span
+					>
 					<span class="text-2xl font-extrabold tabular-nums {corr.color}">
 						{corr.r !== null ? (corr.r >= 0 ? '+' : '') + corr.r.toFixed(2) : '—'}
 					</span>
-					<span class="text-xs text-text-secondary leading-snug">{corr.hint}</span>
+					<span class="text-xs leading-snug text-text-secondary">{corr.hint}</span>
 				</div>
 			{/each}
 		</div>
-		<p class="text-[11px] text-text-tertiary px-1">
+		<p class="px-1 text-[11px] text-text-tertiary">
 			Pearson-Korrelation über {points().length} Tage. Bereich: −1 (negativ) bis +1 (positiv).
 		</p>
 	{/if}

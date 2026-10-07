@@ -60,7 +60,7 @@ function holeAudioContext(): AudioContext | null {
 	const AudioCtx =
 		typeof window !== 'undefined'
 			? window.AudioContext ||
-			  (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+				(window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
 			: null;
 	if (!AudioCtx) return null;
 	audioCtx = new AudioCtx();

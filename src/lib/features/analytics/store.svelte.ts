@@ -87,19 +87,23 @@ class AnalyticsState {
 	private subscribe() {
 		this.unsubscribe?.();
 		if (!this.workspaceId) return;
-		this.unsubscribe = subscribeToTable<analyticsApi.DBScoreEntry>('life_scores', this.workspaceId, {
-			onInsert: (row) => {
-				if (!this.scores.some((s) => s.id === row.id)) {
-					this.scores = [...this.scores, row].sort((a, b) => a.date.localeCompare(b.date));
+		this.unsubscribe = subscribeToTable<analyticsApi.DBScoreEntry>(
+			'life_scores',
+			this.workspaceId,
+			{
+				onInsert: (row) => {
+					if (!this.scores.some((s) => s.id === row.id)) {
+						this.scores = [...this.scores, row].sort((a, b) => a.date.localeCompare(b.date));
+					}
+				},
+				onUpdate: (row) => {
+					this.scores = this.scores.map((s) => (s.id === row.id ? row : s));
+				},
+				onDelete: ({ id }) => {
+					this.scores = this.scores.filter((s) => s.id !== id);
 				}
-			},
-			onUpdate: (row) => {
-				this.scores = this.scores.map((s) => (s.id === row.id ? row : s));
-			},
-			onDelete: ({ id }) => {
-				this.scores = this.scores.filter((s) => s.id !== id);
 			}
-		});
+		);
 	}
 
 	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */

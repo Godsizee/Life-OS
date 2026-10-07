@@ -16,8 +16,12 @@ export function parseTaskInput(text: string): ParsedTaskInput {
 	const lower = trimmed.toLowerCase();
 
 	let priority: 'low' | 'medium' | 'high' = 'medium';
-	if (/!(high|hoch|wichtig|dringend|urgent|critical|kritisch|asap|schnell)/i.test(trimmed)
-			|| /^!!/.test(trimmed) || trimmed.includes('‼️')) priority = 'high';
+	if (
+		/!(high|hoch|wichtig|dringend|urgent|critical|kritisch|asap|schnell)/i.test(trimmed) ||
+		/^!!/.test(trimmed) ||
+		trimmed.includes('‼️')
+	)
+		priority = 'high';
 	else if (/!(low|niedrig|später|irgendwann)/i.test(trimmed)) priority = 'low';
 
 	let due_at: string | null = null;
@@ -36,21 +40,29 @@ export function parseTaskInput(text: string): ParsedTaskInput {
 
 	const labels = Array.from(trimmed.matchAll(new RegExp(`@(${WORD})`, 'g')), (m) => m[1]);
 
-	const isRecurring = /\b(täglich|daily|wöchentlich|weekly|jeden\s+tag|jede\s+woche|monatlich)\b/i.test(lower);
-	const rrule = !isRecurring ? null
-		: /\b(wöchentlich|weekly|jede\s+woche)\b/i.test(lower) ? 'FREQ=WEEKLY'
-		: /\bmonatlich\b/i.test(lower) ? 'FREQ=MONTHLY'
-		: 'FREQ=DAILY';
+	const isRecurring =
+		/\b(täglich|daily|wöchentlich|weekly|jeden\s+tag|jede\s+woche|monatlich)\b/i.test(lower);
+	const rrule = !isRecurring
+		? null
+		: /\b(wöchentlich|weekly|jede\s+woche)\b/i.test(lower)
+			? 'FREQ=WEEKLY'
+			: /\bmonatlich\b/i.test(lower)
+				? 'FREQ=MONTHLY'
+				: 'FREQ=DAILY';
 
 	const cleanTitle = trimmed
-		.replace(/!(high|medium|low|hoch|mittel|niedrig|wichtig|dringend|urgent|critical|kritisch|asap|schnell|später|irgendwann)/gi, '')
+		.replace(
+			/!(high|medium|low|hoch|mittel|niedrig|wichtig|dringend|urgent|critical|kritisch|asap|schnell|später|irgendwann)/gi,
+			''
+		)
 		.replace(/^!!/, '')
 		.replace(new RegExp(`#${WORD}`, 'g'), '')
 		.replace(new RegExp(`@${WORD}`, 'g'), '')
 		.replace(/\b(bis|due|fällig|deadline|spätestens)\s+\S+/gi, '')
 		.replace(/\b(täglich|daily|wöchentlich|weekly|jeden\s+tag|jede\s+woche|monatlich)\b/gi, '')
 		.replace(/\b(heute|morgen|übermorgen|today|tomorrow)\b/gi, '')
-		.replace(/\s+/g, ' ').trim();
+		.replace(/\s+/g, ' ')
+		.trim();
 
 	return { title: cleanTitle || trimmed, priority, due_at, project_name, labels, rrule };
 }

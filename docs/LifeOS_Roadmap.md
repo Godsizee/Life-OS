@@ -12,14 +12,14 @@ status: planung
 > M0–M3 sind umgesetzt. M4/M5 werden durch den [[LifeOS_SaaS_Pilot_Plan|SaaS-Pilot-Plan (P0–P4)]]
 > ersetzt: Pilot mit wenigen Haushalten zuerst, SaaS-Ausbau danach. Tabelle unten = Historie.
 
-| Phase | Inhalt | Aufwand |
-|---|---|---|
-| **M0 Setup** | Repo, SvelteKit+TS+Tailwind, PWA-Shell, UI-Kit, BottomNav, Supabase-Projekt, Auth, Workspace + Einladung, RLS-Baseline | ~1 Wo |
-| **M1 Core** | Aufgaben & Projekte, Notizen, Heute-Dashboard, Realtime, Offline-Outbox | ~1–2 Wo |
-| **M2 Module** | Gewohnheiten, Kalender, Einkauf, Ziele & Tagebuch | ~2 Wo |
-| **M3 PWA-Politur** | Install, Offline-Sync-Status, Web-Push, Responsive-Härtung <360/≥360 | ~1 Wo |
-| **M4 Automation** | n8n-Workflows + Edge Functions (Digest, Reminder, Recurring, ICS, Telegram) | ~1 Wo |
-| **M5 SaaS** | Pläne, Stripe, Onboarding, Landing | später |
+| Phase              | Inhalt                                                                                                                 | Aufwand |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------- | ------- |
+| **M0 Setup**       | Repo, SvelteKit+TS+Tailwind, PWA-Shell, UI-Kit, BottomNav, Supabase-Projekt, Auth, Workspace + Einladung, RLS-Baseline | ~1 Wo   |
+| **M1 Core**        | Aufgaben & Projekte, Notizen, Heute-Dashboard, Realtime, Offline-Outbox                                                | ~1–2 Wo |
+| **M2 Module**      | Gewohnheiten, Kalender, Einkauf, Ziele & Tagebuch                                                                      | ~2 Wo   |
+| **M3 PWA-Politur** | Install, Offline-Sync-Status, Web-Push, Responsive-Härtung <360/≥360                                                   | ~1 Wo   |
+| **M4 Automation**  | n8n-Workflows + Edge Functions (Digest, Reminder, Recurring, ICS, Telegram)                                            | ~1 Wo   |
+| **M5 SaaS**        | Pläne, Stripe, Onboarding, Landing                                                                                     | später  |
 
 ## v2-Backlog
 

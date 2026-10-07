@@ -5,10 +5,21 @@
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
-	import { LogOut, Sun, Moon, ChevronLeft, ChevronRight, CloudLightning, Settings } from '@lucide/svelte';
+	import {
+		LogOut,
+		Sun,
+		Moon,
+		ChevronLeft,
+		ChevronRight,
+		CloudLightning,
+		Settings
+	} from '@lucide/svelte';
 	import Spinner from '#lib/ui/Spinner.svelte';
 
-	let { currentPath = '/', collapsed = $bindable(false) }: { currentPath?: string, collapsed?: boolean } = $props();
+	let {
+		currentPath = '/',
+		collapsed = $bindable(false)
+	}: { currentPath?: string; collapsed?: boolean } = $props();
 
 	$effect(() => {
 		if (typeof window === 'undefined') return;
@@ -33,11 +44,10 @@
 			localStorage.setItem('sidebar_collapsed', String(collapsed));
 		} catch {}
 	}
-
 </script>
 
 <aside
-	class="fixed bottom-0 top-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 pt-safe pl-safe transition-all duration-300 ease-in-out md:flex md:flex-col
+	class="pt-safe pl-safe fixed top-0 bottom-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 transition-all duration-300 ease-in-out md:flex md:flex-col
 		{collapsed ? 'w-20' : 'w-64'}"
 	style="view-transition-name: sidebar"
 >
@@ -51,8 +61,12 @@
 	>
 		{#if !collapsed}
 			<div class="flex min-w-0 items-center gap-2.5 overflow-hidden">
-				<img src="/favicon.svg" alt="Life OS Logo" class="h-9 w-9 shrink-0 rounded-xl premium-shadow object-cover" />
-				<div class="flex flex-col min-w-0">
+				<img
+					src="/favicon.svg"
+					alt="Life OS Logo"
+					class="premium-shadow h-9 w-9 shrink-0 rounded-xl object-cover"
+				/>
+				<div class="flex min-w-0 flex-col">
 					<span class="truncate text-sm font-bold tracking-tight text-text-primary">Life OS</span>
 					<span class="truncate text-[10px] text-text-secondary">
 						{workspaceState.workspace?.name ?? 'Lädt...'}
@@ -75,7 +89,7 @@
 				<img
 					src="/favicon.svg"
 					alt=""
-					class="h-9 w-9 rounded-xl premium-shadow object-cover transition-opacity group-hover:opacity-0"
+					class="premium-shadow h-9 w-9 rounded-xl object-cover transition-opacity group-hover:opacity-0"
 				/>
 				<ChevronRight
 					size={18}
@@ -86,30 +100,32 @@
 	</div>
 
 	<!-- Module Links -->
-	<nav class="flex-1 overflow-y-auto p-3 space-y-1">
+	<nav class="flex-1 space-y-1 overflow-y-auto p-3">
 		{#each modules as item (item.id)}
 			{@const Icon = item.icon}
 			{@const active = currentPath === item.route}
 			<a
 				href={item.route}
-				class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative group
+				class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200
 					{collapsed ? 'justify-center' : ''}
 					{active
-						? 'bg-primary-active-bg text-primary-active font-semibold'
-						: 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'}"
+					? 'bg-primary-active-bg font-semibold text-primary-active'
+					: 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'}"
 			>
 				<!-- Active Indicator Line -->
 				{#if active}
-					<div class="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-primary-active"></div>
+					<div class="absolute top-2 bottom-2 left-0 w-1 rounded-r bg-primary-active"></div>
 				{/if}
 
 				<Icon size={20} class="shrink-0 {active ? 'text-primary-active' : 'text-text-tertiary'}" />
-				
+
 				{#if !collapsed}
 					<span class="truncate">{item.label}</span>
 				{:else}
 					<!-- Tooltip on Collapse -->
-					<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+					<div
+						class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+					>
 						{item.label}
 					</div>
 				{/if}
@@ -119,7 +135,7 @@
 
 	<!-- Sync / Info Status (only show when active/syncing) -->
 	{#if outbox.status === 'syncing'}
-		<div class="flex items-center gap-2 px-6 py-2 text-xs text-primary-active animate-pulse-subtle">
+		<div class="animate-pulse-subtle flex items-center gap-2 px-6 py-2 text-xs text-primary-active">
 			<CloudLightning size={14} />
 			{#if !collapsed}
 				<span>Synchronisiere...</span>
@@ -131,17 +147,28 @@
 	     Die Tooltips im eingeklappten Zustand brauchen `group relative` auf dem
 	     jeweiligen Element - ohne `group` blieben sie dauerhaft unsichtbar, ohne
 	     `relative` haengten sie am oberen Rand der Leiste statt neben ihrem Eintrag. -->
-	<div class="border-t border-border-color p-3 space-y-2">
+	<div class="space-y-2 border-t border-border-color p-3">
 		<!-- Settings -->
 		<a
 			href="/settings"
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed ? 'justify-center' : ''} {currentPath === '/settings' ? 'bg-primary-active-bg text-primary-active font-semibold' : ''}"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed
+				? 'justify-center'
+				: ''} {currentPath === '/settings'
+				? 'bg-primary-active-bg font-semibold text-primary-active'
+				: ''}"
 		>
-			<Settings size={20} class="shrink-0 {currentPath === '/settings' ? 'text-primary-active' : 'text-text-tertiary'}" />
+			<Settings
+				size={20}
+				class="shrink-0 {currentPath === '/settings'
+					? 'text-primary-active'
+					: 'text-text-tertiary'}"
+			/>
 			{#if !collapsed}
 				<span class="truncate">Einstellungen</span>
 			{:else}
-				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+				<div
+					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+				>
 					Einstellungen
 				</div>
 			{/if}
@@ -149,7 +176,9 @@
 		<!-- Dark Mode Toggle -->
 		<button
 			onclick={() => themeState.toggle()}
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed ? 'justify-center' : ''}"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed
+				? 'justify-center'
+				: ''}"
 		>
 			{#if themeState.isDark}
 				<Sun size={20} class="shrink-0 text-amber-500" />
@@ -159,7 +188,9 @@
 			{#if !collapsed}
 				<span class="truncate">{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}</span>
 			{:else}
-				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+				<div
+					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+				>
 					{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}
 				</div>
 			{/if}
@@ -170,7 +201,9 @@
 			onclick={logout}
 			disabled={logoutState.loading}
 			aria-busy={logoutState.loading}
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20 {collapsed ? 'justify-center' : ''}"
+			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20 {collapsed
+				? 'justify-center'
+				: ''}"
 		>
 			{#if logoutState.loading}
 				<Spinner size={20} />
@@ -180,7 +213,9 @@
 			{#if !collapsed}
 				<span class="truncate">{logoutState.loading ? 'Melde ab…' : 'Abmelden'}</span>
 			{:else}
-				<div class="absolute left-16 z-50 hidden whitespace-nowrap rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs text-text-primary elevation-2 group-hover:block">
+				<div
+					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+				>
 					Abmelden
 				</div>
 			{/if}
@@ -188,14 +223,16 @@
 
 		<!-- User Avatar/Info -->
 		{#if authState.user}
-			<div class="flex items-center gap-3 pt-2 px-1 {collapsed ? 'justify-center' : ''}">
+			<div class="flex items-center gap-3 px-1 pt-2 {collapsed ? 'justify-center' : ''}">
 				<!-- Zweites `?.`: bei leerer (nicht nur fehlender) E-Mail griff die
 				     Optional-Chain nicht und .toUpperCase() lief auf undefined. -->
-				<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-active-bg text-sm font-bold text-primary-active">
+				<div
+					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-active-bg text-sm font-bold text-primary-active"
+				>
 					{authState.user.email?.[0]?.toUpperCase() ?? 'U'}
 				</div>
 				{#if !collapsed}
-					<div class="flex flex-col min-w-0">
+					<div class="flex min-w-0 flex-col">
 						<span class="truncate text-xs font-semibold text-text-primary">
 							{authState.user.email}
 						</span>

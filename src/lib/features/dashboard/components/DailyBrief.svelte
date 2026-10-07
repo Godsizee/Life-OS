@@ -46,9 +46,7 @@
 	);
 	const topTasks = $derived(rankTasks(tasksState.tasks).slice(0, 3));
 	const dueHabits = $derived(
-		habitsState.habits.filter(
-			(h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id))
-		)
+		habitsState.habits.filter((h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id)))
 	);
 	const lastWorkout = $derived(fitnessState.logs[0]?.date ?? null);
 	const workoutStale = $derived.by(() => {
@@ -67,7 +65,11 @@
 			const planId = linksState
 				.linksFor('event', e.event.id)
 				.map((l) =>
-					l.source_type === 'workout_plan' ? l.source_id : l.target_type === 'workout_plan' ? l.target_id : null
+					l.source_type === 'workout_plan'
+						? l.source_id
+						: l.target_type === 'workout_plan'
+							? l.target_id
+							: null
 				)
 				.find((id): id is string => id !== null);
 			if (planId) return planId;
@@ -75,7 +77,9 @@
 		return null;
 	});
 	const plannedTodayPlanName = $derived(
-		plannedTodayPlanId ? (fitnessState.plans.find((p) => p.id === plannedTodayPlanId)?.name ?? null) : null
+		plannedTodayPlanId
+			? (fitnessState.plans.find((p) => p.id === plannedTodayPlanId)?.name ?? null)
+			: null
 	);
 
 	const openShopping = $derived(shoppingState.items.filter((i) => !i.checked).length);
@@ -98,12 +102,18 @@
 </script>
 
 {#if !dismissed && hasContent}
-	<section class="rounded-2xl border border-primary-active/20 bg-primary-active-bg/40 p-4 premium-shadow">
+	<section
+		class="premium-shadow rounded-2xl border border-primary-active/20 bg-primary-active-bg/40 p-4"
+	>
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="flex items-center gap-2 text-sm font-bold text-text-primary">
 				<Sun size={16} class="text-amber-500" /> Dein Tag
 			</h2>
-			<button onclick={dismiss} aria-label="Ausblenden" class="text-text-tertiary hover:text-text-primary">
+			<button
+				onclick={dismiss}
+				aria-label="Ausblenden"
+				class="text-text-tertiary hover:text-text-primary"
+			>
 				<X size={16} />
 			</button>
 		</div>
@@ -111,14 +121,17 @@
 		<div class="grid gap-3 sm:grid-cols-2">
 			<!-- Termine -->
 			<div>
-				<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Termine</p>
+				<p class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Termine</p>
 				{#if todayEvents.length > 0}
 					<ul class="mt-1 space-y-0.5">
 						{#each todayEvents.slice(0, 3) as e (e.key)}
 							<li class="truncate text-sm text-text-secondary">
 								{e.allDay
 									? 'Ganztägig'
-									: new Date(e.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} · {e.title}
+									: new Date(e.start).toLocaleTimeString('de-DE', {
+											hour: '2-digit',
+											minute: '2-digit'
+										})} · {e.title}
 							</li>
 						{/each}
 					</ul>
@@ -129,7 +142,7 @@
 
 			<!-- Top-Aufgaben -->
 			<div>
-				<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Fokus heute</p>
+				<p class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Fokus heute</p>
 				{#if topTasks.length > 0}
 					<ul class="mt-1 space-y-0.5">
 						{#each topTasks as t (t.id)}
@@ -149,27 +162,48 @@
 				</span>
 			{/if}
 			{#if focusToday > 0}
-				<a href="/focus" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+				<a
+					href="/focus"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
 					⏱ {formatMinutes(focusToday)} fokussiert
 				</a>
 			{:else if topTasks.length > 0}
-				<a href="/focus" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+				<a
+					href="/focus"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
 					🎯 Fokus starten
 				</a>
 			{/if}
 			{#if openShopping > 0}
-				<a href="/shopping" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+				<a
+					href="/shopping"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
 					🛒 {openShopping} Artikel
 				</a>
 			{/if}
 			{#if !moodLogged}
-				<a href="/mood" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+				<a
+					href="/mood"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
 					🙂 Stimmung erfassen
 				</a>
 			{/if}
 			{#if waterToday !== null && waterToday < waterGoal}
-				<a href="/health" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
-					💧 {formatMetric('water_ml', waterToday, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })} / {formatMetric('water_ml', waterGoal, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })}
+				<a
+					href="/health"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
+					💧 {formatMetric('water_ml', waterToday, {
+						waterUnit: profileState.waterUnit,
+						glassSizeMl: profileState.glassSizeMl
+					})} / {formatMetric('water_ml', waterGoal, {
+						waterUnit: profileState.waterUnit,
+						glassSizeMl: profileState.glassSizeMl
+					})}
 				</a>
 			{/if}
 			{#if dueHabits.length > 0}
@@ -182,10 +216,14 @@
 					href="/fitness?startPlan={plannedTodayPlanId}"
 					class="inline-flex items-center gap-1 rounded-full bg-primary-700 px-2.5 py-1 font-bold text-white hover:bg-primary-800"
 				>
-					<Dumbbell size={12} /> {plannedTodayPlanName} starten
+					<Dumbbell size={12} />
+					{plannedTodayPlanName} starten
 				</a>
 			{:else if workoutStale}
-				<a href="/fitness" class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary">
+				<a
+					href="/fitness"
+					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
+				>
 					🏋️ Training fällig
 				</a>
 			{/if}

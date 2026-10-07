@@ -24,7 +24,9 @@
 	{/if}
 	{@render children()}
 	{#if error}
-		<span id={id ? `${id}-error` : undefined} role="alert" class="text-xs text-red-500">{error}</span>
+		<span id={id ? `${id}-error` : undefined} role="alert" class="text-xs text-red-500"
+			>{error}</span
+		>
 	{:else if hint}
 		<span class="text-xs text-text-tertiary">{hint}</span>
 	{/if}

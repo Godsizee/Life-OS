@@ -15,11 +15,14 @@ export interface StreakInfo {
 	total: number;
 }
 
-/** 
+/**
  * Eine Streak reißt erst ab, wenn GESTERN gefehlt hat (is_active = true, wenn heute
  * ODER gestern geloggt wurde).
  */
-export function calculateJournalStreak(entries: JournalEntry[], todayIso = toISODate(new Date())): StreakInfo {
+export function calculateJournalStreak(
+	entries: JournalEntry[],
+	todayIso = toISODate(new Date())
+): StreakInfo {
 	const dailies = entries
 		.filter((e) => e.kind === 'daily' && isValidEntryDate(e.date))
 		.map((e) => e.date)
@@ -41,7 +44,8 @@ export function calculateJournalStreak(entries: JournalEntry[], todayIso = toISO
 
 	for (let i = 0; i < unique.length; i++) {
 		const dMs = Math.floor(
-			(new Date(unique[i]).getTime() - new Date().getTimezoneOffset() * MILLIS_PER_MINUTE) / MS_PER_DAY
+			(new Date(unique[i]).getTime() - new Date().getTimezoneOffset() * MILLIS_PER_MINUTE) /
+				MS_PER_DAY
 		);
 
 		if (i === 0) {
@@ -75,7 +79,10 @@ export function calculateJournalStreak(entries: JournalEntry[], todayIso = toISO
 }
 
 /** Findet Einträge vom exakt gleichen Tag/Monat in der Vergangenheit (inklusive Wochen-Reviews). */
-export function getOnThisDay(entries: JournalEntry[], todayIso = toISODate(new Date())): JournalEntry[] {
+export function getOnThisDay(
+	entries: JournalEntry[],
+	todayIso = toISODate(new Date())
+): JournalEntry[] {
 	const [, mm, dd] = todayIso.split('-');
 	const targetSuffix = `-${mm}-${dd}`;
 	return entries.filter((e) => e.date < todayIso && e.date.endsWith(targetSuffix));

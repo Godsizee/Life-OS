@@ -58,19 +58,29 @@
 		<div class="space-y-4 px-4 pb-5">
 			<div class="flex flex-wrap items-center gap-3">
 				<div>
-					<span class="mb-1 block text-[11px] font-bold uppercase tracking-wider text-text-tertiary">Zielgewicht</span>
-					<StepperInput bind:value={targetKg} step={2.5} placeholder="kg" unit="kg" label="Zielgewicht" />
+					<span class="mb-1 block text-[11px] font-bold tracking-wider text-text-tertiary uppercase"
+						>Zielgewicht</span
+					>
+					<StepperInput
+						bind:value={targetKg}
+						step={2.5}
+						placeholder="kg"
+						unit="kg"
+						label="Zielgewicht"
+					/>
 				</div>
 				<div>
-					<span class="mb-1 block text-[11px] font-bold uppercase tracking-wider text-text-tertiary">Stange</span>
+					<span class="mb-1 block text-[11px] font-bold tracking-wider text-text-tertiary uppercase"
+						>Stange</span
+					>
 					<div class="flex gap-1.5">
 						{#each BAR_WEIGHTS_KG as kg (kg)}
 							<button
 								onclick={() => setBar(kg)}
 								class="min-h-11 rounded-xl border px-3 text-xs font-bold transition-all
 									{barKg === kg
-										? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
-										: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
+									? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+									: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 							>
 								{kg} kg
 							</button>
@@ -83,7 +93,7 @@
 				<p class="text-sm text-text-secondary">Zielgewicht liegt unter dem Stangengewicht.</p>
 			{:else if breakdown}
 				<div class="rounded-2xl border border-border-color bg-surface-1/50 p-4">
-					<p class="mb-2 text-[11px] font-bold uppercase tracking-wider text-text-tertiary">
+					<p class="mb-2 text-[11px] font-bold tracking-wider text-text-tertiary uppercase">
 						Pro Seite ({breakdown.perSideKg} kg)
 					</p>
 					{#if breakdown.perSide.length === 0}
@@ -94,7 +104,10 @@
 								{#each Array(p.count) as _, i (i)}
 									<span
 										class="flex items-center justify-center rounded-md bg-primary-700 font-bold text-white dark:bg-primary-600"
-										style="width: {Math.max(26, Math.min(44, p.plateKg * 1.6))}px; height: {Math.max(34, Math.min(72, p.plateKg * 2.4))}px; font-size: 10px;"
+										style="width: {Math.max(
+											26,
+											Math.min(44, p.plateKg * 1.6)
+										)}px; height: {Math.max(34, Math.min(72, p.plateKg * 2.4))}px; font-size: 10px;"
 									>
 										{p.plateKg}
 									</span>

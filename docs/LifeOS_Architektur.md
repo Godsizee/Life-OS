@@ -10,14 +10,14 @@ status: planung
 
 ## Stack & Begründung
 
-| Schicht | Wahl | Warum |
-|---|---|---|
-| Frontend | **SvelteKit + Svelte 5 (Runes) + TypeScript** | Erprobt, kleinste Bundles, ideal für PWA |
-| Styling | **Tailwind CSS v4** + Design-Tokens | Mobile-First, konsistent, schnell |
-| Backend | **Supabase** (Postgres, Auth, RLS, Realtime, Storage, Edge Functions) | RLS = Mandantenfähigkeit eingebaut, Realtime statt SSE, kein Docker nötig, Free-Tier |
-| PWA | **`@vite-pwa/sveltekit`** + IndexedDB-Outbox | Offline, installierbar |
-| Automatisierung | **n8n** (optional) | Orchestrierung, keine Geschäftslogik |
-| Deployment | **Supabase Cloud + Vercel** *(oder Coolify/adapter-node)* | KISS, Self-Host bleibt offen |
+| Schicht         | Wahl                                                                  | Warum                                                                                |
+| --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Frontend        | **SvelteKit + Svelte 5 (Runes) + TypeScript**                         | Erprobt, kleinste Bundles, ideal für PWA                                             |
+| Styling         | **Tailwind CSS v4** + Design-Tokens                                   | Mobile-First, konsistent, schnell                                                    |
+| Backend         | **Supabase** (Postgres, Auth, RLS, Realtime, Storage, Edge Functions) | RLS = Mandantenfähigkeit eingebaut, Realtime statt SSE, kein Docker nötig, Free-Tier |
+| PWA             | **`@vite-pwa/sveltekit`** + IndexedDB-Outbox                          | Offline, installierbar                                                               |
+| Automatisierung | **n8n** (optional)                                                    | Orchestrierung, keine Geschäftslogik                                                 |
+| Deployment      | **Supabase Cloud + Vercel** _(oder Coolify/adapter-node)_             | KISS, Self-Host bleibt offen                                                         |
 
 > [!note] Directus verworfen
 > Stärker CMS-orientiert, braucht Docker (nicht vorhanden), schwächeres Multi-Tenant-/RLS-Modell
@@ -26,16 +26,19 @@ status: planung
 ## Prinzipien — konkret umgesetzt
 
 ### KISS
+
 - Eine SvelteKit-App, ein Managed-Backend — **kein eigener Server** anfangs.
 - Edge Functions nur für serverseitige Regeln/Secrets (Recurrence, n8n-Endpoints, später Billing).
 - Module nach einheitlichem, simplem Schema.
 
 ### OCP (Open/Closed)
+
 - **Repository-Pattern:** UI spricht nur mit `api.ts` des Features, nie direkt mit dem
   Supabase-Client → Backend austauschbar.
 - **Modul-Registry** (`lib/config/modules.ts`): neue Module registrieren statt Kern ändern.
 
 ### SRP (Single Responsibility)
+
 - **Feature-Sliced Design** — Code nach Fachdomäne.
 - Pro Feature: `components/` · `api.ts` · `store.svelte.ts` · `types.ts` + `schema.ts` (Zod).
 - `ui/` = dumme Komponenten · `core/` = domänenübergreifend.

@@ -4,10 +4,7 @@ import type { Goal, GoalCheckin, JournalEntry } from './types';
 
 export async function listGoals(workspaceId: string, includeArchived = false): Promise<Goal[]> {
 	return fetchAllPages<Goal>('goals', (from, to) => {
-		let q = supabase
-			.from('goals')
-			.select('*')
-			.eq('workspace_id', workspaceId);
+		let q = supabase.from('goals').select('*').eq('workspace_id', workspaceId);
 		if (!includeArchived) {
 			q = q.eq('archived', false);
 		}
@@ -23,12 +20,7 @@ export async function insertGoalRaw(goal: Goal): Promise<Goal> {
 
 export async function updateGoalRaw(patch: Partial<Goal> & { id: string }): Promise<Goal> {
 	const { id, ...rest } = patch;
-	const { data, error } = await supabase
-		.from('goals')
-		.update(rest)
-		.eq('id', id)
-		.select()
-		.single();
+	const { data, error } = await supabase.from('goals').update(rest).eq('id', id).select().single();
 	if (error) throw error;
 	return data;
 }

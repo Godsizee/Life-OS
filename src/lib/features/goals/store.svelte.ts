@@ -6,7 +6,12 @@ import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as goalsApi from './api';
 import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
-import { goalCheckinInputSchema, goalInputSchema, journalEntryInputSchema, type GoalInput } from './schema';
+import {
+	goalCheckinInputSchema,
+	goalInputSchema,
+	journalEntryInputSchema,
+	type GoalInput
+} from './schema';
 import type { Goal, GoalCheckin, GoalStatus, JournalEntry, JournalKind, DayContext } from './types';
 import { isValidEntryDate } from './journal-stats';
 import { weekKey } from '#lib/features/analytics/week-window.js';
@@ -79,38 +84,29 @@ class GoalsState {
 		});
 		// journal_entries ist durch RLS personenbezogen - dieser Channel liefert serverseitig
 		// ohnehin nur die eigenen Zeilen, kein Partner-Sync vorgesehen (gewollt, kein Bug).
-		this.unsubscribeJournal = subscribeToTable<JournalEntry>(
-			'journal_entries',
-			this.workspaceId,
-			{
-				onInsert: (row) => {
-					if (!this.journalEntries.some((j) => j.id === row.id))
-						this.journalEntries = [row, ...this.journalEntries];
-				},
-				onUpdate: (row) => {
-					this.journalEntries = this.journalEntries.map((j) => (j.id === row.id ? row : j));
-				},
-				onDelete: ({ id }) => {
-					this.journalEntries = this.journalEntries.filter((j) => j.id !== id);
-				}
+		this.unsubscribeJournal = subscribeToTable<JournalEntry>('journal_entries', this.workspaceId, {
+			onInsert: (row) => {
+				if (!this.journalEntries.some((j) => j.id === row.id))
+					this.journalEntries = [row, ...this.journalEntries];
+			},
+			onUpdate: (row) => {
+				this.journalEntries = this.journalEntries.map((j) => (j.id === row.id ? row : j));
+			},
+			onDelete: ({ id }) => {
+				this.journalEntries = this.journalEntries.filter((j) => j.id !== id);
 			}
-		);
-		this.unsubscribeCheckins = subscribeToTable<GoalCheckin>(
-			'goal_checkins',
-			this.workspaceId,
-			{
-				onInsert: (row) => {
-					if (!this.checkins.some((c) => c.id === row.id))
-						this.checkins = [row, ...this.checkins];
-				},
-				onUpdate: (row) => {
-					this.checkins = this.checkins.map((c) => (c.id === row.id ? row : c));
-				},
-				onDelete: ({ id }) => {
-					this.checkins = this.checkins.filter((c) => c.id !== id);
-				}
+		});
+		this.unsubscribeCheckins = subscribeToTable<GoalCheckin>('goal_checkins', this.workspaceId, {
+			onInsert: (row) => {
+				if (!this.checkins.some((c) => c.id === row.id)) this.checkins = [row, ...this.checkins];
+			},
+			onUpdate: (row) => {
+				this.checkins = this.checkins.map((c) => (c.id === row.id ? row : c));
+			},
+			onDelete: ({ id }) => {
+				this.checkins = this.checkins.filter((c) => c.id !== id);
 			}
-		);
+		});
 	}
 
 	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
@@ -188,9 +184,7 @@ class GoalsState {
 	async updateProgress(id: string, progress: number) {
 		const clamped = Math.max(0, Math.min(100, progress));
 		const updated_at = new Date().toISOString();
-		this.goals = this.goals.map((g) =>
-			g.id === id ? { ...g, progress: clamped, updated_at } : g
-		);
+		this.goals = this.goals.map((g) => (g.id === id ? { ...g, progress: clamped, updated_at } : g));
 		await outbox.runOrQueue('goals', 'update', { id, progress: clamped, updated_at }, () =>
 			goalsApi.updateGoalRaw({ id, progress: clamped, updated_at })
 		);

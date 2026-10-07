@@ -23,12 +23,7 @@ export async function insertRaw(note: Note): Promise<Note> {
 
 export async function updateRaw(patch: Partial<Note> & { id: string }): Promise<Note> {
 	const { id, ...rest } = patch;
-	const { data, error } = await supabase
-		.from('notes')
-		.update(rest)
-		.eq('id', id)
-		.select()
-		.single();
+	const { data, error } = await supabase.from('notes').update(rest).eq('id', id).select().single();
 	if (error) throw error;
 	return data;
 }

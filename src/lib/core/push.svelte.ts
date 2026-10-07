@@ -5,14 +5,15 @@ import * as remindersApi from '#lib/features/reminders/api.js';
 const VAPID_PUBLIC_KEY = VITE_VAPID_PUBLIC_KEY || '';
 
 function urlBase64ToUint8Array(base64: string): Uint8Array {
-	const padding = ('=').repeat((4 - base64.length % 4) % 4);
+	const padding = '='.repeat((4 - (base64.length % 4)) % 4);
 	const normalized = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
 	const raw = atob(normalized);
 	return Uint8Array.from([...raw].map((char) => char.charCodeAt(0)));
 }
 
 class PushState {
-	supported = typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
+	supported =
+		typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
 	permission = $state<NotificationPermission>(this.supported ? Notification.permission : 'denied');
 	subscribed = $state(false);
 	loading = $state(false);

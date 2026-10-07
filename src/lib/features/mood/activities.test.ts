@@ -99,7 +99,10 @@ describe('customActivitiesWithCounts', () => {
 
 describe('renameInList', () => {
 	it('benennt um', () => {
-		expect(renameInList(['sport', 'arbeit'], 'sport', 'laufen').sort()).toEqual(['arbeit', 'laufen']);
+		expect(renameInList(['sport', 'arbeit'], 'sport', 'laufen').sort()).toEqual([
+			'arbeit',
+			'laufen'
+		]);
 	});
 	it('entfernt bei null', () => {
 		expect(renameInList(['sport', 'arbeit'], 'sport', null)).toEqual(['arbeit']);
@@ -111,4 +114,3 @@ describe('renameInList', () => {
 		expect(renameInList(['arbeit'], 'sport', 'laufen')).toEqual(['arbeit']);
 	});
 });
-

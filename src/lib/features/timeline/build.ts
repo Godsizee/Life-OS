@@ -3,7 +3,12 @@ import { toISODate, fromISODate } from '#lib/core/date.js';
 import { isCompleted, type HabitDay } from '#lib/features/habits/streak.js';
 import { activityLabel } from '#lib/features/mood/activities.js';
 import { expandEvents } from '#lib/features/calendar/occurrences.js';
-import { entryDate, formatMinutes, minutesOf, pomodorosOnDate } from '#lib/features/timetracking/stats.js';
+import {
+	entryDate,
+	formatMinutes,
+	minutesOf,
+	pomodorosOnDate
+} from '#lib/features/timetracking/stats.js';
 
 /** Baut die Einträge im Fenster, absteigend nach Datum. Keine Store-Zugriffe. */
 export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineItem[] {
@@ -47,9 +52,7 @@ export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineI
 	q.moods.forEach((m) => {
 		if (isInFenster(m.date)) {
 			const tags = (m.activities ?? []).map((a) => activityLabel(a as any));
-			const desc = [m.note, tags.length > 0 ? tags.join(' · ') : null]
-				.filter(Boolean)
-				.join(' — ');
+			const desc = [m.note, tags.length > 0 ? tags.join(' · ') : null].filter(Boolean).join(' — ');
 			items.push({
 				id: `mood_${m.id}`,
 				date: m.date,
@@ -195,7 +198,7 @@ export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineI
 /** Gruppiert nach Tag. Erwartet bereits gefilterte Einträge. */
 export function groupByDay(items: TimelineItem[]): TimelineGroup[] {
 	const groups: Record<string, TimelineItem[]> = {};
-	
+
 	items.forEach((item) => {
 		if (!groups[item.date]) groups[item.date] = [];
 		groups[item.date].push(item);

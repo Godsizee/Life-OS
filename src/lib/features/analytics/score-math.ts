@@ -8,14 +8,14 @@ export type ScoreKey = keyof ScoreBreakdown;
  * DIE Quelle: Berechnung und Anzeige lesen beide hier.
  */
 export const SCORE_WEIGHTS: Record<ScoreKey, number> = {
-	tasks:   0.22,
-	habits:  0.22,
-	health:  0.13,
-	fitness: 0.10,
-	goals:   0.10,
-	journal: 0.10,
-	mood:    0.08,
-	focus:   0.05
+	tasks: 0.22,
+	habits: 0.22,
+	health: 0.13,
+	fitness: 0.1,
+	goals: 0.1,
+	journal: 0.1,
+	mood: 0.08,
+	focus: 0.05
 };
 
 export const SCORE_LABELS: Record<ScoreKey, string> = {
@@ -70,7 +70,11 @@ export function scoreSeries(
 }
 
 /** Ø über die erfassten Tage + wie viele Tage überhaupt erfasst wurden. */
-export function scoreAverage(punkte: ScorePoint[]): { avg: number; tracked: number; total: number } {
+export function scoreAverage(punkte: ScorePoint[]): {
+	avg: number;
+	tracked: number;
+	total: number;
+} {
 	const werte = punkte.filter((p): p is ScorePoint & { total: number } => p.total !== null);
 	return {
 		avg: werte.length === 0 ? 0 : Math.round(werte.reduce((s, p) => s + p.total, 0) / werte.length),

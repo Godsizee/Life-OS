@@ -27,13 +27,13 @@
 		'bg-cyan-500'
 	];
 
-	let sizeClass = $derived(
-		size === 'sm' ? 'h-5 w-5 text-[10px]' : 'h-8 w-8 text-xs'
-	);
+	let sizeClass = $derived(size === 'sm' ? 'h-5 w-5 text-[10px]' : 'h-8 w-8 text-xs');
 </script>
 
 <div
-	class="flex shrink-0 items-center justify-center rounded-full font-semibold text-white {sizeClass} {colors[colorIndex]}"
+	class="flex shrink-0 items-center justify-center rounded-full font-semibold text-white {sizeClass} {colors[
+		colorIndex
+	]}"
 	title={member?.profile?.display_name ?? 'Unbekannt'}
 >
 	{initials}

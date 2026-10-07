@@ -23,8 +23,11 @@ export function buildDayContext(dateStr: string): DayContext {
 	const tasksDone = todaysTasks.filter((t) => t.status === 'done').length;
 
 	const active = habitsState.habits.filter((h) => !h.archived);
-	const entryOf = (h: HabitCore & { id: string }, dStr: string) => habitsState.entriesFor(h.id).find((d) => d.date === dStr);
-	const dueHabits = active.filter((h) => isDueOn(h.schedule, date) && !isSkipped(entryOf(h, dateStr)));
+	const entryOf = (h: HabitCore & { id: string }, dStr: string) =>
+		habitsState.entriesFor(h.id).find((d) => d.date === dStr);
+	const dueHabits = active.filter(
+		(h) => isDueOn(h.schedule, date) && !isSkipped(entryOf(h, dateStr))
+	);
 	const habitsLogged = dueHabits.filter((h) => isCompleted(h, entryOf(h, dateStr))).length;
 
 	const workout = fitnessState.logs.some((l) => l.date === dateStr);

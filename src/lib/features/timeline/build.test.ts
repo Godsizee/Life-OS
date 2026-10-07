@@ -22,7 +22,18 @@ describe('buildTimeline — Datumsableitung', () => {
 	it('nutzt das LOKALE Datum, nicht UTC', () => {
 		const spaet = new Date(2026, 6, 31, 23, 45).toISOString();
 		const r = buildTimeline(
-			{ ...leer, tasks: [{ id: 't1', title: 'Test', status: 'done', completed_at: spaet, updated_at: spaet } as never] },
+			{
+				...leer,
+				tasks: [
+					{
+						id: 't1',
+						title: 'Test',
+						status: 'done',
+						completed_at: spaet,
+						updated_at: spaet
+					} as never
+				]
+			},
 			{ von: '2026-07-01', bis: '2026-07-31' }
 		);
 		expect(r[0].date).toBe('2026-07-31');
@@ -35,9 +46,24 @@ describe('buildTimeline — Fenster', () => {
 			{
 				...leer,
 				notes: [
-					{ id: '1', title: 'A', created_at: new Date(2026, 6, 1).toISOString(), private: false } as never,
-					{ id: '2', title: 'B', created_at: new Date(2026, 6, 15).toISOString(), private: false } as never,
-					{ id: '3', title: 'C', created_at: new Date(2026, 6, 30).toISOString(), private: false } as never
+					{
+						id: '1',
+						title: 'A',
+						created_at: new Date(2026, 6, 1).toISOString(),
+						private: false
+					} as never,
+					{
+						id: '2',
+						title: 'B',
+						created_at: new Date(2026, 6, 15).toISOString(),
+						private: false
+					} as never,
+					{
+						id: '3',
+						title: 'C',
+						created_at: new Date(2026, 6, 30).toISOString(),
+						private: false
+					} as never
 				]
 			},
 			{ von: '2026-07-10', bis: '2026-07-20' }
@@ -51,8 +77,18 @@ describe('buildTimeline — Fenster', () => {
 			{
 				...leer,
 				notes: [
-					{ id: '1', title: 'A', created_at: new Date(2026, 6, 10).toISOString(), private: false } as never,
-					{ id: '2', title: 'B', created_at: new Date(2026, 6, 20).toISOString(), private: false } as never
+					{
+						id: '1',
+						title: 'A',
+						created_at: new Date(2026, 6, 10).toISOString(),
+						private: false
+					} as never,
+					{
+						id: '2',
+						title: 'B',
+						created_at: new Date(2026, 6, 20).toISOString(),
+						private: false
+					} as never
 				]
 			},
 			{ von: '2026-07-10', bis: '2026-07-20' }
@@ -63,8 +99,11 @@ describe('buildTimeline — Fenster', () => {
 
 describe('buildTimeline — Fokus', () => {
 	it('fasst Fokuszeit je Tag zusammen, statt je Runde', () => {
-		const t = (h: number, min: number) =>
-			({ started_at: new Date(2026, 6, 31, h).toISOString(), duration_min: min, source: 'pomodoro' as const });
+		const t = (h: number, min: number) => ({
+			started_at: new Date(2026, 6, 31, h).toISOString(),
+			duration_min: min,
+			source: 'pomodoro' as const
+		});
 		const r = buildTimeline(
 			{ ...leer, timeEntries: [t(9, 25), t(11, 25)] },
 			{ von: '2026-07-31', bis: '2026-07-31' }

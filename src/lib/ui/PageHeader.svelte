@@ -31,7 +31,7 @@
 
 <div
 	aria-hidden={!stuck}
-	class="sticky top-0 z-20 -mx-4 mb-2 flex items-center justify-between gap-3 border-b border-border-color px-4 py-2 glass-chrome transition-opacity duration-200 md:-mx-8 md:px-8
+	class="glass-chrome sticky top-0 z-20 -mx-4 mb-2 flex items-center justify-between gap-3 border-b border-border-color px-4 py-2 transition-opacity duration-200 md:-mx-8 md:px-8
 		{stuck ? 'opacity-100' : 'pointer-events-none opacity-0'}"
 >
 	<span class="truncate text-sm font-bold tracking-tight text-text-primary">{title}</span>

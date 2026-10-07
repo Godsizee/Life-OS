@@ -14,17 +14,44 @@ describe('SCORE_WEIGHTS', () => {
 
 describe('weightedTotal', () => {
 	it('liefert 100 bei perfektem Tag', () => {
-		const alles100 = { tasks: 100, habits: 100, health: 100, fitness: 100, goals: 100, journal: 100, mood: 100, focus: 100 };
+		const alles100 = {
+			tasks: 100,
+			habits: 100,
+			health: 100,
+			fitness: 100,
+			goals: 100,
+			journal: 100,
+			mood: 100,
+			focus: 100
+		};
 		expect(weightedTotal(alles100)).toBe(100);
 	});
 
 	it('liefert 0 bei leerem Tag', () => {
-		const alles0 = { tasks: 0, habits: 0, health: 0, fitness: 0, goals: 0, journal: 0, mood: 0, focus: 0 };
+		const alles0 = {
+			tasks: 0,
+			habits: 0,
+			health: 0,
+			fitness: 0,
+			goals: 0,
+			journal: 0,
+			mood: 0,
+			focus: 0
+		};
 		expect(weightedTotal(alles0)).toBe(0);
 	});
 
 	it('gewichtet Aufgaben stärker als Fokus', () => {
-		const nurTasks = { tasks: 100, habits: 0, health: 0, fitness: 0, goals: 0, journal: 0, mood: 0, focus: 0 };
+		const nurTasks = {
+			tasks: 100,
+			habits: 0,
+			health: 0,
+			fitness: 0,
+			goals: 0,
+			journal: 0,
+			mood: 0,
+			focus: 0
+		};
 		const nurFocus = { ...nurTasks, tasks: 0, focus: 100 };
 		expect(weightedTotal(nurTasks)).toBeGreaterThan(weightedTotal(nurFocus));
 	});

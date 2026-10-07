@@ -21,22 +21,38 @@
 <section class="flex flex-col gap-4">
 	<div>
 		<h2 class="text-lg font-semibold text-text-primary">Reflexion</h2>
-		<p class="mt-1 text-sm text-text-secondary">3 kurze Fragen — du musst nicht alle beantworten.</p>
+		<p class="mt-1 text-sm text-text-secondary">
+			3 kurze Fragen — du musst nicht alle beantworten.
+		</p>
 	</div>
 
 	<label class="flex flex-col gap-1.5">
 		<span class="text-sm font-medium text-text-secondary">🌟 Was lief diese Woche gut?</span>
-		<Textarea bind:value={reflGood} rows={3} placeholder="z.B. Alle Habits eingehalten, ein schwieriges Gespräch geführt…" />
+		<Textarea
+			bind:value={reflGood}
+			rows={3}
+			placeholder="z.B. Alle Habits eingehalten, ein schwieriges Gespräch geführt…"
+		/>
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-secondary">💪 Was war schwer oder hat nicht geklappt?</span>
-		<Textarea bind:value={reflHard} rows={3} placeholder="z.B. Ablenkungen, zu viele Aufgaben auf einmal…" />
+		<span class="text-sm font-medium text-text-secondary"
+			>💪 Was war schwer oder hat nicht geklappt?</span
+		>
+		<Textarea
+			bind:value={reflHard}
+			rows={3}
+			placeholder="z.B. Ablenkungen, zu viele Aufgaben auf einmal…"
+		/>
 	</label>
 
 	<label class="flex flex-col gap-1.5">
 		<span class="text-sm font-medium text-text-secondary">🔄 Was ändere ich nächste Woche?</span>
-		<Textarea bind:value={reflChange} rows={3} placeholder="z.B. Früher schlafen, täglich 1 Priorität setzen…" />
+		<Textarea
+			bind:value={reflChange}
+			rows={3}
+			placeholder="z.B. Früher schlafen, täglich 1 Priorität setzen…"
+		/>
 	</label>
 
 	<div class="flex gap-3">
@@ -55,7 +71,10 @@
 		</button>
 	</div>
 
-	<a href="/journal?kind=weekly" class="text-center text-xs text-text-tertiary hover:text-text-secondary">
+	<a
+		href="/journal?kind=weekly"
+		class="text-center text-xs text-text-tertiary hover:text-text-secondary"
+	>
 		Frühere Reviews ansehen
 	</a>
 </section>

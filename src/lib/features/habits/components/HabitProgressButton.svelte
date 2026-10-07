@@ -22,7 +22,8 @@
 	async function handleClick(e: MouseEvent) {
 		e.stopPropagation();
 		if (habit.target_value && habit.target_value > 1) {
-			if (skipped) await habitsState.setValueToday(habit.id, 1); // Überschreibt Skip
+			if (skipped)
+				await habitsState.setValueToday(habit.id, 1); // Überschreibt Skip
 			else if (current < target) await habitsState.incrementToday(habit.id, 1);
 			else await habitsState.toggleToday(habit.id); // Wenn voll, dann leeren
 		} else {

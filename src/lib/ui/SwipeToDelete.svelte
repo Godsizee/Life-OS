@@ -79,7 +79,9 @@
 		onpointermove={onPointerMove}
 		onpointerup={onPointerUp}
 		onpointercancel={onPointerUp}
-		style="transform: translateX({offset}px); touch-action: pan-y; transition: {dragging ? 'none' : 'transform 0.2s ease'};"
+		style="transform: translateX({offset}px); touch-action: pan-y; transition: {dragging
+			? 'none'
+			: 'transform 0.2s ease'};"
 		class="relative"
 	>
 		{@render children()}

@@ -125,7 +125,10 @@ class HabitsState {
 	/** Nur die Daten, an denen die Routine wirklich ERLEDIGT war (Menge erreicht, nicht übersprungen). */
 	logsFor(habitId: string): string[] {
 		const habit = this.habitById(habitId);
-		const core = { schedule: habit?.schedule ?? { type: 'daily' as const }, target_value: habit?.target_value ?? null };
+		const core = {
+			schedule: habit?.schedule ?? { type: 'daily' as const },
+			target_value: habit?.target_value ?? null
+		};
 		return this.entriesFor(habitId)
 			.filter((d) => isCompleted(core, d))
 			.map((d) => d.date);
@@ -179,7 +182,8 @@ class HabitsState {
 		const parsed = habitPatchSchema.parse(patch);
 		const clean: Partial<Habit> = { ...parsed };
 		if ('target_value' in parsed) {
-			clean.target_value = parsed.target_value && parsed.target_value > 1 ? parsed.target_value : null;
+			clean.target_value =
+				parsed.target_value && parsed.target_value > 1 ? parsed.target_value : null;
 		}
 		const updated_at = new Date().toISOString();
 		this.habits = this.habits.map((h) => (h.id === id ? { ...h, ...clean, updated_at } : h));

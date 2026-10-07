@@ -43,7 +43,7 @@ export function buildExport(): string {
 			time_sessions: timeTrackingState.entries
 		}
 	};
-	
+
 	return JSON.stringify(data, null, 2);
 }
 

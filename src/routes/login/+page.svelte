@@ -193,7 +193,11 @@
 				{/if}
 			{/snippet}
 			{#snippet children()}
-				{phase === 'password' ? 'Wird angemeldet…' : phase === 'success' ? 'Angemeldet' : 'Anmelden'}
+				{phase === 'password'
+					? 'Wird angemeldet…'
+					: phase === 'success'
+						? 'Angemeldet'
+						: 'Anmelden'}
 			{/snippet}
 		</Button>
 
@@ -244,7 +248,9 @@
 		{#if resetHintOpen}
 			<!-- Ehrlich statt stumme Sackgasse: ohne SMTP kann der Server keine
 			     Zurücksetzen-Mail verschicken. -->
-			<p class="rounded-xl bg-surface-2 px-3 py-2 text-left text-xs leading-relaxed text-text-secondary">
+			<p
+				class="rounded-xl bg-surface-2 px-3 py-2 text-left text-xs leading-relaxed text-text-secondary"
+			>
 				Life OS verschickt im Pilotbetrieb noch keine E-Mails, ein automatisches Zurücksetzen ist
 				deshalb nicht möglich. Melde dich bei der Person, die dich eingeladen hat — sie kann das
 				Passwort im Supabase-Studio neu setzen.

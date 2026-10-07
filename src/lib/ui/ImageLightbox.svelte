@@ -72,7 +72,7 @@
 			type="button"
 			onclick={close}
 			aria-label="Schließen"
-			class="pt-safe absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
+			class="pt-safe absolute top-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
 		>
 			<X size={22} />
 		</button>
@@ -80,7 +80,10 @@
 		{#if items.length > 1}
 			<button
 				type="button"
-				onclick={(e) => { e.stopPropagation(); step(-1); }}
+				onclick={(e) => {
+					e.stopPropagation();
+					step(-1);
+				}}
 				aria-label="Vorheriges Bild"
 				class="absolute left-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
 			>
@@ -88,7 +91,10 @@
 			</button>
 			<button
 				type="button"
-				onclick={(e) => { e.stopPropagation(); step(1); }}
+				onclick={(e) => {
+					e.stopPropagation();
+					step(1);
+				}}
 				aria-label="Nächstes Bild"
 				class="absolute right-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
 			>

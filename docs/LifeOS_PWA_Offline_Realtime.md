@@ -41,6 +41,7 @@ sequenceDiagram
 - **Optimistic UI** für Häkchen (Aufgaben/Einkauf) → fühlt sich nativ an.
 
 > [!warning] Offline-Sicherheit
+>
 > - Queue **nutzerbezogen** speichern, bei **Logout leeren**
 > - keine Vermischung zwischen Nutzern
 > - Konflikte **nicht still** überschreiben — Status anzeigen

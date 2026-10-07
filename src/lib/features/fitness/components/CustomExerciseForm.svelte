@@ -47,7 +47,11 @@
 >
 	<Input bind:value={nameDe} placeholder="Übungsname..." />
 	<div class="grid grid-cols-2 gap-2">
-		<Input bind:value={muscleGroup} list="fitness-muscle-groups" placeholder="Muskelgruppe (optional)" />
+		<Input
+			bind:value={muscleGroup}
+			list="fitness-muscle-groups"
+			placeholder="Muskelgruppe (optional)"
+		/>
 		<datalist id="fitness-muscle-groups">
 			{#each fitnessState.availableMuscleGroups as group}
 				<option value={group}></option>

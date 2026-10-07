@@ -10,7 +10,7 @@
 </script>
 
 <div class="space-y-2">
-	<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+	<h3 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
 		Stimmungs-Verteilung
 	</h3>
 
@@ -22,16 +22,19 @@
 				{@const count = dist[score - 1]}
 				{@const percent = Math.round((count / total) * 100)}
 				<div class="flex items-center gap-2 text-xs">
-					<span class="w-24 shrink-0 font-medium text-text-secondary truncate">
-						{MOOD_EMOJIS[score]} {MOOD_LABELS[score]}
+					<span class="w-24 shrink-0 truncate font-medium text-text-secondary">
+						{MOOD_EMOJIS[score]}
+						{MOOD_LABELS[score]}
 					</span>
-					<div class="h-3.5 flex-1 overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
+					<div
+						class="h-3.5 flex-1 overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
+					>
 						<div
 							class="h-full transition-all duration-500 {MOOD_CLASSES[score]}"
 							style="width: {percent}%"
 						></div>
 					</div>
-					<span class="w-12 shrink-0 text-right tabular-nums text-text-tertiary">
+					<span class="w-12 shrink-0 text-right text-text-tertiary tabular-nums">
 						{count} ({percent}%)
 					</span>
 				</div>

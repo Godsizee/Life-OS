@@ -1,7 +1,12 @@
 <script lang="ts">
 	import Input from './Input.svelte';
 
-	let { value, limits, suffix, onchange }: {
+	let {
+		value,
+		limits,
+		suffix,
+		onchange
+	}: {
 		value: number;
 		limits: { min: number; max: number; step: number };
 		suffix?: string;

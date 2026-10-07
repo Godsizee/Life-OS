@@ -30,7 +30,7 @@ function parseIcs(icsData: string) {
 
 		const colonIdx = line.indexOf(':');
 		if (colonIdx === -1) continue;
-		
+
 		let keyRaw = line.substring(0, colonIdx);
 		const value = line.substring(colonIdx + 1);
 
@@ -79,7 +79,7 @@ serve(async (req) => {
 	try {
 		const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 		const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-		
+
 		const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 		// Lade alle Kalender mit ICS URL
@@ -87,7 +87,7 @@ serve(async (req) => {
 			.from('calendars')
 			.select('id, workspace_id, ics_url')
 			.not('ics_url', 'is', null);
-			
+
 		if (calError) throw calError;
 
 		let processed = 0;
@@ -101,11 +101,11 @@ serve(async (req) => {
 					console.error(`Fehler beim Abruf von ${cal.ics_url}: ${response.statusText}`);
 					continue;
 				}
-				
+
 				const icsData = await response.text();
 				const icsEvents = parseIcs(icsData);
-				
-				const upsertPayloads = icsEvents.map(e => {
+
+				const upsertPayloads = icsEvents.map((e) => {
 					return {
 						workspace_id: cal.workspace_id,
 						calendar_id: cal.id,
@@ -129,7 +129,7 @@ serve(async (req) => {
 					const { error: upsertError } = await supabase
 						.from('events')
 						.upsert(batch, { onConflict: 'calendar_id, external_uid', ignoreDuplicates: false });
-					
+
 					if (upsertError) console.error('Fehler beim Upsert:', upsertError);
 				}
 
@@ -140,7 +140,6 @@ serve(async (req) => {
 					.eq('id', cal.id);
 
 				processed++;
-
 			} catch (err) {
 				console.error(`Fehler beim Verarbeiten von Kalender ${cal.id}:`, err);
 			}

@@ -11,9 +11,11 @@
 
 <button
 	onclick={() => onOpen(goalsState.todayKey)}
-	class="flex w-full items-center gap-3 rounded-2xl border border-border-color bg-surface-0 p-4 text-left transition-colors hover:border-primary-500 hover:bg-primary-50/50 dark:hover:bg-primary-950/20 active:scale-[0.98]"
+	class="flex w-full items-center gap-3 rounded-2xl border border-border-color bg-surface-0 p-4 text-left transition-colors hover:border-primary-500 hover:bg-primary-50/50 active:scale-[0.98] dark:hover:bg-primary-950/20"
 >
-	<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400">
+	<div
+		class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400"
+	>
 		<PenTool size={20} />
 	</div>
 	<div class="flex-1">

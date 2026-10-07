@@ -49,7 +49,9 @@ class MoodState {
 	}
 
 	entriesForDate(date: string): MoodEntry[] {
-		return this.entries.filter((e) => e.date === date).sort((a, b) => a.logged_at.localeCompare(b.logged_at));
+		return this.entries
+			.filter((e) => e.date === date)
+			.sort((a, b) => a.logged_at.localeCompare(b.logged_at));
 	}
 
 	/** 7-Tage-Sparkline (aelteste links). null = kein Eintrag. */
@@ -97,12 +99,7 @@ class MoodState {
 		const uId = authState.user?.id;
 		if (!wId || !uId || this.loadedYears.has(year)) return;
 		this.loadedYears.add(year);
-		const rows = await moodApi.listMoodEntriesInRange(
-			wId,
-			uId,
-			`${year}-01-01`,
-			`${year}-12-31`
-		);
+		const rows = await moodApi.listMoodEntriesInRange(wId, uId, `${year}-01-01`, `${year}-12-31`);
 		for (const row of rows) this.mergeLocal(row);
 	}
 
@@ -185,9 +182,7 @@ class MoodState {
 			activities: parsed.data.activities
 		};
 
-		const existing = this.entries.find(
-			(e) => e.date === parsed.data.date && e.logged_at === time
-		);
+		const existing = this.entries.find((e) => e.date === parsed.data.date && e.logged_at === time);
 		const row: MoodEntry = {
 			id: existing?.id ?? neueId(),
 			workspace_id: wId,
@@ -238,9 +233,7 @@ class MoodState {
 
 	async remove(id: string) {
 		this.entries = this.entries.filter((e) => e.id !== id);
-		await outbox.runOrQueue('mood_entries', 'delete', { id }, () =>
-			moodApi.deleteMoodEntry(id)
-		);
+		await outbox.runOrQueue('mood_entries', 'delete', { id }, () => moodApi.deleteMoodEntry(id));
 	}
 }
 

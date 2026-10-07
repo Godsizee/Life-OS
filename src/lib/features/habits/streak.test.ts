@@ -89,13 +89,21 @@ describe('calculateStreak — daily/weekly (Alt-Verhalten bleibt)', () => {
 	});
 
 	it('only counts scheduled weekdays for weekly habits', () => {
-		const habit: HabitCore = { schedule: { type: 'weekly', days: [today.getDay()] }, target_value: null };
-		expect(calculateStreak(habit, [done(today, 0), done(today, 7), done(today, 14)], today)).toBe(3);
+		const habit: HabitCore = {
+			schedule: { type: 'weekly', days: [today.getDay()] },
+			target_value: null
+		};
+		expect(calculateStreak(habit, [done(today, 0), done(today, 7), done(today, 14)], today)).toBe(
+			3
+		);
 	});
 
 	it('weekly: missing the most recent due day (not today) breaks the streak', () => {
 		const yesterday = daysAgo(today, 1);
-		const habit: HabitCore = { schedule: { type: 'weekly', days: [yesterday.getDay()] }, target_value: null };
+		const habit: HabitCore = {
+			schedule: { type: 'weekly', days: [yesterday.getDay()] },
+			target_value: null
+		};
 		expect(calculateStreak(habit, [done(today, 8)], today)).toBe(0);
 	});
 });
@@ -112,7 +120,13 @@ describe('calculateStreak — Skip hält den Streak', () => {
 	});
 
 	it('bridges several consecutive skipped days (Urlaub)', () => {
-		const days = [done(today, 0), skipped(today, 1), skipped(today, 2), skipped(today, 3), done(today, 4)];
+		const days = [
+			done(today, 0),
+			skipped(today, 1),
+			skipped(today, 2),
+			skipped(today, 3),
+			done(today, 4)
+		];
 		expect(calculateStreak(daily, days, today)).toBe(2);
 	});
 });
@@ -182,16 +196,22 @@ describe('bestStreak — Regressionen zu R-01', () => {
 		const days = [
 			{ date: '2026-01-05', value: 1, status: 'done' as const }, // Mo
 			{ date: '2026-01-07', value: 1, status: 'done' as const }, // Mi
-			{ date: '2026-01-09', value: 1, status: 'done' as const }  // Fr
+			{ date: '2026-01-09', value: 1, status: 'done' as const } // Fr
 		];
 		expect(bestStreak(habit, days, new Date(2026, 0, 10))).toBe(3);
 	});
 
 	it('ist nie kleiner als der aktuelle Streak', () => {
 		const habit = { schedule: { type: 'daily' } as const, target_value: null };
-		const days = ['2026-01-05', '2026-01-06', '2026-01-07'].map((date) => ({ date, value: 1, status: 'done' as const }));
+		const days = ['2026-01-05', '2026-01-06', '2026-01-07'].map((date) => ({
+			date,
+			value: 1,
+			status: 'done' as const
+		}));
 		const heute = new Date(2026, 0, 7);
-		expect(bestStreak(habit, days, heute)).toBeGreaterThanOrEqual(calculateStreak(habit, days, heute));
+		expect(bestStreak(habit, days, heute)).toBeGreaterThanOrEqual(
+			calculateStreak(habit, days, heute)
+		);
 	});
 
 	it('returns 0 without logs', () => {
@@ -207,7 +227,10 @@ describe('bestStreak — Regressionen zu R-01', () => {
 
 describe('completionRate', () => {
 	it('is 100 when nothing is due', () => {
-		const habit: HabitCore = { schedule: { type: 'weekly', days: [] as number[] }, target_value: null };
+		const habit: HabitCore = {
+			schedule: { type: 'weekly', days: [] as number[] },
+			target_value: null
+		};
 		expect(completionRate(habit, [], 30, today).pct).toBe(100);
 	});
 
@@ -224,7 +247,9 @@ describe('completionRate', () => {
 
 	it('calculateHabitProgress30Days mirrors the 30-day window', () => {
 		const days = [done(today, 0), done(today, 1)];
-		expect(calculateHabitProgress30Days(daily, days, today)).toBe(completionRate(daily, days, 30, today).pct);
+		expect(calculateHabitProgress30Days(daily, days, today)).toBe(
+			completionRate(daily, days, 30, today).pct
+		);
 	});
 });
 
@@ -257,7 +282,10 @@ describe('weekProgress / isOpenToday', () => {
 	});
 
 	it('is not open on a non-due weekday', () => {
-		const habit: HabitCore = { schedule: { type: 'weekly', days: [(today.getDay() + 1) % 7] }, target_value: null };
+		const habit: HabitCore = {
+			schedule: { type: 'weekly', days: [(today.getDay() + 1) % 7] },
+			target_value: null
+		};
 		expect(isOpenToday(habit, [], today)).toBe(false);
 	});
 });

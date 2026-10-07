@@ -50,7 +50,7 @@ export function currentWeekVolumeByMuscleGroup(
 		if (s.date < weekStart || !s.reps || !s.exercise_id) continue;
 		const entry = catalogById.get(s.exercise_id);
 		if (!entry?.muscle_group) continue;
-		
+
 		const isBW = isBodyweightExercise(entry.equipment);
 		const effWeight = effectiveWeight(s, bodyWeightKg, isBW);
 		if (effWeight === 0 && s.exercise_type === 'strength') continue;

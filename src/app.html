@@ -24,7 +24,8 @@
 			(function () {
 				const stored = localStorage.getItem('theme');
 				const dark =
-					stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+					stored === 'dark' ||
+					(!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
 				if (dark) {
 					document.documentElement.classList.add('dark');
 				} else {
@@ -38,7 +39,10 @@
 		</script>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-[var(--surface-1)] text-[var(--text-primary)] antialiased transition-colors duration-300">
+	<body
+		data-sveltekit-preload-data="hover"
+		class="bg-[var(--surface-1)] text-[var(--text-primary)] antialiased transition-colors duration-300"
+	>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

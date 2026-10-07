@@ -19,7 +19,10 @@
 	const topTasks = $derived(
 		minutesByTask(
 			timeTrackingState.entries,
-			(id) => (id === null ? 'Ohne Aufgabe' : (tasksState.tasks.find((t) => t.id === id)?.title ?? 'Gelöschte Aufgabe')),
+			(id) =>
+				id === null
+					? 'Ohne Aufgabe'
+					: (tasksState.tasks.find((t) => t.id === id)?.title ?? 'Gelöschte Aufgabe'),
 			weekStart,
 			5
 		)
@@ -27,23 +30,33 @@
 	const hasData = $derived(points.some((p) => p.value > 0));
 </script>
 
-<section class="glass-card rounded-2xl p-4 premium-shadow">
+<section class="glass-card premium-shadow rounded-2xl p-4">
 	<div class="mb-3 flex items-center justify-between gap-2">
-		<h2 class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-tertiary">
-			<Zap size={14} class="text-yellow-500" /> {title}
+		<h2
+			class="flex items-center gap-2 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+		>
+			<Zap size={14} class="text-yellow-500" />
+			{title}
 		</h2>
-		<a href="/focus" class="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400">
+		<a
+			href="/focus"
+			class="text-xs font-medium text-primary-600 hover:underline dark:text-primary-400"
+		>
 			Fokus starten
 		</a>
 	</div>
 
 	<div class="flex flex-wrap items-baseline gap-x-6 gap-y-1">
 		<div>
-			<p class="text-2xl font-extrabold tabular-nums text-text-primary">{formatMinutes(weekMinutes)}</p>
+			<p class="text-2xl font-extrabold text-text-primary tabular-nums">
+				{formatMinutes(weekMinutes)}
+			</p>
 			<p class="text-[11px] text-text-tertiary">diese Woche</p>
 		</div>
 		<div>
-			<p class="text-lg font-bold tabular-nums text-text-secondary">{formatMinutes(todayMinutes)}</p>
+			<p class="text-lg font-bold text-text-secondary tabular-nums">
+				{formatMinutes(todayMinutes)}
+			</p>
 			<p class="text-[11px] text-text-tertiary">heute</p>
 		</div>
 	</div>
@@ -62,7 +75,7 @@
 						<div class="h-1.5 w-16 shrink-0 overflow-hidden rounded-full bg-surface-3">
 							<div class="h-full rounded-full bg-primary-600" style="width: {pct}%"></div>
 						</div>
-						<span class="w-16 shrink-0 text-right text-xs tabular-nums text-text-secondary">
+						<span class="w-16 shrink-0 text-right text-xs text-text-secondary tabular-nums">
 							{formatMinutes(row.minutes)}
 						</span>
 					</li>

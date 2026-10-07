@@ -34,7 +34,7 @@
 			<button
 				onclick={() => (createOpen = true)}
 				aria-label="Neues Ziel"
-				class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+				class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white transition-transform active:scale-95"
 			>
 				<Plus size={22} />
 			</button>

@@ -38,32 +38,38 @@
 	const hasData = $derived(checkins.length > 0);
 </script>
 
-<section class="glass-card rounded-2xl p-4 premium-shadow">
+<section class="glass-card premium-shadow rounded-2xl p-4">
 	<div class="mb-3 flex items-center justify-between gap-2">
-		<h2 class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+		<h2
+			class="flex items-center gap-2 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+		>
 			<Target size={14} /> Zielwert
 		</h2>
 		<button
 			onclick={() => (checkinOpen = true)}
-			class="inline-flex min-h-9 items-center gap-1 rounded-full bg-primary-600 px-3 text-xs font-bold text-white active:scale-95 transition-transform"
+			class="inline-flex min-h-9 items-center gap-1 rounded-full bg-primary-600 px-3 text-xs font-bold text-white transition-transform active:scale-95"
 		>
 			<Plus size={14} /> Check-in
 		</button>
 	</div>
 
-	<p class="text-2xl font-extrabold tabular-nums text-text-primary">
+	<p class="text-2xl font-extrabold text-text-primary tabular-nums">
 		{formatTargetProgress(sum, goal.target_value, goal.target_unit)}
 	</p>
 	<div class="flex flex-wrap items-center justify-between text-[11px] text-text-tertiary">
 		<span>{percent} % erreicht</span>
 		{#if rateNeeded !== null && goal.target_value}
 			<span class="font-medium text-text-secondary">
-				Noch {Math.max(0, Math.round((goal.target_value - sum) * 100) / 100)} {goal.target_unit ?? ''} in {track.daysLeft} Tagen ({rateNeeded} {goal.target_unit ?? ''}/Tag)
+				Noch {Math.max(0, Math.round((goal.target_value - sum) * 100) / 100)}
+				{goal.target_unit ?? ''} in {track.daysLeft} Tagen ({rateNeeded}
+				{goal.target_unit ?? ''}/Tag)
 			</span>
 		{/if}
 	</div>
 
-	<div class="mt-3 h-2 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2">
+	<div
+		class="mt-3 h-2 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
+	>
 		<div
 			class="h-full bg-primary-600 transition-all duration-500 dark:bg-primary-500"
 			style="width: {percent}%"
@@ -96,13 +102,14 @@
 				<ul class="mt-2 flex flex-col gap-1.5">
 					{#each history as c (c.id)}
 						<li class="flex items-center gap-2">
-							<span class="w-20 shrink-0 text-xs tabular-nums text-text-tertiary">
+							<span class="w-20 shrink-0 text-xs text-text-tertiary tabular-nums">
 								{formatShortDate(c.date)}
 							</span>
-							<span class="shrink-0 text-xs font-bold tabular-nums text-text-primary">
+							<span class="shrink-0 text-xs font-bold text-text-primary tabular-nums">
 								+{checkinValue(c)}
 							</span>
-							<span class="min-w-0 flex-1 truncate text-xs text-text-secondary">{c.note ?? ''}</span>
+							<span class="min-w-0 flex-1 truncate text-xs text-text-secondary">{c.note ?? ''}</span
+							>
 							<button
 								onclick={() => goalsState.removeCheckin(c.id)}
 								aria-label="Check-in löschen"
@@ -123,4 +130,3 @@
 </section>
 
 <GoalCheckinSheet {goal} bind:open={checkinOpen} />
-

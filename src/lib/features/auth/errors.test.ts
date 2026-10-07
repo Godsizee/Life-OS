@@ -3,9 +3,9 @@ import { authErrorText } from './errors';
 
 describe('authErrorText', () => {
 	it('uebersetzt bekannte GoTrue-Codes', () => {
-		expect(authErrorText({ code: 'invalid_credentials', message: 'Invalid login credentials' })).toBe(
-			'E-Mail oder Passwort stimmt nicht.'
-		);
+		expect(
+			authErrorText({ code: 'invalid_credentials', message: 'Invalid login credentials' })
+		).toBe('E-Mail oder Passwort stimmt nicht.');
 		expect(authErrorText({ code: 'email_exists' })).toBe(
 			'Für diese E-Mail-Adresse gibt es bereits ein Konto.'
 		);

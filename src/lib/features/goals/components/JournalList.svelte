@@ -57,13 +57,16 @@
 			</div>
 
 			{#if snippet}
-				<div class="mt-1.5 rounded-lg bg-surface-2 p-2 text-xs text-text-primary border border-border-color/30">
-					<span class="font-bold text-text-tertiary">Treffer:</span> {snippet}
+				<div
+					class="mt-1.5 rounded-lg border border-border-color/30 bg-surface-2 p-2 text-xs text-text-primary"
+				>
+					<span class="font-bold text-text-tertiary">Treffer:</span>
+					{snippet}
 				</div>
 			{/if}
 
 			{#if entry.body}
-				<p class="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{entry.body}</p>
+				<p class="mt-1 text-sm whitespace-pre-wrap text-text-secondary">{entry.body}</p>
 			{/if}
 
 			<div class="mt-2">

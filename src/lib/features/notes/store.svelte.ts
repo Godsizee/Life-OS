@@ -97,10 +97,7 @@ class NotesState {
 		await outbox.runOrQueue('notes', 'insert', note, () => notesApi.insertRaw(note));
 	}
 
-	async updateNote(
-		id: string,
-		patch: Partial<Pick<Note, 'title' | 'body' | 'tags' | 'private'>>
-	) {
+	async updateNote(id: string, patch: Partial<Pick<Note, 'title' | 'body' | 'tags' | 'private'>>) {
 		const updated_at = new Date().toISOString();
 		const updated_by = authState.user!.id;
 		this.notes = this.notes.map((n) =>

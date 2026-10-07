@@ -20,7 +20,8 @@
 	import MemberSelect from '#lib/features/workspace/components/MemberSelect.svelte';
 	import RecurrenceField from './RecurrenceField.svelte';
 
-	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } = $props();
+	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } =
+		$props();
 
 	let title = $state('');
 	let description = $state('');
@@ -31,7 +32,7 @@
 	let labels = $state<string[]>([]);
 	let assigneeId = $state<string | null>(null);
 	let rrule = $state<string | null>(null);
-	
+
 	let newLabel = $state('');
 	let newSubtaskTitle = $state('');
 
@@ -75,7 +76,21 @@
 		}
 	});
 
-	function update(patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id' | 'rrule'>>) {
+	function update(
+		patch: Partial<
+			Pick<
+				Task,
+				| 'title'
+				| 'description'
+				| 'priority'
+				| 'due_at'
+				| 'labels'
+				| 'project_id'
+				| 'goal_id'
+				| 'rrule'
+			>
+		>
+	) {
 		if (task) {
 			tasksState.updateTask(task.id, patch);
 		}
@@ -204,7 +219,9 @@
 				<Field label="Wiederholung">
 					<RecurrenceField value={rrule} onchange={handleRruleChange} />
 					{#if rrule && !dueAt}
-						<div class="mt-2 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-200">
+						<div
+							class="mt-2 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-700"
+						>
 							Wiederholung braucht ein Fälligkeitsdatum.
 						</div>
 					{/if}
@@ -239,10 +256,10 @@
 						</Chip>
 					{/each}
 				</div>
-				{#if allLabels.filter(l => !labels.includes(l)).length > 0}
+				{#if allLabels.filter((l) => !labels.includes(l)).length > 0}
 					<div class="mt-2 flex flex-wrap gap-1">
-						<span class="text-xs text-text-tertiary w-full">Vorschläge:</span>
-						{#each allLabels.filter(l => !labels.includes(l)) as label (label)}
+						<span class="w-full text-xs text-text-tertiary">Vorschläge:</span>
+						{#each allLabels.filter((l) => !labels.includes(l)) as label (label)}
 							<Chip onclick={() => addSuggestedLabel(label)}>
 								<span class="opacity-70">@{label}</span>
 							</Chip>
@@ -253,11 +270,15 @@
 
 			<Field label="Unteraufgaben">
 				{#if subtasks.length > 0}
-					<ul class="flex flex-col gap-1 mb-2">
+					<ul class="mb-2 flex flex-col gap-1">
 						{#each subtasks as sub (sub.id)}
 							<li class="flex items-center gap-2">
 								<CheckCircle checked={sub.status === 'done'} ontoggle={() => toggleSubtask(sub)} />
-								<span class="text-sm {sub.status === 'done' ? 'line-through text-text-tertiary' : 'text-text-primary'}">{sub.title}</span>
+								<span
+									class="text-sm {sub.status === 'done'
+										? 'text-text-tertiary line-through'
+										: 'text-text-primary'}">{sub.title}</span
+								>
 							</li>
 						{/each}
 					</ul>
@@ -310,7 +331,7 @@
 				/>
 			</div>
 
-			<div class="mt-4 border-t border-border-color pt-4 flex items-center justify-between">
+			<div class="mt-4 flex items-center justify-between border-t border-border-color pt-4">
 				<div class="flex items-center gap-1">
 					<Button variant="ghost" onclick={() => tasksState.move(task!.id, -1)}>
 						{#snippet children()}

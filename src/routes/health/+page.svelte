@@ -21,7 +21,7 @@
 	let sheetOpen = $state(false);
 	let sheetDate = $state(healthState.todayKey());
 	let goalsOpen = $state(false);
-	
+
 	let captureDate = $state(healthState.todayKey());
 
 	function edit(date: string) {
@@ -55,7 +55,10 @@
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<div class="mb-4 flex items-center justify-between">
 			<h2 class="text-sm font-semibold text-text-primary">Heute</h2>
-			<button onclick={() => (goalsOpen = true)} class="p-1 text-text-secondary hover:text-text-primary transition-colors">
+			<button
+				onclick={() => (goalsOpen = true)}
+				class="p-1 text-text-secondary transition-colors hover:text-text-primary"
+			>
 				<Settings size={16} />
 			</button>
 		</div>
@@ -72,15 +75,19 @@
 			<h2 class="text-sm font-semibold text-text-primary">Erfassen</h2>
 			<div class="flex items-center gap-2">
 				<Calendar size={14} class="text-text-tertiary" />
-				<input type="date" bind:value={captureDate} class="bg-transparent text-sm text-text-secondary outline-none cursor-pointer" />
+				<input
+					type="date"
+					bind:value={captureDate}
+					class="cursor-pointer bg-transparent text-sm text-text-secondary outline-none"
+				/>
 			</div>
 		</div>
-		
+
 		{#if missingDays.length > 0}
 			<div class="mb-4 flex flex-wrap gap-1.5">
-				<span class="text-xs text-text-tertiary mr-1 flex items-center">Lücken füllen:</span>
+				<span class="mr-1 flex items-center text-xs text-text-tertiary">Lücken füllen:</span>
 				{#each missingDays as md}
-					<button 
+					<button
 						onclick={() => (captureDate = md)}
 						class="rounded border border-border-color bg-surface-1 px-1.5 py-0.5 text-[10px] text-text-secondary transition-all hover:bg-surface-2"
 					>
@@ -90,14 +97,19 @@
 			</div>
 		{/if}
 
-		<HealthForm date={captureDate} onsaved={() => { captureDate = healthState.todayKey(); }} />
+		<HealthForm
+			date={captureDate}
+			onsaved={() => {
+				captureDate = healthState.todayKey();
+			}}
+		/>
 	</section>
 
 	<SleepEnergyCard days={90} />
 
 	<!-- Trends -->
 	<section>
-		<h2 class="mb-3 text-xs font-bold uppercase tracking-wider text-text-tertiary">Trends</h2>
+		<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">Trends</h2>
 		<HealthTrends />
 	</section>
 
@@ -120,7 +132,11 @@
 							</span>
 							<span class="flex items-center gap-2 text-xs text-text-secondary">
 								{#if entry.energy != null}<span>⚡{entry.energy}/5</span>{/if}
-								{#if entry.weight_kg != null}<span>{formatMetric('weight_kg', num(entry.weight_kg), { weightUnit: profileState.weightUnit })}</span>{/if}
+								{#if entry.weight_kg != null}<span
+										>{formatMetric('weight_kg', num(entry.weight_kg), {
+											weightUnit: profileState.weightUnit
+										})}</span
+									>{/if}
 								<Pencil size={11} class="text-text-faint" />
 							</span>
 						</div>
@@ -130,11 +146,15 @@
 									<span class="w-5 text-xs">😴</span>
 									<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
 										<div
-											class="h-full {sleep >= profileState.sleepGoalH ? 'bg-emerald-500' : 'bg-primary-400'}"
+											class="h-full {sleep >= profileState.sleepGoalH
+												? 'bg-emerald-500'
+												: 'bg-primary-400'}"
 											style="width: {goalPercent(sleep, profileState.sleepGoalH)}%"
 										></div>
 									</div>
-									<span class="w-12 text-right text-xs text-text-secondary">{formatMetric('sleep_h', sleep)}</span>
+									<span class="w-12 text-right text-xs text-text-secondary"
+										>{formatMetric('sleep_h', sleep)}</span
+									>
 								</div>
 							{/if}
 							{#if waterVal !== null}
@@ -142,11 +162,18 @@
 									<span class="w-5 text-xs">💧</span>
 									<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
 										<div
-											class="h-full {waterVal >= profileState.waterGoalMl ? 'bg-emerald-500' : 'bg-primary-500'}"
+											class="h-full {waterVal >= profileState.waterGoalMl
+												? 'bg-emerald-500'
+												: 'bg-primary-500'}"
 											style="width: {goalPercent(waterVal, profileState.waterGoalMl)}%"
 										></div>
 									</div>
-									<span class="w-20 text-right text-xs text-text-secondary">{formatMetric('water_ml', waterVal, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl })}</span>
+									<span class="w-20 text-right text-xs text-text-secondary"
+										>{formatMetric('water_ml', waterVal, {
+											waterUnit: profileState.waterUnit,
+											glassSizeMl: profileState.glassSizeMl
+										})}</span
+									>
 								</div>
 							{/if}
 						</div>

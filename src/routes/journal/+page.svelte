@@ -20,7 +20,9 @@
 	let query = $state('');
 	// Deep-Link vom Weekly Review: /journal?kind=weekly.
 	const kindParam = page.url.searchParams.get('kind');
-	let selectedKind = $state<JournalKind | null>(kindParam === 'daily' || kindParam === 'weekly' ? kindParam : null);
+	let selectedKind = $state<JournalKind | null>(
+		kindParam === 'daily' || kindParam === 'weekly' ? kindParam : null
+	);
 	let selectedMonth = $state('');
 
 	const streak = $derived(calculateJournalStreak(goalsState.journalEntries));
@@ -49,7 +51,7 @@
 
 <PageHeader title="Tagebuch">
 	{#snippet trailing()}
-		<JournalStreakBadge streak={streak} />
+		<JournalStreakBadge {streak} />
 	{/snippet}
 </PageHeader>
 
@@ -81,26 +83,26 @@
 	<!-- Art-Filter -->
 	<div class="flex gap-2">
 		<button
-			onclick={() => selectedKind = null}
+			onclick={() => (selectedKind = null)}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === null
 				? 'bg-primary-600 text-white'
-				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
+				: 'border border-border-color/30 bg-surface-2 text-text-secondary'}"
 		>
 			Alle
 		</button>
 		<button
-			onclick={() => selectedKind = 'daily'}
+			onclick={() => (selectedKind = 'daily')}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === 'daily'
 				? 'bg-primary-600 text-white'
-				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
+				: 'border border-border-color/30 bg-surface-2 text-text-secondary'}"
 		>
 			Täglich
 		</button>
 		<button
-			onclick={() => selectedKind = 'weekly'}
+			onclick={() => (selectedKind = 'weekly')}
 			class="rounded-full px-3 py-1 text-xs font-medium {selectedKind === 'weekly'
 				? 'bg-primary-600 text-white'
-				: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
+				: 'border border-border-color/30 bg-surface-2 text-text-secondary'}"
 		>
 			Wöchentlich
 		</button>
@@ -108,15 +110,7 @@
 </section>
 
 <section>
-	<JournalList
-		entries={filteredEntries}
-		query={query}
-		onEdit={openJournal}
-	/>
+	<JournalList entries={filteredEntries} {query} onEdit={openJournal} />
 </section>
 
-<JournalEntrySheet
-	bind:open={journalSheetOpen}
-	date={journalDate}
-	kind={journalKind}
-/>
+<JournalEntrySheet bind:open={journalSheetOpen} date={journalDate} kind={journalKind} />

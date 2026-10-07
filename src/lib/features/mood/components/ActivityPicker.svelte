@@ -25,7 +25,9 @@
 	/** Eigene Tags, die im aktuellen Eintrag stehen, aber (noch) nicht in der Historie. */
 	const ownAll = $derived([
 		...own,
-		...value.filter((id) => !own.includes(id) && !groups.some((g) => g.activities.some((a) => a.id === id)))
+		...value.filter(
+			(id) => !own.includes(id) && !groups.some((g) => g.activities.some((a) => a.id === id))
+		)
 	]);
 
 	let newTag = $state('');
@@ -53,7 +55,9 @@
 	{#each groups as { group, activities } (group.id)}
 		{@const Icon = activityIcon(group.id)}
 		<div>
-			<p class="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-text-tertiary">
+			<p
+				class="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-text-tertiary uppercase"
+			>
 				<Icon size={12} />
 				{group.label}
 			</p>
@@ -66,8 +70,8 @@
 						aria-pressed={selected}
 						class="min-h-9 rounded-full border px-3 text-xs font-semibold transition-all active:scale-95
 							{selected
-								? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
-								: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
+							? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+							: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 					>
 						{activity.label}
 					</button>
@@ -78,7 +82,7 @@
 
 	{#if ownAll.length > 0}
 		<div>
-			<p class="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-text-tertiary">Eigene</p>
+			<p class="mb-1.5 text-[11px] font-bold tracking-wider text-text-tertiary uppercase">Eigene</p>
 			<div class="flex flex-wrap gap-1.5">
 				{#each ownAll as id (id)}
 					{@const selected = value.includes(id)}
@@ -88,8 +92,8 @@
 						aria-pressed={selected}
 						class="min-h-9 rounded-full border px-3 text-xs font-semibold transition-all active:scale-95
 							{selected
-								? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
-								: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
+							? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+							: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 					>
 						{activityLabel(id)}
 					</button>
@@ -105,7 +109,7 @@
 			maxlength="24"
 			placeholder="Eigene Aktivität…"
 			aria-label="Eigene Aktivität hinzufügen"
-			class="min-h-11 min-w-0 flex-1 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary placeholder:text-text-tertiary transition-colors duration-200 focus:border-primary-500 focus:outline-none"
+			class="min-h-11 min-w-0 flex-1 rounded-xl border border-border-color bg-surface-0 px-3 text-sm text-text-primary transition-colors duration-200 placeholder:text-text-tertiary focus:border-primary-500 focus:outline-none"
 		/>
 		<button
 			type="button"

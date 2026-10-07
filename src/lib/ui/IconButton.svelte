@@ -26,7 +26,8 @@
 	const variants = {
 		ghost: 'text-text-tertiary hover:bg-surface-2 hover:text-text-primary',
 		surface: 'bg-surface-2 text-text-primary hover:bg-surface-3',
-		primary: 'bg-primary-700 text-white hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700',
+		primary:
+			'bg-primary-700 text-white hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700',
 		danger: 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30'
 	};
 

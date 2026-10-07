@@ -18,11 +18,13 @@
 	// bereits verknüpfte IDs ausblenden
 	const linkedIds = $derived(
 		new Set(
-			linksState.linksFor(sourceType, sourceId).map((l) =>
-				l.source_type === sourceType && l.source_id === sourceId
-					? `${l.target_type}:${l.target_id}`
-					: `${l.source_type}:${l.source_id}`
-			)
+			linksState
+				.linksFor(sourceType, sourceId)
+				.map((l) =>
+					l.source_type === sourceType && l.source_id === sourceId
+						? `${l.target_type}:${l.target_id}`
+						: `${l.source_type}:${l.source_id}`
+				)
 		)
 	);
 	const filtered = $derived(results.filter((r) => !linkedIds.has(`${r.type}:${r.id}`)));

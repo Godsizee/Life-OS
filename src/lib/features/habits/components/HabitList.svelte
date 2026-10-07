@@ -15,7 +15,11 @@
 {:else}
 	<ul class="flex flex-col gap-2">
 		{#each habits as habit (habit.id)}
-			<li class="contents" transition:fade={{ duration: motionDuration(DURATION.fast) }} animate:flip={{ duration: motionDuration(DURATION.base) }}>
+			<li
+				class="contents"
+				transition:fade={{ duration: motionDuration(DURATION.fast) }}
+				animate:flip={{ duration: motionDuration(DURATION.base) }}
+			>
 				<HabitItem {habit} />
 			</li>
 		{/each}

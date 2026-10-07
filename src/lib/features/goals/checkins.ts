@@ -88,7 +88,7 @@ export function evaluateTrack(
 	const start = new Date(goal.created_at);
 	const end = fromISODate(goal.target_date);
 	const totalDays = diffDays(end, start);
-	
+
 	let expected = 100;
 	if (totalDays > 0) {
 		const elapsed = Math.max(0, Math.min(totalDays, diffDays(today, start)));
@@ -264,4 +264,3 @@ export function buildGoalTree<T extends { id: string; parent_id: string | null }
 	}
 	return tree;
 }
-

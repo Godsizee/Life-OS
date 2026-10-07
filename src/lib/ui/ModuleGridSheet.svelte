@@ -4,10 +4,8 @@
 	import { haptic } from '#lib/core/haptics.js';
 	import Sheet from './Sheet.svelte';
 
-	let {
-		open = $bindable(false),
-		currentPath = '/'
-	}: { open?: boolean; currentPath?: string } = $props();
+	let { open = $bindable(false), currentPath = '/' }: { open?: boolean; currentPath?: string } =
+		$props();
 
 	function go() {
 		haptic(10);

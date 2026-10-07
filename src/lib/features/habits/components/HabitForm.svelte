@@ -117,13 +117,19 @@
 			bind:value={name}
 			placeholder="z.B. Trinken, Lesen, Joggen..."
 			required
-			class="h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
+			class="premium-shadow h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
 		/>
 	</label>
 
 	<!-- W5: Mengen-Routinen Toggle -->
-	<label class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3 premium-shadow">
-		<input type="checkbox" bind:checked={isQuantity} class="h-5 w-5 rounded border-border-color text-primary-600 focus:ring-primary-500" />
+	<label
+		class="premium-shadow flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3"
+	>
+		<input
+			type="checkbox"
+			bind:checked={isQuantity}
+			class="h-5 w-5 rounded border-border-color text-primary-600 focus:ring-primary-500"
+		/>
 		<div class="flex flex-col">
 			<span class="text-sm font-semibold text-text-primary">Ziel-Menge festlegen</span>
 			<span class="text-xs text-text-secondary">Statt einfachem Häkchen (z. B. 8 Gläser)</span>
@@ -140,7 +146,7 @@
 					min="2"
 					max="10000"
 					required
-					class="h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
+					class="premium-shadow h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
 				/>
 			</label>
 			<label class="flex flex-2 flex-col gap-1.5" style="flex: 2;">
@@ -150,7 +156,7 @@
 					bind:value={unit}
 					placeholder="z. B. Gläser, Seiten..."
 					required
-					class="h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
+					class="premium-shadow h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary placeholder:text-text-tertiary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
 				/>
 			</label>
 		</div>
@@ -172,7 +178,8 @@
 			<button
 				type="button"
 				onclick={() => (scheduleType = 'weekly_count')}
-				class="h-10 flex-1 rounded-xl border font-medium transition-all {scheduleType === 'weekly_count'
+				class="h-10 flex-1 rounded-xl border font-medium transition-all {scheduleType ===
+				'weekly_count'
 					? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/30'
 					: 'border-border-color bg-surface-0 text-text-secondary'}"
 			>
@@ -196,7 +203,7 @@
 			<span class="text-xs font-semibold text-text-secondary">Wie oft pro Woche?</span>
 			<select
 				bind:value={weeklyTimes}
-				class="h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none premium-shadow"
+				class="premium-shadow h-12 w-full rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
 			>
 				{#each [1, 2, 3, 4, 5, 6] as times}
 					<option value={times}>{times} mal</option>

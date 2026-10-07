@@ -2,7 +2,10 @@ import type { Task, TaskStatus } from './types';
 import { toISODate } from '#lib/core/date.js';
 import { weekKey } from '#lib/features/analytics/week-window.js';
 
-export interface TaskNode { task: Task; children: Task[]; }
+export interface TaskNode {
+	task: Task;
+	children: Task[];
+}
 
 const byPosition = (a: Task, b: Task) =>
 	a.position - b.position || a.created_at.localeCompare(b.created_at);
@@ -49,9 +52,12 @@ export function smartViewFilter(tasks: Task[], view: SmartView, now: Date = new 
 		const key = weekKey(now);
 		return tasks.filter((t) => t.focus_week === key);
 	}
-	const endOfToday = new Date(now); endOfToday.setHours(23, 59, 59, 999);
-	const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
-	const in7 = new Date(endOfToday); in7.setDate(in7.getDate() + 7);
+	const endOfToday = new Date(now);
+	endOfToday.setHours(23, 59, 59, 999);
+	const startOfToday = new Date(now);
+	startOfToday.setHours(0, 0, 0, 0);
+	const in7 = new Date(endOfToday);
+	in7.setDate(in7.getDate() + 7);
 
 	return tasks.filter((t) => {
 		if (view === 'no_date') return t.due_at === null;

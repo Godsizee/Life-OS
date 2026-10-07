@@ -6,7 +6,18 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 
 	const moreLinks = modules.filter((m) =>
-		['habits', 'shopping', 'goals', 'journal', 'mood', 'health', 'review', 'fitness', 'analytics', 'timeline'].includes(m.id)
+		[
+			'habits',
+			'shopping',
+			'goals',
+			'journal',
+			'mood',
+			'health',
+			'review',
+			'fitness',
+			'analytics',
+			'timeline'
+		].includes(m.id)
 	);
 </script>
 
@@ -25,7 +36,7 @@
 				<li>
 					<a
 						href={link.route}
-						class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
+						class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-primary transition-colors hover:bg-surface-1 active:bg-surface-2"
 					>
 						<Icon size={20} class="text-text-secondary" />
 						{link.label}
@@ -40,7 +51,7 @@
 			<li>
 				<a
 					href="/settings"
-					class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-primary hover:bg-surface-1 active:bg-surface-2 transition-colors"
+					class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-primary transition-colors hover:bg-surface-1 active:bg-surface-2"
 				>
 					<span class="text-xl">⚙️</span>
 					Einstellungen
@@ -56,6 +67,9 @@
 	</Button>
 
 	<p class="text-center text-xs text-text-tertiary">
-		Übungsdatenbank basiert auf <a href="https://wger.de" class="underline hover:text-text-secondary">wger.de</a> (CC-BY-SA).
+		Übungsdatenbank basiert auf <a
+			href="https://wger.de"
+			class="underline hover:text-text-secondary">wger.de</a
+		> (CC-BY-SA).
 	</p>
 </section>

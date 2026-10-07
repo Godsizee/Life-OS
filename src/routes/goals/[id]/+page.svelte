@@ -15,7 +15,15 @@
 	import OnTrackBadge from '#lib/features/goals/components/OnTrackBadge.svelte';
 	import CheckCircle from '#lib/ui/CheckCircle.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
-	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck, Archive, ArchiveRestore } from '@lucide/svelte';
+	import {
+		ArrowLeft,
+		Trash2,
+		X,
+		Dumbbell,
+		CalendarCheck,
+		Archive,
+		ArchiveRestore
+	} from '@lucide/svelte';
 	import Select from '#lib/ui/Select.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import type { GoalStatus } from '#lib/features/goals/types.js';
@@ -29,7 +37,9 @@
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
 	const track = $derived(goal ? evaluateTrack(goal, progress) : null);
 
-	const unterziele = $derived(goalsState.goals.filter((g) => g.parent_id === goalId && !g.archived));
+	const unterziele = $derived(
+		goalsState.goals.filter((g) => g.parent_id === goalId && !g.archived)
+	);
 	const linkedTasks = $derived(goal ? tasksState.tasks.filter((t) => t.goal_id === goal.id) : []);
 	const linkedHabits = $derived(
 		goal ? habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived) : []
@@ -46,7 +56,9 @@
 			? fitnessState.prFor(goal.target_exercise)
 			: undefined
 	);
-	const weeklyCount = $derived(goal?.goal_type === 'fitness_frequency' ? workoutsThisWeek(fitnessState.logs) : 0);
+	const weeklyCount = $derived(
+		goal?.goal_type === 'fitness_frequency' ? workoutsThisWeek(fitnessState.logs) : 0
+	);
 
 	const statusLabel: Record<GoalStatus, string> = {
 		open: 'Offen',
@@ -77,13 +89,18 @@
 	<title>{goal ? goal.title : 'Ziel'} - Life OS</title>
 </svelte:head>
 
-<a href="/goals" class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary">
+<a
+	href="/goals"
+	class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary"
+>
 	<ArrowLeft size={16} /> Ziele
 </a>
 
 {#if !goal}
 	{#if goalsState.loading}
-		<div class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary">
+		<div
+			class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary"
+		>
 			Lade Ziel…
 		</div>
 	{:else}
@@ -95,17 +112,31 @@
 		<header class="space-y-3">
 			<div class="flex items-start justify-between gap-3">
 				<h1 class="text-2xl font-bold tracking-tight text-text-primary">{goal.title}</h1>
-				<div class="flex items-center gap-2 shrink-0">
+				<div class="flex shrink-0 items-center gap-2">
 					{#if goal.archived}
-						<button onclick={() => goalsState.unarchiveGoal(goal.id)} aria-label="Wiederherstellen" class="flex items-center gap-1 text-xs font-medium text-primary-active hover:underline">
+						<button
+							onclick={() => goalsState.unarchiveGoal(goal.id)}
+							aria-label="Wiederherstellen"
+							class="flex items-center gap-1 text-xs font-medium text-primary-active hover:underline"
+						>
 							<ArchiveRestore size={16} /> Wiederherstellen
 						</button>
 					{:else}
-						<button onclick={() => goalsState.archiveGoal(goal.id)} aria-label="Ziel archivieren" class="text-text-tertiary hover:text-text-primary" title="Archivieren">
+						<button
+							onclick={() => goalsState.archiveGoal(goal.id)}
+							aria-label="Ziel archivieren"
+							class="text-text-tertiary hover:text-text-primary"
+							title="Archivieren"
+						>
 							<Archive size={18} />
 						</button>
 					{/if}
-					<button onclick={removeGoal} aria-label="Ziel löschen" class="text-text-tertiary hover:text-red-500" title="Endgültig löschen">
+					<button
+						onclick={removeGoal}
+						aria-label="Ziel löschen"
+						class="text-text-tertiary hover:text-red-500"
+						title="Endgültig löschen"
+					>
 						<Trash2 size={18} />
 					</button>
 				</div>
@@ -122,15 +153,28 @@
 						<div class="flex items-center gap-2 text-text-tertiary">
 							<span>Zieldatum: {new Date(goal.target_date).toLocaleDateString('de-DE')}</span>
 							{#if track && track.state !== 'no_date' && track.state !== 'done'}
-								<span class="font-medium {track.daysLeft < 0 ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-text-tertiary'}">
-									({track.daysLeft > 0 ? `noch ${track.daysLeft} Tage` : track.daysLeft === 0 ? 'heute fällig' : `${-track.daysLeft} Tage überfällig`})
+								<span
+									class="font-medium {track.daysLeft < 0
+										? 'font-semibold text-red-600 dark:text-red-400'
+										: 'text-text-tertiary'}"
+								>
+									({track.daysLeft > 0
+										? `noch ${track.daysLeft} Tage`
+										: track.daysLeft === 0
+											? 'heute fällig'
+											: `${-track.daysLeft} Tage überfällig`})
 								</span>
 							{/if}
 						</div>
 					{/if}
 				</div>
-				<div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
-					<div class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500" style="width: {progress}%"></div>
+				<div
+					class="h-2.5 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
+				>
+					<div
+						class="h-full bg-primary-600 transition-all duration-500 dark:bg-primary-500"
+						style="width: {progress}%"
+					></div>
 				</div>
 				{#if track}
 					<div class="mt-2">
@@ -140,7 +184,10 @@
 			</div>
 
 			<div class="flex items-center gap-2">
-				<Select value={goal.status} onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}>
+				<Select
+					value={goal.status}
+					onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}
+				>
 					{#each Object.entries(statusLabel) as [value, label] (value)}
 						<option {value}>{label}</option>
 					{/each}
@@ -151,8 +198,11 @@
 		<!-- Meilensteine -->
 		<section class="space-y-2">
 			<div class="flex items-center justify-between">
-				<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Meilensteine</h2>
-				<button onclick={() => (meilensteinOffen = true)} class="text-xs font-medium text-primary-active hover:underline">
+				<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Meilensteine</h2>
+				<button
+					onclick={() => (meilensteinOffen = true)}
+					class="text-xs font-medium text-primary-active hover:underline"
+				>
 					+ Meilenstein
 				</button>
 			</div>
@@ -160,9 +210,16 @@
 				<ul class="flex flex-col gap-1.5">
 					{#each unterziele as u (u.id)}
 						{@const p = getGoalProgress(u)}
-						<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
-							<CheckCircle checked={u.status === 'done'} ontoggle={() => goalsState.setStatus(u.id, u.status === 'done' ? 'open' : 'done')} />
-							<a href="/goals/{u.id}" class="min-w-0 flex-1 truncate text-sm text-text-primary">{u.title}</a>
+						<li
+							class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
+						>
+							<CheckCircle
+								checked={u.status === 'done'}
+								ontoggle={() => goalsState.setStatus(u.id, u.status === 'done' ? 'open' : 'done')}
+							/>
+							<a href="/goals/{u.id}" class="min-w-0 flex-1 truncate text-sm text-text-primary"
+								>{u.title}</a
+							>
 							<span class="shrink-0 text-xs text-text-tertiary">{p}%</span>
 						</li>
 					{/each}
@@ -213,14 +270,24 @@
 
 		<!-- Verknüpfte Aufgaben -->
 		<section class="space-y-2">
-			<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Aufgaben</h2>
+			<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Aufgaben</h2>
 			{#if linkedTasks.length > 0}
 				<ul class="flex flex-col gap-1.5">
 					{#each linkedTasks as task (task.id)}
-						<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
+						<li
+							class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
+						>
 							<span class="text-xs">{task.status === 'done' ? '✓' : '○'}</span>
-							<span class="min-w-0 flex-1 truncate text-sm text-text-primary {task.status === 'done' ? 'line-through opacity-60' : ''}">{task.title}</span>
-							<button onclick={() => tasksState.updateGoalLink(task.id, null)} aria-label="Aufgabe entkoppeln" class="shrink-0 text-text-tertiary hover:text-red-500">
+							<span
+								class="min-w-0 flex-1 truncate text-sm text-text-primary {task.status === 'done'
+									? 'line-through opacity-60'
+									: ''}">{task.title}</span
+							>
+							<button
+								onclick={() => tasksState.updateGoalLink(task.id, null)}
+								aria-label="Aufgabe entkoppeln"
+								class="shrink-0 text-text-tertiary hover:text-red-500"
+							>
 								<X size={14} />
 							</button>
 						</li>
@@ -239,16 +306,22 @@
 
 		<!-- Verknüpfte Routinen -->
 		<section class="space-y-2">
-			<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Routinen</h2>
+			<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Routinen</h2>
 			{#if linkedHabits.length > 0}
 				<ul class="flex flex-col gap-1.5">
 					{#each linkedHabits as habit (habit.id)}
 						{@const hp = calculateHabitProgress30Days(habit, habitsState.entriesFor(habit.id))}
-						<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
+						<li
+							class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
+						>
 							<span class="text-xs">🔁</span>
 							<span class="min-w-0 flex-1 truncate text-sm text-text-primary">{habit.name}</span>
 							<span class="shrink-0 text-xs text-text-tertiary">{hp}%</span>
-							<button onclick={() => habitsState.updateGoalLink(habit.id, null)} aria-label="Routine entkoppeln" class="shrink-0 text-text-tertiary hover:text-red-500">
+							<button
+								onclick={() => habitsState.updateGoalLink(habit.id, null)}
+								aria-label="Routine entkoppeln"
+								class="shrink-0 text-text-tertiary hover:text-red-500"
+							>
 								<X size={14} />
 							</button>
 						</li>

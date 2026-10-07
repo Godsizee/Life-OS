@@ -19,7 +19,9 @@
 <section class="flex flex-col gap-4">
 	<div>
 		<h2 class="text-lg font-semibold text-text-primary">Nächste Woche</h2>
-		<p class="mt-1 text-sm text-text-secondary">Wähle deine Top-3 Aufgaben für die nächste Woche.</p>
+		<p class="mt-1 text-sm text-text-secondary">
+			Wähle deine Top-3 Aufgaben für die nächste Woche.
+		</p>
 	</div>
 
 	{#if openTasks.length === 0}
@@ -55,7 +57,9 @@
 			{/each}
 		</ul>
 		{#if openTasks.length > 15}
-			<p class="text-xs text-text-tertiary">Nur die ersten 15 angezeigt — ggf. Tasks priorisieren.</p>
+			<p class="text-xs text-text-tertiary">
+				Nur die ersten 15 angezeigt — ggf. Tasks priorisieren.
+			</p>
 		{/if}
 	{/if}
 

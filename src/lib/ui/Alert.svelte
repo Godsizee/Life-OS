@@ -37,7 +37,9 @@
 <div
 	role={roles[variant]}
 	transition:fly={{ y: -6, duration: motionDuration(DURATION.fast), easing: EASE_STANDARD }}
-	class="flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm leading-snug {styles[variant]}"
+	class="flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm leading-snug {styles[
+		variant
+	]}"
 >
 	<Icon size={16} class="mt-0.5 shrink-0" />
 	<div class="flex min-w-0 flex-1 flex-col gap-1.5">

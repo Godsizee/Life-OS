@@ -7,10 +7,10 @@
 
 {#if streak.total > 0}
 	<div
-		class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold border
+		class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-bold
 			{streak.isActive
-			? 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/40'
-			: 'bg-surface-2 text-text-secondary border-border-color/30'}"
+			? 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/40 dark:bg-orange-950/30 dark:text-orange-400'
+			: 'border-border-color/30 bg-surface-2 text-text-secondary'}"
 		title="Längste Streak: {streak.longest} Tage"
 	>
 		<Flame size={12} class={streak.isActive ? 'text-orange-500' : 'text-text-tertiary'} />

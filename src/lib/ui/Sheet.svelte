@@ -61,7 +61,11 @@
 	}
 </script>
 
-<svelte:window onpointermove={onPointerMove} onpointerup={onPointerUp} onpointercancel={onPointerUp} />
+<svelte:window
+	onpointermove={onPointerMove}
+	onpointerup={onPointerUp}
+	onpointercancel={onPointerUp}
+/>
 
 {#if open}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -80,7 +84,7 @@
 		aria-label={title}
 		tabindex="-1"
 		onkeydown={handleKeydown}
-		class="pb-safe fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-2xl border-t border-border-color bg-surface-0 elevation-3 outline-none"
+		class="pb-safe elevation-3 fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-2xl border-t border-border-color bg-surface-0 outline-none"
 		style="transform: translateY({dragOffset}px); transition: transform {dragOffset === 0
 			? `${motionDuration(DURATION.fast)}ms`
 			: '0ms'} {EASE_STANDARD_CSS}"
@@ -94,7 +98,7 @@
 			<div class="h-1 w-9 rounded-full bg-surface-3"></div>
 		</div>
 
-		<div class="flex shrink-0 items-center justify-between px-4 pb-2 pt-2">
+		<div class="flex shrink-0 items-center justify-between px-4 pt-2 pb-2">
 			{#if header}
 				{@render header()}
 			{:else}

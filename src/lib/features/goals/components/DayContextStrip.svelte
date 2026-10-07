@@ -29,7 +29,13 @@
 		{ icon: Moon, label: `${context.sleep_h} h Schlaf`, show: context.sleep_h !== null },
 		{
 			icon: Droplet,
-			label: context.water_ml !== null ? formatMetric('water_ml', context.water_ml, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl }) : '',
+			label:
+				context.water_ml !== null
+					? formatMetric('water_ml', context.water_ml, {
+							waterUnit: profileState.waterUnit,
+							glassSizeMl: profileState.glassSizeMl
+						})
+					: '',
 			show: context.water_ml !== null && context.water_ml > 0
 		},
 		{ icon: Zap, label: `${context.focus_minutes} min Fokus`, show: context.focus_minutes > 0 }

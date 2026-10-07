@@ -62,7 +62,9 @@ function habitAdherence(q: WochenQuellen, fenster: WeekWindow): number | null {
 function trainingsvolumen(q: WochenQuellen, von: string, bis: string): number {
 	return Math.round(
 		q.setLogs
-			.filter((s) => s.date >= von && s.date <= bis && s.set_type !== 'warmup' && s.weight_kg && s.reps)
+			.filter(
+				(s) => s.date >= von && s.date <= bis && s.set_type !== 'warmup' && s.weight_kg && s.reps
+			)
 			.reduce((sum, s) => sum + (s.weight_kg ?? 0) * (s.reps ?? 0), 0)
 	);
 }
@@ -86,7 +88,8 @@ function rohWerte(q: WochenQuellen, fenster: WeekWindow): RohWert[] {
 		{
 			id: 'workouts',
 			label: 'Workouts',
-			wert: new Set(q.workouts.filter((w) => w.date >= von && w.date <= bis).map((w) => w.date)).size
+			wert: new Set(q.workouts.filter((w) => w.date >= von && w.date <= bis).map((w) => w.date))
+				.size
 		},
 		{
 			id: 'volume',
@@ -122,7 +125,10 @@ function rohWerte(q: WochenQuellen, fenster: WeekWindow): RohWert[] {
 		{
 			id: 'score',
 			label: 'Ø Life Score',
-			wert: scores.length > 0 ? Math.round(scores.reduce((s, x) => s + x.total, 0) / scores.length) : null,
+			wert:
+				scores.length > 0
+					? Math.round(scores.reduce((s, x) => s + x.total, 0) / scores.length)
+					: null,
 			hoeherIstBesser: true
 		}
 	];
@@ -133,7 +139,11 @@ function rohWerte(q: WochenQuellen, fenster: WeekWindow): RohWert[] {
  * `q` bleibt für beide Fenster dieselbe (ungefilterte) Datenquelle — gefiltert
  * wird ausschließlich über `aktuell`/`vorwoche`.
  */
-export function wochenKennzahlen(q: WochenQuellen, aktuell: WeekWindow, vorwoche: WeekWindow): Kennzahl[] {
+export function wochenKennzahlen(
+	q: WochenQuellen,
+	aktuell: WeekWindow,
+	vorwoche: WeekWindow
+): Kennzahl[] {
 	const a = rohWerte(q, aktuell);
 	const v = rohWerte(q, vorwoche);
 	return a.map((r, i) => ({

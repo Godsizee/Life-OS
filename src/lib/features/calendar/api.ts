@@ -24,7 +24,9 @@ export async function createCalendar(workspaceId: string, name: string): Promise
 	return data;
 }
 
-export async function updateCalendarRaw(patch: Partial<Pick<Calendar, 'name' | 'color' | 'ics_url'>> & { id: string }): Promise<Calendar> {
+export async function updateCalendarRaw(
+	patch: Partial<Pick<Calendar, 'name' | 'color' | 'ics_url'>> & { id: string }
+): Promise<Calendar> {
 	const { id, ...rest } = patch;
 	const { data, error } = await supabase
 		.from('calendars')
@@ -66,12 +68,7 @@ export async function insertRaw(event: Event): Promise<Event> {
 
 export async function updateRaw(patch: Partial<Event> & { id: string }): Promise<Event> {
 	const { id, ...rest } = patch;
-	const { data, error } = await supabase
-		.from('events')
-		.update(rest)
-		.eq('id', id)
-		.select()
-		.single();
+	const { data, error } = await supabase.from('events').update(rest).eq('id', id).select().single();
 	if (error) throw error;
 	return data;
 }

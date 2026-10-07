@@ -17,7 +17,7 @@
 					? 'stroke-amber-500'
 					: 'stroke-red-500'
 	);
-	
+
 	const textClass = $derived(
 		score >= 80
 			? 'text-primary-600 dark:text-primary-400'
@@ -41,7 +41,7 @@
 			stroke-width="8"
 			class="text-surface-3"
 		/>
-		
+
 		<!-- Indicator Ring -->
 		<circle
 			cx="50"
@@ -64,10 +64,10 @@
 			</filter>
 		</defs>
 	</svg>
-	
+
 	<!-- Score Text overlay -->
 	<div class="absolute flex flex-col items-center justify-center">
 		<span class="text-3xl font-extrabold tracking-tight tabular-nums {textClass}">{score}</span>
-		<span class="text-[9px] uppercase tracking-wider font-semibold text-text-tertiary">Score</span>
+		<span class="text-[9px] font-semibold tracking-wider text-text-tertiary uppercase">Score</span>
 	</div>
 </div>

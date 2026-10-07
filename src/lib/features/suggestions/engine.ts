@@ -5,7 +5,12 @@ import { goalsState } from '#lib/features/goals/store.svelte.js';
 import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 import { getGoalProgress } from '#lib/features/goals/progress.js';
 import { evaluateTrack } from '#lib/features/goals/checkins.js';
-import { calculateStreak, toISODate, isOpenToday, streakLabel } from '#lib/features/habits/streak.js';
+import {
+	calculateStreak,
+	toISODate,
+	isOpenToday,
+	streakLabel
+} from '#lib/features/habits/streak.js';
 import { shoppingState } from '#lib/features/shopping/store.svelte.js';
 import { waterMl } from '#lib/features/health/stats.js';
 import { profileState } from '#lib/features/profile/store.svelte.js';
@@ -105,7 +110,9 @@ export function getSuggestions(): Suggestion[] {
 	}
 
 	// 5. Kein Journal (3+ Tage kein Eintrag)
-	const recentJournalEntries = goalsState.journalEntries.filter(j => j.kind !== 'weekly').map(j => j.date);
+	const recentJournalEntries = goalsState.journalEntries
+		.filter((j) => j.kind !== 'weekly')
+		.map((j) => j.date);
 	let journalMissingDays = 0;
 	for (let i = 1; i <= 3; i++) {
 		const d = new Date();

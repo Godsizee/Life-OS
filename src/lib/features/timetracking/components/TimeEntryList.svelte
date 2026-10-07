@@ -14,7 +14,7 @@
 	<ul class="flex flex-col divide-y divide-border-color">
 		{#each entries as entry (entry.id)}
 			<li class="flex items-center gap-2 py-2">
-				<span class="w-20 shrink-0 text-xs tabular-nums text-text-secondary">
+				<span class="w-20 shrink-0 text-xs text-text-secondary tabular-nums">
 					{formatMinutes(minutesOf(entry))}
 				</span>
 				<span class="w-24 shrink-0 text-xs text-text-tertiary">

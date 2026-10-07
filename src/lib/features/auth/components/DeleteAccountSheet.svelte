@@ -57,7 +57,9 @@
 
 <Sheet bind:open title="Konto löschen">
 	<div class="flex flex-col gap-4 px-4 pb-6">
-		<div class="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30">
+		<div
+			class="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30"
+		>
 			<AlertTriangle size={18} class="mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
 			<div class="text-sm text-red-800 dark:text-red-300">
 				<p class="font-semibold">Das lässt sich nicht rückgängig machen.</p>

@@ -12,7 +12,7 @@
 		if (scores.length === 0) return '';
 		let d = '';
 		let isDrawing = false;
-		
+
 		for (let i = 0; i < scores.length; i++) {
 			const s = scores[i];
 			if (s.total === null) {
@@ -21,7 +21,7 @@
 			}
 			const x = (i / (scores.length - 1 || 1)) * width;
 			const y = height - (s.total / 100) * (height - 6) - 3;
-			
+
 			if (!isDrawing) {
 				d += ` M ${x},${y}`;
 				isDrawing = true;
@@ -48,7 +48,7 @@
 				stroke-linejoin="round"
 				class="text-primary-600 dark:text-primary-400"
 			/>
-			
+
 			<!-- Dots for each valid point -->
 			{#each scores as s, i}
 				{#if s.total !== null}

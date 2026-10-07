@@ -39,7 +39,8 @@
 			? 'text-primary-700 dark:text-primary-400'
 			: 'text-text-secondary'}"
 	>
-		{#if isPrivate}<Lock size={16} />Nur für mich{:else}<LockOpen size={16} />Mit dem Workspace geteilt{/if}
+		{#if isPrivate}<Lock size={16} />Nur für mich{:else}<LockOpen size={16} />Mit dem Workspace
+			geteilt{/if}
 	</button>
 
 	<Button type="submit">

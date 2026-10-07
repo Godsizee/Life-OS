@@ -44,7 +44,10 @@
 		Math.round(
 			sets.reduce(
 				(sum, s) =>
-					sum + (s.completed && s.set_type !== 'warmup' && s.weight_kg && s.reps ? s.weight_kg * s.reps : 0),
+					sum +
+					(s.completed && s.set_type !== 'warmup' && s.weight_kg && s.reps
+						? s.weight_kg * s.reps
+						: 0),
 				0
 			)
 		)
@@ -57,7 +60,9 @@
 		failure: { label: 'F', cls: 'text-red-600 dark:text-red-400' }
 	};
 	const totalDistanceKm = $derived(
-		Math.round(sets.reduce((sum, s) => sum + (s.completed && s.distance_km ? s.distance_km : 0), 0) * 10) / 10
+		Math.round(
+			sets.reduce((sum, s) => sum + (s.completed && s.distance_km ? s.distance_km : 0), 0) * 10
+		) / 10
 	);
 
 	import { healthState } from '#lib/features/health/store.svelte.js';
@@ -79,12 +84,17 @@
 	<title>Workout-Log - Fitness</title>
 </svelte:head>
 
-<a href="/fitness" class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary">
+<a
+	href="/fitness"
+	class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary"
+>
 	<ArrowLeft size={16} /> Fitness
 </a>
 
 {#if !log}
-	<div class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary">
+	<div
+		class="rounded-2xl border border-border-color bg-surface-0 p-8 text-center text-text-secondary"
+	>
 		{#if fitnessState.loading}
 			Lade Workout…
 		{:else}
@@ -96,8 +106,10 @@
 		<!-- Kopf -->
 		<header class="space-y-2">
 			<div class="flex items-center justify-between gap-4">
-				<h1 class="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2 min-w-0">
-					{#if isFreestyle}<Zap size={18} class="text-primary-active shrink-0" />{/if}
+				<h1
+					class="flex min-w-0 items-center gap-2 text-2xl font-bold tracking-tight text-text-primary"
+				>
+					{#if isFreestyle}<Zap size={18} class="shrink-0 text-primary-active" />{/if}
 					<span class="truncate">{planName}</span>
 				</h1>
 				<button
@@ -106,7 +118,7 @@
 						await liveWorkoutState.startFromLog(logId);
 						goto('/fitness');
 					}}
-					class="shrink-0 h-10 px-3 rounded-lg bg-surface-2 hover:bg-primary-500/10 hover:text-primary-active text-text-secondary font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95"
+					class="flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-surface-2 px-3 text-xs font-bold text-text-secondary transition-all hover:bg-primary-500/10 hover:text-primary-active active:scale-95"
 				>
 					<Repeat size={14} />
 					<span class="hidden sm:inline">Wiederholen</span>
@@ -115,7 +127,13 @@
 			<div class="flex flex-wrap gap-4 text-xs font-semibold text-text-secondary">
 				<span class="flex items-center gap-1">
 					<Calendar size={12} />
-					<span>{new Date(log.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+					<span
+						>{new Date(log.date).toLocaleDateString('de-DE', {
+							weekday: 'long',
+							day: 'numeric',
+							month: 'long'
+						})}</span
+					>
 				</span>
 				{#if log.duration_minutes}
 					<span class="flex items-center gap-1">
@@ -134,18 +152,22 @@
 
 		<!-- Stats -->
 		<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-			<div class="glass-card rounded-2xl p-4 premium-shadow">
-				<p class="text-[11px] uppercase tracking-wider text-text-tertiary font-bold">Gesamtvolumen</p>
-				<p class="text-lg font-extrabold text-text-primary">{totalVolumeKg.toLocaleString('de-DE')} kg</p>
+			<div class="glass-card premium-shadow rounded-2xl p-4">
+				<p class="text-[11px] font-bold tracking-wider text-text-tertiary uppercase">
+					Gesamtvolumen
+				</p>
+				<p class="text-lg font-extrabold text-text-primary">
+					{totalVolumeKg.toLocaleString('de-DE')} kg
+				</p>
 			</div>
 			{#if totalDistanceKm > 0}
-				<div class="glass-card rounded-2xl p-4 premium-shadow">
-					<p class="text-[11px] uppercase tracking-wider text-text-tertiary font-bold">Strecke</p>
+				<div class="glass-card premium-shadow rounded-2xl p-4">
+					<p class="text-[11px] font-bold tracking-wider text-text-tertiary uppercase">Strecke</p>
 					<p class="text-lg font-extrabold text-text-primary">{totalDistanceKm} km</p>
 				</div>
 			{/if}
-			<div class="glass-card rounded-2xl p-4 premium-shadow">
-				<p class="text-[11px] uppercase tracking-wider text-text-tertiary font-bold">Übungen</p>
+			<div class="glass-card premium-shadow rounded-2xl p-4">
+				<p class="text-[11px] font-bold tracking-wider text-text-tertiary uppercase">Übungen</p>
 				<p class="text-lg font-extrabold text-text-primary">{exerciseNames.length}</p>
 			</div>
 		</div>
@@ -154,7 +176,9 @@
 		{#if loadingSets}
 			<p class="text-sm text-text-tertiary">Lade Sätze…</p>
 		{:else if exerciseNames.length === 0}
-			<div class="text-center py-8 text-text-tertiary border border-dashed border-border-color rounded-2xl text-sm">
+			<div
+				class="rounded-2xl border border-dashed border-border-color py-8 text-center text-sm text-text-tertiary"
+			>
 				Keine Sätze für dieses Workout aufgezeichnet.
 			</div>
 		{:else}
@@ -162,17 +186,22 @@
 				{#each exerciseNames as exName}
 					{@const exId = exerciseIdFor(exName)}
 					{@const best = prForExercise(exName)}
-					<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
+					<div class="glass-card premium-shadow space-y-3 rounded-2xl p-4">
 						<div class="flex items-center justify-between border-b border-border-color pb-2">
 							{#if exId}
-								<a href="/fitness/exercise/{exId}" class="font-bold text-sm text-text-primary hover:text-primary-active hover:underline">
+								<a
+									href="/fitness/exercise/{exId}"
+									class="text-sm font-bold text-text-primary hover:text-primary-active hover:underline"
+								>
 									{exName}
 								</a>
 							{:else}
-								<h4 class="font-bold text-sm text-text-primary">{exName}</h4>
+								<h4 class="text-sm font-bold text-text-primary">{exName}</h4>
 							{/if}
 							{#if best && isPR(exName, best.est_1rm)}
-								<span class="flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+								<span
+									class="flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400"
+								>
 									<Trophy size={12} />
 									<span>Neuer PR</span>
 								</span>
@@ -183,7 +212,7 @@
 							{#each setsFor(exName) as set (set.id)}
 								{@const badge = setTypeBadge[set.set_type]}
 								<div class="flex items-center justify-between text-xs">
-									<span class="font-bold w-6 shrink-0 {badge ? badge.cls : 'text-text-tertiary'}">
+									<span class="w-6 shrink-0 font-bold {badge ? badge.cls : 'text-text-tertiary'}">
 										{badge ? badge.label : `#${set.set_index}`}
 									</span>
 									<span class="flex-1 text-text-secondary">
@@ -192,7 +221,7 @@
 										{:else if set.exercise_type === 'cardio'}
 											{set.duration_min ?? '–'} Min · {set.distance_km ?? '–'} km
 											{#if formatPace(set.duration_min, set.distance_km)}
-												<span class="inline-flex items-center gap-0.5 ml-1 text-text-tertiary">
+												<span class="ml-1 inline-flex items-center gap-0.5 text-text-tertiary">
 													<Gauge size={10} />{formatPace(set.duration_min, set.distance_km)}
 												</span>
 											{/if}
@@ -203,7 +232,11 @@
 											<span class="text-text-tertiary">· RPE {set.rpe}</span>
 										{/if}
 									</span>
-									<span class={set.completed ? 'text-primary-600 dark:text-primary-400 font-bold' : 'text-text-tertiary'}>
+									<span
+										class={set.completed
+											? 'font-bold text-primary-600 dark:text-primary-400'
+											: 'text-text-tertiary'}
+									>
 										{set.completed ? '✓' : '–'}
 									</span>
 								</div>

@@ -10,10 +10,29 @@
 	import FocusStatsCard from '#lib/features/timetracking/components/FocusStatsCard.svelte';
 	import MonthlyReport from '#lib/features/analytics/components/MonthlyReport.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus, Download } from '@lucide/svelte';
+	import {
+		Activity,
+		Target,
+		Repeat,
+		Heart,
+		SmilePlus,
+		BookOpen,
+		Zap,
+		Dumbbell,
+		TrendingUp,
+		TrendingDown,
+		Minus,
+		Download
+	} from '@lucide/svelte';
 	import { APP_LOCALE } from '#lib/core/locale.js';
 	import { toISODate } from '#lib/core/date.js';
-	import { SCORE_WEIGHTS, SCORE_LABELS, weightLabel, scoreSeries, type ScoreKey } from '#lib/features/analytics/score-math.js';
+	import {
+		SCORE_WEIGHTS,
+		SCORE_LABELS,
+		weightLabel,
+		scoreSeries,
+		type ScoreKey
+	} from '#lib/features/analytics/score-math.js';
 	import { toCsv } from '#lib/features/analytics/report.js';
 
 	let zeitraum = $state<30 | 90 | 365>(30);
@@ -25,25 +44,41 @@
 
 	const series = $derived(scoreSeries(analyticsState.scores, zeitraum));
 	const averageScore = $derived(
-		series.filter(s => s.total !== null).length > 0
-			? Math.round(series.filter(s => s.total !== null).reduce((a, b) => a + (b.total ?? 0), 0) / series.filter(s => s.total !== null).length)
+		series.filter((s) => s.total !== null).length > 0
+			? Math.round(
+					series.filter((s) => s.total !== null).reduce((a, b) => a + (b.total ?? 0), 0) /
+						series.filter((s) => s.total !== null).length
+				)
 			: 0
 	);
-	
-	const historyList = $derived(showAllHistory ? analyticsState.scores.slice().reverse() : analyticsState.scores.slice().reverse().slice(0, 30));
-	
+
+	const historyList = $derived(
+		showAllHistory
+			? analyticsState.scores.slice().reverse()
+			: analyticsState.scores.slice().reverse().slice(0, 30)
+	);
+
 	const moodStatsEntries = $derived(filterSince(moodState.entries, zeitraum));
 
-	const breakdown = $derived(analyticsState.todayBreakdown ?? {
-		tasks: 0, habits: 0, health: 0, fitness: 0, mood: 0, goals: 0, journal: 0, focus: 0
-	});
+	const breakdown = $derived(
+		analyticsState.todayBreakdown ?? {
+			tasks: 0,
+			habits: 0,
+			health: 0,
+			fitness: 0,
+			mood: 0,
+			goals: 0,
+			journal: 0,
+			focus: 0
+		}
+	);
 
 	const yesterdayStr = $derived.by(() => {
 		const d = new Date();
 		d.setDate(d.getDate() - 1);
 		return toISODate(d);
 	});
-	
+
 	const yesterdayBreakdown = $derived.by(() => {
 		const entry = analyticsState.scores.find((s) => s.date === yesterdayStr);
 		return entry?.breakdown ?? null;
@@ -60,20 +95,25 @@
 	}
 
 	const KATEGORIE_STIL: Record<ScoreKey, { icon: typeof Target; color: string; bg: string }> = {
-		tasks:   { icon: Target,    color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/20' },
-		habits:  { icon: Repeat,    color: 'text-pink-500',   bg: 'bg-pink-50 dark:bg-pink-950/20' },
-		health:  { icon: Heart,     color: 'text-cyan-500',   bg: 'bg-cyan-50 dark:bg-cyan-950/20' },
-		fitness: { icon: Dumbbell,  color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/20' },
-		goals:   { icon: Activity,  color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-950/20' },
-		journal: { icon: BookOpen,  color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
-		mood:    { icon: SmilePlus, color: 'text-amber-500',  bg: 'bg-amber-50 dark:bg-amber-950/20' },
-		focus:   { icon: Zap,       color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' }
+		tasks: { icon: Target, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
+		habits: { icon: Repeat, color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-950/20' },
+		health: { icon: Heart, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-950/20' },
+		fitness: { icon: Dumbbell, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/20' },
+		goals: { icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-950/20' },
+		journal: { icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
+		mood: { icon: SmilePlus, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/20' },
+		focus: { icon: Zap, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' }
 	};
 
 	const categories = $derived(
 		(Object.keys(SCORE_WEIGHTS) as ScoreKey[])
 			.sort((a, b) => SCORE_WEIGHTS[b] - SCORE_WEIGHTS[a])
-			.map((key) => ({ key, name: SCORE_LABELS[key], weight: weightLabel(key), ...KATEGORIE_STIL[key] }))
+			.map((key) => ({
+				key,
+				name: SCORE_LABELS[key],
+				weight: weightLabel(key),
+				...KATEGORIE_STIL[key]
+			}))
 	);
 
 	function exportCsv() {
@@ -97,10 +137,12 @@
 	<div class="flex items-center gap-1 rounded-xl bg-surface-2 p-1">
 		{#each [30, 90, 365] as z}
 			<button
-				onclick={() => { zeitraum = z as any; }}
+				onclick={() => {
+					zeitraum = z as any;
+				}}
 				class="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-xs font-bold transition-all md:flex-none md:px-3 {zeitraum ===
 				z
-					? 'bg-surface-0 text-primary-active premium-shadow'
+					? 'premium-shadow bg-surface-0 text-primary-active'
 					: 'text-text-secondary hover:text-text-primary'}"
 			>
 				{z} T.
@@ -113,7 +155,10 @@
 	<!-- Header. Der Zeitraum-Umschalter ist ~184px breit und liesse neben Titel und
 	     Untertitel auf schmalen Displays keine brauchbare Spalte uebrig - darunter
 	     steht er deshalb als eigene Zeile. -->
-	<PageHeader title="Life Score" subtitle="Analysiere dein tägliches Wohlbefinden und Produktivität.">
+	<PageHeader
+		title="Life Score"
+		subtitle="Analysiere dein tägliches Wohlbefinden und Produktivität."
+	>
 		{#snippet trailing()}
 			<div class="hidden md:block">
 				{@render zeitraumToggle()}
@@ -128,29 +173,37 @@
 	<!-- Core Dashboard -->
 	<div class="grid gap-6 md:grid-cols-3">
 		<!-- Ring / Score Card -->
-		<div class="glass-card rounded-2xl p-6 premium-shadow flex flex-col items-center justify-center text-center">
+		<div
+			class="glass-card premium-shadow flex flex-col items-center justify-center rounded-2xl p-6 text-center"
+		>
 			<ScoreRing score={analyticsState.todayScore} size={140} />
 			<div class="mt-4">
 				<h3 class="text-base font-bold text-text-primary">Heutiger Life Score</h3>
-				<p class="text-xs text-text-secondary mt-1">Dein aktueller Tages-Score basierend auf deinen Daten.</p>
+				<p class="mt-1 text-xs text-text-secondary">
+					Dein aktueller Tages-Score basierend auf deinen Daten.
+				</p>
 			</div>
 		</div>
 
 		<!-- Trend Sparkline -->
-		<div class="glass-card rounded-2xl p-6 premium-shadow flex flex-col justify-between md:col-span-2">
+		<div
+			class="glass-card premium-shadow flex flex-col justify-between rounded-2xl p-6 md:col-span-2"
+		>
 			<div class="flex items-center justify-between">
 				<div>
-					<h3 class="text-sm font-bold uppercase tracking-wider text-text-tertiary">Score-Verlauf</h3>
+					<h3 class="text-sm font-bold tracking-wider text-text-tertiary uppercase">
+						Score-Verlauf
+					</h3>
 					<span class="text-3xl font-extrabold text-text-primary tabular-nums">{averageScore}</span>
-					<span class="text-xs text-text-secondary ml-1">Ø-Score</span>
+					<span class="ml-1 text-xs text-text-secondary">Ø-Score</span>
 				</div>
 			</div>
-			
+
 			<div class="my-4 flex justify-center py-2">
 				<WeekSparkline scores={series} />
 			</div>
-			
-			<div class="text-[11px] text-text-tertiary border-t border-border-color pt-3">
+
+			<div class="border-t border-border-color pt-3 text-[11px] text-text-tertiary">
 				Je beständiger du trackst, desto präziser ist dein durchschnittlicher Score.
 			</div>
 		</div>
@@ -158,13 +211,15 @@
 
 	<!-- Breakdown Details -->
 	<section class="space-y-3">
-		<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Heutige Aufschlüsselung</h2>
-		<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+		<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
+			Heutige Aufschlüsselung
+		</h2>
+		<div class="grid gap-4 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-4">
 			{#each categories as cat (cat.key)}
 				{@const Icon = cat.icon}
 				{@const val = breakdown[cat.key] ?? 0}
 				{@const t = trend(cat.key)}
-				<div class="glass-card rounded-2xl p-4 premium-shadow flex items-center justify-between">
+				<div class="glass-card premium-shadow flex items-center justify-between rounded-2xl p-4">
 					<div class="flex items-center gap-3">
 						<div class="flex h-10 w-10 items-center justify-center rounded-xl {cat.bg} {cat.color}">
 							<Icon size={18} />
@@ -186,10 +241,13 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<!-- Progress mini bar -->
-					<div class="h-10 w-1 bg-surface-3 rounded-full overflow-hidden">
-						<div class="bg-primary-600 w-full rounded-full transition-all duration-1000" style="height: {val}%"></div>
+					<div class="h-10 w-1 overflow-hidden rounded-full bg-surface-3">
+						<div
+							class="w-full rounded-full bg-primary-600 transition-all duration-1000"
+							style="height: {val}%"
+						></div>
 					</div>
 				</div>
 			{/each}
@@ -204,7 +262,7 @@
 
 	<!-- Aktivitäts-Statistik -->
 	<section class="space-y-3">
-		<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+		<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
 			Stimmung ↔ Aktivitäten ({zeitraum} Tage)
 		</h2>
 		<MoodActivityStats entries={moodStatsEntries} />
@@ -217,36 +275,45 @@
 	{#if analyticsState.scores.length > 0}
 		<section class="space-y-3">
 			<div class="flex items-center justify-between">
-				<h2 class="text-xs font-bold uppercase tracking-wider text-text-tertiary">Verlauf</h2>
-				<button 
+				<h2 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Verlauf</h2>
+				<button
 					onclick={exportCsv}
-					class="text-xs font-bold text-primary-active hover:text-primary-600 flex items-center gap-1"
+					class="flex items-center gap-1 text-xs font-bold text-primary-active hover:text-primary-600"
 				>
 					<Download size={14} /> CSV
 				</button>
 			</div>
-			
-			<div class="glass-card rounded-2xl p-4 premium-shadow overflow-hidden divide-y divide-border-color">
+
+			<div
+				class="glass-card premium-shadow divide-y divide-border-color overflow-hidden rounded-2xl p-4"
+			>
 				{#each historyList as entry (entry.id)}
 					<div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
 						<div class="flex items-center gap-3">
 							<span class="text-xs font-bold text-text-primary">
-								{new Date(entry.date).toLocaleDateString(APP_LOCALE, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+								{new Date(entry.date).toLocaleDateString(APP_LOCALE, {
+									weekday: 'short',
+									day: 'numeric',
+									month: 'short',
+									year: 'numeric'
+								})}
 							</span>
 						</div>
 						<div class="flex items-center gap-2">
-							<div class="h-2 w-12 bg-surface-3 rounded-full overflow-hidden hidden xs:block">
-								<div class="h-full bg-primary-600 rounded-full" style="width: {entry.total}%"></div>
+							<div class="hidden h-2 w-12 overflow-hidden rounded-full bg-surface-3 xs:block">
+								<div class="h-full rounded-full bg-primary-600" style="width: {entry.total}%"></div>
 							</div>
-							<span class="text-xs font-bold tabular-nums text-primary-active">{entry.total} Pts</span>
+							<span class="text-xs font-bold text-primary-active tabular-nums"
+								>{entry.total} Pts</span
+							>
 						</div>
 					</div>
 				{/each}
-				
+
 				{#if !showAllHistory && analyticsState.scores.length > 30}
-					<div class="pt-3 flex justify-center">
-						<button 
-							onclick={() => showAllHistory = true}
+					<div class="flex justify-center pt-3">
+						<button
+							onclick={() => (showAllHistory = true)}
 							class="text-xs font-bold text-text-secondary hover:text-text-primary"
 						>
 							Mehr anzeigen

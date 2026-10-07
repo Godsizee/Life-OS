@@ -22,9 +22,7 @@ describe('renderMarkdownSafe — Sicherheit', () => {
 	});
 
 	it('escaped HTML in Code-Bloecken', () => {
-		expect(renderMarkdownSafe('```\n<script>\n```')).toBe(
-			'<pre><code>&lt;script&gt;</code></pre>'
-		);
+		expect(renderMarkdownSafe('```\n<script>\n```')).toBe('<pre><code>&lt;script&gt;</code></pre>');
 	});
 
 	it('verlinkt keine anderen Schemata als http(s)', () => {

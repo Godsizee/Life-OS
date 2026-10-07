@@ -36,28 +36,30 @@
 	{#if habit}
 		{@const day = habitsState.entryToday(habit.id)}
 		{@const skipped = isSkipped(day)}
-		
+
 		<div class="flex flex-col p-2">
 			<!-- Link zur Detailseite -->
 			{#if showStatsLink}
 				<a
-				href={`/habits/${habit.id}`}
-				onclick={() => {
-					open = false;
-					onClose();
-				}}
-				class="flex items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-surface-1"
-			>
-				<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/30">
-					<Activity size={20} />
-				</div>
-				<div class="flex flex-col">
-					<span class="text-sm font-semibold text-text-primary">Statistiken ansehen</span>
-					<span class="text-xs text-text-secondary">Verlauf & Streaks im Detail</span>
-				</div>
-			</a>
+					href={`/habits/${habit.id}`}
+					onclick={() => {
+						open = false;
+						onClose();
+					}}
+					class="flex items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-surface-1"
+				>
+					<div
+						class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/30"
+					>
+						<Activity size={20} />
+					</div>
+					<div class="flex flex-col">
+						<span class="text-sm font-semibold text-text-primary">Statistiken ansehen</span>
+						<span class="text-xs text-text-secondary">Verlauf & Streaks im Detail</span>
+					</div>
+				</a>
 
-			<hr class="my-2 border-border-color" />
+				<hr class="my-2 border-border-color" />
 			{/if}
 
 			<!-- Skip -->
@@ -65,7 +67,9 @@
 				onclick={handleSkip}
 				class="flex items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-surface-1"
 			>
-				<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-text-secondary">
+				<div
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-text-secondary"
+				>
 					<Ban size={20} />
 				</div>
 				<div class="flex flex-col">
@@ -83,7 +87,9 @@
 				}}
 				class="flex items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-surface-1"
 			>
-				<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-text-secondary">
+				<div
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-text-secondary"
+				>
 					<Edit2 size={20} />
 				</div>
 				<div class="flex flex-col">
@@ -99,12 +105,17 @@
 				onclick={handleArchive}
 				class="flex items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-red-50 dark:hover:bg-red-950/20"
 			>
-				<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600 dark:bg-red-900/30">
+				<div
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600 dark:bg-red-900/30"
+				>
 					<Archive size={20} />
 				</div>
 				<div class="flex flex-col">
 					<span class="text-sm font-semibold text-red-600">Archivieren</span>
-					<span class="text-xs text-red-500/70">Wird ins Archiv verschoben — Verlauf bleibt erhalten, Wiederherstellen jederzeit möglich.</span>
+					<span class="text-xs text-red-500/70"
+						>Wird ins Archiv verschoben — Verlauf bleibt erhalten, Wiederherstellen jederzeit
+						möglich.</span
+					>
 				</div>
 			</button>
 		</div>

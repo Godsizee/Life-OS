@@ -14,7 +14,11 @@
 	import PasswordField from '#lib/features/auth/components/PasswordField.svelte';
 	import { signUpWithPassword } from '#lib/features/auth/api.js';
 	import { authErrorText } from '#lib/features/auth/errors.js';
-	import { authErrorCode, focusTargetFor, offersLoginInstead } from '#lib/features/auth/feedback.js';
+	import {
+		authErrorCode,
+		focusTargetFor,
+		offersLoginInstead
+	} from '#lib/features/auth/feedback.js';
 	import { safeNextPath } from '#lib/features/auth/redirect.js';
 	import { emailSchema, passwordSchema } from '#lib/features/auth/schema.js';
 
@@ -125,8 +129,8 @@
 					<Check size={24} />
 				</span>
 				<p class="text-sm leading-relaxed text-text-secondary">
-					Wir haben eine Nachricht an <strong class="text-text-primary">{email}</strong> geschickt.
-					Öffne den Link darin, danach kannst du dich anmelden.
+					Wir haben eine Nachricht an <strong class="text-text-primary">{email}</strong> geschickt. Öffne
+					den Link darin, danach kannst du dich anmelden.
 				</p>
 			</div>
 		{/snippet}

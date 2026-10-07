@@ -21,7 +21,9 @@
 	// Tasks und Habits die diesem Ziel zugeordnet sind
 	const linkedTasks = $derived(tasksState.tasks.filter((t) => t.goal_id === goal.id));
 	const linkedDone = $derived(linkedTasks.filter((t) => t.status === 'done'));
-	const linkedHabits = $derived(habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived));
+	const linkedHabits = $derived(
+		habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived)
+	);
 
 	const displayProgress = $derived(getGoalProgress(goal));
 	const isManual = $derived(usesManualProgress(goal));
@@ -33,7 +35,10 @@
 </script>
 
 <ListRow align="start">
-	<a href="/goals/{goal.id}" class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline">
+	<a
+		href="/goals/{goal.id}"
+		class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline"
+	>
 		{goal.title}
 		{#if goal.goal_type === 'pr'}<span class="ml-1 text-xs">🏋️</span>{/if}
 		{#if goal.goal_type === 'target'}<span class="ml-1 text-xs">🎯</span>{/if}
@@ -62,9 +67,11 @@
 	{/snippet}
 
 	<!-- Fortschritts-Balken -->
-	<div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
+	<div
+		class="mt-2 h-2 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
+	>
 		<div
-			class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500"
+			class="h-full bg-primary-600 transition-all duration-500 dark:bg-primary-500"
 			style="width: {displayProgress}%"
 		></div>
 	</div>
@@ -72,12 +79,20 @@
 	<div class="mt-2 flex flex-wrap items-center gap-1.5">
 		<OnTrackBadge {track} />
 		{#if track && track.state !== 'no_date' && track.state !== 'done'}
-			<span class="text-xs font-medium {track.daysLeft < 0 ? 'text-red-600 dark:text-red-400' : 'text-text-tertiary'}">
-				{track.daysLeft > 0 ? `noch ${track.daysLeft} Tage` : track.daysLeft === 0 ? 'heute fällig' : `${-track.daysLeft} Tage überfällig`}
+			<span
+				class="text-xs font-medium {track.daysLeft < 0
+					? 'text-red-600 dark:text-red-400'
+					: 'text-text-tertiary'}"
+			>
+				{track.daysLeft > 0
+					? `noch ${track.daysLeft} Tage`
+					: track.daysLeft === 0
+						? 'heute fällig'
+						: `${-track.daysLeft} Tage überfällig`}
 			</span>
 		{/if}
 		{#if goal.goal_type === 'target'}
-			<span class="text-[11px] font-medium tabular-nums text-text-secondary">
+			<span class="text-[11px] font-medium text-text-secondary tabular-nums">
 				{formatTargetProgress(checkinSum, goal.target_value, goal.target_unit)}
 			</span>
 		{/if}
@@ -97,15 +112,17 @@
 						<span
 							class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium {task.status ===
 							'done'
-								? 'bg-primary-100 dark:bg-primary-950/40 text-primary-700 dark:text-primary-400 line-through'
-								: 'bg-surface-2 text-text-secondary border border-border-color/30'}"
+								? 'bg-primary-100 text-primary-700 line-through dark:bg-primary-950/40 dark:text-primary-400'
+								: 'border border-border-color/30 bg-surface-2 text-text-secondary'}"
 						>
 							{task.status === 'done' ? '✓' : '○'}
 							{task.title.length > 20 ? task.title.slice(0, 20) + '…' : task.title}
 						</span>
 					{/each}
 					{#if linkedTasks.length > 4}
-						<span class="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-text-secondary border border-border-color/30">
+						<span
+							class="rounded-full border border-border-color/30 bg-surface-2 px-2 py-0.5 text-[10px] text-text-secondary"
+						>
 							+{linkedTasks.length - 4} weitere
 						</span>
 					{/if}
@@ -115,15 +132,20 @@
 			{#if linkedHabits.length > 0}
 				<div class="flex flex-wrap gap-1">
 					{#each linkedHabits.slice(0, 4) as habit (habit.id)}
-						{@const progress = calculateHabitProgress30Days(habit, habitsState.entriesFor(habit.id))}
+						{@const progress = calculateHabitProgress30Days(
+							habit,
+							habitsState.entriesFor(habit.id)
+						)}
 						<span
-							class="inline-flex items-center gap-1 rounded-full bg-pink-50 dark:bg-pink-950/20 text-pink-700 dark:text-pink-400 border border-pink-100 dark:border-pink-900/30 px-2 py-0.5 text-[10px] font-medium"
+							class="inline-flex items-center gap-1 rounded-full border border-pink-100 bg-pink-50 px-2 py-0.5 text-[10px] font-medium text-pink-700 dark:border-pink-900/30 dark:bg-pink-950/20 dark:text-pink-400"
 						>
 							🔁 {habit.name} ({progress}%)
 						</span>
 					{/each}
 					{#if linkedHabits.length > 4}
-						<span class="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-text-secondary border border-border-color/30">
+						<span
+							class="rounded-full border border-border-color/30 bg-surface-2 px-2 py-0.5 text-[10px] text-text-secondary"
+						>
 							+{linkedHabits.length - 4} weitere
 						</span>
 					{/if}
@@ -163,7 +185,7 @@
 		<select
 			value={goal.status}
 			onchange={(e) => goalsState.setStatus(goal.id, e.currentTarget.value as GoalStatus)}
-			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-2 text-xs text-text-primary focus:border-primary-500 focus:outline-none transition-colors duration-200"
+			class="min-h-12 rounded-xl border border-border-color bg-surface-0 px-2 text-xs text-text-primary transition-colors duration-200 focus:border-primary-500 focus:outline-none"
 		>
 			{#each Object.entries(statusLabel) as [value, label] (value)}
 				<option {value}>{label}</option>

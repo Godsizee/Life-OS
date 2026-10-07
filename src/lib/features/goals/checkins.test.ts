@@ -157,7 +157,10 @@ describe('formatTargetProgress', () => {
 
 describe('lastCheckinDate / daysSinceLastCheckin', () => {
 	it('finds the newest date regardless of input order', () => {
-		const list = [{ date: daysAgo(5), value: 1 }, { date: daysAgo(2), value: 1 }];
+		const list = [
+			{ date: daysAgo(5), value: 1 },
+			{ date: daysAgo(2), value: 1 }
+		];
 		expect(lastCheckinDate(list)).toBe(daysAgo(2));
 		expect(daysSinceLastCheckin(list, today)).toBe(2);
 	});
@@ -230,4 +233,3 @@ describe('buildGoalTree', () => {
 		expect(tree[1].goal.id).toBe('c');
 	});
 });
-

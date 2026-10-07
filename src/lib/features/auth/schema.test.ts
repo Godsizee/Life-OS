@@ -3,7 +3,9 @@ import { credentialsSchema, loginCredentialsSchema, passwordStrength } from './s
 
 describe('credentialsSchema', () => {
 	it('nimmt gueltige Zugangsdaten an', () => {
-		expect(credentialsSchema.safeParse({ email: 'a@b.de', password: 'geheim12' }).success).toBe(true);
+		expect(credentialsSchema.safeParse({ email: 'a@b.de', password: 'geheim12' }).success).toBe(
+			true
+		);
 	});
 
 	it('weist unvollstaendige Eingaben mit deutschem Text ab', () => {
@@ -24,7 +26,9 @@ describe('credentialsSchema', () => {
 describe('loginCredentialsSchema', () => {
 	it('laesst kuerzere Bestandspasswoerter durch, die die Vergabe-Policy nicht erzwingt', () => {
 		// z. B. im Supabase-Studio manuell gesetzt, ohne die 8-Zeichen-Regel der Registrierung.
-		expect(loginCredentialsSchema.safeParse({ email: 'a@b.de', password: 'kurz' }).success).toBe(true);
+		expect(loginCredentialsSchema.safeParse({ email: 'a@b.de', password: 'kurz' }).success).toBe(
+			true
+		);
 	});
 
 	it('weist ein leeres Passwort ab', () => {

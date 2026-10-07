@@ -58,7 +58,7 @@
 			aria-label={label}
 			tabindex="-1"
 			onkeydown={handleKeydown}
-			class="fixed inset-x-4 top-[10%] z-50 mx-auto max-h-[80dvh] max-w-lg overflow-y-auto rounded-2xl border border-border-color bg-surface-0 elevation-3 outline-none"
+			class="elevation-3 fixed inset-x-4 top-[10%] z-50 mx-auto max-h-[80dvh] max-w-lg overflow-y-auto rounded-2xl border border-border-color bg-surface-0 outline-none"
 			transition:scale={{ start: 0.96, duration: motionDuration(DURATION.base) }}
 		>
 			{@render children?.()}
@@ -72,7 +72,7 @@
 			aria-label={label}
 			tabindex="-1"
 			onkeydown={handleKeydown}
-			class="pb-safe fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-2xl border-t border-border-color bg-surface-0 elevation-3 outline-none"
+			class="pb-safe elevation-3 fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-2xl border-t border-border-color bg-surface-0 outline-none"
 			transition:fly={{ y: 300, duration: motionDuration(DURATION.base), easing: EASE_STANDARD }}
 		>
 			{@render children?.()}

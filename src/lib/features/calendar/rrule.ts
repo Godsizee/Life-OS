@@ -15,7 +15,12 @@ export interface RecurrenceForm {
 }
 
 export const LEERE_REGEL: RecurrenceForm = {
-	freq: 'none', interval: 1, byday: [], ende: 'nie', until: null, count: null
+	freq: 'none',
+	interval: 1,
+	byday: [],
+	ende: 'nie',
+	until: null,
+	count: null
 };
 
 const DAY_CODES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;
@@ -26,7 +31,12 @@ export function buildRrule(form: RecurrenceForm): string | null {
 	const teile = [`FREQ=${form.freq.toUpperCase()}`];
 	if (form.interval > 1) teile.push(`INTERVAL=${form.interval}`);
 	if (form.freq === 'weekly' && form.byday.length > 0) {
-		teile.push(`BYDAY=${[...form.byday].sort((a, b) => a - b).map((d) => DAY_CODES[d]).join(',')}`);
+		teile.push(
+			`BYDAY=${[...form.byday]
+				.sort((a, b) => a - b)
+				.map((d) => DAY_CODES[d])
+				.join(',')}`
+		);
 	}
 	if (form.ende === 'am' && form.until) teile.push(`UNTIL=${form.until.replace(/-/g, '')}`);
 	if (form.ende === 'nach' && form.count && form.count > 0) teile.push(`COUNT=${form.count}`);
@@ -39,15 +49,15 @@ export function buildRrule(form: RecurrenceForm): string | null {
  */
 export function parseRrule(rrule: string | null): RecurrenceForm {
 	if (!rrule || !rrule.startsWith('RRULE:')) return { ...LEERE_REGEL };
-	
+
 	const form: RecurrenceForm = { ...LEERE_REGEL };
 	const body = rrule.slice(6);
 	const parts = body.split(';');
-	
+
 	for (const part of parts) {
 		const [key, value] = part.split('=');
 		if (!key || !value) continue;
-		
+
 		switch (key) {
 			case 'FREQ':
 				const freqLower = value.toLowerCase();
@@ -60,7 +70,7 @@ export function parseRrule(rrule: string | null): RecurrenceForm {
 				break;
 			case 'BYDAY':
 				const days = value.split(',');
-				form.byday = days.map(d => DAY_CODES.indexOf(d as any)).filter(i => i !== -1);
+				form.byday = days.map((d) => DAY_CODES.indexOf(d as any)).filter((i) => i !== -1);
 				break;
 			case 'UNTIL':
 				if (value.length >= 8) {
@@ -74,7 +84,7 @@ export function parseRrule(rrule: string | null): RecurrenceForm {
 				break;
 		}
 	}
-	
+
 	return form;
 }
 
@@ -85,18 +95,19 @@ export function formatRecurrence(rrule: string | null): string {
 	if (!rrule) return 'einmalig';
 	const form = parseRrule(rrule);
 	if (form.freq === 'none') return 'einmalig';
-	
+
 	let freqText = '';
-	if (form.freq === 'daily') freqText = form.interval > 1 ? `alle ${form.interval} Tage` : 'täglich';
+	if (form.freq === 'daily')
+		freqText = form.interval > 1 ? `alle ${form.interval} Tage` : 'täglich';
 	else if (form.freq === 'weekly') {
 		freqText = form.interval > 1 ? `alle ${form.interval} Wochen` : 'wöchentlich';
 		if (form.byday.length > 0) {
-			const dayNames = [...form.byday].sort((a, b) => a - b).map(d => GERMAN_DAYS[d]);
+			const dayNames = [...form.byday].sort((a, b) => a - b).map((d) => GERMAN_DAYS[d]);
 			freqText += `, ${dayNames.join(', ')}`;
 		}
-	}
-	else if (form.freq === 'monthly') freqText = form.interval > 1 ? `alle ${form.interval} Monate` : 'monatlich';
-	
+	} else if (form.freq === 'monthly')
+		freqText = form.interval > 1 ? `alle ${form.interval} Monate` : 'monatlich';
+
 	let endeText = '';
 	if (form.ende === 'am' && form.until) {
 		const [y, m, d] = form.until.split('-');
@@ -104,6 +115,6 @@ export function formatRecurrence(rrule: string | null): string {
 	} else if (form.ende === 'nach' && form.count) {
 		endeText = ` (${form.count} Termine)`;
 	}
-	
+
 	return `${freqText}${endeText}`;
 }

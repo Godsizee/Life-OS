@@ -78,7 +78,7 @@
 
 	function toggleAttendee(id: string) {
 		if (attendeeIds.includes(id)) {
-			attendeeIds = attendeeIds.filter(x => x !== id);
+			attendeeIds = attendeeIds.filter((x) => x !== id);
 		} else {
 			attendeeIds = [...attendeeIds, id];
 		}
@@ -89,7 +89,7 @@
 		if (!title.trim() || !start) return;
 		const startDate = new Date(start);
 		const endDate = end ? new Date(end) : new Date(startDate.getTime() + 60 * 60 * 1000);
-		
+
 		if (occurrenceDate && event) {
 			await calendarState.patchOccurrence(event.id, occurrenceDate, {
 				title,
@@ -126,7 +126,9 @@
 
 <form onsubmit={submit} class="flex flex-col gap-3">
 	{#if isExternal}
-		<div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/30 dark:bg-blue-900/10 dark:text-blue-300">
+		<div
+			class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-900/30 dark:bg-blue-900/10 dark:text-blue-300"
+		>
 			Dieser Termin stammt aus einem externen Kalender-Abo und kann nicht bearbeitet werden.
 		</div>
 	{/if}
@@ -142,18 +144,20 @@
 	<Input type="datetime-local" bind:value={start} required disabled={isExternal} />
 	<Input type="datetime-local" bind:value={end} disabled={isExternal} />
 	<Input placeholder="Ort (optional)…" bind:value={location} disabled={isExternal} />
-	
-	<label class="flex min-h-12 items-center gap-2 text-sm text-text-secondary {isExternal ? 'opacity-50' : ''}">
+
+	<label
+		class="flex min-h-12 items-center gap-2 text-sm text-text-secondary {isExternal
+			? 'opacity-50'
+			: ''}"
+	>
 		<input type="checkbox" bind:checked={allDay} class="h-5 w-5" disabled={isExternal} />
 		Ganztägig
 	</label>
-	
+
 	{#if isExternal}
 		<!-- Zeige nur an, ob es eine Serie ist oder nicht -->
 		{#if recurrence.freq !== 'none'}
-			<div class="text-sm text-text-secondary">
-				Terminserie (extern verwaltet)
-			</div>
+			<div class="text-sm text-text-secondary">Terminserie (extern verwaltet)</div>
 		{/if}
 	{:else if !occurrenceDate}
 		<div class="mt-2 rounded-xl border border-border-color bg-surface-1 p-3">
@@ -164,11 +168,13 @@
 	<!-- Teilnehmer -->
 	{#if workspaceState.members.length > 0 && !occurrenceDate}
 		<div>
-			<span class="mb-1 block text-xs font-bold uppercase tracking-wide text-text-tertiary">Teilnehmer</span>
+			<span class="mb-1 block text-xs font-bold tracking-wide text-text-tertiary uppercase"
+				>Teilnehmer</span
+			>
 			<div class="flex flex-wrap gap-2">
 				{#each workspaceState.members as member (member.user_id)}
-					<Chip 
-						selected={attendeeIds.includes(member.user_id)} 
+					<Chip
+						selected={attendeeIds.includes(member.user_id)}
 						onclick={() => toggleAttendee(member.user_id)}
 					>
 						{member.profile?.display_name ?? 'Mitglied'}

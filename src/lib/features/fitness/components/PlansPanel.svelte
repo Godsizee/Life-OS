@@ -8,7 +8,7 @@
 
 	let newPlanName = $state('');
 	let newPlanDesc = $state('');
-	
+
 	async function handleCreatePlan() {
 		if (!newPlanName.trim()) return;
 		await fitnessState.addPlan({ name: newPlanName, description: newPlanDesc || null });
@@ -31,7 +31,12 @@
 		newExName = picked.name;
 		newExExerciseId = picked.exercise_id;
 		newExType = picked.exercise_type;
-		newExCategory = picked.exercise_type === 'cardio' ? 'Cardio' : picked.exercise_type === 'duration' ? 'Mobility' : 'Kraft';
+		newExCategory =
+			picked.exercise_type === 'cardio'
+				? 'Cardio'
+				: picked.exercise_type === 'duration'
+					? 'Mobility'
+					: 'Kraft';
 	}
 
 	async function handleAddExercise(planId: string) {
@@ -59,21 +64,23 @@
 
 <div class="space-y-6">
 	<!-- Create Plan Form -->
-	<form onsubmit={(e) => { e.preventDefault(); handleCreatePlan(); }} class="glass-card rounded-2xl p-5 premium-shadow space-y-4">
-		<h3 class="text-sm font-bold uppercase tracking-wider text-text-tertiary">Neuen Plan erstellen</h3>
+	<form
+		onsubmit={(e) => {
+			e.preventDefault();
+			handleCreatePlan();
+		}}
+		class="glass-card premium-shadow space-y-4 rounded-2xl p-5"
+	>
+		<h3 class="text-sm font-bold tracking-wider text-text-tertiary uppercase">
+			Neuen Plan erstellen
+		</h3>
 		<div class="grid gap-3 sm:grid-cols-2">
-			<Input
-				bind:value={newPlanName}
-				placeholder="z.B. Oberkörper / Push"
-			/>
-			<Input
-				bind:value={newPlanDesc}
-				placeholder="Beschreibung (optional)"
-			/>
+			<Input bind:value={newPlanName} placeholder="z.B. Oberkörper / Push" />
+			<Input bind:value={newPlanDesc} placeholder="Beschreibung (optional)" />
 		</div>
 		<button
 			type="submit"
-			class="min-h-10 w-full rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm transition-all active:scale-[0.99]"
+			class="min-h-10 w-full rounded-xl bg-primary-700 text-sm font-bold text-white transition-all hover:bg-primary-800 active:scale-[0.99]"
 		>
 			Erstellen
 		</button>
@@ -82,35 +89,39 @@
 	<!-- Plans List -->
 	<div class="grid gap-4 lg:grid-cols-2 lg:items-start">
 		{#each fitnessState.plans as plan (plan.id)}
-			<div class="glass-card rounded-2xl p-5 premium-shadow space-y-4">
+			<div class="glass-card premium-shadow space-y-4 rounded-2xl p-5">
 				<div class="flex items-start justify-between">
 					<div>
-						<h4 class="font-extrabold text-base text-text-primary">{plan.name}</h4>
+						<h4 class="text-base font-extrabold text-text-primary">{plan.name}</h4>
 						{#if plan.description}
-							<p class="text-xs text-text-secondary mt-1">{plan.description}</p>
+							<p class="mt-1 text-xs text-text-secondary">{plan.description}</p>
 						{/if}
 					</div>
 					<button
 						onclick={() => fitnessState.removePlan(plan.id)}
 						aria-label="Plan löschen"
-						class="text-red-500 hover:text-red-700 transition-colors p-1"
+						class="p-1 text-red-500 transition-colors hover:text-red-700"
 					>
 						<Trash2 size={16} />
 					</button>
 				</div>
 
 				<!-- Exercises inside Plan -->
-				<div class="border-t border-border-color pt-3 space-y-3">
-					<h5 class="text-xs font-bold text-text-tertiary uppercase tracking-wider">Übungen:</h5>
+				<div class="space-y-3 border-t border-border-color pt-3">
+					<h5 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">Übungen:</h5>
 					<ul class="space-y-2">
 						{#each fitnessState.exercises[plan.id] ?? [] as ex}
-							<li class="flex items-center justify-between text-xs text-text-secondary bg-surface-1/50 px-3 py-2 rounded-lg border border-border-color">
+							<li
+								class="flex items-center justify-between rounded-lg border border-border-color bg-surface-1/50 px-3 py-2 text-xs text-text-secondary"
+							>
 								<span>{ex.name} ({ex.category})</span>
-								<span class="font-semibold text-right">
+								<span class="text-right font-semibold">
 									{#if ex.exercise_type === 'strength'}
-										{ex.default_sets} Sätze x {ex.default_reps} Reps {#if ex.default_weight} @ {ex.default_weight}kg{/if}
+										{ex.default_sets} Sätze x {ex.default_reps} Reps {#if ex.default_weight}
+											@ {ex.default_weight}kg{/if}
 									{:else if ex.exercise_type === 'cardio'}
-										{ex.default_sets}x {#if ex.default_duration_min}{ex.default_duration_min} Min{/if} {#if ex.default_distance_km}· {ex.default_distance_km} km{/if}
+										{ex.default_sets}x {#if ex.default_duration_min}{ex.default_duration_min} Min{/if}
+										{#if ex.default_distance_km}· {ex.default_distance_km} km{/if}
 									{:else}
 										{ex.default_sets}x {#if ex.default_duration_min}{ex.default_duration_min} Min{/if}
 									{/if}
@@ -118,7 +129,7 @@
 								<button
 									onclick={() => fitnessState.removeExercise(plan.id, ex.id)}
 									aria-label="Übung entfernen"
-									class="ml-2 text-red-400 hover:text-red-600 transition-colors flex items-center shrink-0"
+									class="ml-2 flex shrink-0 items-center text-red-400 transition-colors hover:text-red-600"
 								>
 									<X size={13} />
 								</button>
@@ -127,10 +138,10 @@
 					</ul>
 
 					<!-- Add Exercise Inline Form -->
-					<div class="grid grid-cols-2 gap-2 mt-2">
+					<div class="mt-2 grid grid-cols-2 gap-2">
 						<button
 							onclick={() => (showPlanPicker = true)}
-							class="min-h-10 rounded-xl border border-border-color bg-surface-0 px-3 text-xs text-left col-span-2 flex items-center gap-2
+							class="col-span-2 flex min-h-10 items-center gap-2 rounded-xl border border-border-color bg-surface-0 px-3 text-left text-xs
 								{newExName ? 'text-text-primary' : 'text-text-tertiary'}"
 						>
 							<ListPlus size={14} class="shrink-0 text-text-tertiary" />
@@ -154,7 +165,7 @@
 					</div>
 					<button
 						onclick={() => handleAddExercise(plan.id)}
-						class="w-full min-h-10 bg-surface-2 hover:bg-surface-3 text-text-primary font-bold text-xs rounded-xl mt-2 flex items-center justify-center gap-2"
+						class="mt-2 flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-surface-2 text-xs font-bold text-text-primary hover:bg-surface-3"
 					>
 						<Plus size={14} />
 						<span>Übung hinzufügen</span>

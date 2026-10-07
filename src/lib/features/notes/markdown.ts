@@ -229,10 +229,10 @@ export interface MarkdownWerkzeug {
 }
 
 export const MARKDOWN_WERKZEUGE: MarkdownWerkzeug[] = [
-	{ id: 'h2',        label: 'Überschrift', prefix: '## ' },
-	{ id: 'list',      label: 'Liste',       prefix: '- ' },
-	{ id: 'checklist', label: 'Checkliste',  prefix: '- [ ] ' },
-	{ id: 'quote',     label: 'Zitat',       prefix: '> ' }
+	{ id: 'h2', label: 'Überschrift', prefix: '## ' },
+	{ id: 'list', label: 'Liste', prefix: '- ' },
+	{ id: 'checklist', label: 'Checkliste', prefix: '- [ ] ' },
+	{ id: 'quote', label: 'Zitat', prefix: '> ' }
 ];
 
 /**
@@ -251,7 +251,10 @@ export function toggleLinePrefix(
 
 	if (zeile.startsWith(prefix)) {
 		return {
-			text: text.slice(0, zeilenStart) + zeile.slice(prefix.length) + text.slice(zeilenStart + zeile.length),
+			text:
+				text.slice(0, zeilenStart) +
+				zeile.slice(prefix.length) +
+				text.slice(zeilenStart + zeile.length),
 			cursor: Math.max(zeilenStart, cursor - prefix.length)
 		};
 	}

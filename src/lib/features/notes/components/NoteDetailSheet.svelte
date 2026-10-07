@@ -2,7 +2,14 @@
 	import { Eye, Hash, ListChecks, Lock, LockOpen, Pen, Pin, Trash2 } from '@lucide/svelte';
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
-	import { checklistProgress, renderMarkdownSafe, toggleChecklistLine, MARKDOWN_WERKZEUGE, toggleLinePrefix, type MarkdownWerkzeug } from '../markdown';
+	import {
+		checklistProgress,
+		renderMarkdownSafe,
+		toggleChecklistLine,
+		MARKDOWN_WERKZEUGE,
+		toggleLinePrefix,
+		type MarkdownWerkzeug
+	} from '../markdown';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
@@ -71,7 +78,7 @@
 		const r = toggleLinePrefix(body, cursor, w.prefix);
 		body = r.text;
 		saveBody();
-		
+
 		// DOM Update abwarten, dann Cursor setzen
 		setTimeout(() => {
 			if (textareaEl) {
@@ -149,15 +156,15 @@
 
 				{#if note.private && !isAuthor}
 					<p class="rounded-xl bg-surface-2 px-3 py-2 text-xs text-text-tertiary">
-						Diese Notiz ist privat — nur die Person, die sie angelegt hat, kann den
-						Schalter umlegen.
+						Diese Notiz ist privat — nur die Person, die sie angelegt hat, kann den Schalter
+						umlegen.
 					</p>
 				{/if}
 
 				<!-- Inhalt -->
 				{#if mode === 'edit'}
 					<Field label="Inhalt">
-						<div class="flex flex-wrap gap-1.5 mb-2">
+						<div class="mb-2 flex flex-wrap gap-1.5">
 							{#each MARKDOWN_WERKZEUGE as w (w.id)}
 								<button
 									type="button"
@@ -222,15 +229,20 @@
 				</Field>
 
 				<div class="mt-2 flex flex-col items-end gap-2 border-t border-border-color pt-4">
-					<p class="text-[11px] text-text-tertiary text-right">
+					<p class="text-right text-[11px] text-text-tertiary">
 						Erstellt {formatDate(note.created_at)}
-						{#if workspaceState.memberName(note.created_by)}von {workspaceState.memberName(note.created_by)}{/if}
+						{#if workspaceState.memberName(note.created_by)}von {workspaceState.memberName(
+								note.created_by
+							)}{/if}
 						· Zuletzt geändert {formatDate(note.updated_at)}
-						{#if workspaceState.memberName(note.updated_by) && note.updated_by !== note.created_by}von {workspaceState.memberName(note.updated_by)}{/if}
+						{#if workspaceState.memberName(note.updated_by) && note.updated_by !== note.created_by}von
+							{workspaceState.memberName(note.updated_by)}{/if}
 					</p>
 					<Button variant="ghost" onclick={del}>
 						{#snippet children()}
-							<span class="flex items-center gap-1.5 text-red-500"><Trash2 size={16} /> Löschen</span>
+							<span class="flex items-center gap-1.5 text-red-500"
+								><Trash2 size={16} /> Löschen</span
+							>
 						{/snippet}
 					</Button>
 				</div>

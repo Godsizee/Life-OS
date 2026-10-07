@@ -7,7 +7,11 @@
 	import { pushState } from '#lib/core/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { profileState, HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
-	import { HEIGHT_LIMITS, GLASS_SIZE_LIMITS, WATER_GOAL_ML_LIMITS } from '#lib/features/profile/units.js';
+	import {
+		HEIGHT_LIMITS,
+		GLASS_SIZE_LIMITS,
+		WATER_GOAL_ML_LIMITS
+	} from '#lib/features/profile/units.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import { remindersState } from '#lib/features/reminders/store.svelte.js';
 	import { reminderAtOnDate } from '#lib/features/reminders/schedule.js';
@@ -35,7 +39,9 @@
 	});
 
 	let timerSignalsPermission = $state<NotificationPermission | 'unsupported'>(
-		typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported'
+		typeof window !== 'undefined' && 'Notification' in window
+			? Notification.permission
+			: 'unsupported'
 	);
 
 	async function requestTimerSignals() {
@@ -99,13 +105,12 @@
 				<div class="flex items-center gap-2">
 					<Input
 						value={displayNameInput}
-						onchange={(e) => { displayNameInput = (e.currentTarget as HTMLInputElement).value; }}
-						class="w-32 min-h-9 px-2"
+						onchange={(e) => {
+							displayNameInput = (e.currentTarget as HTMLInputElement).value;
+						}}
+						class="min-h-9 w-32 px-2"
 					/>
-					<Button
-						variant="secondary"
-						onclick={() => profileState.setDisplayName(displayNameInput)}
-					>
+					<Button variant="secondary" onclick={() => profileState.setDisplayName(displayNameInput)}>
 						Speichern
 					</Button>
 				</div>
@@ -184,7 +189,7 @@
 					/>
 				{/if}
 			</SettingRow>
-			
+
 			<SettingRow label="Schlaf pro Nacht">
 				<NumberSetting
 					value={profileState.sleepGoalH}
@@ -207,7 +212,7 @@
 							const raw = (e.currentTarget as HTMLInputElement).value.trim();
 							profileState.setWeightGoal(raw === '' ? null : Number(raw));
 						}}
-						class="w-24 text-center min-h-9 px-2"
+						class="min-h-9 w-24 px-2 text-center"
 					/>
 					<span class="text-xs text-text-tertiary">kg</span>
 				</div>
@@ -238,7 +243,9 @@
 				<select
 					value={resolveNavModules(profileState.settings.nav_module_ids)[0].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(m => m.id);
+						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+							(m) => m.id
+						);
 						current[0] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
 					}}
@@ -253,7 +260,9 @@
 				<select
 					value={resolveNavModules(profileState.settings.nav_module_ids)[1].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(m => m.id);
+						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+							(m) => m.id
+						);
 						current[1] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
 					}}
@@ -268,7 +277,9 @@
 				<select
 					value={resolveNavModules(profileState.settings.nav_module_ids)[2].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(m => m.id);
+						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+							(m) => m.id
+						);
 						current[2] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
 					}}
@@ -283,7 +294,9 @@
 				<select
 					value={resolveNavModules(profileState.settings.nav_module_ids)[3].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(m => m.id);
+						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+							(m) => m.id
+						);
 						current[3] = e.currentTarget.value;
 						profileState.setSettings({ nav_module_ids: current });
 					}}
@@ -294,9 +307,13 @@
 					{/each}
 				</select>
 			</SettingRow>
-			
+
 			<SettingRow label="Dunkles Design">
-				<Switch label="Dunkles Design" checked={themeState.isDark} onchange={() => themeState.toggle()} />
+				<Switch
+					label="Dunkles Design"
+					checked={themeState.isDark}
+					onchange={() => themeState.toggle()}
+				/>
 			</SettingRow>
 			<SettingRow label="Willkommens-Hinweis">
 				<Button
@@ -311,9 +328,7 @@
 			</SettingRow>
 			{#if installState.canInstall}
 				<SettingRow label="App installieren">
-					<Button variant="secondary" onclick={() => installState.install()}>
-						Installieren
-					</Button>
+					<Button variant="secondary" onclick={() => installState.install()}>Installieren</Button>
 				</SettingRow>
 			{:else if installState.installed}
 				<SettingRow label="App ist installiert">
@@ -332,8 +347,8 @@
 				hint={timerSignalsPermission === 'granted'
 					? 'Lokale Signale (Vibration, Ton & System-Push) bei Phasen- und Pausenende sind aktiv.'
 					: timerSignalsPermission === 'denied'
-					? 'System-Benachrichtigungen sind im Browser blockiert.'
-					: 'Signalisiert Runden- und Pausenende lokal, auch wenn die App im Hintergrund ist.'}
+						? 'System-Benachrichtigungen sind im Browser blockiert.'
+						: 'Signalisiert Runden- und Pausenende lokal, auch wenn die App im Hintergrund ist.'}
 			>
 				{#if timerSignalsPermission === 'unsupported'}
 					<span class="text-xs text-text-tertiary">Nicht unterstützt</span>
@@ -369,11 +384,12 @@
 						label="Push-Benachrichtigungen"
 						checked={pushState.subscribed}
 						disabled={pushState.loading}
-						onchange={() => (pushState.subscribed ? pushState.unsubscribe() : pushState.subscribe())}
+						onchange={() =>
+							pushState.subscribed ? pushState.unsubscribe() : pushState.subscribe()}
 					/>
 				</SettingRow>
 				{#if pushState.permission === 'denied'}
-					<p class="text-xs text-red-500 mt-2 px-2">
+					<p class="mt-2 px-2 text-xs text-red-500">
 						Benachrichtigungen sind im Browser blockiert. Bitte erlauben.
 					</p>
 				{/if}
@@ -387,7 +403,9 @@
 
 	<!-- Haushalt -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Haushalt: {workspaceState.workspace?.name ?? ''}</h2>
+		<h2 class="mb-3 text-sm font-semibold text-text-primary">
+			Haushalt: {workspaceState.workspace?.name ?? ''}
+		</h2>
 		<div class="flex flex-col gap-4">
 			<MemberList members={workspaceState.members} />
 			<InviteForm />
@@ -399,16 +417,14 @@
 		<h2 class="mb-3 text-sm font-semibold text-text-primary">Konto</h2>
 		<div class="flex flex-col divide-y divide-border-color/50">
 			<SettingRow label="Daten exportieren" hint="Lädt alle Bereiche als JSON herunter">
-				<Button variant="secondary" onclick={() => downloadExport()}>
-					Exportieren
-				</Button>
+				<Button variant="secondary" onclick={() => downloadExport()}>Exportieren</Button>
 			</SettingRow>
-			
+
 			<SettingRow label="Konto löschen" hint="Alle Daten werden unwiderruflich gelöscht">
 				<Button variant="danger" onclick={() => (deleteAccountOpen = true)}>Löschen</Button>
 			</SettingRow>
 
-			<div class="pt-4 mt-2">
+			<div class="mt-2 pt-4">
 				<Button variant="secondary" class="w-full" onclick={logout} loading={logoutState.loading}>
 					{#snippet children()}
 						{logoutState.loading ? 'Melde ab…' : 'Abmelden'}
@@ -418,8 +434,11 @@
 		</div>
 	</section>
 
-	<p class="text-center text-xs text-text-tertiary pb-8">
-		Übungsdatenbank basiert auf <a href="https://wger.de" class="underline hover:text-text-secondary">wger.de</a> (CC-BY-SA).
+	<p class="pb-8 text-center text-xs text-text-tertiary">
+		Übungsdatenbank basiert auf <a
+			href="https://wger.de"
+			class="underline hover:text-text-secondary">wger.de</a
+		> (CC-BY-SA).
 	</p>
 </div>
 

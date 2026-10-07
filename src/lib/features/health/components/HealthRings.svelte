@@ -4,7 +4,15 @@
 	import MetricRing from './MetricRing.svelte';
 	import { healthState } from '../store.svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
-	import { formatMetric, goalPercent, num, weightToGoal, waterMl, weightTrend, weightGoalPercent } from '../stats';
+	import {
+		formatMetric,
+		goalPercent,
+		num,
+		weightToGoal,
+		waterMl,
+		weightTrend,
+		weightGoalPercent
+	} from '../stats';
 
 	const entry = $derived(healthState.todayEntry);
 
@@ -20,9 +28,18 @@
 	const weightTrendData = $derived(weightTrend(healthState.entries, 400));
 	const startWeight = $derived(weightTrendData?.first ?? null);
 	const weightPct = $derived(weightGoalPercent(startWeight, weight, weightGoal) ?? 0);
-	const weightFormatted = $derived(formatMetric('weight_kg', weight, { weightUnit: profileState.weightUnit }));
-	const weightGoalFormatted = $derived(formatMetric('weight_kg', weightGoal, { weightUnit: profileState.weightUnit }));
-	const waterFormatted = $derived(formatMetric('water_ml', waterMlValue, { waterUnit: profileState.waterUnit, glassSizeMl: profileState.glassSizeMl }));
+	const weightFormatted = $derived(
+		formatMetric('weight_kg', weight, { weightUnit: profileState.weightUnit })
+	);
+	const weightGoalFormatted = $derived(
+		formatMetric('weight_kg', weightGoal, { weightUnit: profileState.weightUnit })
+	);
+	const waterFormatted = $derived(
+		formatMetric('water_ml', waterMlValue, {
+			waterUnit: profileState.waterUnit,
+			glassSizeMl: profileState.glassSizeMl
+		})
+	);
 </script>
 
 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -30,7 +47,9 @@
 		percent={goalPercent(waterMlValue, profileState.waterGoalMl)}
 		label="Wasser"
 		value={waterFormatted}
-		goalLabel="Ziel {profileState.waterUnit === 'ml' ? `${profileState.waterGoalMl} ml` : `${profileState.waterGoalGlasses} Gläser`}"
+		goalLabel="Ziel {profileState.waterUnit === 'ml'
+			? `${profileState.waterGoalMl} ml`
+			: `${profileState.waterGoalGlasses} Gläser`}"
 		icon={Droplet}
 		colorClass="stroke-blue-500"
 	/>

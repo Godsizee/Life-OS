@@ -158,7 +158,10 @@ describe('Überfällige Aufgaben', () => {
 	});
 
 	it('zählt erledigte nicht mit', () => {
-		z.tasks = [{ ...ueberfaellig(), status: 'done' }, { ...ueberfaellig(), status: 'done' }];
+		z.tasks = [
+			{ ...ueberfaellig(), status: 'done' },
+			{ ...ueberfaellig(), status: 'done' }
+		];
 		expect(ids()).not.toContain('overdue_tasks');
 	});
 

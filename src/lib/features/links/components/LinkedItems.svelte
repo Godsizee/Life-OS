@@ -24,7 +24,9 @@
 
 <div class="space-y-2">
 	<div class="flex items-center justify-between">
-		<h3 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+		<h3
+			class="flex items-center gap-1.5 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+		>
 			<Link2 size={13} /> Verknüpfungen
 		</h3>
 		<button
@@ -41,7 +43,9 @@
 				{#if item.entity}
 					{@const Meta = entityMeta[item.otherType]}
 					{@const Icon = Meta.icon}
-					<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5">
+					<li
+						class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
+					>
 						<Icon size={14} class="shrink-0 text-text-tertiary" />
 						<button
 							onclick={() => goto(Meta.route(item.entity!.id))}

@@ -1,5 +1,9 @@
 <script lang="ts">
-	let { label, hint, children }: {
+	let {
+		label,
+		hint,
+		children
+	}: {
 		label: string;
 		hint?: string;
 		children: import('svelte').Snippet;

@@ -41,7 +41,9 @@ export function safeNextPath(raw: string | null | undefined, fallback = '/'): st
 export function loginUrlFor(
 	pathname: string,
 	search = '',
-	options?: { /** Sitzung ist unerwartet weggefallen, nicht durch Klick auf "Abmelden". */ expired?: boolean }
+	options?: {
+		/** Sitzung ist unerwartet weggefallen, nicht durch Klick auf "Abmelden". */ expired?: boolean;
+	}
 ): string {
 	const next = safeNextPath(`${pathname}${search}`, '');
 	const params = new URLSearchParams();

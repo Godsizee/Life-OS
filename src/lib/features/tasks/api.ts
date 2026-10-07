@@ -36,12 +36,7 @@ export async function insertRaw(task: Task): Promise<Task> {
 
 export async function updateRaw(patch: Partial<Task> & { id: string }): Promise<Task> {
 	const { id, ...rest } = patch;
-	const { data, error } = await supabase
-		.from('tasks')
-		.update(rest)
-		.eq('id', id)
-		.select()
-		.single();
+	const { data, error } = await supabase.from('tasks').update(rest).eq('id', id).select().single();
 	if (error) throw error;
 	return data;
 }

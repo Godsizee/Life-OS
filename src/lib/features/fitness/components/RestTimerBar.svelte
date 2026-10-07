@@ -17,10 +17,12 @@
 </script>
 
 {#if restRemaining !== null}
-	<div class="glass-card rounded-xl p-3 premium-shadow flex items-center justify-between gap-2">
+	<div class="glass-card premium-shadow flex items-center justify-between gap-2 rounded-xl p-3">
 		<span class="flex items-center gap-2 text-sm font-bold text-text-primary">
 			<Timer size={15} class="text-primary-active" />
-			<span>Pause: {Math.floor(restRemaining / 60)}:{String(restRemaining % 60).padStart(2, '0')}</span>
+			<span
+				>Pause: {Math.floor(restRemaining / 60)}:{String(restRemaining % 60).padStart(2, '0')}</span
+			>
 		</span>
 		<div class="flex items-center gap-1">
 			<button
@@ -35,7 +37,11 @@
 			>
 				+15s
 			</button>
-			<button onclick={() => liveWorkoutState.stopRest()} class="min-h-9 px-2 text-xs font-semibold text-text-tertiary hover:text-text-primary">Überspringen</button>
+			<button
+				onclick={() => liveWorkoutState.stopRest()}
+				class="min-h-9 px-2 text-xs font-semibold text-text-tertiary hover:text-text-primary"
+				>Überspringen</button
+			>
 		</div>
 	</div>
 {/if}

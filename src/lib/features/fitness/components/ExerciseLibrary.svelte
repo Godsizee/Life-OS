@@ -15,7 +15,9 @@
 	};
 
 	const typeFiltered = $derived(
-		activeType === 'all' ? fitnessState.catalog : fitnessState.catalog.filter((e) => e.exercise_type === activeType)
+		activeType === 'all'
+			? fitnessState.catalog
+			: fitnessState.catalog.filter((e) => e.exercise_type === activeType)
 	);
 	// Nur Muskelgruppen anbieten, die beim aktuellen Typ-Filter auch vorkommen.
 	const muscleGroups = $derived(
@@ -26,7 +28,8 @@
 			const q = query.trim().toLowerCase();
 			if (!q) return typeFiltered;
 			return typeFiltered.filter(
-				(e) => e.name_de.toLowerCase().includes(q) || (e.name_en?.toLowerCase().includes(q) ?? false)
+				(e) =>
+					e.name_de.toLowerCase().includes(q) || (e.name_en?.toLowerCase().includes(q) ?? false)
 			);
 		})()
 	);
@@ -46,7 +49,7 @@
 
 <div class="space-y-6">
 	<!-- Suche + Filter -->
-	<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
+	<div class="glass-card premium-shadow space-y-3 rounded-2xl p-4">
 		<div class="flex items-center gap-2 rounded-xl border border-border-color bg-surface-0 px-3">
 			<Search size={16} class="shrink-0 text-text-tertiary" />
 			<input
@@ -61,20 +64,20 @@
 		<div class="flex gap-2 overflow-x-auto pb-1">
 			<button
 				onclick={() => (activeType = 'all')}
-				class="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
+				class="shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all
 					{activeType === 'all'
-					? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600'
-					: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
+					? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+					: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 			>
 				Alle Typen
 			</button>
 			{#each Object.entries(TYPE_LABELS) as [type, label]}
 				<button
 					onclick={() => (activeType = activeType === type ? 'all' : (type as ExerciseType))}
-					class="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
+					class="shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all
 						{activeType === type
-						? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600'
-						: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
+						? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+						: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 				>
 					{label}
 				</button>
@@ -85,20 +88,20 @@
 			<div class="flex gap-2 overflow-x-auto pb-1">
 				<button
 					onclick={() => (activeMuscleGroup = null)}
-					class="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
+					class="shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all
 						{activeMuscleGroup === null
-						? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600'
-						: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
+						? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+						: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 				>
 					Alle Muskelgruppen
 				</button>
 				{#each muscleGroups as group}
 					<button
 						onclick={() => (activeMuscleGroup = activeMuscleGroup === group ? null : group)}
-						class="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all
+						class="shrink-0 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all
 							{activeMuscleGroup === group
-							? 'bg-primary-700 text-white border-primary-700 dark:bg-primary-600 dark:border-primary-600'
-							: 'bg-surface-0 text-text-secondary border-border-color hover:bg-surface-1'}"
+							? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+							: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-1'}"
 					>
 						{group}
 					</button>
@@ -112,52 +115,65 @@
 		{#each filtered as entry (entry.id)}
 			<a
 				href="/fitness/exercise/{entry.id}"
-				class="glass-card flex items-center justify-between gap-3 rounded-2xl p-4 premium-shadow hover:border-primary-400 dark:hover:border-primary-900 transition-all"
+				class="glass-card premium-shadow flex items-center justify-between gap-3 rounded-2xl p-4 transition-all hover:border-primary-400 dark:hover:border-primary-900"
 			>
 				<div class="min-w-0">
-					<h4 class="font-bold text-sm text-text-primary truncate">{entry.name_de}</h4>
+					<h4 class="truncate text-sm font-bold text-text-primary">{entry.name_de}</h4>
 					{#if entry.name_en && entry.name_en !== entry.name_de}
-						<p class="text-xs text-text-tertiary truncate">{entry.name_en}</p>
+						<p class="truncate text-xs text-text-tertiary">{entry.name_en}</p>
 					{/if}
 				</div>
 				<div class="flex shrink-0 items-center gap-1.5">
 					{#if entry.muscle_group}
-						<span class="rounded-full border border-border-color bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary">
+						<span
+							class="rounded-full border border-border-color bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary"
+						>
 							{entry.muscle_group}
 						</span>
 					{/if}
-					<span class="rounded-full border border-border-color bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary">
+					<span
+						class="rounded-full border border-border-color bg-surface-2 px-2 py-0.5 text-[11px] text-text-tertiary"
+					>
 						{TYPE_LABELS[entry.exercise_type]}
 					</span>
 				</div>
 			</a>
 		{:else}
-			<div class="text-center py-8 text-text-tertiary border border-dashed border-border-color rounded-2xl text-sm">
+			<div
+				class="rounded-2xl border border-dashed border-border-color py-8 text-center text-sm text-text-tertiary"
+			>
 				Keine Übungen gefunden.
 			</div>
 		{/each}
 		{#if isUnfiltered && filteredAll.length > DISPLAY_CAP}
-			<p class="text-center text-xs text-text-tertiary py-1">
+			<p class="py-1 text-center text-xs text-text-tertiary">
 				{filteredAll.length - DISPLAY_CAP} weitere — tippe zum Suchen oder wähle einen Filter
 			</p>
 		{/if}
 	</div>
 
 	<!-- Eigene Übungen verwalten -->
-	<div class="glass-card rounded-2xl p-4 premium-shadow space-y-3">
-		<h3 class="text-xs font-bold uppercase tracking-wider text-text-tertiary flex items-center gap-1.5">
+	<div class="glass-card premium-shadow space-y-3 rounded-2xl p-4">
+		<h3
+			class="flex items-center gap-1.5 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+		>
 			<User size={12} />
 			<span>Eigene Übungen</span>
 		</h3>
 		{#if customExercises.length > 0}
 			<ul class="space-y-2">
 				{#each customExercises as entry (entry.id)}
-					<li class="flex items-center justify-between text-xs text-text-secondary bg-surface-1/50 px-3 py-2 rounded-lg border border-border-color">
-						<span class="truncate">{entry.name_de}{#if entry.muscle_group} ({entry.muscle_group}){/if}</span>
+					<li
+						class="flex items-center justify-between rounded-lg border border-border-color bg-surface-1/50 px-3 py-2 text-xs text-text-secondary"
+					>
+						<span class="truncate"
+							>{entry.name_de}{#if entry.muscle_group}
+								({entry.muscle_group}){/if}</span
+						>
 						<button
 							onclick={() => handleDelete(entry.id)}
 							aria-label="Übung löschen"
-							class="ml-2 shrink-0 text-red-400 hover:text-red-600 transition-colors flex items-center"
+							class="ml-2 flex shrink-0 items-center text-red-400 transition-colors hover:text-red-600"
 						>
 							<Trash2 size={13} />
 						</button>

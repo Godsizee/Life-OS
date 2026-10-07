@@ -48,7 +48,9 @@ function createThemeState() {
 	}
 
 	return {
-		get isDark() { return isDark; },
+		get isDark() {
+			return isDark;
+		},
 		init,
 		toggle
 	};

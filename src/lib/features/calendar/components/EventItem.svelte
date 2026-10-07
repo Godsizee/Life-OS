@@ -28,7 +28,13 @@
 	const linkedPlanId = $derived(
 		linksState
 			.linksFor('event', event.id)
-			.map((l) => (l.source_type === 'workout_plan' ? l.source_id : l.target_type === 'workout_plan' ? l.target_id : null))
+			.map((l) =>
+				l.source_type === 'workout_plan'
+					? l.source_id
+					: l.target_type === 'workout_plan'
+						? l.target_id
+						: null
+			)
 			.find((id): id is string => id !== null) ?? null
 	);
 
@@ -48,7 +54,7 @@
 		{#if linkedPlanId}
 			<button
 				onclick={() => goto(`/fitness?startPlan=${linkedPlanId}`)}
-				class="shrink-0 inline-flex items-center gap-1 rounded-lg bg-primary-700 px-2 py-1 text-xs font-bold text-white hover:bg-primary-800"
+				class="inline-flex shrink-0 items-center gap-1 rounded-lg bg-primary-700 px-2 py-1 text-xs font-bold text-white hover:bg-primary-800"
 			>
 				<Dumbbell size={12} /> Start
 			</button>

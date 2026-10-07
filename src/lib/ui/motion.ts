@@ -17,8 +17,10 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
 	const b = (v1: number, v2: number) => 3 * v2 - 6 * v1;
 	const c = (v1: number) => 3 * v1;
 
-	const bezierAt = (t: number, v1: number, v2: number) => ((a(v1, v2) * t + b(v1, v2)) * t + c(v1)) * t;
-	const slopeAt = (t: number, v1: number, v2: number) => 3 * a(v1, v2) * t * t + 2 * b(v1, v2) * t + c(v1);
+	const bezierAt = (t: number, v1: number, v2: number) =>
+		((a(v1, v2) * t + b(v1, v2)) * t + c(v1)) * t;
+	const slopeAt = (t: number, v1: number, v2: number) =>
+		3 * a(v1, v2) * t * t + 2 * b(v1, v2) * t + c(v1);
 
 	function tForX(x: number): number {
 		let t = x;

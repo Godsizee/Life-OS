@@ -154,7 +154,11 @@ describe('activityStats', () => {
 	});
 	it('markiert eigene Tags', () => {
 		const stats = activityStats(
-			[E('2026-02-01', 4, ['bouldern']), E('2026-02-02', 4, ['bouldern']), E('2026-02-03', 5, ['bouldern'])],
+			[
+				E('2026-02-01', 4, ['bouldern']),
+				E('2026-02-02', 4, ['bouldern']),
+				E('2026-02-03', 5, ['bouldern'])
+			],
 			3
 		);
 		expect(stats[0].custom).toBe(true);
@@ -216,7 +220,7 @@ describe('averageByDaypart', () => {
 			{ date: '2026-07-31', score: 5, logged_at: '2026-07-31T08:00:00Z' }, // Morgen
 			{ date: '2026-07-31', score: 3, logged_at: '2026-07-31T14:00:00Z' }, // Mittag
 			{ date: '2026-07-31', score: 4, logged_at: '2026-07-31T19:00:00Z' }, // Abend
-			{ date: '2026-07-31', score: 2, logged_at: '2026-07-31T01:00:00Z' }  // Nacht
+			{ date: '2026-07-31', score: 2, logged_at: '2026-07-31T01:00:00Z' } // Nacht
 		];
 		const res = averageByDaypart(entries);
 		expect(res).toHaveLength(4);
@@ -226,4 +230,3 @@ describe('averageByDaypart', () => {
 		expect(res[3]).toBe(2);
 	});
 });
-

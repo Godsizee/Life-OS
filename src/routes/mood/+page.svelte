@@ -96,7 +96,7 @@
 
 		{#if todayEntries.length > 0}
 			<div class="mb-4 space-y-2">
-				<p class="text-xs font-bold uppercase tracking-wider text-text-tertiary">
+				<p class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
 					Heutige Einträge ({todayEntries.length})
 				</p>
 				<ul class="flex flex-col gap-1.5">
@@ -189,7 +189,9 @@
 				</span>
 			{/each}
 		</div>
-		<p class="mt-2 text-[11px] text-text-tertiary">Tippe auf einen Tag, um ihn nachzutragen oder zu ändern.</p>
+		<p class="mt-2 text-[11px] text-text-tertiary">
+			Tippe auf einen Tag, um ihn nachzutragen oder zu ändern.
+		</p>
 
 		<div class="mt-6 border-t border-border-color pt-4">
 			<MoodDistribution entries={statsEntries} />
@@ -233,7 +235,9 @@
 				{#each daypartLabels as label, i (label)}
 					{@const score = daypartAverages[i]}
 					{@const IconComponent = daypartIcons[i]}
-					<div class="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-surface-1 p-2 text-center">
+					<div
+						class="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-surface-1 p-2 text-center"
+					>
 						<IconComponent size={16} class="shrink-0 text-text-tertiary" />
 						<span class="w-full truncate text-[11px] text-text-secondary">{label}</span>
 						<span class="text-sm font-bold text-text-primary">{formatScore(score)}</span>

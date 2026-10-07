@@ -196,12 +196,16 @@ export interface SleepEnergyBucket {
 	days: number;
 }
 
-export function sleepEnergyBuckets(entries: HealthLike[], days = 90, today = new Date()): SleepEnergyBucket[] {
+export function sleepEnergyBuckets(
+	entries: HealthLike[],
+	days = 90,
+	today = new Date()
+): SleepEnergyBucket[] {
 	const defs = [
 		{ label: 'unter 6 h', test: (h: number) => h < 6 },
-		{ label: '6–7 h',     test: (h: number) => h >= 6 && h < 7 },
-		{ label: '7–8 h',     test: (h: number) => h >= 7 && h < 8 },
-		{ label: 'über 8 h',  test: (h: number) => h >= 8 }
+		{ label: '6–7 h', test: (h: number) => h >= 6 && h < 7 },
+		{ label: '7–8 h', test: (h: number) => h >= 7 && h < 8 },
+		{ label: 'über 8 h', test: (h: number) => h >= 8 }
 	];
 	const acc = defs.map(() => ({ sum: 0, n: 0 }));
 	for (const e of windowEntries(entries, days, today)) {
@@ -233,9 +237,13 @@ export function formatMetric(
 ): string {
 	if (val === null) return '—';
 	switch (metric) {
-		case 'weight_kg': return formatWeight(val, opts?.weightUnit ?? 'kg');
-		case 'sleep_h': return `${formatNumber(val, 1)} h`;
-		case 'water_ml': return formatWater(val, opts?.waterUnit ?? 'glasses', opts?.glassSizeMl);
-		case 'energy': return `${formatNumber(val, 0)}/5`;
+		case 'weight_kg':
+			return formatWeight(val, opts?.weightUnit ?? 'kg');
+		case 'sleep_h':
+			return `${formatNumber(val, 1)} h`;
+		case 'water_ml':
+			return formatWater(val, opts?.waterUnit ?? 'glasses', opts?.glassSizeMl);
+		case 'energy':
+			return `${formatNumber(val, 0)}/5`;
 	}
 }

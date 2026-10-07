@@ -4,7 +4,12 @@ import { outbox } from '#lib/core/outbox.svelte.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as calendarApi from './api';
-import { eventInputSchema, type EventInput, calendarInputSchema, type CalendarInput } from './schema';
+import {
+	eventInputSchema,
+	type EventInput,
+	calendarInputSchema,
+	type CalendarInput
+} from './schema';
 import type { Calendar, Event, EventOverride, EventOverridePatch } from './types';
 import { remindersState } from '#lib/features/reminders/store.svelte.js';
 
@@ -25,8 +30,10 @@ class CalendarState {
 			delete: (payload) => calendarApi.deleteEvent((payload as { id: string }).id)
 		});
 		outbox.registerExecutor('calendars', {
-			insert: (payload) => calendarApi.createCalendar(this.workspaceId!, (payload as Calendar).name),
-			update: (payload) => calendarApi.updateCalendarRaw(payload as Partial<Calendar> & { id: string }),
+			insert: (payload) =>
+				calendarApi.createCalendar(this.workspaceId!, (payload as Calendar).name),
+			update: (payload) =>
+				calendarApi.updateCalendarRaw(payload as Partial<Calendar> & { id: string }),
 			delete: (payload) => calendarApi.deleteCalendar((payload as { id: string }).id)
 		});
 		outbox.registerExecutor('event_overrides', {
@@ -76,19 +83,23 @@ class CalendarState {
 				this.events = this.events.filter((e) => e.id !== id);
 			}
 		});
-		this.unsubscribeOverrides = subscribeToTable<EventOverride>('event_overrides', this.workspaceId, {
-			onInsert: (row) => {
-				this.overrides = this.overrides.some((o) => o.id === row.id)
-					? this.overrides.map((o) => (o.id === row.id ? row : o))
-					: [...this.overrides, row];
-			},
-			onUpdate: (row) => {
-				this.overrides = this.overrides.map((o) => (o.id === row.id ? row : o));
-			},
-			onDelete: ({ id }) => {
-				this.overrides = this.overrides.filter((o) => o.id !== id);
+		this.unsubscribeOverrides = subscribeToTable<EventOverride>(
+			'event_overrides',
+			this.workspaceId,
+			{
+				onInsert: (row) => {
+					this.overrides = this.overrides.some((o) => o.id === row.id)
+						? this.overrides.map((o) => (o.id === row.id ? row : o))
+						: [...this.overrides, row];
+				},
+				onUpdate: (row) => {
+					this.overrides = this.overrides.map((o) => (o.id === row.id ? row : o));
+				},
+				onDelete: ({ id }) => {
+					this.overrides = this.overrides.filter((o) => o.id !== id);
+				}
 			}
-		});
+		);
 	}
 
 	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
@@ -128,26 +139,40 @@ class CalendarState {
 			updated_at: now
 		};
 		this.calendars = [...this.calendars, cal];
-		await outbox.runOrQueue('calendars', 'insert', cal, () => calendarApi.createCalendar(this.workspaceId!, cal.name).then(async (c) => {
-			if (cal.color) {
-				await calendarApi.updateCalendarRaw({ id: c.id, color: cal.color });
-			}
-		}));
+		await outbox.runOrQueue('calendars', 'insert', cal, () =>
+			calendarApi.createCalendar(this.workspaceId!, cal.name).then(async (c) => {
+				if (cal.color) {
+					await calendarApi.updateCalendarRaw({ id: c.id, color: cal.color });
+				}
+			})
+		);
 	}
 
 	async renameCalendar(id: string, name: string) {
-		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, name, updated_at: new Date().toISOString() } : c));
-		await outbox.runOrQueue('calendars', 'update', { id, name }, () => calendarApi.updateCalendarRaw({ id, name }));
+		this.calendars = this.calendars.map((c) =>
+			c.id === id ? { ...c, name, updated_at: new Date().toISOString() } : c
+		);
+		await outbox.runOrQueue('calendars', 'update', { id, name }, () =>
+			calendarApi.updateCalendarRaw({ id, name })
+		);
 	}
 
 	async setCalendarColor(id: string, color: string) {
-		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, color, updated_at: new Date().toISOString() } : c));
-		await outbox.runOrQueue('calendars', 'update', { id, color }, () => calendarApi.updateCalendarRaw({ id, color }));
+		this.calendars = this.calendars.map((c) =>
+			c.id === id ? { ...c, color, updated_at: new Date().toISOString() } : c
+		);
+		await outbox.runOrQueue('calendars', 'update', { id, color }, () =>
+			calendarApi.updateCalendarRaw({ id, color })
+		);
 	}
 
 	async updateCalendarUrl(id: string, ics_url: string | null) {
-		this.calendars = this.calendars.map((c) => (c.id === id ? { ...c, ics_url, updated_at: new Date().toISOString() } : c));
-		await outbox.runOrQueue('calendars', 'update', { id, ics_url }, () => calendarApi.updateCalendarRaw({ id, ics_url }));
+		this.calendars = this.calendars.map((c) =>
+			c.id === id ? { ...c, ics_url, updated_at: new Date().toISOString() } : c
+		);
+		await outbox.runOrQueue('calendars', 'update', { id, ics_url }, () =>
+			calendarApi.updateCalendarRaw({ id, ics_url })
+		);
 	}
 
 	async removeCalendar(id: string) {
@@ -196,7 +221,9 @@ class CalendarState {
 
 	async cancelOccurrence(eventId: string, occurrenceDate: string) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
-		const existing = this.overrides.find((o) => o.event_id === eventId && o.occurrence_date === occurrenceDate);
+		const existing = this.overrides.find(
+			(o) => o.event_id === eventId && o.occurrence_date === occurrenceDate
+		);
 		const now = new Date().toISOString();
 		const row: EventOverride = {
 			id: existing?.id ?? neueId(),
@@ -211,12 +238,16 @@ class CalendarState {
 		this.overrides = existing
 			? this.overrides.map((o) => (o.id === row.id ? row : o))
 			: [...this.overrides, row];
-		await outbox.runOrQueue('event_overrides', 'insert', row, () => calendarApi.upsertOverrideRaw(row));
+		await outbox.runOrQueue('event_overrides', 'insert', row, () =>
+			calendarApi.upsertOverrideRaw(row)
+		);
 	}
 
 	async patchOccurrence(eventId: string, occurrenceDate: string, patch: EventOverridePatch) {
 		if (!this.workspaceId) throw new Error('Kein Workspace geladen');
-		const existing = this.overrides.find((o) => o.event_id === eventId && o.occurrence_date === occurrenceDate);
+		const existing = this.overrides.find(
+			(o) => o.event_id === eventId && o.occurrence_date === occurrenceDate
+		);
 		const now = new Date().toISOString();
 		const row: EventOverride = {
 			id: existing?.id ?? neueId(),
@@ -231,10 +262,27 @@ class CalendarState {
 		this.overrides = existing
 			? this.overrides.map((o) => (o.id === row.id ? row : o))
 			: [...this.overrides, row];
-		await outbox.runOrQueue('event_overrides', 'insert', row, () => calendarApi.upsertOverrideRaw(row));
+		await outbox.runOrQueue('event_overrides', 'insert', row, () =>
+			calendarApi.upsertOverrideRaw(row)
+		);
 	}
 
-	async updateEvent(id: string, patch: Partial<Pick<Event, 'title' | 'start' | 'end' | 'all_day' | 'location' | 'rrule' | 'calendar_id' | 'attendee_ids'>>) {
+	async updateEvent(
+		id: string,
+		patch: Partial<
+			Pick<
+				Event,
+				| 'title'
+				| 'start'
+				| 'end'
+				| 'all_day'
+				| 'location'
+				| 'rrule'
+				| 'calendar_id'
+				| 'attendee_ids'
+			>
+		>
+	) {
 		const updated_at = new Date().toISOString();
 		this.events = this.events.map((e) => (e.id === id ? { ...e, ...patch, updated_at } : e));
 		await outbox.runOrQueue('events', 'update', { id, ...patch, updated_at }, () =>

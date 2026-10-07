@@ -13,14 +13,16 @@
 
 	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
 	const streakStats = $derived(
-		habitsState.habits.map((h) => {
-			const entries = habitsState.entriesFor(h.id);
-			return {
-				habit: h,
-				streak: calculateStreak(h, entries),
-				best: bestStreak(h, entries)
-			};
-		}).sort((a, b) => b.streak - a.streak)
+		habitsState.habits
+			.map((h) => {
+				const entries = habitsState.entriesFor(h.id);
+				return {
+					habit: h,
+					streak: calculateStreak(h, entries),
+					best: bestStreak(h, entries)
+				};
+			})
+			.sort((a, b) => b.streak - a.streak)
 	);
 
 	const totalActiveStreaks = $derived(streakStats.filter((s) => s.streak > 0).length);
@@ -35,7 +37,7 @@
 		<button
 			onclick={() => (createOpen = true)}
 			aria-label="Neue Gewohnheit"
-			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform"
+			class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white transition-transform active:scale-95"
 		>
 			<Plus size={22} />
 		</button>
@@ -56,7 +58,9 @@
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="text-sm font-semibold text-text-primary">Aktivität — letzte 12 Wochen</h2>
 			{#if totalActiveStreaks > 0}
-				<span class="text-xs text-text-secondary">{totalActiveStreaks} aktive Streak{totalActiveStreaks !== 1 ? 's' : ''}</span>
+				<span class="text-xs text-text-secondary"
+					>{totalActiveStreaks} aktive Streak{totalActiveStreaks !== 1 ? 's' : ''}</span
+				>
 			{/if}
 		</div>
 		<StreakCalendar habits={habitsState.habits} entriesFor={(id) => habitsState.entriesFor(id)} />
@@ -67,8 +71,12 @@
 				{#each streakStats.filter((s) => s.streak > 0 || s.best > 0) as { habit, streak, best } (habit.id)}
 					<div class="flex items-center gap-2">
 						<span class="min-w-0 flex-1 truncate text-xs text-text-secondary">{habit.name}</span>
-						<span class="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-							🔥 {streak} {habit.schedule.type === 'weekly_count' ? 'Wochen' : 'Tage'} <span class="text-text-tertiary opacity-70 ml-1">· Best {best}</span>
+						<span
+							class="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400"
+						>
+							🔥 {streak}
+							{habit.schedule.type === 'weekly_count' ? 'Wochen' : 'Tage'}
+							<span class="ml-1 text-text-tertiary opacity-70">· Best {best}</span>
 						</span>
 					</div>
 				{/each}
@@ -96,11 +104,17 @@
 		</summary>
 		<ul class="mt-2 flex flex-col gap-1.5">
 			{#each habitsState.archived as h (h.id)}
-				<li class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-2">
+				<li
+					class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-2"
+				>
 					<span class="min-w-0 flex-1 truncate text-sm text-text-secondary">{h.name}</span>
-					<a href="/habits/{h.id}" class="shrink-0 text-xs text-text-tertiary hover:underline">Verlauf</a>
-					<button onclick={() => habitsState.unarchiveHabit(h.id)}
-					        class="shrink-0 text-xs font-medium text-primary-active hover:underline">
+					<a href="/habits/{h.id}" class="shrink-0 text-xs text-text-tertiary hover:underline"
+						>Verlauf</a
+					>
+					<button
+						onclick={() => habitsState.unarchiveHabit(h.id)}
+						class="shrink-0 text-xs font-medium text-primary-active hover:underline"
+					>
 						Wiederherstellen
 					</button>
 				</li>
@@ -108,4 +122,3 @@
 		</ul>
 	</details>
 {/if}
-

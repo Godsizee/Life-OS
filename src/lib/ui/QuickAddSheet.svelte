@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { Activity, Calendar, CheckSquare, Flame, Notebook, ShoppingCart, Target } from '@lucide/svelte';
+	import {
+		Activity,
+		Calendar,
+		CheckSquare,
+		Flame,
+		Notebook,
+		ShoppingCart,
+		Target
+	} from '@lucide/svelte';
 	import { parseNLPInput } from '#lib/core/nlp-parse.js';
 	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
@@ -20,13 +28,41 @@
 	// Dieselbe Zuordnung wie im Dashboard-Quick-Add: die Kategorie-Farben sind
 	// bewusst neutrale Tailwind-Töne, damit sie sich von primary/accent abheben.
 	const kinds: Record<string, { label: string; color: string; icon: typeof CheckSquare }> = {
-		task: { label: 'Aufgabe', color: 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400', icon: CheckSquare },
-		shopping: { label: 'Einkauf', color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400', icon: ShoppingCart },
-		event: { label: 'Kalender', color: 'bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400', icon: Calendar },
-		health: { label: 'Gesundheit', color: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-400', icon: Activity },
-		habit: { label: 'Routine', color: 'bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400', icon: Flame },
-		note: { label: 'Notiz', color: 'bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400', icon: Notebook },
-		goal: { label: 'Ziel', color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400', icon: Target }
+		task: {
+			label: 'Aufgabe',
+			color: 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+			icon: CheckSquare
+		},
+		shopping: {
+			label: 'Einkauf',
+			color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+			icon: ShoppingCart
+		},
+		event: {
+			label: 'Kalender',
+			color: 'bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+			icon: Calendar
+		},
+		health: {
+			label: 'Gesundheit',
+			color: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-400',
+			icon: Activity
+		},
+		habit: {
+			label: 'Routine',
+			color: 'bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400',
+			icon: Flame
+		},
+		note: {
+			label: 'Notiz',
+			color: 'bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400',
+			icon: Notebook
+		},
+		goal: {
+			label: 'Ziel',
+			color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400',
+			icon: Target
+		}
 	};
 
 	const kind = $derived(parsed ? (kinds[parsed.type] ?? null) : null);
@@ -82,7 +118,9 @@
 					Erkannt: {kind.label}
 				</span>
 			{:else if text.trim()}
-				<span class="text-xs text-text-tertiary">Noch nichts erkannt – Eingabe wird als Aufgabe angelegt.</span>
+				<span class="text-xs text-text-tertiary"
+					>Noch nichts erkannt – Eingabe wird als Aufgabe angelegt.</span
+				>
 			{/if}
 		</div>
 

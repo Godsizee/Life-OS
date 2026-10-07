@@ -18,8 +18,8 @@
 	const PAD_Y = 8;
 
 	const allVals = $derived([
-		...points.map(p => p.value),
-		...(overlay ? overlay.map(p => p.value) : []),
+		...points.map((p) => p.value),
+		...(overlay ? overlay.map((p) => p.value) : []),
 		...(goalLine !== undefined ? [goalLine] : [])
 	]);
 	const maxVal = $derived(allVals.length ? Math.max(...allVals) : 1);
@@ -33,7 +33,9 @@
 		return HEIGHT - PAD_Y - ((v - minVal) / range) * (HEIGHT - PAD_Y * 2);
 	}
 	const linePoints = $derived(points.map((p, i) => `${x(i)},${y(p.value)}`).join(' '));
-	const overlayPoints = $derived(overlay ? overlay.map((p, i) => `${x(i)},${y(p.value)}`).join(' ') : null);
+	const overlayPoints = $derived(
+		overlay ? overlay.map((p, i) => `${x(i)},${y(p.value)}`).join(' ') : null
+	);
 
 	let hoverIndex = $state<number | null>(null);
 	const shown = $derived(hoverIndex !== null ? points[hoverIndex] : points[points.length - 1]);
@@ -67,7 +69,7 @@
 					stroke-dasharray="4"
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					class="text-indigo-400 dark:text-indigo-600 opacity-60"
+					class="text-indigo-400 opacity-60 dark:text-indigo-600"
 					points={overlayPoints}
 				/>
 			{/if}
@@ -88,7 +90,7 @@
 					cx={x(i)}
 					cy={y(p.value)}
 					r={hoverIndex === i ? 4 : 2.5}
-					class="fill-surface-0 stroke-primary-600 stroke-[1.5px] dark:stroke-primary-400 cursor-pointer transition-all"
+					class="cursor-pointer fill-surface-0 stroke-primary-600 stroke-[1.5px] transition-all dark:stroke-primary-400"
 					onmouseenter={() => (hoverIndex = i)}
 					onmouseleave={() => (hoverIndex = null)}
 					role="img"

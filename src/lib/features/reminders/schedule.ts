@@ -35,7 +35,10 @@ export function parseReminderRrule(rrule: string | null): ReminderRule | null {
 }
 
 /** Baut eine RRULE aus einem Habit-Schedule (JS-Wochentage). */
-export function buildRrule(schedule: { type: 'daily' } | { type: 'weekly'; days: number[] } | { type: 'weekly_count'; times: number }): string | null {
+export function buildRrule(
+	schedule:
+		{ type: 'daily' } | { type: 'weekly'; days: number[] } | { type: 'weekly_count'; times: number }
+): string | null {
 	if (schedule.type === 'daily') return 'RRULE:FREQ=DAILY';
 	if (schedule.type === 'weekly_count') return null;
 	const days = [...schedule.days].sort((a, b) => a - b).map((d) => DAY_CODES[d]);
@@ -124,12 +127,18 @@ export function formatReminder(reminder: Pick<Reminder, 'remind_at' | 'rrule'>):
 }
 
 /** Fällig = aktiv und Zeitpunkt erreicht. */
-export function isDue(reminder: Pick<Reminder, 'remind_at' | 'active'>, now: Date = new Date()): boolean {
+export function isDue(
+	reminder: Pick<Reminder, 'remind_at' | 'active'>,
+	now: Date = new Date()
+): boolean {
 	return reminder.active && new Date(reminder.remind_at).getTime() <= now.getTime();
 }
 
 /** Fällt der Reminder auf `day` (lokal)? — für die Dashboard-Zählung. */
-export function isOnDay(reminder: Pick<Reminder, 'remind_at' | 'active'>, day: Date = new Date()): boolean {
+export function isOnDay(
+	reminder: Pick<Reminder, 'remind_at' | 'active'>,
+	day: Date = new Date()
+): boolean {
 	if (!reminder.active) return false;
 	const at = new Date(reminder.remind_at);
 	return (

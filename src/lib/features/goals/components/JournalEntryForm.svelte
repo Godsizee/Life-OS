@@ -82,10 +82,10 @@
 					onclick={() => pickMood(m.value)}
 					disabled={saving}
 					aria-label={m.value}
-					class="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl text-xl xs:text-2xl transition-all disabled:opacity-50 {mood ===
+					class="flex h-12 min-w-0 flex-1 items-center justify-center rounded-xl text-xl transition-all disabled:opacity-50 xs:text-2xl {mood ===
 					m.value
-						? 'bg-primary-100 dark:bg-primary-950/40 ring-2 ring-primary-600 dark:ring-primary-400'
-						: 'bg-surface-2 hover:bg-surface-3 text-text-primary'}"
+						? 'bg-primary-100 ring-2 ring-primary-600 dark:bg-primary-950/40 dark:ring-primary-400'
+						: 'bg-surface-2 text-text-primary hover:bg-surface-3'}"
 				>
 					{m.label}
 				</button>

@@ -49,14 +49,14 @@ ausschließlich die untenstehenden Tokens.
 
 CSS-Variablen in `src/app.css` (`:root` / `html.dark`):
 
-| Variable | Light | Dark | Zweck |
-|---|---|---|---|
-| `--surface-1` | `#F6F6F8` | `#0E0E12` | Seiten-Hintergrund |
-| `--surface-0` | `#FFFFFF` | `#17171D` | Cards |
-| `--surface-2` / `--surface-3` | `#ECECF1` / `#E2E2EA` | `#1F1F27` / `#2A2A34` | Abstufungen (Chips inaktiv, Trenner) |
-| `--text-primary` / `-secondary` / `-tertiary` | `#111114` / `#55555F` / `#8E8E99` | `#F4F4F6` / `#B4B4BF` / `#6E6E7A` | Text-Hierarchie |
-| `--border-color` | `#E7E7EC` | `#26262E` | Rahmen |
-| `--primary-active` / `--primary-active-bg` | `#4F46E5` / `#EEF2FF` | `#818CF8` / `rgba(49,46,129,.35)` | Aktive Nav-/Filter-States |
+| Variable                                      | Light                             | Dark                              | Zweck                                |
+| --------------------------------------------- | --------------------------------- | --------------------------------- | ------------------------------------ |
+| `--surface-1`                                 | `#F6F6F8`                         | `#0E0E12`                         | Seiten-Hintergrund                   |
+| `--surface-0`                                 | `#FFFFFF`                         | `#17171D`                         | Cards                                |
+| `--surface-2` / `--surface-3`                 | `#ECECF1` / `#E2E2EA`             | `#1F1F27` / `#2A2A34`             | Abstufungen (Chips inaktiv, Trenner) |
+| `--text-primary` / `-secondary` / `-tertiary` | `#111114` / `#55555F` / `#8E8E99` | `#F4F4F6` / `#B4B4BF` / `#6E6E7A` | Text-Hierarchie                      |
+| `--border-color`                              | `#E7E7EC`                         | `#26262E`                         | Rahmen                               |
+| `--primary-active` / `--primary-active-bg`    | `#4F46E5` / `#EEF2FF`             | `#818CF8` / `rgba(49,46,129,.35)` | Aktive Nav-/Filter-States            |
 
 Akzentfarben im `@theme`-Block (`src/app.css`):
 
@@ -75,20 +75,20 @@ Akzentfarben im `@theme`-Block (`src/app.css`):
 Gemeinsame, dumme UI-Bausteine — Feature-Code baut UI ausschließlich hieraus, nicht aus
 rohen `<input>`/`<select>`/`<button>` o. Ä.:
 
-| Primitive | Zweck |
-|---|---|
-| `Button.svelte` | primary/secondary/ghost, `min-h-12 rounded-xl active:scale-95` |
-| `Input.svelte` / `Select.svelte` / `Textarea.svelte` | Alle Formularfelder; `text-base` (16px-Floor gegen iOS-Zoom); Rest-Props durchgereicht |
-| `Field.svelte` | Label + Hint/Error-Wrapper für ein Formularelement |
-| `Card.svelte` | `interactive`-/`shadow`-Varianten für Content-Karten |
-| `ListRow.svelte` | Geteiltes Row-Idiom (`leading`/`children`/`trailing`-Snippets, `align: center\|start`) |
-| `CheckCircle.svelte` | 48px-Hit-Target, animiertes Häkchen, Haptik beim Toggle |
-| `Chip.svelte` | Filter-Pills mit `selected`-State |
-| `EmptyState.svelte` | Icon + Titel + Hinweis + optionales Action-Snippet |
-| `PageHeader.svelte` | `text-2xl font-bold tracking-tight` + `mb-6`, optional `subtitle`/`trailing`-Snippet (Standard für alle Routen-Header) |
-| `Sheet.svelte` / `Modal.svelte` | Bottom-Sheet bzw. zentriertes Overlay; Focus-Trap, Scroll-Lock, Escape/Backdrop schließen |
-| `SwipeToDelete.svelte` | Wisch-Geste (Touch) mit Papierkorb-Button als Desktop-Fallback |
-| `Skeleton.svelte` | Lade-Platzhalter, an `store.loading` gekoppelt |
+| Primitive                                            | Zweck                                                                                                                  |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `Button.svelte`                                      | primary/secondary/ghost, `min-h-12 rounded-xl active:scale-95`                                                         |
+| `Input.svelte` / `Select.svelte` / `Textarea.svelte` | Alle Formularfelder; `text-base` (16px-Floor gegen iOS-Zoom); Rest-Props durchgereicht                                 |
+| `Field.svelte`                                       | Label + Hint/Error-Wrapper für ein Formularelement                                                                     |
+| `Card.svelte`                                        | `interactive`-/`shadow`-Varianten für Content-Karten                                                                   |
+| `ListRow.svelte`                                     | Geteiltes Row-Idiom (`leading`/`children`/`trailing`-Snippets, `align: center\|start`)                                 |
+| `CheckCircle.svelte`                                 | 48px-Hit-Target, animiertes Häkchen, Haptik beim Toggle                                                                |
+| `Chip.svelte`                                        | Filter-Pills mit `selected`-State                                                                                      |
+| `EmptyState.svelte`                                  | Icon + Titel + Hinweis + optionales Action-Snippet                                                                     |
+| `PageHeader.svelte`                                  | `text-2xl font-bold tracking-tight` + `mb-6`, optional `subtitle`/`trailing`-Snippet (Standard für alle Routen-Header) |
+| `Sheet.svelte` / `Modal.svelte`                      | Bottom-Sheet bzw. zentriertes Overlay; Focus-Trap, Scroll-Lock, Escape/Backdrop schließen                              |
+| `SwipeToDelete.svelte`                               | Wisch-Geste (Touch) mit Papierkorb-Button als Desktop-Fallback                                                         |
+| `Skeleton.svelte`                                    | Lade-Platzhalter, an `store.loading` gekoppelt                                                                         |
 
 **Wichtig:** `transition:`/`animate:` sind in Svelte 5 auf Custom-Component-Tags nicht
 erlaubt. Wo Listen-Items als eigene Komponente gerendert werden (z. B. `TaskItem`), muss

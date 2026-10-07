@@ -10,8 +10,18 @@ export interface MoodLike {
 }
 
 export const MONTH_SHORT = [
-	'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
-	'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'
+	'Jan',
+	'Feb',
+	'Mär',
+	'Apr',
+	'Mai',
+	'Jun',
+	'Jul',
+	'Aug',
+	'Sep',
+	'Okt',
+	'Nov',
+	'Dez'
 ];
 
 export const WEEKDAY_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
@@ -75,7 +85,9 @@ export function dailyAverages(entries: MoodLike[]): (MoodLike & { score: 1 | 2 |
 }
 
 /** Ø-Score je Tagesabschnitt (Morgen/Mittag/Abend/Nacht). Index 0: Morgen … 3: Nacht. */
-export function averageByDaypart(entries: (MoodLike & { logged_at?: string })[]): (number | null)[] {
+export function averageByDaypart(
+	entries: (MoodLike & { logged_at?: string })[]
+): (number | null)[] {
 	const sums = [0, 0, 0, 0];
 	const counts = [0, 0, 0, 0];
 	for (const e of entries) {
@@ -85,8 +97,10 @@ export function averageByDaypart(entries: (MoodLike & { logged_at?: string })[])
 		if (isNaN(date.getTime())) continue;
 		const hour = date.getHours();
 		let idx = 3; // Nacht
-		if (hour >= 5 && hour < 12) idx = 0; // Morgen
-		else if (hour >= 12 && hour < 17) idx = 1; // Mittag
+		if (hour >= 5 && hour < 12)
+			idx = 0; // Morgen
+		else if (hour >= 12 && hour < 17)
+			idx = 1; // Mittag
 		else if (hour >= 17 && hour < 23) idx = 2; // Abend
 
 		sums[idx] += s;

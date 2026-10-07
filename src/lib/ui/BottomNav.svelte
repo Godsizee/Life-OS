@@ -35,7 +35,7 @@
 </script>
 
 <nav
-	class="fixed bottom-0 left-0 right-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] pl-safe pr-safe md:hidden select-none-native transition duration-300
+	class="pl-safe pr-safe select-none-native fixed right-0 bottom-0 left-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] transition duration-300 md:hidden
 		{keyboardState.open ? 'translate-y-full' : 'translate-y-0'}"
 	style="view-transition-name: bottom-nav"
 >
@@ -51,9 +51,12 @@
 					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">{item.label}</span>
+				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block"
+					>{item.label}</span
+				>
 				{#if active}
-					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
+					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"
+					></span>
 				{/if}
 			</a>
 		{/each}
@@ -64,7 +67,7 @@
 			type="button"
 			onclick={quickAdd}
 			aria-label="Schnell erfassen"
-			class="relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white transition-all active:scale-90 elevation-2 hero-gradient"
+			class="elevation-2 hero-gradient relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white transition-all active:scale-90"
 		>
 			<Plus size={24} strokeWidth={2.5} />
 		</button>
@@ -80,9 +83,12 @@
 					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
 			>
 				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">{item.label}</span>
+				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block"
+					>{item.label}</span
+				>
 				{#if active}
-					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"></span>
+					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"
+					></span>
 				{/if}
 			</a>
 		{/each}

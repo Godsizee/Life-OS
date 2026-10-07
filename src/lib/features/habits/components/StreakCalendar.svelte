@@ -18,7 +18,7 @@
 	const DAYS = $derived(weeks * 7);
 
 	const today = new Date();
-	
+
 	// Starte am ersten Tag des Grid (Tage zurück, dann ausrichten auf Montag)
 	const gridStart = $derived.by(() => {
 		const start = new Date(today);
@@ -27,11 +27,13 @@
 	});
 
 	// Alle Tage als ISO-Strings
-	const allDays = $derived(Array.from({ length: DAYS }, (_, i) => {
-		const d = new Date(gridStart);
-		d.setDate(gridStart.getDate() + i);
-		return toISODate(d);
-	}));
+	const allDays = $derived(
+		Array.from({ length: DAYS }, (_, i) => {
+			const d = new Date(gridStart);
+			d.setDate(gridStart.getDate() + i);
+			return toISODate(d);
+		})
+	);
 
 	// Tage nach Wochen gruppieren (je 7 Tage = 1 Spalte im Grid)
 	const weeksGrid = $derived.by(() => {
@@ -64,7 +66,12 @@
 					if (isCompleted(h, day)) logged++;
 				}
 			}
-			acc[dateStr] = { date: dateStr, due, logged, pct: due > 0 ? Math.round((logged / due) * 100) : -1 };
+			acc[dateStr] = {
+				date: dateStr,
+				due,
+				logged,
+				pct: due > 0 ? Math.round((logged / due) * 100) : -1
+			};
 			return acc;
 		}, {})
 	);
@@ -126,8 +133,8 @@
 				font-size="9"
 				fill="currentColor"
 				class="text-text-tertiary"
-				font-family="system-ui, sans-serif"
-			>{label}</text>
+				font-family="system-ui, sans-serif">{label}</text
+			>
 		{/each}
 
 		<!-- Zellen -->
@@ -158,10 +165,17 @@
 	<!-- Tooltip -->
 	{#if tooltip}
 		<div class="mt-1 text-xs text-text-secondary">
-			<span class="font-medium">{new Date(tooltip.date).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+			<span class="font-medium"
+				>{new Date(tooltip.date).toLocaleDateString('de-DE', {
+					weekday: 'short',
+					day: 'numeric',
+					month: 'short'
+				})}</span
+			>
 			{#if tooltip.due > 0}
-				— {tooltip.logged}/{tooltip.due} Habits
-				({tooltip.logged > 0 ? Math.round((tooltip.logged / tooltip.due) * 100) : 0}%)
+				— {tooltip.logged}/{tooltip.due} Habits ({tooltip.logged > 0
+					? Math.round((tooltip.logged / tooltip.due) * 100)
+					: 0}%)
 			{:else}
 				— kein Habit fällig
 			{/if}
@@ -172,10 +186,7 @@
 	<div class="mt-2 flex items-center gap-2 text-[10px] text-text-tertiary">
 		<span>Weniger</span>
 		{#each legendColors as color}
-			<span
-				class="inline-block h-2.5 w-2.5 rounded-sm"
-				style="background:{color}"
-			></span>
+			<span class="inline-block h-2.5 w-2.5 rounded-sm" style="background:{color}"></span>
 		{/each}
 		<span>Mehr</span>
 	</div>

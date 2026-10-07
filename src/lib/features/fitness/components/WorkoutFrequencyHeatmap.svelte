@@ -27,14 +27,23 @@
 
 	function cellColor(dateStr: string): string {
 		const isDark = themeState.isDark;
-		return loggedSet.has(dateStr) ? (isDark ? '#10b981' : '#059669') : isDark ? '#1e113a' : '#f1f5f9';
+		return loggedSet.has(dateStr)
+			? isDark
+				? '#10b981'
+				: '#059669'
+			: isDark
+				? '#1e113a'
+				: '#f1f5f9';
 	}
 
 	const monthLabels: { week: number; label: string }[] = [];
 	for (let w = 0; w < weeks.length; w++) {
 		const firstDay = new Date(weeks[w][0]);
 		if (firstDay.getDate() <= 7 || w === 0) {
-			monthLabels.push({ week: w, label: firstDay.toLocaleDateString('de-DE', { month: 'short' }) });
+			monthLabels.push({
+				week: w,
+				label: firstDay.toLocaleDateString('de-DE', { month: 'short' })
+			});
 		}
 	}
 
@@ -62,8 +71,8 @@
 				font-size="9"
 				fill="currentColor"
 				class="text-text-tertiary"
-				font-family="system-ui, sans-serif"
-			>{label}</text>
+				font-family="system-ui, sans-serif">{label}</text
+			>
 		{/each}
 
 		{#each weeks as week, wi}
@@ -92,7 +101,11 @@
 	{#if tooltip}
 		<div class="mt-1 text-xs text-text-secondary">
 			<span class="font-medium">
-				{new Date(tooltip).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })}
+				{new Date(tooltip).toLocaleDateString('de-DE', {
+					weekday: 'short',
+					day: 'numeric',
+					month: 'short'
+				})}
 			</span>
 			— {loggedSet.has(tooltip) ? 'Training absolviert' : 'kein Training'}
 		</div>

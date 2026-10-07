@@ -51,21 +51,21 @@ export async function deleteChecked(workspaceId: string): Promise<void> {
 }
 
 export async function getWorkspaceSettings(workspaceId: string): Promise<WorkspaceSettings> {
-  const { data, error } = await supabase
-    .from('workspace_settings')
-    .select('settings')
-    .eq('workspace_id', workspaceId)
-    .maybeSingle();
-  if (error) throw error;
-  return (data?.settings as WorkspaceSettings) ?? {};
+	const { data, error } = await supabase
+		.from('workspace_settings')
+		.select('settings')
+		.eq('workspace_id', workspaceId)
+		.maybeSingle();
+	if (error) throw error;
+	return (data?.settings as WorkspaceSettings) ?? {};
 }
 
 export async function upsertWorkspaceSettings(
-  workspaceId: string,
-  settings: WorkspaceSettings
+	workspaceId: string,
+	settings: WorkspaceSettings
 ): Promise<void> {
-  const { error } = await supabase
-    .from('workspace_settings')
-    .upsert({ workspace_id: workspaceId, settings, updated_at: new Date().toISOString() });
-  if (error) throw error;
+	const { error } = await supabase
+		.from('workspace_settings')
+		.upsert({ workspace_id: workspaceId, settings, updated_at: new Date().toISOString() });
+	if (error) throw error;
 }

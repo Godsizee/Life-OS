@@ -33,13 +33,7 @@
 
 	// Rot → Amber → Grün. Bewusst nicht nur Farbe: der Text daneben trägt
 	// dieselbe Information für Nutzer, die Farben nicht unterscheiden.
-	const barColors = [
-		'bg-red-500',
-		'bg-red-500',
-		'bg-amber-500',
-		'bg-primary-500',
-		'bg-green-500'
-	];
+	const barColors = ['bg-red-500', 'bg-red-500', 'bg-amber-500', 'bg-primary-500', 'bg-green-500'];
 
 	// Haeufigste Ursache fuer "mein Passwort stimmt doch" — vorher unsichtbar.
 	function trackCapsLock(event: KeyboardEvent) {
@@ -66,7 +60,7 @@
 			aria-describedby={error ? `${id}-error` : showStrength ? `${id}-strength` : undefined}
 			onkeydown={trackCapsLock}
 			onkeyup={trackCapsLock}
-			class="min-h-12 w-full rounded-xl border bg-surface-0 pl-4 pr-14 text-base text-text-primary placeholder:text-text-tertiary transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60
+			class="min-h-12 w-full rounded-xl border bg-surface-0 pr-14 pl-4 text-base text-text-primary transition-colors duration-200 placeholder:text-text-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60
 				{error ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-primary-500'}"
 		/>
 		<button
@@ -75,7 +69,7 @@
 			onclick={() => (visible = !visible)}
 			aria-label={visible ? 'Passwort verbergen' : 'Passwort anzeigen'}
 			aria-pressed={visible}
-			class="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-xl text-text-tertiary transition-transform hover:text-text-primary active:scale-95 disabled:opacity-50"
+			class="absolute top-1/2 right-1 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-xl text-text-tertiary transition-transform hover:text-text-primary active:scale-95 disabled:opacity-50"
 		>
 			{#if visible}
 				<EyeOff size={18} />

@@ -98,7 +98,13 @@
 		<div class="flex gap-2">
 			<Input placeholder="Übung (z. B. Kreuzheben)" bind:value={targetExercise} />
 			<div class="w-32">
-				<Input type="number" min="1" step="0.5" placeholder="Ziel-1RM kg" bind:value={targetValue} />
+				<Input
+					type="number"
+					min="1"
+					step="0.5"
+					placeholder="Ziel-1RM kg"
+					bind:value={targetValue}
+				/>
 			</div>
 		</div>
 	{:else if goalType === 'fitness_frequency'}

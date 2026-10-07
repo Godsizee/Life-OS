@@ -57,7 +57,7 @@
 			// zugestellt — ohne Abgleich blieben sie bis zum naechsten Reload unsichtbar.
 			fordereAbgleich('online');
 		});
-		window.addEventListener('offline', () => online = false);
+		window.addEventListener('offline', () => (online = false));
 		// Der haeufigste Fall auf dem Handy: App lag im Hintergrund, das System hat
 		// den Socket stillgelegt. Beim Zurueckkehren kommt kein Fehlerstatus,
 		// deshalb hier aktiv nachfassen. fordereAbgleich() drosselt selbst.
@@ -191,40 +191,40 @@
 {#if authState.loading}
 	<AuthSplash />
 {:else}
-	<div class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300">
+	<div
+		class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300"
+	>
 		{#if showNav}
-		<SidebarNav currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
+			<SidebarNav currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 		{/if}
 
 		<div
-			class="flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out pt-safe pl-safe pr-safe
-			{showNav ? sidebarCollapsed ? 'md:pl-20' : 'md:pl-64' : ''}
-			{showNav && !keyboardState.open
-				? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0'
-				: ''}"
+			class="pt-safe pl-safe pr-safe flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out
+			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
+			{showNav && !keyboardState.open ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 		>
 			{#if syncBanner}
 				<button
-					onclick={() => syncBanner.zeigeProbleme ? syncIssuesOpen = true : outbox.replay()}
+					onclick={() => (syncBanner.zeigeProbleme ? (syncIssuesOpen = true) : outbox.replay())}
 					style="view-transition-name: sync-banner"
 					class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium {syncBanner.class}"
-			>
-				{syncBanner.text}
-			</button>
+				>
+					{syncBanner.text}
+				</button>
 			{/if}
 			<UpdateBand />
 			<main
-			class="mx-auto w-full flex-1 {showNav ? 'p-4 md:p-8' : ''} {wideRoute
-				? 'max-w-6xl'
-				: 'max-w-4xl'}"
-		>
-			{@render children()}
-		</main>
+				class="mx-auto w-full flex-1 {showNav ? 'p-4 md:p-8' : ''} {wideRoute
+					? 'max-w-6xl'
+					: 'max-w-4xl'}"
+			>
+				{@render children()}
+			</main>
 			{#if showNav}
 				<BottomNav
 					currentPath={page.url.pathname}
-					onQuickAdd={() => quickAddOpen = true}
-					onMore={() => moduleGridOpen = true}
+					onQuickAdd={() => (quickAddOpen = true)}
+					onMore={() => (moduleGridOpen = true)}
 				/>
 			{/if}
 		</div>

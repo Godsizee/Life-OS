@@ -6,7 +6,9 @@
 
 <ul class="flex flex-col gap-2">
 	{#each members as member (member.user_id)}
-		<li class="flex items-center justify-between rounded-xl border border-border-color bg-surface-0 p-3">
+		<li
+			class="flex items-center justify-between rounded-xl border border-border-color bg-surface-0 p-3"
+		>
 			<span class="truncate text-text-primary">
 				{member.profile?.display_name ?? member.user_id}
 			</span>

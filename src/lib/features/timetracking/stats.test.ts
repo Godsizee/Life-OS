@@ -17,7 +17,12 @@ import { toISODate } from '#lib/core/date.js';
 // Mittwoch, 24.06.2026, 10:00 lokal
 const today = new Date(2026, 5, 24, 10, 0, 0);
 
-function at(daysAgo: number, hour: number, minutes: number, extra: Partial<TimeEntryLike> = {}): TimeEntryLike {
+function at(
+	daysAgo: number,
+	hour: number,
+	minutes: number,
+	extra: Partial<TimeEntryLike> = {}
+): TimeEntryLike {
 	const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysAgo, hour, 0, 0);
 	return { started_at: d.toISOString(), duration_min: minutes, source: 'pomodoro', ...extra };
 }
@@ -132,13 +137,25 @@ describe('focusScoreForDate', () => {
 
 describe('focusScoreForDate mit eigenem Tagesziel', () => {
 	it('rechnet gegen das übergebene Ziel, nicht gegen eine Konstante', () => {
-		const e = [{ started_at: new Date(2026, 6, 31, 10, 0).toISOString(), duration_min: 50, source: 'pomodoro' as const }];
+		const e = [
+			{
+				started_at: new Date(2026, 6, 31, 10, 0).toISOString(),
+				duration_min: 50,
+				source: 'pomodoro' as const
+			}
+		];
 		expect(focusScoreForDate(e, '2026-07-31', 100)).toBe(50);
 		expect(focusScoreForDate(e, '2026-07-31', 50)).toBe(100);
 	});
 
 	it('deckelt bei 100', () => {
-		const e = [{ started_at: new Date(2026, 6, 31, 10, 0).toISOString(), duration_min: 500, source: 'pomodoro' as const }];
+		const e = [
+			{
+				started_at: new Date(2026, 6, 31, 10, 0).toISOString(),
+				duration_min: 500,
+				source: 'pomodoro' as const
+			}
+		];
 		expect(focusScoreForDate(e, '2026-07-31', 100)).toBe(100);
 	});
 

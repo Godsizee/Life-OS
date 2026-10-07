@@ -32,6 +32,7 @@ Workspace/RLS-Migrations, PWA (Install-Prompt, Service Worker mit Push-Handlern,
 `Recent.md` steht seit M2 aus. **Das ist Blocker Nr. 1.**
 
 > [!bug] Kritische Friction-Befunde (Code-Audit)
+>
 > 1. **Invite-Loop ist tot:** `inviteMember()` ([api.ts](../src/lib/features/workspace/api.ts)) erzeugt den Token, aber die UI zeigt ihn nie an und es geht keine E-Mail raus → Partner kann faktisch nicht beitreten.
 > 2. **Invite-Token geht verloren:** `/invite?token=…` ohne Session verweist auf `/login` **ohne Rücksprung** — nach dem Login landet der Partner im eigenen leeren Workspace statt in der Einladung.
 > 3. **Signup kollidiert mit E-Mail-Bestätigung:** `signUp()` → sofort `goto('/')`; mit aktivierter Confirm-Mail (Supabase-Default) hängt der Nutzer ohne Erklärung.
@@ -40,13 +41,13 @@ Workspace/RLS-Migrations, PWA (Install-Prompt, Service Worker mit Push-Handlern,
 
 ## Frictionless-Funnel (Zielbild)
 
-| Schritt | Zielzustand | Zielzeit |
-|---|---|---|
-| Landing/Login | 1 Feld (E-Mail) + Beta-Code (aus Link vorausgefüllt) | 10 s |
-| Auth | 6-stelliger E-Mail-OTP-Code — kein Passwort, kein Confirm-Link, PWA-sicher | 20 s |
-| Onboarding | 2 Fragen: Anzeigename + „Wie heißt euer Haushalt?" → fertig | 15 s |
-| Erste Aktion | Empty-States mit je 1 CTA („Erste Aufgabe", „Partner einladen") | 15 s |
-| Partner-Loop | Teilbarer Invite-Link (Web-Share/WhatsApp) → OTP → Auto-Join in den Workspace | < 90 s |
+| Schritt       | Zielzustand                                                                   | Zielzeit |
+| ------------- | ----------------------------------------------------------------------------- | -------- |
+| Landing/Login | 1 Feld (E-Mail) + Beta-Code (aus Link vorausgefüllt)                          | 10 s     |
+| Auth          | 6-stelliger E-Mail-OTP-Code — kein Passwort, kein Confirm-Link, PWA-sicher    | 20 s     |
+| Onboarding    | 2 Fragen: Anzeigename + „Wie heißt euer Haushalt?" → fertig                   | 15 s     |
+| Erste Aktion  | Empty-States mit je 1 CTA („Erste Aufgabe", „Partner einladen")               | 15 s     |
+| Partner-Loop  | Teilbarer Invite-Link (Web-Share/WhatsApp) → OTP → Auto-Join in den Workspace | < 90 s   |
 
 E-Mail-OTP statt Magic-Link ist bewusst: Magic-Links brechen auf iOS aus der installierten PWA
 in den Safari-Kontext aus (Session-Mismatch); ein Code funktioniert überall.
@@ -95,23 +96,25 @@ Workspace; kompletter Funnel in Telemetrie sichtbar.
 ## P3 — Pilotbetrieb (4 Wochen)
 
 **Setup:**
+
 - [ ] **Supabase Pro** (25 $/Mo) ab Pilot-Start — Free-Tier hat **keine Backups** und pausiert bei Inaktivität; im Piloten liegen private Tagebuch-Daten
 - [ ] Restore-Test einmal durchspielen ([[LifeOS_Sicherheit|Sicherheit]]: „Restore testen")
 - [ ] Rekrutierung: 5–15 Haushalte (Paare/WGs) aus Umfeld + Warteliste; pro Haushalt 1 Beta-Code; Erwartung setzen: Beta, Feedback erwünscht, Daten in EU, Löschung jederzeit auf Zuruf
 
 **Rhythmus:**
+
 - [ ] Wöchentlich: Metrik-Review (SQL auf `events`) + Feedback-Triage → **1 Release/Woche**, strikt aus Feedback priorisiert (kein Scope-Creep)
 - [ ] **Retention-Features nachschieben** (M4-Subset, ab Pilot-Woche 2): Push-Versand-Edge-Function (liest `push_subscriptions`, `VAPID_PRIVATE_KEY`) für Aufgaben-Reminder + Morgen-Digest; serverseitige RRULE-Expansion via **pg_cron + Edge Function** — n8n erst, wenn externe Integrationen (Telegram/ICS) wirklich gebraucht werden
 
 **Go/No-Go-Kriterien (Ende Pilot):**
 
-| Metrik | Ziel |
-|---|---|
-| Aktivierung: 2. Mitglied im Workspace ≤ 72 h | ≥ 70 % der Haushalte |
-| Kern-Nutzung: aktive Tage/Woche pro Haushalt | ≥ 3 |
-| Retention Woche 4 | ≥ 50 % der Haushalte aktiv |
-| Qualität | Crash-free ≥ 99 %, 0 RLS-Vorfälle, Sync-Fehler < 1 % |
-| Zahlungsbereitschaft (Abschluss-Interview) | ≥ 40 % „ja" bei ~4 €/Monat |
+| Metrik                                       | Ziel                                                 |
+| -------------------------------------------- | ---------------------------------------------------- |
+| Aktivierung: 2. Mitglied im Workspace ≤ 72 h | ≥ 70 % der Haushalte                                 |
+| Kern-Nutzung: aktive Tage/Woche pro Haushalt | ≥ 3                                                  |
+| Retention Woche 4                            | ≥ 50 % der Haushalte aktiv                           |
+| Qualität                                     | Crash-free ≥ 99 %, 0 RLS-Vorfälle, Sync-Fehler < 1 % |
+| Zahlungsbereitschaft (Abschluss-Interview)   | ≥ 40 % „ja" bei ~4 €/Monat                           |
 
 ## P4 — SaaS-Ausbau (nach Go, ~2–3 Wochen)
 
@@ -131,13 +134,13 @@ Workspace; kompletter Funnel in Telemetrie sichtbar.
 
 ## Risiken
 
-| Risiko | Gegenmaßnahme |
-|---|---|
-| Zweiseitiges Onboarding scheitert (Partner kommt nie an) | Invite-Loop ist P1-Kernstück; Funnel-Events messen jeden Schritt |
-| E-Mail-Zustellbarkeit (OTP hängt an SMTP) | Eigene Domain + SPF/DKIM in P0, nicht erst im Pilot |
+| Risiko                                                                                 | Gegenmaßnahme                                                                       |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Zweiseitiges Onboarding scheitert (Partner kommt nie an)                               | Invite-Loop ist P1-Kernstück; Funnel-Events messen jeden Schritt                    |
+| E-Mail-Zustellbarkeit (OTP hängt an SMTP)                                              | Eigene Domain + SPF/DKIM in P0, nicht erst im Pilot                                 |
 | iOS-PWA-Eigenheiten (Push erst ≥ 16.4; Safari räumt Storage nach ~7 Tagen Inaktivität) | Outbox klein halten, Sync-Status sichtbar (existiert), Erwartung in Onboarding-Mail |
-| Supabase-Free-Pause / Datenverlust | Pro-Plan ab Pilot-Start (P3) |
-| Scope-Creep während Pilot | Wochen-Releases nur aus Feedback-Triage; v2-Backlog bleibt zu |
+| Supabase-Free-Pause / Datenverlust                                                     | Pro-Plan ab Pilot-Start (P3)                                                        |
+| Scope-Creep während Pilot                                                              | Wochen-Releases nur aus Feedback-Triage; v2-Backlog bleibt zu                       |
 
 ## Entscheidungen (Empfehlung = Default, Einspruch jederzeit)
 

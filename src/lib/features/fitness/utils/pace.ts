@@ -1,7 +1,10 @@
 // Welle F2 — Pace-Anzeige für Cardio-Sätze (Zeit + Strecke → min/km).
 
 /** Pace in min/km, oder null wenn Zeit/Strecke fehlen oder ungültig sind. */
-export function computePaceMinPerKm(durationMin: number | null, distanceKm: number | null): number | null {
+export function computePaceMinPerKm(
+	durationMin: number | null,
+	distanceKm: number | null
+): number | null {
 	if (!durationMin || !distanceKm || durationMin <= 0 || distanceKm <= 0) return null;
 	return durationMin / distanceKm;
 }

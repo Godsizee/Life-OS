@@ -42,10 +42,7 @@ Deno.serve(async (req) => {
 	// Workspaces, deren einziger Eigentuemer dieser Nutzer ist, wuerden sonst als
 	// Waisen zurueckbleiben — inklusive aller geteilten Daten darin. Migration 12
 	// deckt nur die Ketten AB auth.users ab, nicht diesen Fall.
-	const { data: eigene } = await admin
-		.from('workspaces')
-		.select('id')
-		.eq('owner_id', userId);
+	const { data: eigene } = await admin.from('workspaces').select('id').eq('owner_id', userId);
 
 	for (const ws of eigene ?? []) {
 		const { count } = await admin

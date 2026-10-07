@@ -31,7 +31,11 @@
 	}
 
 	async function deleteTag(tag: string, count: number) {
-		if (confirm(`Tag "${activityLabel(tag)}" wirklich löschen? Er wird aus ${count} Eintrag/Einträgen entfernt.`)) {
+		if (
+			confirm(
+				`Tag "${activityLabel(tag)}" wirklich löschen? Er wird aus ${count} Eintrag/Einträgen entfernt.`
+			)
+		) {
 			await moodState.renameActivity(tag, null);
 		}
 	}
@@ -40,18 +44,18 @@
 <Sheet bind:open title="Eigene Tags verwalten">
 	<div class="space-y-4 p-4">
 		<p class="text-xs text-text-tertiary">
-			Hier kannst du deine selbst erstellten Aktivitäts-Tags umbenennen oder löschen.
-			Ältere Jahre werden erst angepasst, wenn sie im Jahresraster geladen wurden.
+			Hier kannst du deine selbst erstellten Aktivitäts-Tags umbenennen oder löschen. Ältere Jahre
+			werden erst angepasst, wenn sie im Jahresraster geladen wurden.
 		</p>
 
 		{#if customTags.length === 0}
-			<p class="py-4 text-center text-sm text-text-secondary">
-				Noch keine eigenen Tags erstellt.
-			</p>
+			<p class="py-4 text-center text-sm text-text-secondary">Noch keine eigenen Tags erstellt.</p>
 		{:else}
 			<ul class="flex flex-col gap-2">
 				{#each customTags as item (item.tag)}
-					<li class="flex items-center justify-between gap-2 rounded-xl border border-border-color bg-surface-1 p-2.5">
+					<li
+						class="flex items-center justify-between gap-2 rounded-xl border border-border-color bg-surface-1 p-2.5"
+					>
 						{#if editingTag === item.tag}
 							<div class="flex flex-1 items-center gap-1.5">
 								<Input bind:value={newName} placeholder="Neuer Name" />
@@ -76,7 +80,8 @@
 									#{activityLabel(item.tag)}
 								</p>
 								<p class="text-[11px] text-text-tertiary">
-									{item.count} {item.count === 1 ? 'Eintrag' : 'Einträge'}
+									{item.count}
+									{item.count === 1 ? 'Eintrag' : 'Einträge'}
 								</p>
 							</div>
 							<div class="flex items-center gap-1">

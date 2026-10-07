@@ -150,7 +150,9 @@ class TasksState {
 		// weiterhin in der Woche ihrer alten Erledigung mit.
 		const completed_at = status === 'done' ? updated_at : null;
 
-		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, status, updated_at, completed_at } : t));
+		this.tasks = this.tasks.map((t) =>
+			t.id === id ? { ...t, status, updated_at, completed_at } : t
+		);
 		await outbox.runOrQueue('tasks', 'update', { id, status, updated_at, completed_at }, () =>
 			tasksApi.updateRaw({ id, status, updated_at, completed_at })
 		);
@@ -197,7 +199,21 @@ class TasksState {
 
 	async updateTask(
 		id: string,
-		patch: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'due_at' | 'labels' | 'project_id' | 'goal_id' | 'rrule' | 'position' | 'assignee_id'>>
+		patch: Partial<
+			Pick<
+				Task,
+				| 'title'
+				| 'description'
+				| 'priority'
+				| 'due_at'
+				| 'labels'
+				| 'project_id'
+				| 'goal_id'
+				| 'rrule'
+				| 'position'
+				| 'assignee_id'
+			>
+		>
 	) {
 		const updated_at = new Date().toISOString();
 		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
@@ -232,7 +248,9 @@ class TasksState {
 
 	async setAssignee(id: string, assigneeId: string | null) {
 		const updated_at = new Date().toISOString();
-		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, assignee_id: assigneeId, updated_at } : t));
+		this.tasks = this.tasks.map((t) =>
+			t.id === id ? { ...t, assignee_id: assigneeId, updated_at } : t
+		);
 		await outbox.runOrQueue('tasks', 'update', { id, assignee_id: assigneeId, updated_at }, () =>
 			tasksApi.updateRaw({ id, assignee_id: assigneeId, updated_at })
 		);

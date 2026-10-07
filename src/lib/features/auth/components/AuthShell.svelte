@@ -14,10 +14,10 @@
 	} = $props();
 </script>
 
-<div class="flex min-h-dvh flex-col justify-center px-4 py-10 pt-safe pb-safe">
+<div class="pt-safe pb-safe flex min-h-dvh flex-col justify-center px-4 py-10">
 	<div class="mx-auto flex w-full max-w-sm flex-col gap-6">
 		<div class="auth-enter flex items-center gap-3" style="--stagger: 0ms">
-			<img src="/favicon.svg" alt="" class="h-11 w-11 rounded-2xl elevation-1" />
+			<img src="/favicon.svg" alt="" class="elevation-1 h-11 w-11 rounded-2xl" />
 			<div class="flex min-w-0 flex-col">
 				<span class="text-base font-bold tracking-tight text-text-primary">Life OS</span>
 				<span class="truncate text-xs text-text-secondary">Dein persönliches Betriebssystem</span>

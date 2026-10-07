@@ -24,7 +24,12 @@ describe('parseTaskInput', () => {
 	});
 	it('kombinierte Eingabe', () => {
 		const r = parseTaskInput('Steuer machen morgen !hoch #Finanzen @wichtig');
-		expect(r).toMatchObject({ title: 'Steuer machen', priority: 'high', project_name: 'Finanzen', labels: ['wichtig'] });
+		expect(r).toMatchObject({
+			title: 'Steuer machen',
+			priority: 'high',
+			project_name: 'Finanzen',
+			labels: ['wichtig']
+		});
 		expect(r.due_at).not.toBeNull();
 	});
 	it('leerer Rest-Titel fällt auf Originaltext zurück', () => {

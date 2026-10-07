@@ -2,7 +2,13 @@
 	import { page } from '$app/state';
 	import { Hash, Plus } from '@lucide/svelte';
 	import { notesState } from '#lib/features/notes/store.svelte.js';
-	import { searchNotes, sortNotes, tagUnion, type NoteSort, NOTE_SORT_LABELS } from '#lib/features/notes/filter.js';
+	import {
+		searchNotes,
+		sortNotes,
+		tagUnion,
+		type NoteSort,
+		NOTE_SORT_LABELS
+	} from '#lib/features/notes/filter.js';
 	import type { Note } from '#lib/features/notes/types.js';
 	import { onMount } from 'svelte';
 	import NoteForm from '#lib/features/notes/components/NoteForm.svelte';
@@ -44,7 +50,9 @@
 	});
 
 	const tags = $derived(tagUnion(notesState.notes));
-	const visibleMatches = $derived(searchNotes(sortNotes(notesState.notes, sortMode), search, activeTag));
+	const visibleMatches = $derived(
+		searchNotes(sortNotes(notesState.notes, sortMode), search, activeTag)
+	);
 	const pinnedMatches = $derived(visibleMatches.filter((m) => m.note.pinned));
 	const restMatches = $derived(visibleMatches.filter((m) => !m.note.pinned));
 
@@ -93,7 +101,10 @@
 	<section class="mb-4 flex gap-2 overflow-x-auto pb-1">
 		<Chip selected={activeTag === null} onclick={() => (activeTag = null)}>Alle</Chip>
 		{#each tags as tag (tag)}
-			<Chip selected={activeTag === tag} onclick={() => (activeTag = activeTag === tag ? null : tag)}>
+			<Chip
+				selected={activeTag === tag}
+				onclick={() => (activeTag = activeTag === tag ? null : tag)}
+			>
 				<Hash size={12} />{tag}
 			</Chip>
 		{/each}
@@ -102,11 +113,20 @@
 
 <div class="mb-4 flex items-center gap-2 text-sm text-text-secondary">
 	<span>Sortieren:</span>
-	<button class="hover:text-text-primary {sortMode === 'updated' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('updated')}>{NOTE_SORT_LABELS.updated}</button>
+	<button
+		class="hover:text-text-primary {sortMode === 'updated' ? 'font-bold text-text-primary' : ''}"
+		onclick={() => setSort('updated')}>{NOTE_SORT_LABELS.updated}</button
+	>
 	<span>·</span>
-	<button class="hover:text-text-primary {sortMode === 'created' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('created')}>{NOTE_SORT_LABELS.created}</button>
+	<button
+		class="hover:text-text-primary {sortMode === 'created' ? 'font-bold text-text-primary' : ''}"
+		onclick={() => setSort('created')}>{NOTE_SORT_LABELS.created}</button
+	>
 	<span>·</span>
-	<button class="hover:text-text-primary {sortMode === 'title' ? 'font-bold text-text-primary' : ''}" onclick={() => setSort('title')}>{NOTE_SORT_LABELS.title}</button>
+	<button
+		class="hover:text-text-primary {sortMode === 'title' ? 'font-bold text-text-primary' : ''}"
+		onclick={() => setSort('title')}>{NOTE_SORT_LABELS.title}</button
+	>
 </div>
 
 <section class="flex flex-col gap-6">
@@ -119,14 +139,14 @@
 	{:else}
 		{#if pinnedMatches.length > 0}
 			<div class="flex flex-col gap-2">
-				<h2 class="text-xs font-bold uppercase tracking-wide text-text-tertiary">Angepinnt</h2>
+				<h2 class="text-xs font-bold tracking-wide text-text-tertiary uppercase">Angepinnt</h2>
 				<NoteList matches={pinnedMatches} onopen={open} />
 			</div>
 		{/if}
 
 		<div class="flex flex-col gap-2">
 			{#if pinnedMatches.length > 0 && restMatches.length > 0}
-				<h2 class="text-xs font-bold uppercase tracking-wide text-text-tertiary">Weitere</h2>
+				<h2 class="text-xs font-bold tracking-wide text-text-tertiary uppercase">Weitere</h2>
 			{/if}
 			<NoteList
 				matches={restMatches}

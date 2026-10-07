@@ -18,10 +18,7 @@ import {
 	type HealthLike
 } from './stats';
 
-const E = (
-	date: string,
-	p: Partial<Omit<HealthLike, 'date'>> = {}
-): HealthLike => ({
+const E = (date: string, p: Partial<Omit<HealthLike, 'date'>> = {}): HealthLike => ({
 	date,
 	weight_kg: p.weight_kg ?? null,
 	sleep_h: p.sleep_h ?? null,
@@ -69,8 +66,8 @@ describe('movingAverage', () => {
 		const p = [1, 3, 2, 4].map((v, i) => ({ date: `2026-07-0${i + 1}`, label: '', value: v }));
 		const g = movingAverage(p, 2);
 		expect(g).toHaveLength(4);
-		expect(g[1].value).toBe(2);   // (1+3)/2
-		expect(g[3].value).toBe(3);   // (2+4)/2
+		expect(g[1].value).toBe(2); // (1+3)/2
+		expect(g[3].value).toBe(3); // (2+4)/2
 	});
 });
 
@@ -145,7 +142,12 @@ describe('metricSeries', () => {
 describe('metricAverage', () => {
 	it('mittelt nur erfasste Tage', () => {
 		expect(
-			metricAverage([E('2026-01-09', { water_ml: 1000 }), E('2026-01-10', { water_ml: 2000 })], 'water_ml', 7, TODAY)
+			metricAverage(
+				[E('2026-01-09', { water_ml: 1000 }), E('2026-01-10', { water_ml: 2000 })],
+				'water_ml',
+				7,
+				TODAY
+			)
 		).toBe(1500);
 	});
 	it('gibt null ohne Werte', () => {
@@ -164,7 +166,9 @@ describe('goalHitDays', () => {
 		expect(goalHitDays(entries, 'water_ml', 2000, 30, TODAY)).toEqual({ hit: 2, tracked: 3 });
 	});
 	it('zaehlt nichts ohne Ziel', () => {
-		expect(goalHitDays([E('2026-01-10', { water_ml: 2000 })], 'water_ml', 0, 30, TODAY).hit).toBe(0);
+		expect(goalHitDays([E('2026-01-10', { water_ml: 2000 })], 'water_ml', 0, 30, TODAY).hit).toBe(
+			0
+		);
 	});
 });
 
@@ -220,8 +224,12 @@ describe('Formatierung', () => {
 	it('formatMetric je Metrik', () => {
 		expect(formatMetric('weight_kg', 72.53)).toBe('72,5 kg');
 		expect(formatMetric('sleep_h', 7.5)).toBe('7,5 h');
-		expect(formatMetric('water_ml', 250, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe('1 Glas');
-		expect(formatMetric('water_ml', 2000, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe('8 Gläser');
+		expect(formatMetric('water_ml', 250, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe(
+			'1 Glas'
+		);
+		expect(formatMetric('water_ml', 2000, { waterUnit: 'glasses', glassSizeMl: 250 })).toBe(
+			'8 Gläser'
+		);
 		expect(formatMetric('energy', 4)).toBe('4/5');
 		expect(formatMetric('sleep_h', null)).toBe('—');
 	});

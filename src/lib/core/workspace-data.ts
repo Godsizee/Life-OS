@@ -61,10 +61,10 @@ export async function loadWorkspaceData(workspaceId: string): Promise<void> {
 		timeTrackingState.load(),
 		profileState.load()
 	]);
-	
+
 	// Nach dem Laden: eine laufende Session muss auch außerhalb von /focus sichtbar sein.
 	focusSession.restore();
-	
+
 	// Nachberechnung fehlender Analytics-Tage, sobald alle relevanten Stores befüllt sind
 	void analyticsState.backfillScores(7);
 

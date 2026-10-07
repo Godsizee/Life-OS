@@ -15,8 +15,11 @@
 			{#each buckets as b}
 				<div class="flex items-center gap-3">
 					<span class="w-16 shrink-0 text-xs text-text-secondary">{b.label}</span>
-					<div class="flex-1 h-3 rounded-full bg-surface-2 overflow-hidden">
-						<div class="h-full bg-amber-500 rounded-full" style="width: {(b.avgEnergy / 5) * 100}%"></div>
+					<div class="h-3 flex-1 overflow-hidden rounded-full bg-surface-2">
+						<div
+							class="h-full rounded-full bg-amber-500"
+							style="width: {(b.avgEnergy / 5) * 100}%"
+						></div>
 					</div>
 					<span class="w-12 text-right text-xs font-bold text-text-primary">{b.avgEnergy}</span>
 					<span class="w-12 text-right text-[10px] text-text-tertiary">({b.days} T)</span>

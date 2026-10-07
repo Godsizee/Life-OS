@@ -46,7 +46,9 @@ export function getGoalProgress(goal: Goal): number {
 		items.push(habitScores.reduce((a, b) => a + b, 0) / habitScores.length);
 	}
 
-	return items.length > 0 ? Math.round(items.reduce((a, b) => a + b, 0) / items.length) : goal.progress;
+	return items.length > 0
+		? Math.round(items.reduce((a, b) => a + b, 0) / items.length)
+		: goal.progress;
 }
 
 /** True, wenn der manuelle Slider noch sinnvoll ist (Plan §5, Regel 5). */

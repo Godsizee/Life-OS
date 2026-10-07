@@ -47,7 +47,12 @@ describe('expandEvents', () => {
 	});
 
 	it('einmaliger Termin außerhalb des Fensters: keine Occurrence', () => {
-		const occ = expandEvents([ev({ start: '2026-07-01T09:00:00Z', end: '2026-07-01T10:00:00Z' })], [], R_START, R_END);
+		const occ = expandEvents(
+			[ev({ start: '2026-07-01T09:00:00Z', end: '2026-07-01T10:00:00Z' })],
+			[],
+			R_START,
+			R_END
+		);
 		expect(occ).toHaveLength(0);
 	});
 
@@ -76,7 +81,12 @@ describe('expandEvents', () => {
 	});
 
 	it('UNTIL begrenzt', () => {
-		const occ = expandEvents([ev({ rrule: 'RRULE:FREQ=DAILY;UNTIL=20260805' })], [], R_START, R_END);
+		const occ = expandEvents(
+			[ev({ rrule: 'RRULE:FREQ=DAILY;UNTIL=20260805' })],
+			[],
+			R_START,
+			R_END
+		);
 		// 03,04,05 = 3
 		expect(occ).toHaveLength(3);
 	});
@@ -84,8 +94,14 @@ describe('expandEvents', () => {
 	it('cancelled-Override entfernt genau eine Occurrence', () => {
 		const overrides: EventOverride[] = [
 			{
-				id: 'o1', workspace_id: 'w1', event_id: 'e1', occurrence_date: '2026-08-10',
-				cancelled: true, patch: {}, created_at: '', updated_at: ''
+				id: 'o1',
+				workspace_id: 'w1',
+				event_id: 'e1',
+				occurrence_date: '2026-08-10',
+				cancelled: true,
+				patch: {},
+				created_at: '',
+				updated_at: ''
 			}
 		];
 		const occ = expandEvents([ev({ rrule: 'RRULE:FREQ=WEEKLY' })], overrides, R_START, R_END);
@@ -96,10 +112,18 @@ describe('expandEvents', () => {
 	it('patch-Override verschiebt Titel/Zeit dieser einen Occurrence', () => {
 		const overrides: EventOverride[] = [
 			{
-				id: 'o1', workspace_id: 'w1', event_id: 'e1', occurrence_date: '2026-08-10',
+				id: 'o1',
+				workspace_id: 'w1',
+				event_id: 'e1',
+				occurrence_date: '2026-08-10',
 				cancelled: false,
-				patch: { title: 'Verschoben', start: '2026-08-10T14:00:00.000Z', end: '2026-08-10T15:00:00.000Z' },
-				created_at: '', updated_at: ''
+				patch: {
+					title: 'Verschoben',
+					start: '2026-08-10T14:00:00.000Z',
+					end: '2026-08-10T15:00:00.000Z'
+				},
+				created_at: '',
+				updated_at: ''
 			}
 		];
 		const occ = expandEvents([ev({ rrule: 'RRULE:FREQ=WEEKLY' })], overrides, R_START, R_END);
@@ -114,10 +138,17 @@ describe('Integration mit rrule.ts', () => {
 	it('expandEvents versteht die Ausgaben von buildRrule', () => {
 		const forms: RecurrenceForm[] = [
 			{ freq: 'weekly', interval: 2, byday: [2], ende: 'nie', until: null, count: null },
-			{ freq: 'weekly', interval: 1, byday: [1, 3, 5], ende: 'am', until: '2026-08-15', count: null },
+			{
+				freq: 'weekly',
+				interval: 1,
+				byday: [1, 3, 5],
+				ende: 'am',
+				until: '2026-08-15',
+				count: null
+			},
 			{ freq: 'monthly', interval: 3, byday: [], ende: 'nach', until: null, count: 2 }
 		];
-		
+
 		const ev1 = ev({ rrule: buildRrule(forms[0]), start: '2026-08-04T09:00:00Z' }); // 04.08 = Di
 		const occ1 = expandEvents([ev1], [], R_START, R_END);
 		// 04.08, 18.08 -> 2
@@ -127,7 +158,7 @@ describe('Integration mit rrule.ts', () => {
 		const occ2 = expandEvents([ev2], [], R_START, R_END);
 		// 03,05,07, 10,12,14 -> 6
 		expect(occ2).toHaveLength(6);
-		
+
 		const ev3 = ev({ rrule: buildRrule(forms[2]), start: '2026-08-01T09:00:00Z' }); // monthly
 		const occ3 = expandEvents([ev3], [], R_START, new Date('2027-12-31'));
 		// count: 2

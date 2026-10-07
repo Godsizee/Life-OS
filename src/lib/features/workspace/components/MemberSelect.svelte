@@ -2,7 +2,11 @@
 	import Select from '#lib/ui/Select.svelte';
 	import { workspaceState } from '../store.svelte';
 
-	let { value, onchange, emptyLabel = 'Niemand zugewiesen' }: {
+	let {
+		value,
+		onchange,
+		emptyLabel = 'Niemand zugewiesen'
+	}: {
 		value: string | null;
 		onchange: (next: string | null) => void;
 		emptyLabel?: string;

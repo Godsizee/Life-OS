@@ -103,7 +103,11 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	);
 
 	// 8. Fitness — Wochenziel-Score, pro-rata über die laufende Woche.
-	const fitnessScore = fitnessFrequencyScore(fitnessState.logs, profileState.weeklyWorkoutGoal, date);
+	const fitnessScore = fitnessFrequencyScore(
+		fitnessState.logs,
+		profileState.weeklyWorkoutGoal,
+		date
+	);
 
 	const breakdown: ScoreBreakdown = {
 		tasks: Math.round(tasksScore),

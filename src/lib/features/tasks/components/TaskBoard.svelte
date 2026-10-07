@@ -15,7 +15,8 @@
 	];
 	const childrenById = $derived(new Map(buildTaskTree(tasks).map((n) => [n.task.id, n.children])));
 	function column(status: TaskStatus): Task[] {
-		return tasks.filter((t) => !t.parent_id && t.status === status)
+		return tasks
+			.filter((t) => !t.parent_id && t.status === status)
 			.sort((a, b) => a.position - b.position || a.created_at.localeCompare(b.created_at));
 	}
 	let draggingId: string | null = null;
@@ -33,7 +34,12 @@
 		const task = tasksState.tasks.find((t) => t.id === id);
 		if (!task || task.parent_id) return;
 		if (task.status !== status) await tasksState.setStatus(id, status);
-		const ordered = [...column(status).filter((t) => t.id !== id).map((t) => t.id), id];
+		const ordered = [
+			...column(status)
+				.filter((t) => t.id !== id)
+				.map((t) => t.id),
+			id
+		];
 		await tasksState.setPositions(ordered);
 	}
 </script>
@@ -46,74 +52,106 @@
 -->
 <div class="overflow-x-auto pb-1">
 	<div class="grid min-w-xl grid-cols-3 gap-4 sm:min-w-0">
-	{#each COLUMNS as col (col.status)}
-		<!-- Drop-Ziel der Spalte. Bedienbar bleibt das Board auch ohne Drag&Drop:
+		{#each COLUMNS as col (col.status)}
+			<!-- Drop-Ziel der Spalte. Bedienbar bleibt das Board auch ohne Drag&Drop:
 			 der Status lässt sich im Detail-Sheet der Aufgabe umstellen. -->
-		<div class="rounded-2xl border border-border-color bg-surface-1 p-3"
-				 role="group" aria-label="Spalte {col.label}"
-				 ondragover={(e) => e.preventDefault()} ondrop={(e) => onDrop(e, col.status)}>
-			<h3 class="mb-2 text-sm font-bold text-text-secondary">{col.label} ({column(col.status).length})</h3>
-			<div class="flex min-h-16 flex-col gap-2">
-				{#each column(col.status) as task (task.id)}
-					{@const progress = subtaskProgress(childrenById.get(task.id) ?? [])}
-					{@const isOverdue = !['done'].includes(task.status) && !!task.due_at && new Date(task.due_at) < new Date()}
-					<div draggable="true" ondragstart={(e) => onDragStart(e, task.id)}
-							 onclick={() => onopen(task)}
-							 onkeydown={(e) => e.key === 'Enter' && onopen(task)}
-							 role="button" tabindex="0"
-							 class="cursor-grab active:cursor-grabbing">
-						<Card>
-							{#snippet children()}
-								<div class="p-3">
-									<div class="flex items-center gap-1.5 mb-1.5">
-										{#if task.priority === 'high'}
-											<span class="inline-block h-2 w-2 rounded-full bg-red-500 shrink-0"></span>
-										{:else if task.priority === 'low'}
-											<span class="inline-block h-2 w-2 rounded-full bg-slate-400 shrink-0"></span>
-										{/if}
-										<!-- wrap-break-word: ein langes Wort wuerde sonst aus der schmalen Spalte ragen. -->
-										<p class="min-w-0 wrap-break-word text-sm font-medium {task.status === 'done' ? 'text-text-tertiary line-through' : 'text-text-primary'}">{task.title}</p>
-									</div>
-									<div class="flex items-center gap-1.5 flex-wrap">
-										{#if task.due_at}
-											<span class="text-xs shrink-0 {isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : 'text-text-secondary'}">
-												{new Date(task.due_at).toLocaleDateString('de-DE')}
-											</span>
-										{/if}
-										{#if task.description}
-											<AlignLeft size={12} class="text-text-tertiary shrink-0" />
-										{/if}
-										{#if progress.total > 0}
-											<span class="inline-flex items-center rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary">
-												{progress.done}/{progress.total}
-											</span>
-										{/if}
-										{#if task.rrule}
-											<span class="inline-flex items-center gap-1 rounded bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:text-primary-300">
-												<Repeat size={10} />
-												{formatRRule(task.rrule)}
-											</span>
-										{/if}
-										{#if task.labels && task.labels.length > 0}
-											{#each task.labels.slice(0, 2) as label}
-												<span class="inline-flex items-center rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary max-w-24 truncate">
-													@{label}
-												</span>
-											{/each}
-											{#if task.labels.length > 2}
-												<span class="inline-flex items-center rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary">
-													+{task.labels.length - 2}
+			<div
+				class="rounded-2xl border border-border-color bg-surface-1 p-3"
+				role="group"
+				aria-label="Spalte {col.label}"
+				ondragover={(e) => e.preventDefault()}
+				ondrop={(e) => onDrop(e, col.status)}
+			>
+				<h3 class="mb-2 text-sm font-bold text-text-secondary">
+					{col.label} ({column(col.status).length})
+				</h3>
+				<div class="flex min-h-16 flex-col gap-2">
+					{#each column(col.status) as task (task.id)}
+						{@const progress = subtaskProgress(childrenById.get(task.id) ?? [])}
+						{@const isOverdue =
+							!['done'].includes(task.status) &&
+							!!task.due_at &&
+							new Date(task.due_at) < new Date()}
+						<div
+							draggable="true"
+							ondragstart={(e) => onDragStart(e, task.id)}
+							onclick={() => onopen(task)}
+							onkeydown={(e) => e.key === 'Enter' && onopen(task)}
+							role="button"
+							tabindex="0"
+							class="cursor-grab active:cursor-grabbing"
+						>
+							<Card>
+								{#snippet children()}
+									<div class="p-3">
+										<div class="mb-1.5 flex items-center gap-1.5">
+											{#if task.priority === 'high'}
+												<span class="inline-block h-2 w-2 shrink-0 rounded-full bg-red-500"></span>
+											{:else if task.priority === 'low'}
+												<span class="inline-block h-2 w-2 shrink-0 rounded-full bg-slate-400"
+												></span>
+											{/if}
+											<!-- wrap-break-word: ein langes Wort wuerde sonst aus der schmalen Spalte ragen. -->
+											<p
+												class="min-w-0 text-sm font-medium wrap-break-word {task.status === 'done'
+													? 'text-text-tertiary line-through'
+													: 'text-text-primary'}"
+											>
+												{task.title}
+											</p>
+										</div>
+										<div class="flex flex-wrap items-center gap-1.5">
+											{#if task.due_at}
+												<span
+													class="shrink-0 text-xs {isOverdue
+														? 'font-medium text-red-600 dark:text-red-400'
+														: 'text-text-secondary'}"
+												>
+													{new Date(task.due_at).toLocaleDateString('de-DE')}
 												</span>
 											{/if}
-										{/if}
+											{#if task.description}
+												<AlignLeft size={12} class="shrink-0 text-text-tertiary" />
+											{/if}
+											{#if progress.total > 0}
+												<span
+													class="inline-flex items-center rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
+												>
+													{progress.done}/{progress.total}
+												</span>
+											{/if}
+											{#if task.rrule}
+												<span
+													class="inline-flex items-center gap-1 rounded bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-300"
+												>
+													<Repeat size={10} />
+													{formatRRule(task.rrule)}
+												</span>
+											{/if}
+											{#if task.labels && task.labels.length > 0}
+												{#each task.labels.slice(0, 2) as label}
+													<span
+														class="inline-flex max-w-24 items-center truncate rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
+													>
+														@{label}
+													</span>
+												{/each}
+												{#if task.labels.length > 2}
+													<span
+														class="inline-flex items-center rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
+													>
+														+{task.labels.length - 2}
+													</span>
+												{/if}
+											{/if}
+										</div>
 									</div>
-								</div>
-							{/snippet}
-						</Card>
-					</div>
-				{/each}
+								{/snippet}
+							</Card>
+						</div>
+					{/each}
+				</div>
 			</div>
-		</div>
 		{/each}
 	</div>
 </div>

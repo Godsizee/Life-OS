@@ -45,7 +45,7 @@
 						type="button"
 						onclick={() => ondelete(tile.id)}
 						aria-label="Anhang entfernen"
-						class="absolute -right-1.5 -top-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-border-color bg-surface-0 text-text-secondary shadow-sm active:scale-95"
+						class="absolute -top-1.5 -right-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-border-color bg-surface-0 text-text-secondary shadow-sm active:scale-95"
 					>
 						<X size={14} />
 					</button>

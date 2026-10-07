@@ -22,7 +22,12 @@ import type {
 	PickedExercise
 } from './types';
 import { bestPerExercise, type ExerciseBest } from './utils/1rm';
-import { autoLogTrainingHabit, applyPRsToGoals, applyFrequencyToGoals, announcePRs } from './integration';
+import {
+	autoLogTrainingHabit,
+	applyPRsToGoals,
+	applyFrequencyToGoals,
+	announcePRs
+} from './integration';
 
 class FitnessState {
 	plans = $state<WorkoutPlan[]>([]);
@@ -201,10 +206,16 @@ class FitnessState {
 			const key = s.exercise_id ?? s.exercise_name.toLowerCase();
 			if (seen.has(key)) continue;
 			seen.add(key);
-			const catalogEntry = s.exercise_id ? this.catalog.find((e) => e.id === s.exercise_id) : undefined;
+			const catalogEntry = s.exercise_id
+				? this.catalog.find((e) => e.id === s.exercise_id)
+				: undefined;
 			result.push(
 				catalogEntry
-					? { exercise_id: catalogEntry.id, name: catalogEntry.name_de, exercise_type: catalogEntry.exercise_type }
+					? {
+							exercise_id: catalogEntry.id,
+							name: catalogEntry.name_de,
+							exercise_type: catalogEntry.exercise_type
+						}
 					: { exercise_id: null, name: s.exercise_name, exercise_type: 'strength' }
 			);
 			if (result.length >= 8) break;
@@ -290,10 +301,10 @@ class FitnessState {
 			default_duration_min: parsed.default_duration_min,
 			default_distance_km: parsed.default_distance_km
 		};
-		
+
 		const list = this.exercises[planId] ?? [];
 		this.exercises[planId] = [...list, exercise].sort((a, b) => a.order_index - b.order_index);
-		
+
 		await outbox.runOrQueue('workout_exercises', 'insert', exercise, () =>
 			fitnessApi.insertExerciseRaw(exercise)
 		);
@@ -302,7 +313,9 @@ class FitnessState {
 	async removeExercise(planId: string, id: string) {
 		const list = this.exercises[planId] ?? [];
 		this.exercises[planId] = list.filter((e) => e.id !== id);
-		await outbox.runOrQueue('workout_exercises', 'delete', { id }, () => fitnessApi.deleteExercise(id));
+		await outbox.runOrQueue('workout_exercises', 'delete', { id }, () =>
+			fitnessApi.deleteExercise(id)
+		);
 	}
 
 	async logWorkout(
@@ -363,7 +376,9 @@ class FitnessState {
 		autoLogTrainingHabit();
 		applyFrequencyToGoals(this.logs);
 		if (newPRs.length > 0) {
-			const toAnnounce = newPRs.filter((pr) => !alreadyAnnounced.has(pr.exercise_name.toLowerCase()));
+			const toAnnounce = newPRs.filter(
+				(pr) => !alreadyAnnounced.has(pr.exercise_name.toLowerCase())
+			);
 			if (toAnnounce.length > 0) announcePRs(toAnnounce);
 			applyPRsToGoals(newPRs);
 		}

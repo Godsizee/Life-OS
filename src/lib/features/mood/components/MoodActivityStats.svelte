@@ -24,14 +24,16 @@
 {#if !hasData}
 	<div class="rounded-2xl border border-dashed border-border-color px-4 py-6 text-center">
 		<p class="text-sm text-text-secondary">
-			Tagge deine Stimmung mit Aktivitäten — ab {minCount} Tagen je Aktivität siehst du hier,
-			was deine Stimmung hebt oder drückt.
+			Tagge deine Stimmung mit Aktivitäten — ab {minCount} Tagen je Aktivität siehst du hier, was deine
+			Stimmung hebt oder drückt.
 		</p>
 	</div>
 {:else}
 	<div class="grid gap-3 sm:grid-cols-2">
 		<div class="rounded-2xl border border-border-color bg-surface-0 p-4">
-			<p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+			<p
+				class="mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+			>
 				<ThumbsUp size={12} class="text-emerald-500" /> Hebt die Stimmung
 			</p>
 			{#if good.length === 0}
@@ -46,7 +48,9 @@
 								<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
 									{formatDelta(stat.delta)}
 								</span>
-								<span class="w-7 text-right text-xs text-text-secondary">{formatScore(stat.avg)}</span>
+								<span class="w-7 text-right text-xs text-text-secondary"
+									>{formatScore(stat.avg)}</span
+								>
 							</span>
 						</li>
 					{/each}
@@ -55,7 +59,9 @@
 		</div>
 
 		<div class="rounded-2xl border border-border-color bg-surface-0 p-4">
-			<p class="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+			<p
+				class="mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+			>
 				<ThumbsDown size={12} class="text-red-500" /> Drückt die Stimmung
 			</p>
 			{#if bad.length === 0}
@@ -70,7 +76,9 @@
 								<span class="text-xs font-bold text-red-600 dark:text-red-400">
 									{formatDelta(stat.delta)}
 								</span>
-								<span class="w-7 text-right text-xs text-text-secondary">{formatScore(stat.avg)}</span>
+								<span class="w-7 text-right text-xs text-text-secondary"
+									>{formatScore(stat.avg)}</span
+								>
 							</span>
 						</li>
 					{/each}
@@ -79,7 +87,7 @@
 		</div>
 	</div>
 	<p class="mt-2 px-1 text-[11px] text-text-tertiary">
-		Ø-Stimmung an Tagen mit dieser Aktivität, verglichen mit deinem Gesamtdurchschnitt.
-		Erst ab {minCount} Tagen je Aktivität.
+		Ø-Stimmung an Tagen mit dieser Aktivität, verglichen mit deinem Gesamtdurchschnitt. Erst ab {minCount}
+		Tagen je Aktivität.
 	</p>
 {/if}

@@ -7,8 +7,10 @@
 </script>
 
 {#if entries.length > 0}
-	<section class="rounded-2xl border border-border-color bg-surface-0 p-4 premium-shadow">
-		<h2 class="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+	<section class="premium-shadow rounded-2xl border border-border-color bg-surface-0 p-4">
+		<h2
+			class="mb-3 flex items-center gap-1.5 text-xs font-bold tracking-wider text-text-tertiary uppercase"
+		>
 			<History size={14} /> An diesem Tag
 		</h2>
 		<ul class="flex flex-col gap-2">

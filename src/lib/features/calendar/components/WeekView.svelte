@@ -41,7 +41,8 @@
 
 	const todayKey = toISODate(new Date());
 	const rangeLabel = $derived.by(() => {
-		const s = days[0], e = days[6];
+		const s = days[0],
+			e = days[6];
 		return `${s.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${e.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
 	});
 
@@ -66,9 +67,19 @@
 <!-- Desktop: 7-Spalten-Woche -->
 <div class="hidden lg:block">
 	<div class="mb-3 flex items-center justify-between">
-		<button onclick={() => shiftWeek(-1)} aria-label="Vorherige Woche" class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"><ChevronLeft size={20} /></button>
+		<button
+			onclick={() => shiftWeek(-1)}
+			aria-label="Vorherige Woche"
+			class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"
+			><ChevronLeft size={20} /></button
+		>
 		<span class="text-sm font-bold text-text-primary">{rangeLabel}</span>
-		<button onclick={() => shiftWeek(1)} aria-label="Nächste Woche" class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"><ChevronRight size={20} /></button>
+		<button
+			onclick={() => shiftWeek(1)}
+			aria-label="Nächste Woche"
+			class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"
+			><ChevronRight size={20} /></button
+		>
 	</div>
 	<div class="grid grid-cols-7 gap-2">
 		{#each days as day (day.toISOString())}
@@ -76,13 +87,22 @@
 			{@const items = byDay.get(key) ?? []}
 			<div class="rounded-xl border border-border-color bg-surface-1 p-2">
 				<div class="mb-2 text-center">
-					<div class="text-[10px] uppercase text-text-tertiary">{day.toLocaleDateString('de-DE', { weekday: 'short' })}</div>
-					<div class="text-sm {key === todayKey ? 'font-bold text-primary-600' : 'text-text-primary'}">{day.getDate()}</div>
+					<div class="text-[10px] text-text-tertiary uppercase">
+						{day.toLocaleDateString('de-DE', { weekday: 'short' })}
+					</div>
+					<div
+						class="text-sm {key === todayKey ? 'font-bold text-primary-600' : 'text-text-primary'}"
+					>
+						{day.getDate()}
+					</div>
 				</div>
 				<div class="flex flex-col gap-1">
 					{#each items as o (o.key)}
-						<div class="rounded-lg px-2 py-1 text-xs text-white" style="background-color: {colorFor(o.event.calendar_id)}">
-							<div class="font-medium leading-tight">{timeLabel(o)}</div>
+						<div
+							class="rounded-lg px-2 py-1 text-xs text-white"
+							style="background-color: {colorFor(o.event.calendar_id)}"
+						>
+							<div class="leading-tight font-medium">{timeLabel(o)}</div>
 							<div class="truncate leading-tight">{o.title}</div>
 						</div>
 					{/each}
@@ -95,9 +115,25 @@
 <!-- Mobile: vertikale Tagesansicht -->
 <div class="lg:hidden">
 	<div class="mb-3 flex items-center justify-between">
-		<button onclick={() => shiftDay(-1)} aria-label="Vorheriger Tag" class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"><ChevronLeft size={20} /></button>
-		<span class="text-sm font-bold text-text-primary">{new Date(activeDay).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' })}</span>
-		<button onclick={() => shiftDay(1)} aria-label="Nächster Tag" class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"><ChevronRight size={20} /></button>
+		<button
+			onclick={() => shiftDay(-1)}
+			aria-label="Vorheriger Tag"
+			class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"
+			><ChevronLeft size={20} /></button
+		>
+		<span class="text-sm font-bold text-text-primary"
+			>{new Date(activeDay).toLocaleDateString('de-DE', {
+				weekday: 'long',
+				day: '2-digit',
+				month: '2-digit'
+			})}</span
+		>
+		<button
+			onclick={() => shiftDay(1)}
+			aria-label="Nächster Tag"
+			class="flex h-10 w-10 items-center justify-center rounded-xl text-text-secondary hover:bg-surface-2"
+			><ChevronRight size={20} /></button
+		>
 	</div>
 	{#if (byDay.get(activeDay) ?? []).length === 0}
 		<p class="py-8 text-center text-sm text-text-tertiary">Keine Termine an diesem Tag</p>
@@ -105,10 +141,16 @@
 		<ul class="flex flex-col gap-2">
 			{#each byDay.get(activeDay) ?? [] as o (o.key)}
 				<li class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-3">
-					<span class="h-8 w-1 shrink-0 rounded-full" style="background-color: {colorFor(o.event.calendar_id)}"></span>
+					<span
+						class="h-8 w-1 shrink-0 rounded-full"
+						style="background-color: {colorFor(o.event.calendar_id)}"
+					></span>
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-sm font-medium text-text-primary">{o.title}</p>
-						<p class="truncate text-xs text-text-secondary">{timeLabel(o)}{#if o.location} · {o.location}{/if}</p>
+						<p class="truncate text-xs text-text-secondary">
+							{timeLabel(o)}{#if o.location}
+								· {o.location}{/if}
+						</p>
 					</div>
 				</li>
 			{/each}

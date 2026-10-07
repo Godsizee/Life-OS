@@ -28,15 +28,19 @@
 	<div class="flex items-center justify-between gap-2">
 		<h2 class="text-lg font-semibold text-text-primary">Diese Woche im Rückblick</h2>
 		{#if letzterReview && tageSeitReview !== null}
-			<a href="/journal?kind=weekly" class="shrink-0 text-xs text-text-tertiary hover:text-text-secondary">
-				Letzter Review: vor {tageSeitReview} {tageSeitReview === 1 ? 'Tag' : 'Tagen'}
+			<a
+				href="/journal?kind=weekly"
+				class="shrink-0 text-xs text-text-tertiary hover:text-text-secondary"
+			>
+				Letzter Review: vor {tageSeitReview}
+				{tageSeitReview === 1 ? 'Tag' : 'Tagen'}
 			</a>
 		{/if}
 	</div>
 
 	{#if focusLetzteWoche.length > 0}
 		<div class="rounded-xl border border-border-color bg-surface-0 p-4">
-			<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+			<p class="text-xs font-semibold tracking-wider text-text-tertiary uppercase">
 				Dein Fokus letzte Woche
 			</p>
 			<ul class="mt-2 flex flex-col gap-1.5">
@@ -69,7 +73,7 @@
 
 	{#if goalsInProgress.length > 0}
 		<div class="rounded-xl border border-border-color bg-surface-0 p-4">
-			<p class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Ziele</p>
+			<p class="text-xs font-semibold tracking-wider text-text-tertiary uppercase">Ziele</p>
 			<div class="mt-2 flex flex-col gap-2">
 				{#each goalsInProgress as goal (goal.id)}
 					{@const progress = getGoalProgress(goal)}

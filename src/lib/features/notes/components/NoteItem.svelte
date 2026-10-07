@@ -6,7 +6,11 @@
 	import { attachmentsState } from '#lib/features/attachments/store.svelte.js';
 	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
 
-	let { note, snippet = null, onopen }: { note: Note; snippet?: string | null; onopen: (note: Note) => void } = $props();
+	let {
+		note,
+		snippet = null,
+		onopen
+	}: { note: Note; snippet?: string | null; onopen: (note: Note) => void } = $props();
 
 	const preview = $derived(snippet ?? plainTextPreview(note.body ?? '', 120));
 	const progress = $derived(checklistProgress(note.body ?? ''));
@@ -14,7 +18,9 @@
 </script>
 
 <SwipeToDelete onDelete={() => notesState.removeNoteWithUndo(note.id)} label="Notiz löschen">
-	<div class="interactive-card flex h-full flex-col gap-2 rounded-2xl border border-border-color bg-surface-0 p-4">
+	<div
+		class="interactive-card flex h-full flex-col gap-2 rounded-2xl border border-border-color bg-surface-0 p-4"
+	>
 		<div class="flex items-start gap-2">
 			<button type="button" onclick={() => onopen(note)} class="min-w-0 flex-1 text-left">
 				<span class="flex items-center gap-1.5">

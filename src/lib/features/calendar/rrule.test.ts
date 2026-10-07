@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { buildRrule, parseRrule, formatRecurrence, LEERE_REGEL, type RecurrenceForm } from './rrule';
+import {
+	buildRrule,
+	parseRrule,
+	formatRecurrence,
+	LEERE_REGEL,
+	type RecurrenceForm
+} from './rrule';
 
 describe('buildRrule / parseRrule — Rundreise', () => {
 	const faelle: RecurrenceForm[] = [
-		{ freq: 'daily',   interval: 1, byday: [],        ende: 'nie',  until: null,         count: null },
-		{ freq: 'weekly',  interval: 2, byday: [2],       ende: 'nie',  until: null,         count: null },
-		{ freq: 'weekly',  interval: 1, byday: [1, 3, 5], ende: 'am',   until: '2026-12-31', count: null },
-		{ freq: 'monthly', interval: 3, byday: [],        ende: 'nach', until: null,         count: 10 }
+		{ freq: 'daily', interval: 1, byday: [], ende: 'nie', until: null, count: null },
+		{ freq: 'weekly', interval: 2, byday: [2], ende: 'nie', until: null, count: null },
+		{ freq: 'weekly', interval: 1, byday: [1, 3, 5], ende: 'am', until: '2026-12-31', count: null },
+		{ freq: 'monthly', interval: 3, byday: [], ende: 'nach', until: null, count: 10 }
 	];
 
 	it.each(faelle)('überlebt Bauen und Parsen ohne Verlust', (form) => {

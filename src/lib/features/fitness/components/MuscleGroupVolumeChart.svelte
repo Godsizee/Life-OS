@@ -17,11 +17,15 @@
 			<div class="space-y-1">
 				<div class="flex items-center justify-between text-xs">
 					<span class="font-semibold text-text-primary">{d.muscleGroup}</span>
-					<span class="text-text-tertiary tabular-nums">{d.volumeKg.toLocaleString('de-DE')} kg</span>
+					<span class="text-text-tertiary tabular-nums"
+						>{d.volumeKg.toLocaleString('de-DE')} kg</span
+					>
 				</div>
-				<div class="h-2 w-full overflow-hidden rounded-full bg-surface-2 border border-border-color/20">
+				<div
+					class="h-2 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
+				>
 					<div
-						class="h-full bg-primary-600 dark:bg-primary-500 transition-all duration-500"
+						class="h-full bg-primary-600 transition-all duration-500 dark:bg-primary-500"
 						style="width: {(d.volumeKg / max) * 100}%"
 					></div>
 				</div>

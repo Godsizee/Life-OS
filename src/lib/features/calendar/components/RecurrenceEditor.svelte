@@ -21,7 +21,7 @@
 
 	function toggleDay(idx: number) {
 		if (value.byday.includes(idx)) {
-			value.byday = value.byday.filter(d => d !== idx);
+			value.byday = value.byday.filter((d) => d !== idx);
 		} else {
 			value.byday = [...value.byday, idx];
 		}
@@ -31,7 +31,9 @@
 <div class="flex flex-col gap-3">
 	<!-- Frequenz -->
 	<div>
-		<label for="freq-select" class="mb-1 block text-sm font-medium text-text-secondary">Wiederholung</label>
+		<label for="freq-select" class="mb-1 block text-sm font-medium text-text-secondary"
+			>Wiederholung</label
+		>
 		<select
 			id="freq-select"
 			bind:value={value.freq}
@@ -70,39 +72,59 @@
 				{/each}
 			</div>
 			{#if value.byday.length === 0}
-				<span class="text-xs text-text-tertiary">Ohne Wahl wird der Starttag der Serie verwendet.</span>
+				<span class="text-xs text-text-tertiary"
+					>Ohne Wahl wird der Starttag der Serie verwendet.</span
+				>
 			{/if}
 		{/if}
 
 		<!-- Ende -->
 		<div class="mt-2 flex flex-col gap-2 rounded-xl border border-border-color bg-surface-0 p-3">
 			<span class="text-sm font-medium text-text-secondary">Ende</span>
-			
+
 			<label class="flex items-center gap-2 text-sm text-text-primary">
-				<input type="radio" name="ende" value="nie" bind:group={value.ende} class="text-primary-600" />
+				<input
+					type="radio"
+					name="ende"
+					value="nie"
+					bind:group={value.ende}
+					class="text-primary-600"
+				/>
 				Nie
 			</label>
-			
+
 			<label class="flex items-center gap-2 text-sm text-text-primary">
-				<input type="radio" name="ende" value="am" bind:group={value.ende} class="text-primary-600" />
+				<input
+					type="radio"
+					name="ende"
+					value="am"
+					bind:group={value.ende}
+					class="text-primary-600"
+				/>
 				Am
 				<input
 					type="date"
 					bind:value={value.until}
 					disabled={value.ende !== 'am'}
-					class="rounded-lg border border-border-color bg-surface-1 px-2 py-1 text-sm disabled:opacity-50 focus:border-primary-500 focus:outline-none"
+					class="rounded-lg border border-border-color bg-surface-1 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none disabled:opacity-50"
 				/>
 			</label>
-			
+
 			<label class="flex items-center gap-2 text-sm text-text-primary">
-				<input type="radio" name="ende" value="nach" bind:group={value.ende} class="text-primary-600" />
+				<input
+					type="radio"
+					name="ende"
+					value="nach"
+					bind:group={value.ende}
+					class="text-primary-600"
+				/>
 				Nach
 				<input
 					type="number"
 					min="1"
 					bind:value={value.count}
 					disabled={value.ende !== 'nach'}
-					class="w-16 rounded-lg border border-border-color bg-surface-1 px-2 py-1 text-center text-sm disabled:opacity-50 focus:border-primary-500 focus:outline-none"
+					class="w-16 rounded-lg border border-border-color bg-surface-1 px-2 py-1 text-center text-sm focus:border-primary-500 focus:outline-none disabled:opacity-50"
 				/>
 				Terminen
 			</label>

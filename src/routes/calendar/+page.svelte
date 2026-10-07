@@ -11,7 +11,15 @@
 	import MonthView from '#lib/features/calendar/components/MonthView.svelte';
 	import WeekView from '#lib/features/calendar/components/WeekView.svelte';
 	import CalendarManagerSheet from '#lib/features/calendar/components/CalendarManagerSheet.svelte';
-	import { Calendar as CalendarIcon, CheckSquare, Repeat, Plus, Settings, ChevronLeft, ChevronRight } from '@lucide/svelte';
+	import {
+		Calendar as CalendarIcon,
+		CheckSquare,
+		Repeat,
+		Plus,
+		Settings,
+		ChevronLeft,
+		ChevronRight
+	} from '@lucide/svelte';
 	import IconButton from '#lib/ui/IconButton.svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
@@ -43,7 +51,9 @@
 	});
 	function setView(v: View) {
 		view = v;
-		try { localStorage.setItem(VIEW_KEY, v); } catch {}
+		try {
+			localStorage.setItem(VIEW_KEY, v);
+		} catch {}
 	}
 
 	// ── Layer-Toggles ─────────────────────────────────────────────────
@@ -58,7 +68,9 @@
 	});
 	function toggleLayer(key: 'events' | 'tasks' | 'habits') {
 		layers = { ...layers, [key]: !layers[key] };
-		try { localStorage.setItem(LS_KEY, JSON.stringify(layers)); } catch {}
+		try {
+			localStorage.setItem(LS_KEY, JSON.stringify(layers));
+		} catch {}
 	}
 
 	const todayStart = new Date(new Date().toDateString());
@@ -139,7 +151,9 @@
 	);
 
 	const DEFAULT_COLOR = '#6366f1';
-	const colorMap = $derived(new Map(calendarState.calendars.map((c) => [c.id, c.color ?? DEFAULT_COLOR])));
+	const colorMap = $derived(
+		new Map(calendarState.calendars.map((c) => [c.id, c.color ?? DEFAULT_COLOR]))
+	);
 	function colorFor(calendarId: string): string {
 		return colorMap.get(calendarId) ?? DEFAULT_COLOR;
 	}
@@ -178,10 +192,16 @@
 			.sort((a, b) => a.start.localeCompare(b.start))
 	);
 
-	const daySelectedItems = $derived(upcoming.filter((i) => toISODate(new Date(i.start)) === selectedDay));
+	const daySelectedItems = $derived(
+		upcoming.filter((i) => toISODate(new Date(i.start)) === selectedDay)
+	);
 
 	const dueHabitsToday = $derived(
-		layers.habits ? habitsState.habits.filter((h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id))) : []
+		layers.habits
+			? habitsState.habits.filter(
+					(h) => !h.archived && isOpenToday(h, habitsState.entriesFor(h.id))
+				)
+			: []
 	);
 
 	const layerDefs = [
@@ -203,12 +223,18 @@
 <PageHeader title="Kalender & Termine">
 	{#snippet trailing()}
 		<div class="flex items-center gap-2">
-			<button onclick={() => (managerOpen = true)} aria-label="Kalender verwalten"
-				class="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-1 text-text-secondary hover:bg-surface-2 transition-colors">
+			<button
+				onclick={() => (managerOpen = true)}
+				aria-label="Kalender verwalten"
+				class="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-1 text-text-secondary transition-colors hover:bg-surface-2"
+			>
 				<Settings size={22} />
 			</button>
-			<button onclick={() => (createOpen = true)} aria-label="Neuer Termin"
-				class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white active:scale-95 transition-transform">
+			<button
+				onclick={() => (createOpen = true)}
+				aria-label="Neuer Termin"
+				class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white transition-transform active:scale-95"
+			>
 				<Plus size={22} />
 			</button>
 		</div>
@@ -227,19 +253,34 @@
 <div class="mb-3 flex flex-wrap items-center gap-4">
 	<div class="inline-flex rounded-xl bg-surface-1 p-1">
 		{#each viewDefs as v (v.key)}
-			<button onclick={() => setView(v.key)}
-				class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors {view === v.key ? 'bg-surface-0 text-text-primary shadow-sm' : 'text-text-secondary'}">
+			<button
+				onclick={() => setView(v.key)}
+				class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors {view === v.key
+					? 'bg-surface-0 text-text-primary shadow-sm'
+					: 'text-text-secondary'}"
+			>
 				{v.label}
 			</button>
 		{/each}
 	</div>
 
 	<div class="flex items-center gap-1">
-		<button onclick={zurueck} class="flex h-10 w-10 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary" title="Zurück"><ChevronLeft size={18} /></button>
-		<button onclick={heute} class="min-h-10 rounded-lg px-3 text-sm font-medium text-text-primary hover:bg-surface-2">
+		<button
+			onclick={zurueck}
+			class="flex h-10 w-10 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
+			title="Zurück"><ChevronLeft size={18} /></button
+		>
+		<button
+			onclick={heute}
+			class="min-h-10 rounded-lg px-3 text-sm font-medium text-text-primary hover:bg-surface-2"
+		>
 			Heute
 		</button>
-		<button onclick={vor} class="flex h-10 w-10 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary" title="Weiter"><ChevronRight size={18} /></button>
+		<button
+			onclick={vor}
+			class="flex h-10 w-10 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
+			title="Weiter"><ChevronRight size={18} /></button
+		>
 		<Input type="date" bind:value={sprungDatum} onchange={springe} class="ml-2 max-w-40 !py-1.5" />
 	</div>
 </div>
@@ -249,7 +290,8 @@
 	{#each layerDefs as def (def.key)}
 		{@const Icon = def.icon}
 		<Chip selected={layers[def.key]} onclick={() => toggleLayer(def.key)}>
-			<Icon size={13} /> {def.label}
+			<Icon size={13} />
+			{def.label}
 		</Chip>
 	{/each}
 </div>
@@ -257,24 +299,38 @@
 <!-- Routinen-Layer (nur Agenda) -->
 {#if view === 'agenda' && dueHabitsToday.length > 0}
 	<section class="mb-4">
-		<h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-text-tertiary">Routinen heute</h3>
+		<h3 class="mb-2 text-xs font-bold tracking-wide text-text-tertiary uppercase">
+			Routinen heute
+		</h3>
 		<ul class="flex flex-col gap-1.5">
 			{#each dueHabitsToday as habit (habit.id)}
 				{@const logged = isCompleted(habit, habitsState.entryToday(habit.id))}
-				<li class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-2.5">
-					<button onclick={() => habitsState.toggleToday(habit.id)}
-						class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 {logged ? 'border-primary-500 bg-primary-500 text-white' : 'border-border-color text-transparent'}"
-						aria-label={logged ? 'Als offen markieren' : 'Als erledigt markieren'}>✓</button>
-					<span class="min-w-0 flex-1 truncate text-sm text-text-primary {logged ? 'line-through text-text-tertiary' : ''}">{habit.name}</span>
+				<li
+					class="flex items-center gap-3 rounded-xl border border-border-color bg-surface-0 p-2.5"
+				>
+					<button
+						onclick={() => habitsState.toggleToday(habit.id)}
+						class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 {logged
+							? 'border-primary-500 bg-primary-500 text-white'
+							: 'border-border-color text-transparent'}"
+						aria-label={logged ? 'Als offen markieren' : 'Als erledigt markieren'}>✓</button
+					>
+					<span
+						class="min-w-0 flex-1 truncate text-sm text-text-primary {logged
+							? 'text-text-tertiary line-through'
+							: ''}">{habit.name}</span
+					>
 					{#if habit.schedule.type === 'weekly_count'}
 						{@const wp = weekProgress(habit, habitsState.entriesFor(habit.id))}
 						<div class="flex items-center gap-2">
-							<span class="shrink-0 text-xs font-medium tabular-nums text-text-secondary">
+							<span class="shrink-0 text-xs font-medium text-text-secondary tabular-nums">
 								{wp.done}/{wp.target}
 							</span>
 							<div class="h-1.5 w-8 shrink-0 overflow-hidden rounded-full bg-surface-3">
-								<div class="h-full {wp.done >= wp.target ? 'bg-emerald-500' : 'bg-primary-500'}"
-									 style="width: {Math.min(100, (wp.done / Math.max(1, wp.target)) * 100)}%"></div>
+								<div
+									class="h-full {wp.done >= wp.target ? 'bg-emerald-500' : 'bg-primary-500'}"
+									style="width: {Math.min(100, (wp.done / Math.max(1, wp.target)) * 100)}%"
+								></div>
 							</div>
 						</div>
 					{/if}
@@ -286,22 +342,40 @@
 
 <section>
 	{#if calendarState.loading}
-		<div class="flex flex-col gap-2"><Skeleton height="4rem" /><Skeleton height="4rem" /><Skeleton height="4rem" /></div>
+		<div class="flex flex-col gap-2">
+			<Skeleton height="4rem" /><Skeleton height="4rem" /><Skeleton height="4rem" />
+		</div>
 	{:else if view === 'agenda'}
 		<div class="mb-3 flex gap-2">
-			<Chip selected={agendaMode === 'future'} onclick={() => agendaMode = 'future'}>Ab heute</Chip>
-			<Chip selected={agendaMode === 'all'} onclick={() => agendaMode = 'all'}>Alles</Chip>
+			<Chip selected={agendaMode === 'future'} onclick={() => (agendaMode = 'future')}
+				>Ab heute</Chip
+			>
+			<Chip selected={agendaMode === 'all'} onclick={() => (agendaMode = 'all')}>Alles</Chip>
 		</div>
 		<AgendaList items={upcoming} />
 	{:else if view === 'month'}
-		<MonthView occurrences={eventOccurrences} {colorFor} bind:selected={selectedDay} bind:month={monthAnchor} />
+		<MonthView
+			occurrences={eventOccurrences}
+			{colorFor}
+			bind:selected={selectedDay}
+			bind:month={monthAnchor}
+		/>
 		<div class="mt-4">
-			<h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-text-tertiary">
-				{new Date(selectedDay).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+			<h3 class="mb-2 text-xs font-bold tracking-wide text-text-tertiary uppercase">
+				{new Date(selectedDay).toLocaleDateString('de-DE', {
+					weekday: 'long',
+					day: '2-digit',
+					month: '2-digit'
+				})}
 			</h3>
 			<AgendaList items={daySelectedItems} />
 		</div>
 	{:else}
-		<WeekView occurrences={eventOccurrences} {colorFor} bind:anchor={weekAnchor} bind:activeDay={selectedDay} />
+		<WeekView
+			occurrences={eventOccurrences}
+			{colorFor}
+			bind:anchor={weekAnchor}
+			bind:activeDay={selectedDay}
+		/>
 	{/if}
 </section>

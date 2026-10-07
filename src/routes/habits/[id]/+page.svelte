@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
-	import { bestStreak, calculateStreak, completionRate, isCompleted, isSkipped, streakUnit, totalCompleted, weekProgress } from '#lib/features/habits/streak.js';
+	import {
+		bestStreak,
+		calculateStreak,
+		completionRate,
+		isCompleted,
+		isSkipped,
+		streakUnit,
+		totalCompleted,
+		weekProgress
+	} from '#lib/features/habits/streak.js';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import StreakCalendar from '#lib/features/habits/components/StreakCalendar.svelte';
 	import HabitActionsSheet from '#lib/features/habits/components/HabitActionsSheet.svelte';
@@ -11,7 +20,16 @@
 	import Card from '#lib/ui/Card.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
-	import { Flame, Trophy, Calendar, CheckSquare, Ban, ArrowLeft, MoreVertical, Activity } from '@lucide/svelte';
+	import {
+		Flame,
+		Trophy,
+		Calendar,
+		CheckSquare,
+		Ban,
+		ArrowLeft,
+		MoreVertical,
+		Activity
+	} from '@lucide/svelte';
 	import { toISODate } from '#lib/core/date.js';
 
 	const id = $derived(page.params.id as string);
@@ -24,20 +42,18 @@
 	const currentStreak = $derived(habit ? calculateStreak(habit, entries) : 0);
 	const longestStreak = $derived(habit ? bestStreak(habit, entries) : 0);
 	const allTimeDone = $derived(habit ? totalCompleted(habit, entries) : 0);
-	const allTimeSkipped = $derived(entries.filter(d => isSkipped(d)).length);
+	const allTimeSkipped = $derived(entries.filter((d) => isSkipped(d)).length);
 
 	const unitStr = $derived(habit ? streakUnit(habit.schedule) : 'Tage');
 	const isWeeklyCount = $derived(habit?.schedule.type === 'weekly_count');
-	
+
 	let actionsOpen = $state(false);
 	let weeks = $state(12);
-	const cRate = $derived(habit ? completionRate(habit, entries, weeks * 7) : { done: 0, due: 0, pct: 0 });
-
-	const history = $derived(
-		[...entries]
-			.sort((a, b) => b.date.localeCompare(a.date))
-			.slice(0, 10)
+	const cRate = $derived(
+		habit ? completionRate(habit, entries, weeks * 7) : { done: 0, due: 0, pct: 0 }
 	);
+
+	const history = $derived([...entries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10));
 </script>
 
 <svelte:head>
@@ -48,14 +64,22 @@
 	<div class="py-12 text-center text-text-tertiary">Routine nicht gefunden.</div>
 {:else}
 	<div class="space-y-6">
-		<a href="/habits" class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary">
+		<a
+			href="/habits"
+			class="mb-4 inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary"
+		>
 			<ArrowLeft size={16} /> Routinen
 		</a>
 
 		{#if habit.archived}
-			<div class="flex items-center justify-between rounded-xl bg-surface-1 p-3 border border-border-color">
+			<div
+				class="flex items-center justify-between rounded-xl border border-border-color bg-surface-1 p-3"
+			>
 				<span class="text-sm font-medium text-text-secondary">Diese Routine ist archiviert.</span>
-				<button onclick={() => habitsState.unarchiveHabit(habit.id)} class="text-sm font-bold text-primary-600 hover:underline">
+				<button
+					onclick={() => habitsState.unarchiveHabit(habit.id)}
+					class="text-sm font-bold text-primary-600 hover:underline"
+				>
 					Wiederherstellen
 				</button>
 			</div>
@@ -69,9 +93,13 @@
 							<HabitProgressButton {habit} />
 						{:else}
 							{@const logged = isCompleted(habit, habitsState.entryToday(habit.id))}
-							<button onclick={() => habitsState.toggleToday(habit.id)}
-								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors active:scale-95 {logged ? 'border-primary-500 bg-primary-500 text-white' : 'border-border-color bg-surface-0 text-transparent'}"
-								aria-label={logged ? 'Als offen markieren' : 'Als erledigt markieren'}>
+							<button
+								onclick={() => habitsState.toggleToday(habit.id)}
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors active:scale-95 {logged
+									? 'border-primary-500 bg-primary-500 text-white'
+									: 'border-border-color bg-surface-0 text-transparent'}"
+								aria-label={logged ? 'Als offen markieren' : 'Als erledigt markieren'}
+							>
 								<CheckSquare size={18} />
 							</button>
 						{/if}
@@ -111,19 +139,27 @@
 			</Card>
 			{#if isWeeklyCount}
 				{@const wp = weekProgress(habit, entries)}
-				<Card class="col-span-2 flex flex-col items-center justify-center p-4 text-center sm:col-span-4">
-					<div class="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-surface-3 mb-2">
-						<div class="h-full {wp.done >= wp.target ? 'bg-emerald-500' : 'bg-primary-500'}"
-							 style="width: {Math.min(100, (wp.done / Math.max(1, wp.target)) * 100)}%"></div>
+				<Card
+					class="col-span-2 flex flex-col items-center justify-center p-4 text-center sm:col-span-4"
+				>
+					<div class="mb-2 h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-surface-3">
+						<div
+							class="h-full {wp.done >= wp.target ? 'bg-emerald-500' : 'bg-primary-500'}"
+							style="width: {Math.min(100, (wp.done / Math.max(1, wp.target)) * 100)}%"
+						></div>
 					</div>
 					<span class="text-lg font-bold text-text-primary">{wp.done} / {wp.target}</span>
 					<span class="text-xs text-text-secondary">Diese Woche</span>
 				</Card>
 			{/if}
-			<Card class="col-span-2 flex flex-col items-center justify-center p-4 text-center sm:col-span-4">
+			<Card
+				class="col-span-2 flex flex-col items-center justify-center p-4 text-center sm:col-span-4"
+			>
 				<Activity class="mb-2 text-primary-400" size={24} />
 				<span class="text-2xl font-bold text-text-primary">{cRate.pct}%</span>
-				<span class="text-xs text-text-secondary">{cRate.done} von {cRate.due} fälligen Tagen erfüllt</span>
+				<span class="text-xs text-text-secondary"
+					>{cRate.done} von {cRate.due} fälligen Tagen erfüllt</span
+				>
 			</Card>
 		</div>
 
@@ -145,7 +181,10 @@
 		{#if habit.target_value}
 			<Card class="p-4">
 				<h3 class="mb-2 text-sm font-semibold text-text-primary">Ziel-Menge</h3>
-				<p class="text-sm text-text-secondary">Diese Routine hat ein tägliches Ziel von {habit.target_value} {habit.unit ?? 'Stk'}.</p>
+				<p class="text-sm text-text-secondary">
+					Diese Routine hat ein tägliches Ziel von {habit.target_value}
+					{habit.unit ?? 'Stk'}.
+				</p>
 			</Card>
 		{/if}
 
@@ -179,21 +218,38 @@
 										<Calendar size={14} class="text-text-tertiary" />
 									</div>
 									<span class="text-sm font-medium text-text-primary">
-										{new Date(entry.date).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
+										{new Date(entry.date).toLocaleDateString('de-DE', {
+											weekday: 'long',
+											day: 'numeric',
+											month: 'long'
+										})}
 									</span>
 								</div>
 								<div class="flex flex-col items-end">
 									{#if isSkipped(entry)}
-										<span class="inline-flex rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold text-text-secondary">Übersprungen</span>
+										<span
+											class="inline-flex rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold text-text-secondary"
+											>Übersprungen</span
+										>
 									{:else if isCompleted(habit, entry)}
-										<span class="inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400">Erledigt</span>
+										<span
+											class="inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-400"
+											>Erledigt</span
+										>
 										{#if habit.target_value && entry.value}
-											<span class="mt-0.5 text-[10px] text-text-tertiary">{entry.value} / {habit.target_value} {habit.unit}</span>
+											<span class="mt-0.5 text-[10px] text-text-tertiary"
+												>{entry.value} / {habit.target_value} {habit.unit}</span
+											>
 										{/if}
 									{:else}
-										<span class="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Teilweise</span>
+										<span
+											class="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+											>Teilweise</span
+										>
 										{#if habit.target_value && entry.value}
-											<span class="mt-0.5 text-[10px] text-text-tertiary">{entry.value} / {habit.target_value} {habit.unit}</span>
+											<span class="mt-0.5 text-[10px] text-text-tertiary"
+												>{entry.value} / {habit.target_value} {habit.unit}</span
+											>
 										{/if}
 									{/if}
 								</div>
@@ -204,5 +260,10 @@
 			{/if}
 		</section>
 	</div>
-	<HabitActionsSheet bind:open={actionsOpen} {habit} showStatsLink={false} onClose={() => (actionsOpen = false)} />
+	<HabitActionsSheet
+		bind:open={actionsOpen}
+		{habit}
+		showStatsLink={false}
+		onClose={() => (actionsOpen = false)}
+	/>
 {/if}

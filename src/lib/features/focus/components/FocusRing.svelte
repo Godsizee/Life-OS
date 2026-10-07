@@ -38,7 +38,7 @@
 		/>
 	</svg>
 	<div class="absolute flex flex-col items-center">
-		<span class="text-4xl font-bold tabular-nums text-text-primary">{clock}</span>
+		<span class="text-4xl font-bold text-text-primary tabular-nums">{clock}</span>
 		{#if caption}
 			<span class="mt-0.5 text-xs text-text-tertiary">{caption}</span>
 		{/if}

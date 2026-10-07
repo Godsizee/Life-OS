@@ -25,14 +25,14 @@ Kalender, Einkauf/Haushalt sowie Ziele & Tagebuch.
 
 ## Stack (Kurz)
 
-| Schicht | Wahl |
-|---|---|
-| Frontend | SvelteKit + Svelte 5 (Runes) + TypeScript |
-| Styling | Tailwind CSS v4 |
-| Backend | Supabase (Postgres, Auth, RLS, Realtime, Storage, Edge Functions) |
-| PWA | `@vite-pwa/sveltekit` + IndexedDB-Outbox |
-| Automatisierung | n8n (optionale Orchestrierung) |
-| Deployment | Supabase Cloud + Vercel *(oder Coolify/adapter-node)* |
+| Schicht         | Wahl                                                              |
+| --------------- | ----------------------------------------------------------------- |
+| Frontend        | SvelteKit + Svelte 5 (Runes) + TypeScript                         |
+| Styling         | Tailwind CSS v4                                                   |
+| Backend         | Supabase (Postgres, Auth, RLS, Realtime, Storage, Edge Functions) |
+| PWA             | `@vite-pwa/sveltekit` + IndexedDB-Outbox                          |
+| Automatisierung | n8n (optionale Orchestrierung)                                    |
+| Deployment      | Supabase Cloud + Vercel _(oder Coolify/adapter-node)_             |
 
 ## Doku-Karte
 

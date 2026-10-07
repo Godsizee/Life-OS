@@ -7,7 +7,7 @@
 	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
 	import { swipe } from '#lib/ui/actions/swipe.js';
 	import { Dumbbell } from '@lucide/svelte';
-	
+
 	import LiveWorkoutPanel from '#lib/features/fitness/components/LiveWorkoutPanel.svelte';
 	import PlansPanel from '#lib/features/fitness/components/PlansPanel.svelte';
 	import HistoryPanel from '#lib/features/fitness/components/HistoryPanel.svelte';
@@ -90,24 +90,27 @@
 		if (sets.length === 0) return;
 
 		const planName = `Plan aus ${new Date(log.date).toLocaleDateString('de-DE')}`;
-		const planId = await fitnessState.addPlan({ name: planName, description: 'Aus Verlauf erstellt' });
-		
-		const uniqueExercises = [...new Set(sets.map(s => s.exercise_name))];
+		const planId = await fitnessState.addPlan({
+			name: planName,
+			description: 'Aus Verlauf erstellt'
+		});
+
+		const uniqueExercises = [...new Set(sets.map((s) => s.exercise_name))];
 		for (let i = 0; i < uniqueExercises.length; i++) {
 			const name = uniqueExercises[i];
-			const exSets = sets.filter(s => s.exercise_name === name);
+			const exSets = sets.filter((s) => s.exercise_name === name);
 			const first = exSets[0];
 			await fitnessState.addExercise(planId, {
 				name: name,
 				category: first.exercise_type === 'cardio' ? 'Cardio' : 'Kraft',
 				default_sets: exSets.length,
-				default_reps: Math.max(...exSets.map(s => s.reps ?? 0)),
-				default_weight: Math.max(...exSets.map(s => s.weight_kg ?? 0)) || null,
+				default_reps: Math.max(...exSets.map((s) => s.reps ?? 0)),
+				default_weight: Math.max(...exSets.map((s) => s.weight_kg ?? 0)) || null,
 				order_index: i + 1,
 				exercise_id: first.exercise_id,
 				exercise_type: first.exercise_type,
-				default_duration_min: Math.max(...exSets.map(s => s.duration_min ?? 0)) || null,
-				default_distance_km: Math.max(...exSets.map(s => s.distance_km ?? 0)) || null
+				default_duration_min: Math.max(...exSets.map((s) => s.duration_min ?? 0)) || null,
+				default_distance_km: Math.max(...exSets.map((s) => s.distance_km ?? 0)) || null
 			});
 		}
 		activeTab = 'plans';
@@ -122,11 +125,13 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2">
+			<h1 class="flex items-center gap-2 text-2xl font-bold tracking-tight text-text-primary">
 				<Dumbbell size={28} class="text-primary-600 dark:text-primary-400" />
 				<span>Fitness</span>
 			</h1>
-			<p class="text-sm font-medium text-text-secondary">Verwalte deine Trainingspläne und logge Workouts.</p>
+			<p class="text-sm font-medium text-text-secondary">
+				Verwalte deine Trainingspläne und logge Workouts.
+			</p>
 		</div>
 	</div>
 
@@ -139,8 +144,8 @@
 				onclick={() => (activeTab = tab.id)}
 				class="min-h-11 flex-1 rounded-xl px-2 text-center text-xs font-bold transition-all active:scale-95 xs:text-sm
 					{activeTab === tab.id
-						? 'bg-surface-0 text-primary-600 shadow-sm dark:text-primary-400'
-						: 'text-text-secondary hover:text-text-primary'}"
+					? 'bg-surface-0 text-primary-600 shadow-sm dark:text-primary-400'
+					: 'text-text-secondary hover:text-text-primary'}"
 			>
 				{tab.label}
 			</button>
@@ -150,7 +155,11 @@
 	<!-- Content Zones -->
 	<div use:swipe={{ onLeft: () => shiftTab(1), onRight: () => shiftTab(-1) }}>
 		{#if activeTab === 'log'}
-			<LiveWorkoutPanel {elapsedDisplay} onSave={handleSaveWorkoutLog} onCancel={handleCancelWorkout} />
+			<LiveWorkoutPanel
+				{elapsedDisplay}
+				onSave={handleSaveWorkoutLog}
+				onCancel={handleCancelWorkout}
+			/>
 		{:else if activeTab === 'plans'}
 			<PlansPanel />
 		{:else if activeTab === 'library'}

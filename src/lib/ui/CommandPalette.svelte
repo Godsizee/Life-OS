@@ -19,16 +19,27 @@
 
 	// ── Schnell-Aktionen ──────────────────────────────────────────────
 	const quickActions = [
-		{ type: 'action' as const, label: 'Fokus-Modus starten', icon: '⚡', action: () => goto('/focus') },
+		{
+			type: 'action' as const,
+			label: 'Fokus-Modus starten',
+			icon: '⚡',
+			action: () => goto('/focus')
+		},
 		{ type: 'action' as const, label: 'Weekly Review', icon: '📋', action: () => goto('/review') },
 		{ type: 'action' as const, label: 'Neue Aufgabe', icon: '✓', action: () => goto('/tasks') },
-		{ type: 'action' as const, label: 'Neue Notiz', icon: '📝', action: () => goto('/notes') },
+		{ type: 'action' as const, label: 'Neue Notiz', icon: '📝', action: () => goto('/notes') }
 	];
 
 	// ── NLP-Aktion (Welle 5.8): Eingabe direkt ausführen ──────────────
 	const NLP_LABELS: Record<string, string> = {
-		task: 'Aufgabe', shopping: 'Einkauf', event: 'Termin', health: 'Gesundheit',
-		habit: 'Routine', note: 'Notiz', goal: 'Ziel', mood: 'Stimmung'
+		task: 'Aufgabe',
+		shopping: 'Einkauf',
+		event: 'Termin',
+		health: 'Gesundheit',
+		habit: 'Routine',
+		note: 'Notiz',
+		goal: 'Ziel',
+		mood: 'Stimmung'
 	};
 	const nlpPreview = $derived(query.trim() ? parseNLPInput(query.trim()) : null);
 
@@ -127,7 +138,12 @@
 		// Ziele
 		for (const g of goalsState.goals) {
 			if (fuzzy(g.title, q)) {
-				out.push({ type: 'goal', label: g.title, icon: '🎯', action: () => goto(`/goals/${g.id}`) });
+				out.push({
+					type: 'goal',
+					label: g.title,
+					icon: '🎯',
+					action: () => goto(`/goals/${g.id}`)
+				});
 			}
 		}
 
@@ -197,49 +213,66 @@
 </script>
 
 <Modal bind:open label="Command Palette">
-		<!-- Suchfeld -->
-		<div class="flex items-center gap-3 border-b border-border-color px-4 py-3">
-			<span class="text-text-secondary">🔍</span>
-			<input
-				bind:this={inputEl}
-				bind:value={query}
-				onkeydown={handleKeydown}
-				type="text"
-				placeholder="Suchen oder Aktion eingeben…"
-				class="flex-1 bg-transparent text-text-primary placeholder:text-text-tertiary focus:outline-none"
-				autocomplete="off"
-			/>
-			<kbd class="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-tertiary border border-border-color/30">Esc</kbd>
-		</div>
+	<!-- Suchfeld -->
+	<div class="flex items-center gap-3 border-b border-border-color px-4 py-3">
+		<span class="text-text-secondary">🔍</span>
+		<input
+			bind:this={inputEl}
+			bind:value={query}
+			onkeydown={handleKeydown}
+			type="text"
+			placeholder="Suchen oder Aktion eingeben…"
+			class="flex-1 bg-transparent text-text-primary placeholder:text-text-tertiary focus:outline-none"
+			autocomplete="off"
+		/>
+		<kbd
+			class="rounded border border-border-color/30 bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-tertiary"
+			>Esc</kbd
+		>
+	</div>
 
-		<!-- Ergebnisse -->
-		<ul class="max-h-72 overflow-y-auto py-2" role="listbox">
-			{#each results as result, i (i)}
-				<li role="option" aria-selected={i === activeIndex}>
-					<button
-						onclick={() => { result.action(); close(); }}
-						onmouseenter={() => (activeIndex = i)}
-						class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors
+	<!-- Ergebnisse -->
+	<ul class="max-h-72 overflow-y-auto py-2" role="listbox">
+		{#each results as result, i (i)}
+			<li role="option" aria-selected={i === activeIndex}>
+				<button
+					onclick={() => {
+						result.action();
+						close();
+					}}
+					onmouseenter={() => (activeIndex = i)}
+					class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors
 							{i === activeIndex ? 'bg-surface-2' : ''}"
-					>
-						<span class="w-5 text-center text-base {typeColor[result.type]}">{result.icon}</span>
-						<span class="min-w-0 flex-1">
-							<span class="block truncate text-sm text-text-primary">{result.label}</span>
-							{#if result.sub}
-								<span class="text-xs text-text-tertiary">{result.sub}</span>
-							{/if}
-						</span>
-					</button>
-				</li>
-			{:else}
-				<li class="px-4 py-3 text-sm text-text-tertiary">Keine Treffer</li>
-			{/each}
-		</ul>
+				>
+					<span class="w-5 text-center text-base {typeColor[result.type]}">{result.icon}</span>
+					<span class="min-w-0 flex-1">
+						<span class="block truncate text-sm text-text-primary">{result.label}</span>
+						{#if result.sub}
+							<span class="text-xs text-text-tertiary">{result.sub}</span>
+						{/if}
+					</span>
+				</button>
+			</li>
+		{:else}
+			<li class="px-4 py-3 text-sm text-text-tertiary">Keine Treffer</li>
+		{/each}
+	</ul>
 
-		<!-- Footer -->
-		<div class="flex items-center gap-3 border-t border-border-color px-4 py-2 text-[10px] text-text-tertiary">
-			<span><kbd class="rounded bg-surface-2 px-1 py-0.5 font-mono border border-border-color/30">↑↓</kbd> navigieren</span>
-			<span><kbd class="rounded bg-surface-2 px-1 py-0.5 font-mono border border-border-color/30">↵</kbd> auswählen</span>
-			<span><kbd class="rounded bg-surface-2 px-1 py-0.5 font-mono border border-border-color/30">Esc</kbd> schließen</span>
-		</div>
+	<!-- Footer -->
+	<div
+		class="flex items-center gap-3 border-t border-border-color px-4 py-2 text-[10px] text-text-tertiary"
+	>
+		<span
+			><kbd class="rounded border border-border-color/30 bg-surface-2 px-1 py-0.5 font-mono">↑↓</kbd
+			> navigieren</span
+		>
+		<span
+			><kbd class="rounded border border-border-color/30 bg-surface-2 px-1 py-0.5 font-mono">↵</kbd> auswählen</span
+		>
+		<span
+			><kbd class="rounded border border-border-color/30 bg-surface-2 px-1 py-0.5 font-mono"
+				>Esc</kbd
+			> schließen</span
+		>
+	</div>
 </Modal>

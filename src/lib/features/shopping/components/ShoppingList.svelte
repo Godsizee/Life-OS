@@ -11,11 +11,19 @@
 </script>
 
 {#if items.length === 0}
-	<EmptyState icon={ShoppingCart} title="Einkaufsliste ist leer" hint="Füge oben deinen ersten Artikel hinzu." />
+	<EmptyState
+		icon={ShoppingCart}
+		title="Einkaufsliste ist leer"
+		hint="Füge oben deinen ersten Artikel hinzu."
+	/>
 {:else}
 	<ul class="flex flex-col gap-2">
 		{#each items as item (item.id)}
-			<li class="contents" transition:fade={{ duration: motionDuration(DURATION.fast) }} animate:flip={{ duration: motionDuration(DURATION.base) }}>
+			<li
+				class="contents"
+				transition:fade={{ duration: motionDuration(DURATION.fast) }}
+				animate:flip={{ duration: motionDuration(DURATION.base) }}
+			>
 				<ShoppingItemRow {item} />
 			</li>
 		{/each}

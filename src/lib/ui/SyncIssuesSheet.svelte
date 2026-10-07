@@ -112,8 +112,8 @@
 			/>
 		{:else}
 			<p class="text-sm text-text-secondary">
-				Diese Änderungen konnten nicht gespeichert werden und werden nicht erneut versucht.
-				Beim Verwerfen wird der aktuelle Stand vom Server geladen.
+				Diese Änderungen konnten nicht gespeichert werden und werden nicht erneut versucht. Beim
+				Verwerfen wird der aktuelle Stand vom Server geladen.
 			</p>
 
 			<ul class="flex flex-col gap-2">
@@ -128,7 +128,7 @@
 							<span class="ml-auto text-xs text-text-tertiary">{zeitpunkt(eintrag.createdAt)}</span>
 						</div>
 						{#if eintrag.lastError}
-							<p class="mt-1.5 break-words text-xs text-text-tertiary">{eintrag.lastError}</p>
+							<p class="mt-1.5 text-xs break-words text-text-tertiary">{eintrag.lastError}</p>
 						{/if}
 					</li>
 				{/each}

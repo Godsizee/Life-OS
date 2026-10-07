@@ -11,7 +11,13 @@ describe('vergleiche', () => {
 	});
 
 	it('wertet "weniger ist besser" richtig', () => {
-		const v = vergleiche({ id: 'x', label: 'Überfällig', wert: 2, vorwoche: 6, hoeherIstBesser: false })!;
+		const v = vergleiche({
+			id: 'x',
+			label: 'Überfällig',
+			wert: 2,
+			vorwoche: 6,
+			hoeherIstBesser: false
+		})!;
 		expect(v.richtung).toBe('down');
 		expect(v.gut).toBe(true);
 	});

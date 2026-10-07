@@ -46,7 +46,7 @@
 				onclick={() => timelineState.setRange(z as any)}
 				class="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-xs font-bold transition-all md:flex-none md:px-3 {timelineState.range ===
 				z
-					? 'bg-surface-0 text-primary-active premium-shadow'
+					? 'premium-shadow bg-surface-0 text-primary-active'
 					: 'text-text-secondary hover:text-text-primary'}"
 				title={z === 'all' ? 'Bei viel Historie kann das einen Moment dauern' : `${z} Tage`}
 			>
@@ -62,7 +62,10 @@
 		Displays nur Platz fuer wenige Pixel Titel. Deshalb steht er dort erst ab
 		`md` und darunter als eigene Zeile unter dem Header.
 	-->
-	<PageHeader title="Timeline" subtitle="Verfolge all deine Aktivitäten und Fortschritte chronologisch.">
+	<PageHeader
+		title="Timeline"
+		subtitle="Verfolge all deine Aktivitäten und Fortschritte chronologisch."
+	>
 		{#snippet trailing()}
 			<div class="hidden md:block">
 				{@render rangeToggle()}
@@ -75,35 +78,42 @@
 	</div>
 
 	<!-- Filter Chip-row -->
-	<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+	<div class="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
 		<Chip selected={filterModule === 'all'} onclick={() => (filterModule = 'all')}>
-			Alles <span class="ml-1 opacity-60 text-[10px] tabular-nums">({counts('all')})</span>
+			Alles <span class="ml-1 text-[10px] tabular-nums opacity-60">({counts('all')})</span>
 		</Chip>
 		{#each TIMELINE_MODULES as meta (meta.id)}
 			<Chip selected={filterModule === meta.id} onclick={() => (filterModule = meta.id)}>
-				{meta.label} <span class="ml-1 opacity-60 text-[10px] tabular-nums">({counts(meta.id)})</span>
+				{meta.label}
+				<span class="ml-1 text-[10px] tabular-nums opacity-60">({counts(meta.id)})</span>
 			</Chip>
 		{/each}
 	</div>
 
 	<!-- Timeline List -->
 	{#if gruppen.length === 0}
-		<EmptyState 
-			icon={History} 
-			title={filterModule === 'all' ? 'Noch nichts aufgezeichnet' : 'Keine Einträge in diesem Bereich'} 
-			hint={filterModule === 'all' ? 'Sobald du etwas erledigst, erscheint es hier.' : 'Wähle einen anderen Bereich oder „Alles".'}
+		<EmptyState
+			icon={History}
+			title={filterModule === 'all'
+				? 'Noch nichts aufgezeichnet'
+				: 'Keine Einträge in diesem Bereich'}
+			hint={filterModule === 'all'
+				? 'Sobald du etwas erledigst, erscheint es hier.'
+				: 'Wähle einen anderen Bereich oder „Alles".'}
 		/>
 	{:else}
-		<div class="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-color">
+		<div
+			class="relative space-y-8 before:absolute before:top-2 before:bottom-2 before:left-6 before:w-0.5 before:bg-border-color"
+		>
 			{#each renderedGroups as group (group.date)}
 				<TimelineDayGroup {group} />
 			{/each}
 
 			{#if hasMore}
-				<div class="pt-4 flex justify-center relative z-10">
+				<div class="relative z-10 flex justify-center pt-4">
 					<button
 						onclick={() => (visibleGroups += 20)}
-						class="rounded-xl bg-surface-2 px-4 py-2 text-xs font-bold text-text-secondary hover:text-text-primary hover:bg-surface-3 transition-colors"
+						class="rounded-xl bg-surface-2 px-4 py-2 text-xs font-bold text-text-secondary transition-colors hover:bg-surface-3 hover:text-text-primary"
 					>
 						Weitere 20 Tage laden
 					</button>

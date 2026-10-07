@@ -100,7 +100,13 @@
 				.join('\n\n');
 
 			// Datum beim Speichern frisch bilden, nicht aus dem Render-Tick.
-			await goalsState.saveJournalEntry(toISODate(new Date()), '📋', body || '(Kein Text)', null, 'weekly');
+			await goalsState.saveJournalEntry(
+				toISODate(new Date()),
+				'📋',
+				body || '(Kein Text)',
+				null,
+				'weekly'
+			);
 
 			// W10 — Top-3 wirksam machen: als Wochenfokus für die kommende Woche markieren.
 			const kommendeWoche = nextWeekKey(new Date());
@@ -133,9 +139,29 @@
 </div>
 
 {#if step === 1}
-	<StepRueckblick {kennzahlen} {focusLetzteWoche} {goalsInProgress} {letzterReview} {tageSeitReview} onNext={() => step++} />
+	<StepRueckblick
+		{kennzahlen}
+		{focusLetzteWoche}
+		{goalsInProgress}
+		{letzterReview}
+		{tageSeitReview}
+		onNext={() => step++}
+	/>
 {:else if step === 2}
-	<StepAusblick {openTasks} selected={selectedNextTasks} onToggle={toggleNextTask} onBack={() => step--} onNext={() => step++} />
+	<StepAusblick
+		{openTasks}
+		selected={selectedNextTasks}
+		onToggle={toggleNextTask}
+		onBack={() => step--}
+		onNext={() => step++}
+	/>
 {:else if step === 3}
-	<StepReflexion bind:reflGood bind:reflHard bind:reflChange {saving} onBack={() => step--} onFinish={finish} />
+	<StepReflexion
+		bind:reflGood
+		bind:reflHard
+		bind:reflChange
+		{saving}
+		onBack={() => step--}
+		onFinish={finish}
+	/>
 {/if}

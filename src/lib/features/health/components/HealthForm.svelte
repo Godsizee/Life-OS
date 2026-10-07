@@ -30,7 +30,12 @@
 		const key = `${date}:${e?.id ?? 'new'}`;
 		if (key === hydratedFor) return;
 		hydratedFor = key;
-		const w = e?.weight_kg != null ? (profileState.weightUnit === 'lb' ? kgToLb(e.weight_kg) : e.weight_kg) : null;
+		const w =
+			e?.weight_kg != null
+				? profileState.weightUnit === 'lb'
+					? kgToLb(e.weight_kg)
+					: e.weight_kg
+				: null;
 		weight = w != null ? String(Math.round(w * 10) / 10) : '';
 		sleep = e?.sleep_h != null ? String(e.sleep_h) : '';
 		water = e ? (waterMl(e) ?? 0) : 0;
@@ -42,7 +47,12 @@
 		try {
 			const parsedWeight = weight ? parseFloat(weight) : null;
 			await healthState.saveFor(date, {
-				weight_kg: parsedWeight != null ? (profileState.weightUnit === 'lb' ? lbToKg(parsedWeight) : parsedWeight) : null,
+				weight_kg:
+					parsedWeight != null
+						? profileState.weightUnit === 'lb'
+							? lbToKg(parsedWeight)
+							: parsedWeight
+						: null,
 				sleep_h: sleep ? parseFloat(sleep) : null,
 				water_ml: water || null,
 				energy
@@ -64,7 +74,9 @@
 					type="button"
 					onclick={() => (energy = e)}
 					class="flex h-10 flex-1 items-center justify-center rounded-xl border-2 text-sm font-bold transition-all active:scale-95
-						{energy === e ? 'border-primary-700 bg-primary-700 dark:border-primary-600 dark:bg-primary-600 text-white' : 'border-border-color text-text-secondary bg-surface-0 hover:bg-surface-2'}"
+						{energy === e
+						? 'border-primary-700 bg-primary-700 text-white dark:border-primary-600 dark:bg-primary-600'
+						: 'border-border-color bg-surface-0 text-text-secondary hover:bg-surface-2'}"
 				>
 					{e}
 				</button>
@@ -87,13 +99,29 @@
 					<button
 						type="button"
 						onclick={() => (water = 0)}
-						class="h-8 px-3 rounded text-sm bg-surface-2 text-text-secondary hover:bg-surface-3 transition-all"
-					>Reset</button>
+						class="h-8 rounded bg-surface-2 px-3 text-sm text-text-secondary transition-all hover:bg-surface-3"
+						>Reset</button
+					>
 				</div>
 				<div class="flex gap-2">
-					<button type="button" onclick={() => (water = Math.min(15000, water + 250))} class="flex-1 h-10 rounded-xl border border-border-color bg-surface-1 hover:bg-surface-2 transition-all font-medium text-sm">+250</button>
-					<button type="button" onclick={() => (water = Math.min(15000, water + 500))} class="flex-1 h-10 rounded-xl border border-border-color bg-surface-1 hover:bg-surface-2 transition-all font-medium text-sm">+500</button>
-					<button type="button" onclick={() => (water = Math.min(15000, water + 1000))} class="flex-1 h-10 rounded-xl border border-border-color bg-surface-1 hover:bg-surface-2 transition-all font-medium text-sm">+1000</button>
+					<button
+						type="button"
+						onclick={() => (water = Math.min(15000, water + 250))}
+						class="h-10 flex-1 rounded-xl border border-border-color bg-surface-1 text-sm font-medium transition-all hover:bg-surface-2"
+						>+250</button
+					>
+					<button
+						type="button"
+						onclick={() => (water = Math.min(15000, water + 500))}
+						class="h-10 flex-1 rounded-xl border border-border-color bg-surface-1 text-sm font-medium transition-all hover:bg-surface-2"
+						>+500</button
+					>
+					<button
+						type="button"
+						onclick={() => (water = Math.min(15000, water + 1000))}
+						class="h-10 flex-1 rounded-xl border border-border-color bg-surface-1 text-sm font-medium transition-all hover:bg-surface-2"
+						>+1000</button
+					>
 				</div>
 			</div>
 		{:else}
@@ -101,12 +129,15 @@
 				<button
 					type="button"
 					onclick={() => (water = Math.max(0, water - profileState.glassSizeMl))}
-					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-color bg-surface-2 text-xl font-bold text-text-primary hover:bg-surface-3 active:scale-95 transition-all"
-				>−</button>
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-color bg-surface-2 text-xl font-bold text-text-primary transition-all hover:bg-surface-3 active:scale-95"
+					>−</button
+				>
 				<div class="flex-1 text-center">
-					<span class="text-2xl font-bold text-primary-600 dark:text-primary-400">{Math.round(water / profileState.glassSizeMl)}</span>
+					<span class="text-2xl font-bold text-primary-600 dark:text-primary-400"
+						>{Math.round(water / profileState.glassSizeMl)}</span
+					>
 					<span class="ml-1 text-xs text-text-tertiary">/ {profileState.waterGoalGlasses}</span>
-					<div class="mt-1 flex gap-0.5 justify-center flex-wrap">
+					<div class="mt-1 flex flex-wrap justify-center gap-0.5">
 						{#each Array.from({ length: Math.min(Math.round(water / profileState.glassSizeMl), 12) }, (_, i) => i) as i (i)}
 							<span class="text-base">💧</span>
 						{/each}
@@ -115,8 +146,9 @@
 				<button
 					type="button"
 					onclick={() => (water = Math.min(15000, water + profileState.glassSizeMl))}
-					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-color bg-surface-2 text-xl font-bold text-text-primary hover:bg-surface-3 active:scale-95 transition-all"
-				>+</button>
+					class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-color bg-surface-2 text-xl font-bold text-text-primary transition-all hover:bg-surface-3 active:scale-95"
+					>+</button
+				>
 			</div>
 		{/if}
 	</div>
@@ -128,7 +160,14 @@
 
 	<!-- Gewicht (optional) -->
 	<Field label="⚖️ Gewicht ({profileState.weightUnit}, optional)">
-		<Input type="number" bind:value={weight} min="0" max="1000" step="0.1" placeholder={profileState.weightUnit === 'lb' ? 'z.B. 160.0' : 'z.B. 72.5'} />
+		<Input
+			type="number"
+			bind:value={weight}
+			min="0"
+			max="1000"
+			step="0.1"
+			placeholder={profileState.weightUnit === 'lb' ? 'z.B. 160.0' : 'z.B. 72.5'}
+		/>
 	</Field>
 
 	<Button onclick={save} disabled={saving}>

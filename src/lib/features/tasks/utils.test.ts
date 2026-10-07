@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { buildTaskTree, subtaskProgress, smartViewFilter, labelUnion, assignColumnPositions, completedOn, completedBetween, filterTasks } from './utils';
+import {
+	buildTaskTree,
+	subtaskProgress,
+	smartViewFilter,
+	labelUnion,
+	assignColumnPositions,
+	completedOn,
+	completedBetween,
+	filterTasks
+} from './utils';
 import type { Task } from './types';
 
 const baseTask = {
@@ -51,10 +60,10 @@ describe('smartViewFilter', () => {
 		const t5 = mkTask({ id: '5', due_at: '2026-07-23T10:00:00Z', status: 'done' }); // overdue but done
 
 		const tasks = [t1, t2, t3, t4, t5];
-		expect(smartViewFilter(tasks, 'today', now).map(t => t.id)).toEqual(['1']);
-		expect(smartViewFilter(tasks, 'upcoming', now).map(t => t.id)).toEqual(['2']);
-		expect(smartViewFilter(tasks, 'no_date', now).map(t => t.id)).toEqual(['3']);
-		expect(smartViewFilter(tasks, 'overdue', now).map(t => t.id)).toEqual(['4']);
+		expect(smartViewFilter(tasks, 'today', now).map((t) => t.id)).toEqual(['1']);
+		expect(smartViewFilter(tasks, 'upcoming', now).map((t) => t.id)).toEqual(['2']);
+		expect(smartViewFilter(tasks, 'no_date', now).map((t) => t.id)).toEqual(['3']);
+		expect(smartViewFilter(tasks, 'overdue', now).map((t) => t.id)).toEqual(['4']);
 		expect(smartViewFilter(tasks, 'all', now)).toHaveLength(5);
 	});
 });
@@ -79,7 +88,11 @@ describe('assignColumnPositions', () => {
 
 describe('completedOn / completedBetween', () => {
 	it('zählt nur nach completed_at, nicht nach updated_at', () => {
-		const t = mkTask({ status: 'done', completed_at: '2026-03-10T14:00:00Z', updated_at: '2026-07-31T09:00:00Z' });
+		const t = mkTask({
+			status: 'done',
+			completed_at: '2026-03-10T14:00:00Z',
+			updated_at: '2026-07-31T09:00:00Z'
+		});
 		expect(completedOn(t, '2026-03-10')).toBe(true);
 		expect(completedOn(t, '2026-07-31')).toBe(false);
 	});
@@ -104,7 +117,7 @@ describe('filterTasks', () => {
 
 		const res = filterTasks([t1, t2, t3, t4], 'welt');
 		expect(res).toHaveLength(3);
-		expect(res.map(t => t.id)).not.toContain(t4.id);
+		expect(res.map((t) => t.id)).not.toContain(t4.id);
 	});
 
 	it('leerer Query liefert alles zurück', () => {

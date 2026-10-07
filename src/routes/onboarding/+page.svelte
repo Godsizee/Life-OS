@@ -35,7 +35,10 @@
 	}
 
 	function suggestNameFrom(email: string): string {
-		const local = email.split('@')[0].replace(/[._-]+/g, ' ').trim();
+		const local = email
+			.split('@')[0]
+			.replace(/[._-]+/g, ' ')
+			.trim();
 		return local ? local.charAt(0).toUpperCase() + local.slice(1) : '';
 	}
 
@@ -81,7 +84,7 @@
 			haptic(15);
 			await new Promise((resolve) => setTimeout(resolve, motionDuration(DURATION.base)));
 			// Kit 3: goto() verwirft Ziele ohne passende Route — dann aufs Dashboard.
-		await goto(next).catch(() => goto('/'));
+			await goto(next).catch(() => goto('/'));
 		} catch (error) {
 			formError = authErrorText(error);
 			saving = false;
@@ -119,7 +122,11 @@
 		</div>
 	{:else}
 		<form onsubmit={submit} class="flex flex-col gap-4" novalidate>
-			<Field label="Dein Name" hint="So wirst du anderen Mitgliedern angezeigt." error={errors.displayName}>
+			<Field
+				label="Dein Name"
+				hint="So wirst du anderen Mitgliedern angezeigt."
+				error={errors.displayName}
+			>
 				<Input
 					autocomplete="given-name"
 					placeholder="Alex"
@@ -130,7 +137,11 @@
 			</Field>
 
 			{#if isOwner}
-				<Field label="Name deines Bereichs" hint="Lässt sich später jederzeit ändern." error={errors.workspaceName}>
+				<Field
+					label="Name deines Bereichs"
+					hint="Lässt sich später jederzeit ändern."
+					error={errors.workspaceName}
+				>
 					<Input
 						placeholder="Mein Haushalt"
 						bind:value={workspaceName}
@@ -160,7 +171,10 @@
 	{/if}
 
 	{#snippet footer()}
-		<a href={next} class="min-h-11 text-text-tertiary underline transition-colors hover:text-text-primary">
+		<a
+			href={next}
+			class="min-h-11 text-text-tertiary underline transition-colors hover:text-text-primary"
+		>
 			Später ausfüllen
 		</a>
 	{/snippet}

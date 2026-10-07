@@ -27,7 +27,9 @@ export async function insertPlanRaw(plan: WorkoutPlan): Promise<WorkoutPlan> {
 	return data;
 }
 
-export async function updatePlanRaw(plan: Partial<WorkoutPlan> & { id: string }): Promise<WorkoutPlan> {
+export async function updatePlanRaw(
+	plan: Partial<WorkoutPlan> & { id: string }
+): Promise<WorkoutPlan> {
 	const { data, error } = await supabase
 		.from('workout_plans')
 		.update(plan)
@@ -56,7 +58,11 @@ export async function listExercises(planId: string): Promise<WorkoutExercise[]> 
 }
 
 export async function insertExerciseRaw(exercise: WorkoutExercise): Promise<WorkoutExercise> {
-	const { data, error } = await supabase.from('workout_exercises').insert(exercise).select().single();
+	const { data, error } = await supabase
+		.from('workout_exercises')
+		.insert(exercise)
+		.select()
+		.single();
 	if (error) throw error;
 	return data;
 }

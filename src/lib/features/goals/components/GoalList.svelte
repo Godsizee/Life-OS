@@ -16,10 +16,12 @@
 	const archivedGoals = $derived(goals.filter((g) => g.archived));
 
 	const roots = $derived(
-		activeGoals.filter((g) => g.parent_id === null || !activeGoals.some((p) => p.id === g.parent_id))
+		activeGoals.filter(
+			(g) => g.parent_id === null || !activeGoals.some((p) => p.id === g.parent_id)
+		)
 	);
 	const childrenOf = $derived((id: string) => activeGoals.filter((g) => g.parent_id === id));
-	
+
 	const sortedGoals = $derived.by(() => {
 		const out = [];
 		for (const g of roots) {
@@ -46,7 +48,7 @@
 		<ul class="flex flex-col gap-2">
 			{#each sortedGoals as item (item.goal.id)}
 				<li
-					class={item.isChild ? "ml-4 border-l-2 border-border-color pl-2" : ""}
+					class={item.isChild ? 'ml-4 border-l-2 border-border-color pl-2' : ''}
 					transition:fade={{ duration: motionDuration(DURATION.fast) }}
 					animate:flip={{ duration: motionDuration(DURATION.base) }}
 				>

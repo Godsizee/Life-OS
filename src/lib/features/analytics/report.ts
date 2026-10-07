@@ -27,7 +27,9 @@ export function buildPeriodReport(days = 30): PeriodReport {
 	const sinceStr = toISODate(since);
 
 	const scores = analyticsState.scores.filter((s) => s.date >= sinceStr).map((s) => s.total);
-	const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+	const avgScore = scores.length
+		? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+		: 0;
 	const bestScore = scores.length ? Math.max(...scores) : 0;
 
 	const tasksCompleted = tasksState.tasks.filter(
@@ -36,9 +38,13 @@ export function buildPeriodReport(days = 30): PeriodReport {
 
 	const workouts = fitnessState.logs.filter((l) => l.date >= sinceStr).length;
 
-	const journalDays = goalsState.journalEntries.filter((j) => j.kind === 'daily' && j.date >= sinceStr).length;
+	const journalDays = goalsState.journalEntries.filter(
+		(j) => j.kind === 'daily' && j.date >= sinceStr
+	).length;
 
-	const weeklyReviews = goalsState.journalEntries.filter((j) => j.kind === 'weekly' && j.date >= sinceStr).length;
+	const weeklyReviews = goalsState.journalEntries.filter(
+		(j) => j.kind === 'weekly' && j.date >= sinceStr
+	).length;
 
 	const goalsDone = goalsState.goals.filter(
 		(g) => g.status === 'done' && g.updated_at >= sinceStr
@@ -47,10 +53,13 @@ export function buildPeriodReport(days = 30): PeriodReport {
 	let longestStreak: PeriodReport['longestStreak'] = { name: '—', days: 0, unit: 'day' };
 	for (const h of habitsState.habits.filter((h) => !h.archived)) {
 		const streak = calculateStreak(h, habitsState.entriesFor(h.id));
-		if (streak > longestStreak.days) longestStreak = { name: h.name, days: streak, unit: streakUnit(h.schedule) };
+		if (streak > longestStreak.days)
+			longestStreak = { name: h.name, days: streak, unit: streakUnit(h.schedule) };
 	}
 
-	const newPRs = fitnessState.records.filter((r) => toISODate(new Date(r.achieved_at)) >= sinceStr).length;
+	const newPRs = fitnessState.records.filter(
+		(r) => toISODate(new Date(r.achieved_at)) >= sinceStr
+	).length;
 
 	return {
 		days,

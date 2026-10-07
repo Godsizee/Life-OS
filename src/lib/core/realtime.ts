@@ -20,8 +20,7 @@ export function subscribeToTable<T>(
 			(payload) => {
 				if (payload.eventType === 'INSERT') handlers.onInsert?.(payload.new as T);
 				else if (payload.eventType === 'UPDATE') handlers.onUpdate?.(payload.new as T);
-				else if (payload.eventType === 'DELETE')
-					handlers.onDelete?.(payload.old as { id: string });
+				else if (payload.eventType === 'DELETE') handlers.onDelete?.(payload.old as { id: string });
 			}
 		)
 		// Ohne diesen Callback blieb ein Verbindungsabbruch voellig unbemerkt: der

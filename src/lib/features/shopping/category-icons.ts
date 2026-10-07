@@ -1,20 +1,29 @@
 import type { IconKomponente } from '#lib/ui/icon.js';
 import {
-  Carrot, Croissant, Milk, Fish, Snowflake, Package,
-  Cookie, CupSoda, SprayCan, Bath, ShoppingBasket
+	Carrot,
+	Croissant,
+	Milk,
+	Fish,
+	Snowflake,
+	Package,
+	Cookie,
+	CupSoda,
+	SprayCan,
+	Bath,
+	ShoppingBasket
 } from '@lucide/svelte';
 
 /** Kategorie-ID → lucide-Icon. Fällt in Komponenten via ?? auf ShoppingBasket zurück. */
 export const CATEGORY_ICONS: Record<string, IconKomponente> = {
-  produce: Carrot,
-  bakery: Croissant,
-  dairy: Milk,
-  meat: Fish,
-  frozen: Snowflake,
-  pantry: Package,
-  snacks: Cookie,
-  drinks: CupSoda,
-  household: SprayCan,
-  care: Bath,
-  other: ShoppingBasket
+	produce: Carrot,
+	bakery: Croissant,
+	dairy: Milk,
+	meat: Fish,
+	frozen: Snowflake,
+	pantry: Package,
+	snacks: Cookie,
+	drinks: CupSoda,
+	household: SprayCan,
+	care: Bath,
+	other: ShoppingBasket
 };

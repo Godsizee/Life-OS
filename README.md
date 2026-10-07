@@ -11,7 +11,7 @@ Moin. Life OS bündelt mein tägliches Chaos in einer schnellen, installierbaren
 - **Kalender & Termine:** Gemeinsame und persönliche Termine.
 - **Einkauf & Haushalt:** Geteilte Listen für den Wocheneinkauf.
 - **Ziele & Tagebuch:** Reflektion und Stimmungs-Tracker.
-- *Hinweis: Finanzen sind und bleiben bei FairShare. Life OS ist komplett unabhängig davon.*
+- _Hinweis: Finanzen sind und bleiben bei FairShare. Life OS ist komplett unabhängig davon._
 
 ## Architektur & Leitprinzipien
 

@@ -34,11 +34,9 @@ export function sortNotes(notes: Note[], sort: NoteSort = 'updated'): Note[] {
 	const vergleich: Record<NoteSort, (a: Note, b: Note) => number> = {
 		updated: (a, b) => b.updated_at.localeCompare(a.updated_at),
 		created: (a, b) => b.created_at.localeCompare(a.created_at),
-		title:   (a, b) => a.title.localeCompare(b.title, 'de')
+		title: (a, b) => a.title.localeCompare(b.title, 'de')
 	};
-	return [...notes].sort(
-		(a, b) => Number(b.pinned) - Number(a.pinned) || vergleich[sort](a, b)
-	);
+	return [...notes].sort((a, b) => Number(b.pinned) - Number(a.pinned) || vergleich[sort](a, b));
 }
 
 export interface NoteMatch {

@@ -41,7 +41,10 @@ export async function dispatchNLP(text: string): Promise<string | null> {
 			await habitsState.toggleToday(parsed.parsed.habitId);
 			return `Routine „${parsed.parsed.name}" geloggt`;
 		case 'note':
-			await notesState.addNote({ title: parsed.parsed.title, body: parsed.parsed.body || undefined });
+			await notesState.addNote({
+				title: parsed.parsed.title,
+				body: parsed.parsed.body || undefined
+			});
 			return 'Notiz erstellt';
 		case 'goal':
 			await goalsState.addGoal({ title: parsed.parsed.title });

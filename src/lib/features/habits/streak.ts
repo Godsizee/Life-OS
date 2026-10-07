@@ -281,7 +281,10 @@ const WEEKDAY_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 export function scheduleLabel(schedule: HabitSchedule): string {
 	if (schedule.type === 'daily') return 'Täglich';
 	if (schedule.type === 'weekly') {
-		return [...schedule.days].sort((a, b) => a - b).map((d) => WEEKDAY_SHORT[d]).join(', ');
+		return [...schedule.days]
+			.sort((a, b) => a - b)
+			.map((d) => WEEKDAY_SHORT[d])
+			.join(', ');
 	}
 	return `${schedule.times}× pro Woche`;
 }

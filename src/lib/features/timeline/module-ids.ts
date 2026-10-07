@@ -12,4 +12,4 @@ export const TIMELINE_MODULE_IDS = [
 	'journal'
 ] as const;
 
-export type TimelineModule = typeof TIMELINE_MODULE_IDS[number];
+export type TimelineModule = (typeof TIMELINE_MODULE_IDS)[number];

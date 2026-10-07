@@ -9,7 +9,7 @@
 	import { buildTaskTree, subtaskProgress } from '../utils';
 
 	let { tasks, onopen }: { tasks: Task[]; onopen?: (task: Task) => void } = $props();
-	
+
 	const tree = $derived(buildTaskTree(tasks));
 </script>
 
@@ -18,7 +18,11 @@
 {:else}
 	<ul class="flex flex-col gap-2">
 		{#each tree as node (node.task.id)}
-			<li class="flex flex-col gap-2" transition:fade={{ duration: motionDuration(DURATION.fast) }} animate:flip={{ duration: motionDuration(DURATION.base) }}>
+			<li
+				class="flex flex-col gap-2"
+				transition:fade={{ duration: motionDuration(DURATION.fast) }}
+				animate:flip={{ duration: motionDuration(DURATION.base) }}
+			>
 				<TaskItem task={node.task} progress={subtaskProgress(node.children)} {onopen} />
 				{#each node.children as child (child.id)}
 					<div class="ml-8" transition:fade={{ duration: motionDuration(DURATION.fast) }}>

@@ -25,7 +25,7 @@
 <div
 	role="tablist"
 	aria-label={label}
-	class="flex w-full min-w-0 gap-1 rounded-xl bg-surface-2 p-1 select-none-native"
+	class="select-none-native flex w-full min-w-0 gap-1 rounded-xl bg-surface-2 p-1"
 >
 	{#each options as option (option.value)}
 		{@const active = option.value === value}
@@ -36,7 +36,7 @@
 			onclick={() => select(option.value)}
 			class="min-h-10 min-w-0 flex-1 basis-0 truncate rounded-lg px-2 text-sm font-medium transition-all active:scale-95
 				{active
-				? 'bg-surface-0 text-text-primary elevation-1'
+				? 'elevation-1 bg-surface-0 text-text-primary'
 				: 'text-text-secondary hover:text-text-primary'}"
 		>
 			{option.label}

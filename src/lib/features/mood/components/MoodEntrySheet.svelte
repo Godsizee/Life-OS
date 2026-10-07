@@ -59,7 +59,9 @@
 		saving = true;
 		try {
 			const [hh, mm] = timeStr.split(':').map(Number);
-			const loggedAt = new Date(`${date}T${String(hh || 12).padStart(2, '0')}:${String(mm || 0).padStart(2, '0')}:00`).toISOString();
+			const loggedAt = new Date(
+				`${date}T${String(hh || 12).padStart(2, '0')}:${String(mm || 0).padStart(2, '0')}:00`
+			).toISOString();
 			await moodState.saveFor(date, score, note, activities, loggedAt);
 			resetForm();
 		} finally {
@@ -77,15 +79,22 @@
 	<div class="flex flex-col gap-5 px-4 pb-6">
 		{#if dayEntries.length > 0}
 			<div>
-				<p class="mb-2 text-xs font-bold uppercase tracking-wider text-text-tertiary">
+				<p class="mb-2 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 					Einträge an diesem Tag ({dayEntries.length})
 				</p>
 				<ul class="flex flex-col gap-1.5">
 					{#each dayEntries as entry (entry.id)}
 						{@const d = new Date(entry.logged_at)}
-						{@const formattedTime = isNaN(d.getTime()) ? '' : d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
-						<li class="flex items-center justify-between gap-2 rounded-xl border border-border-color bg-surface-1 p-2.5">
-							<button onclick={() => loadEntry(entry)} class="flex flex-1 items-center gap-2 text-left">
+						{@const formattedTime = isNaN(d.getTime())
+							? ''
+							: d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+						<li
+							class="flex items-center justify-between gap-2 rounded-xl border border-border-color bg-surface-1 p-2.5"
+						>
+							<button
+								onclick={() => loadEntry(entry)}
+								class="flex flex-1 items-center gap-2 text-left"
+							>
 								<span class="text-lg">{MOOD_EMOJIS[entry.score]}</span>
 								<div>
 									<p class="text-xs font-bold text-text-primary">
@@ -115,7 +124,7 @@
 			<p class="mb-2 text-sm font-semibold text-text-primary">
 				{editingEntryId ? 'Eintrag bearbeiten' : 'Neuer Eintrag'}
 			</p>
-			
+
 			<div class="mb-4 flex items-center gap-2">
 				<span class="text-xs font-medium text-text-secondary">Uhrzeit:</span>
 				<div class="w-32">
