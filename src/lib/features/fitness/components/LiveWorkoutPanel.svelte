@@ -9,7 +9,7 @@
 	import StepperInput from './StepperInput.svelte';
 	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
 	import { formatPace } from '#lib/features/fitness/utils/pace.js';
-	import { Check, Zap, Timer, X, Calculator, Minus, ListPlus, Save, Gauge, Plus, Link } from 'lucide-svelte';
+	import { Check, Zap, Timer, X, Calculator, Minus, ListPlus, Save, Gauge, Plus, Link } from '@lucide/svelte';
 	import Input from '#lib/ui/Input.svelte';
 
 	interface Props {

@@ -4,7 +4,7 @@
 	// Ein reiner „Wirklich?"-Dialog wird nach dem dritten Mal blind weggeklickt.
 	// Den Workspace-Namen abzutippen erzwingt eine bewusste Handlung — Vorbild:
 	// GitHub-Repository-Löschung.
-	import { AlertTriangle } from 'lucide-svelte';
+	import { AlertTriangle } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';

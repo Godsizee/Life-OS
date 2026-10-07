@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Settings } from 'lucide-svelte';
+	import { Settings } from '@lucide/svelte';
 	import { modules } from '#lib/config/modules.js';
 	import { haptic } from '#lib/core/haptics.js';
 	import Sheet from './Sheet.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus, CheckSquare, ShoppingCart, Calendar, Activity, Flame, Notebook, Target } from 'lucide-svelte';
+	import { Plus, CheckSquare, ShoppingCart, Calendar, Activity, Flame, Notebook, Target } from '@lucide/svelte';
 	import { parseNLPInput } from '#lib/core/nlp-parse.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';

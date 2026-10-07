@@ -4,7 +4,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import { customActivitiesWithCounts, activityLabel, normalizeActivity } from '../activities';
 	import { moodState } from '../store.svelte';
-	import { Edit2, Trash2, Check, X } from 'lucide-svelte';
+	import { Edit2, Trash2, Check, X } from '@lucide/svelte';
 
 	let { open = $bindable(false) }: { open: boolean } = $props();
 

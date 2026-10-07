@@ -10,7 +10,7 @@
 	import { formatDate } from '#lib/core/date.js';
 	import { MOOD_EMOJIS, MOOD_LABELS, type MoodEntry } from '../types';
 	import { activityLabel } from '../activities';
-	import { Trash2 } from 'lucide-svelte';
+	import { Trash2 } from '@lucide/svelte';
 
 	let {
 		open = $bindable(false),

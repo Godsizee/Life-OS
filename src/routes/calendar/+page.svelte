@@ -11,7 +11,7 @@
 	import MonthView from '#lib/features/calendar/components/MonthView.svelte';
 	import WeekView from '#lib/features/calendar/components/WeekView.svelte';
 	import CalendarManagerSheet from '#lib/features/calendar/components/CalendarManagerSheet.svelte';
-	import { Calendar as CalendarIcon, CheckSquare, Repeat, Plus, Settings, ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { Calendar as CalendarIcon, CheckSquare, Repeat, Plus, Settings, ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import IconButton from '#lib/ui/IconButton.svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import Chip from '#lib/ui/Chip.svelte';

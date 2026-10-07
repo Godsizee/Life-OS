@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { History } from 'lucide-svelte';
+	import { History } from '@lucide/svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';

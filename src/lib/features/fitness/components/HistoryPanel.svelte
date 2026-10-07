@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
-	import { Calendar, ChevronRight, Clock, Edit3, Zap, Repeat, Save } from 'lucide-svelte';
+	import { Calendar, ChevronRight, Clock, Edit3, Zap, Repeat, Save } from '@lucide/svelte';
 
 	interface Props {
 		onRepeat: (logId: string) => void;

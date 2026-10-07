@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DayContext } from '../types';
-	import { CheckSquare, Repeat, Dumbbell, Smile, Moon, Droplet, Zap, Tag } from 'lucide-svelte';
+	import { CheckSquare, Repeat, Dumbbell, Smile, Moon, Droplet, Zap, Tag } from '@lucide/svelte';
 	import { activityLabel } from '#lib/features/mood/activities.js';
 	import { formatMetric } from '#lib/features/health/stats.js';
 	import { profileState } from '#lib/features/profile/store.svelte.js';

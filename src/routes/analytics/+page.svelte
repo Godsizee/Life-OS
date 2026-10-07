@@ -10,7 +10,7 @@
 	import FocusStatsCard from '#lib/features/timetracking/components/FocusStatsCard.svelte';
 	import MonthlyReport from '#lib/features/analytics/components/MonthlyReport.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus, Download } from 'lucide-svelte';
+	import { Activity, Target, Repeat, Heart, SmilePlus, BookOpen, Zap, Dumbbell, TrendingUp, TrendingDown, Minus, Download } from '@lucide/svelte';
 	import { APP_LOCALE } from '#lib/core/locale.js';
 	import { toISODate } from '#lib/core/date.js';
 	import { SCORE_WEIGHTS, SCORE_LABELS, weightLabel, scoreSeries, type ScoreKey } from '#lib/features/analytics/score-math.js';

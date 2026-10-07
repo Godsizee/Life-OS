@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { focusSession } from '../session.svelte';
 	import { phaseLabel } from '../session-logic';
-	import { Pause, Play, Zap } from 'lucide-svelte';
+	import { Pause, Play, Zap } from '@lucide/svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 
 	// Sekunden-Tick nur, solange die Karte sichtbar UND die Session aktiv ist.

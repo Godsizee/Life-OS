@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Target, ChevronDown, ChevronUp, Archive } from 'lucide-svelte';
+	import { Target, ChevronDown, ChevronUp, Archive } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import GoalItem from './GoalItem.svelte';

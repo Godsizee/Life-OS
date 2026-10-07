@@ -1,11 +1,11 @@
-import type { Icon } from 'lucide-svelte';
+import type { IconKomponente } from '#lib/ui/icon.js';
 import {
   Carrot, Croissant, Milk, Fish, Snowflake, Package,
   Cookie, CupSoda, SprayCan, Bath, ShoppingBasket
-} from 'lucide-svelte';
+} from '@lucide/svelte';
 
 /** Kategorie-ID → lucide-Icon. Fällt in Komponenten via ?? auf ShoppingBasket zurück. */
-export const CATEGORY_ICONS: Record<string, typeof Icon> = {
+export const CATEGORY_ICONS: Record<string, IconKomponente> = {
   produce: Carrot,
   bakery: Croissant,
   dairy: Milk,

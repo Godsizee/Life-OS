@@ -17,7 +17,7 @@
 	import { rankTasks } from '#lib/features/dashboard/scoring.js';
 	import { workoutsThisWeek } from '#lib/features/fitness/utils/frequency.js';
 	import { toISODate } from '#lib/core/date.js';
-	import { X, Sun, Dumbbell } from 'lucide-svelte';
+	import { X, Sun, Dumbbell } from '@lucide/svelte';
 
 	const today = toISODate(new Date());
 	const LS_KEY = `lifeos:brief:${today}`;

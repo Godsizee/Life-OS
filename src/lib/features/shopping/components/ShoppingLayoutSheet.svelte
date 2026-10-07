@@ -4,7 +4,7 @@
   import Sheet from '#lib/ui/Sheet.svelte';
   import { CATEGORY_LABELS } from '../categories';
   import { CATEGORY_ICONS } from '../category-icons';
-  import { ChevronUp, ChevronDown, Plus, Trash2 } from 'lucide-svelte';
+  import { ChevronUp, ChevronDown, Plus, Trash2 } from '@lucide/svelte';
   import Input from '#lib/ui/Input.svelte';
   import Button from '#lib/ui/Button.svelte';
 

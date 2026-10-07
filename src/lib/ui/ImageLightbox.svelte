@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Vollbild-Betrachter: Pfeile/Wischen blaettern, Escape schliesst.
-	import { ChevronLeft, ChevronRight, X } from 'lucide-svelte';
+	import { ChevronLeft, ChevronRight, X } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { DURATION, motionDuration } from './motion';
 	import { lockScroll, unlockScroll } from './actions/focusTrap';

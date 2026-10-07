@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { scale } from 'svelte/transition';
-	import { Check } from 'lucide-svelte';
+	import { Check } from '@lucide/svelte';
 	import Alert from '#lib/ui/Alert.svelte';
 	import Spinner from '#lib/ui/Spinner.svelte';
 	import { DURATION, EASE_STANDARD_CSS, motionDuration } from '#lib/ui/motion.js';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Repeat } from 'lucide-svelte';
+	import { Repeat } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import HabitItem from './HabitItem.svelte';

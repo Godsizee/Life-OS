@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { scale } from 'svelte/transition';
-	import { Check } from 'lucide-svelte';
+	import { Check } from '@lucide/svelte';
 	import Alert from '#lib/ui/Alert.svelte';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import Button from '#lib/ui/Button.svelte';

@@ -11,7 +11,7 @@
 	import Card from '#lib/ui/Card.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
-	import { Flame, Trophy, Calendar, CheckSquare, Ban, ArrowLeft, MoreVertical, Activity } from 'lucide-svelte';
+	import { Flame, Trophy, Calendar, CheckSquare, Ban, ArrowLeft, MoreVertical, Activity } from '@lucide/svelte';
 	import { toISODate } from '#lib/core/date.js';
 
 	const id = $derived(page.params.id as string);

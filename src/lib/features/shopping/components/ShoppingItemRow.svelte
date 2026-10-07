@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Trash2, AlignLeft } from 'lucide-svelte';
+  import { Trash2, AlignLeft } from '@lucide/svelte';
   import type { ShoppingItem } from '../types';
   import { shoppingState } from '../store.svelte';
   import ListRow from '#lib/ui/ListRow.svelte';

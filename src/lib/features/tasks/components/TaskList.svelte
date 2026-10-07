@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CheckSquare } from 'lucide-svelte';
+	import { CheckSquare } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import TaskItem from './TaskItem.svelte';

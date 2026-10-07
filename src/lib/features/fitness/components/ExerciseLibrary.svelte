@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Search, Trash2, User } from 'lucide-svelte';
+	import { Search, Trash2, User } from '@lucide/svelte';
 	import { fitnessState } from '../store.svelte';
 	import CustomExerciseForm from './CustomExerciseForm.svelte';
 	import type { ExerciseType } from '../types';

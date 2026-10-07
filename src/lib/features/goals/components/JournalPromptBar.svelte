@@ -1,6 +1,6 @@
 <script lang="ts">
 	// W8 — Minimalistischer Entry-Point am Seitenende.
-	import { PenTool } from 'lucide-svelte';
+	import { PenTool } from '@lucide/svelte';
 	import { goalsState } from '../store.svelte';
 
 	let { onOpen }: { onOpen: (date: string) => void } = $props();

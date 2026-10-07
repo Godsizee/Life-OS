@@ -1,7 +1,7 @@
 <script lang="ts">
 	// W9 — Daylio-Aktivitaeten: Katalog nach Gruppen + eigene Tags aus der Historie
 	// + Freitext-Eingabe. Dumm gehalten: kein Store-Zugriff, alles ueber Props.
-	import { Plus } from 'lucide-svelte';
+	import { Plus } from '@lucide/svelte';
 	import {
 		activityLabel,
 		customActivities,

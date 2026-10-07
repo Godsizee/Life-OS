@@ -9,15 +9,15 @@ import {
 	Target,
 	Zap,
 	CheckCircle,
-	BookOpen,
-	type Icon
-} from 'lucide-svelte';
+	BookOpen
+} from '@lucide/svelte';
+import type { IconKomponente } from '#lib/ui/icon.js';
 import type { TimelineModule } from './module-ids';
 
 export interface TimelineModuleMeta {
 	id: TimelineModule;
 	label: string;
-	icon: typeof Icon;
+	icon: IconKomponente;
 	color: string;
 	bg: string;
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { habitsState } from '../store.svelte';
 	import type { Habit } from '../types';
-	import { Check } from 'lucide-svelte';
+	import { Check } from '@lucide/svelte';
 	import { isCompleted, isSkipped, targetOf } from '../streak';
 
 	interface Props {

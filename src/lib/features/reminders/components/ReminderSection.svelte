@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Bell, Trash2 } from 'lucide-svelte';
+	import { Bell, Trash2 } from '@lucide/svelte';
 	import { remindersState } from '../store.svelte';
 	import {
 		formatReminder,

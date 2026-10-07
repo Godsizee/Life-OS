@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { toISODate } from '#lib/core/date.js';
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import type { Occurrence } from '../occurrences';
 
 	let {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// W8 — Soll-Ist-Ampel für Ziele mit Zieldatum. Reine Darstellung.
-	import { TrendingUp, Check, Minus, AlertTriangle, Trophy } from 'lucide-svelte';
+	import { TrendingUp, Check, Minus, AlertTriangle, Trophy } from '@lucide/svelte';
 	import type { TrackResult } from '../checkins';
 
 	let { track, compact = false }: { track: TrackResult; compact?: boolean } = $props();

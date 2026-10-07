@@ -9,7 +9,7 @@
 	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import { formatDate } from '#lib/core/date.js';
 	import { formatMetric, goalPercent, num, waterMl } from '#lib/features/health/stats.js';
-	import { Pencil, Settings, Calendar } from 'lucide-svelte';
+	import { Pencil, Settings, Calendar } from '@lucide/svelte';
 	import HealthGoalsSheet from '#lib/features/health/components/HealthGoalsSheet.svelte';
 	import SleepEnergyCard from '#lib/features/health/components/SleepEnergyCard.svelte';
 

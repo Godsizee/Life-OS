@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-svelte';
+	import { AlertTriangle, CheckCircle, Info, XCircle } from '@lucide/svelte';
 	import { DURATION, EASE_STANDARD, motionDuration } from './motion';
 
 	let {

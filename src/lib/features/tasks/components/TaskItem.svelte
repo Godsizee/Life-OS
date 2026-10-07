@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Trash2, Repeat, AlignLeft, Star } from 'lucide-svelte';
+	import { Trash2, Repeat, AlignLeft, Star } from '@lucide/svelte';
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { formatRRule } from '../recurrence';

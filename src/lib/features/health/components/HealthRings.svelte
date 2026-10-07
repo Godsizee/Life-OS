@@ -1,6 +1,6 @@
 <script lang="ts">
 	// W9 — Tagesfortschritt gegen die Ziele aus profiles.settings.
-	import { Droplet, Moon, Scale, Zap } from 'lucide-svelte';
+	import { Droplet, Moon, Scale, Zap } from '@lucide/svelte';
 	import MetricRing from './MetricRing.svelte';
 	import { healthState } from '../store.svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';

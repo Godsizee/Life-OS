@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Lock, LockOpen } from 'lucide-svelte';
+	import { Lock, LockOpen } from '@lucide/svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import Textarea from '#lib/ui/Textarea.svelte';

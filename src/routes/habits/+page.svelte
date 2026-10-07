@@ -7,7 +7,7 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
-	import { Plus } from 'lucide-svelte';
+	import { Plus } from '@lucide/svelte';
 
 	let createOpen = $state(false);
 

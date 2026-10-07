@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Welle F6 — Platten-Rechner (Hevy/Strong-Muster): Zielgewicht → Scheiben pro Seite.
 	// Bottom-Sheet wie ExercisePicker; Stangengewicht wird in localStorage gemerkt.
-	import { Calculator } from 'lucide-svelte';
+	import { Calculator } from '@lucide/svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import StepperInput from './StepperInput.svelte';
 	import { calculatePlates, BAR_WEIGHTS_KG } from '../utils/plates';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check } from 'lucide-svelte';
+	import { Check } from '@lucide/svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import { analyticsState } from '#lib/features/analytics/store.svelte.js';

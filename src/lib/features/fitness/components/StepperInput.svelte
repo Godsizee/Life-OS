@@ -2,7 +2,7 @@
 	// F5 — Set-Grid touch-tauglich: großer +/− Stepper statt rohem <input type="number">.
 	// Tasten sind 44px hoch (Tap-Ziel), das Zahlenfeld bleibt frei editierbar (Tastatur/
 	// Feinkorrektur). Wert ist nullable — leer bedeutet „nicht gesetzt" (z. B. Bodyweight).
-	import { Minus, Plus } from 'lucide-svelte';
+	import { Minus, Plus } from '@lucide/svelte';
 
 	let {
 		value = $bindable(),

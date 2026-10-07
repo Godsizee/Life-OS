@@ -15,7 +15,7 @@
 	import OnTrackBadge from '#lib/features/goals/components/OnTrackBadge.svelte';
 	import CheckCircle from '#lib/ui/CheckCircle.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
-	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck, Archive, ArchiveRestore } from 'lucide-svelte';
+	import { ArrowLeft, Trash2, X, Dumbbell, CalendarCheck, Archive, ArchiveRestore } from '@lucide/svelte';
 	import Select from '#lib/ui/Select.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import type { GoalStatus } from '#lib/features/goals/types.js';

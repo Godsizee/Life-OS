@@ -25,7 +25,7 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Textarea from '#lib/ui/Textarea.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
-	import { Settings, Trash2, Sun, Sunset, Moon, Sunrise } from 'lucide-svelte';
+	import { Settings, Trash2, Sun, Sunset, Moon, Sunrise } from '@lucide/svelte';
 
 	// ── Heute erfassen ──────────────────────────────────────────────
 	let selectedScore = $state<number | null>(null);

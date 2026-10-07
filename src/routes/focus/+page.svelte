@@ -24,7 +24,7 @@
 		Settings,
 		SkipForward,
 		Target
-	} from 'lucide-svelte';
+	} from '@lucide/svelte';
 
 	let settingsOpen = $state(false);
 	let manualOpen = $state(false);

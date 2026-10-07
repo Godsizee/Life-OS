@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Archive } from 'lucide-svelte';
+	import { Archive } from '@lucide/svelte';
 	import type { Goal, GoalStatus } from '../types';
 	import { goalsState } from '../store.svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';

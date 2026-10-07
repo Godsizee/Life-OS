@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Notebook } from 'lucide-svelte';
+	import { Notebook } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import NoteItem from './NoteItem.svelte';

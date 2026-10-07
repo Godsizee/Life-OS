@@ -2,7 +2,7 @@
 	import { habitsState } from '../store.svelte';
 	import type { Habit } from '../types';
 	import { isCompleted, isSkipped, calculateStreak, streakLabel, weekProgress } from '../streak';
-	import { Flame, MoreVertical, Bell } from 'lucide-svelte';
+	import { Flame, MoreVertical, Bell } from '@lucide/svelte';
 	import HabitProgressButton from './HabitProgressButton.svelte';
 	import HabitActionsSheet from './HabitActionsSheet.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';

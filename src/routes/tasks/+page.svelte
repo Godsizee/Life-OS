@@ -10,7 +10,7 @@
 	import Chip from '#lib/ui/Chip.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
-	import { Plus, FolderPlus, Kanban, List } from 'lucide-svelte';
+	import { Plus, FolderPlus, Kanban, List } from '@lucide/svelte';
 
 	import {
 		smartViewFilter,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Flame } from 'lucide-svelte';
+	import { Flame } from '@lucide/svelte';
 	import type { StreakInfo } from '../journal-stats';
 
 	let { streak }: { streak: StreakInfo } = $props();

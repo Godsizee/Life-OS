@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Eye, EyeOff } from 'lucide-svelte';
+	import { Eye, EyeOff } from '@lucide/svelte';
 	import { passwordStrength, STRENGTH_LABELS } from '../schema';
 
 	let {

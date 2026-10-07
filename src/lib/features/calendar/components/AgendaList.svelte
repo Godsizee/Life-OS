@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar, Pencil, Repeat } from 'lucide-svelte';
+	import { Trash2, CheckCircle2, Circle, Link2, Dumbbell, Calendar, Pencil, Repeat } from '@lucide/svelte';
 	import { calendarState } from '../store.svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { formatRecurrence } from '../rrule';

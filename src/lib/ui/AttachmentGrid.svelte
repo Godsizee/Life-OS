@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Dumm: bekommt fertige Kacheln (id + src) und meldet Klick/Loeschen zurueck.
-	import { ImageOff, Loader2, X } from 'lucide-svelte';
+	import { ImageOff, Loader2, X } from '@lucide/svelte';
 
 	interface Tile {
 		id: string;

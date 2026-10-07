@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Eye, Hash, ListChecks, Lock, LockOpen, Pen, Pin, Trash2 } from 'lucide-svelte';
+	import { Eye, Hash, ListChecks, Lock, LockOpen, Pen, Pin, Trash2 } from '@lucide/svelte';
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
 	import { checklistProgress, renderMarkdownSafe, toggleChecklistLine, MARKDOWN_WERKZEUGE, toggleLinePrefix, type MarkdownWerkzeug } from '../markdown';

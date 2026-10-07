@@ -3,7 +3,7 @@
 	import Input from '#lib/ui/Input.svelte';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import { calendarState } from '../store.svelte';
-	import { Trash2, Link as LinkIcon } from 'lucide-svelte';
+	import { Trash2, Link as LinkIcon } from '@lucide/svelte';
 
 	let {
 		open = $bindable(false),

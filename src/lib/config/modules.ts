@@ -13,14 +13,14 @@ import {
 	Dumbbell,
 	TrendingUp,
 	BookOpen,
-	History,
-	type Icon
-} from 'lucide-svelte';
+	History
+} from '@lucide/svelte';
+import type { IconKomponente } from '#lib/ui/icon.js';
 
 export interface ModuleConfig {
 	id: string;
 	label: string;
-	icon: typeof Icon;
+	icon: IconKomponente;
 	route: string;
 	plan: 'free' | 'paid';
 }

@@ -2,7 +2,7 @@
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 	import ExercisePicker from '#lib/features/fitness/components/ExercisePicker.svelte';
 	import type { PickedExercise, ExerciseType } from '#lib/features/fitness/types.js';
-	import { Trash2, Plus, X, ListPlus } from 'lucide-svelte';
+	import { Trash2, Plus, X, ListPlus } from '@lucide/svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import StepperInput from '#lib/features/fitness/components/StepperInput.svelte';
 

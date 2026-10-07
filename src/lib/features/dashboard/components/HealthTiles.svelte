@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Droplet, Moon } from 'lucide-svelte';
+	import { Droplet, Moon } from '@lucide/svelte';
 	import { healthState } from '#lib/features/health/store.svelte.js';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { analyticsState } from '#lib/features/analytics/store.svelte.js';

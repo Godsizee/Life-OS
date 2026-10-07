@@ -4,7 +4,7 @@
 	import { timeTrackingState } from '../store.svelte';
 	import { formatMinutes, minutesOf } from '../stats';
 	import { formatShortDate } from '#lib/core/date.js';
-	import { Trash2 } from 'lucide-svelte';
+	import { Trash2 } from '@lucide/svelte';
 	import type { TimeEntry } from '../types';
 
 	let { entries }: { entries: TimeEntry[] } = $props();

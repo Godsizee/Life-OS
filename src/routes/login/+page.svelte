@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { fade, scale } from 'svelte/transition';
-	import { Check, Fingerprint } from 'lucide-svelte';
+	import { Check, Fingerprint } from '@lucide/svelte';
 	import Alert from '#lib/ui/Alert.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import Field from '#lib/ui/Field.svelte';

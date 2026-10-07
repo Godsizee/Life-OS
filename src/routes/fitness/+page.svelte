@@ -6,7 +6,7 @@
 	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
 	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
 	import { swipe } from '#lib/ui/actions/swipe.js';
-	import { Dumbbell } from 'lucide-svelte';
+	import { Dumbbell } from '@lucide/svelte';
 	
 	import LiveWorkoutPanel from '#lib/features/fitness/components/LiveWorkoutPanel.svelte';
 	import PlansPanel from '#lib/features/fitness/components/PlansPanel.svelte';

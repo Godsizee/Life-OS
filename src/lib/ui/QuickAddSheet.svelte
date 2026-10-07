@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { Activity, Calendar, CheckSquare, Flame, Notebook, ShoppingCart, Target } from 'lucide-svelte';
+	import { Activity, Calendar, CheckSquare, Flame, Notebook, ShoppingCart, Target } from '@lucide/svelte';
 	import { parseNLPInput } from '#lib/core/nlp-parse.js';
 	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
 	import { toastState } from '#lib/core/toast.svelte.js';

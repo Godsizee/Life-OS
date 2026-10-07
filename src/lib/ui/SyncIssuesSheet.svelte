@@ -5,7 +5,7 @@
 	// ging, und der lokale Zustand blieb danach falsch — eine optimistisch
 	// angezeigte Zeile, die es serverseitig nie gab, blieb bis zum naechsten Reload
 	// stehen. Deshalb hier beides: die Liste und ein Abgleich mit dem Server.
-	import { AlertTriangle, CheckCircle2 } from 'lucide-svelte';
+	import { AlertTriangle, CheckCircle2 } from '@lucide/svelte';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { abgleichJetzt } from '#lib/core/resync.js';
 	import { toastState } from '#lib/core/toast.svelte.js';

@@ -3,7 +3,7 @@
 	import { tasksState } from '../store.svelte';
 	import { buildTaskTree, subtaskProgress } from '../utils';
 	import Card from '#lib/ui/Card.svelte';
-	import { Repeat, AlignLeft } from 'lucide-svelte';
+	import { Repeat, AlignLeft } from '@lucide/svelte';
 	import { formatRRule } from '../recurrence';
 
 	let { tasks, onopen }: { tasks: Task[]; onopen: (t: Task) => void } = $props();

@@ -8,7 +8,7 @@
 	import type { WorkoutSetLog } from '#lib/features/fitness/types.js';
 	import { liveWorkoutState } from '#lib/features/fitness/live-workout.svelte.js';
 	import { goto } from '$app/navigation';
-	import { ArrowLeft, Calendar, Clock, Edit3, Zap, Trophy, Gauge, Repeat } from 'lucide-svelte';
+	import { ArrowLeft, Calendar, Clock, Edit3, Zap, Trophy, Gauge, Repeat } from '@lucide/svelte';
 
 	const logId = $derived(page.params.id);
 

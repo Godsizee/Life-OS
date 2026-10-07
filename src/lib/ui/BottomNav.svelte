@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus, LayoutGrid } from 'lucide-svelte';
+	import { Plus, LayoutGrid } from '@lucide/svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
 	import { keyboardState } from '#lib/core/keyboard.svelte.js';

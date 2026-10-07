@@ -6,7 +6,7 @@
 	import { healthState } from '#lib/features/health/store.svelte.js';
 	import { exerciseProgression } from '#lib/features/fitness/utils/progression.js';
 	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
-	import { ArrowLeft, Trophy, Scale } from 'lucide-svelte';
+	import { ArrowLeft, Trophy, Scale } from '@lucide/svelte';
 
 	const exerciseId = $derived(page.params.id);
 

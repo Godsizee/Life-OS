@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Hash, ImageIcon, ListChecks, Lock, Pin, Trash2 } from 'lucide-svelte';
+	import { Hash, ImageIcon, ListChecks, Lock, Pin, Trash2 } from '@lucide/svelte';
 	import type { Note } from '../types';
 	import { notesState } from '../store.svelte';
 	import { checklistProgress, plainTextPreview } from '../markdown';

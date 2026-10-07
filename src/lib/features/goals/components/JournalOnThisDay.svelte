@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { History } from 'lucide-svelte';
+	import { History } from '@lucide/svelte';
 	import type { JournalEntry } from '../types';
 
 	let { entries, onOpen }: { entries: JournalEntry[]; onOpen: (e: JournalEntry) => void } =

@@ -11,7 +11,7 @@
   import PageHeader from '#lib/ui/PageHeader.svelte';
   import Sheet from '#lib/ui/Sheet.svelte';
   import Skeleton from '#lib/ui/Skeleton.svelte';
-  import { Plus, SlidersHorizontal, RotateCcw } from 'lucide-svelte';
+  import { Plus, SlidersHorizontal, RotateCcw } from '@lucide/svelte';
   import { suggestions, recentlyBought } from '#lib/features/shopping/categories.js';
 
   let createOpen = $state(false);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { buildPeriodReport } from '../report';
-	import { TrendingUp, CheckSquare, Dumbbell, BookOpen, Flame, Target, Trophy, ClipboardCheck } from 'lucide-svelte';
+	import { TrendingUp, CheckSquare, Dumbbell, BookOpen, Flame, Target, Trophy, ClipboardCheck } from '@lucide/svelte';
 
 	let { days = 30 }: { days?: number } = $props();
 

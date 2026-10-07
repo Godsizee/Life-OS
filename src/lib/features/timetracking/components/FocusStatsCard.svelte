@@ -6,7 +6,7 @@
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { toISODate } from '#lib/core/date.js';
 	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
-	import { Zap } from 'lucide-svelte';
+	import { Zap } from '@lucide/svelte';
 
 	let { days = 7, title = 'Fokuszeit' }: { days?: number; title?: string } = $props();
 

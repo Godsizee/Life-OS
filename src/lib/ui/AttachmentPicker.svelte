@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Dumm: kennt weder Store noch Storage — meldet nur die gewaehlten Dateien.
-	import { ImagePlus } from 'lucide-svelte';
+	import { ImagePlus } from '@lucide/svelte';
 
 	let {
 		onpick,

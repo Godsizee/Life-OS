@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Flame } from 'lucide-svelte';
+	import { Flame } from '@lucide/svelte';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
 	import { calculateStreak } from '#lib/features/habits/streak.js';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Trash2, Link2, Dumbbell } from 'lucide-svelte';
+	import { Trash2, Link2, Dumbbell } from '@lucide/svelte';
 	import type { Event } from '../types';
 	import type { Occurrence } from '../occurrences';
 	import { calendarState } from '../store.svelte';

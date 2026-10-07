@@ -1,7 +1,7 @@
 <script lang="ts">
 	// W9 — Fortschrittsring je Metrik. Handgerolltes SVG (stroke-dasharray),
 	// Muster: analytics/components/ScoreRing.svelte, aber generisch und kleiner.
-	import type { Icon } from 'lucide-svelte';
+	import type { IconKomponente } from '#lib/ui/icon.js';
 
 	let {
 		percent,
@@ -16,7 +16,7 @@
 		label: string;
 		value: string;
 		goalLabel?: string;
-		icon?: typeof Icon;
+		icon?: IconKomponente;
 		size?: number;
 		colorClass?: string;
 	} = $props();

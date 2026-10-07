@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { Hash, Plus } from 'lucide-svelte';
+	import { Hash, Plus } from '@lucide/svelte';
 	import { notesState } from '#lib/features/notes/store.svelte.js';
 	import { searchNotes, sortNotes, tagUnion, type NoteSort, NOTE_SORT_LABELS } from '#lib/features/notes/filter.js';
 	import type { Note } from '#lib/features/notes/types.js';

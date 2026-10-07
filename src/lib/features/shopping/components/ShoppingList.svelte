@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ShoppingCart } from 'lucide-svelte';
+	import { ShoppingCart } from '@lucide/svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import ShoppingItemRow from './ShoppingItemRow.svelte';

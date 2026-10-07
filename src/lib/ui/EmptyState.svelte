@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { Icon } from 'lucide-svelte';
+	import type { IconKomponente } from '#lib/ui/icon.js';
 
 	let {
 		icon: IconComponent,
@@ -9,7 +9,7 @@
 		action,
 		size = 'base'
 	}: {
-		icon?: typeof Icon;
+		icon?: IconKomponente;
 		title: string;
 		hint?: string;
 		action?: Snippet;

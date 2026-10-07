@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TrendingDown, TrendingUp, Minus } from 'lucide-svelte';
+	import { TrendingDown, TrendingUp, Minus } from '@lucide/svelte';
 	import { vergleiche, type Kennzahl } from '../week-compare';
 
 	let { kennzahl, children }: { kennzahl: Kennzahl; children?: import('svelte').Snippet } = $props();

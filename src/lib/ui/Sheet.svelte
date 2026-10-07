@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { X } from 'lucide-svelte';
+	import { X } from '@lucide/svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { DURATION, EASE_STANDARD, EASE_STANDARD_CSS, motionDuration } from './motion';
 	import { focusTrap, lockScroll, unlockScroll } from './actions/focusTrap';

@@ -4,7 +4,7 @@
 	import { resolveEntity, entityMeta } from '../registry';
 	import type { LinkEntityType } from '../types';
 	import LinkPicker from './LinkPicker.svelte';
-	import { X, Link2, Plus } from 'lucide-svelte';
+	import { X, Link2, Plus } from '@lucide/svelte';
 
 	let { type, id }: { type: LinkEntityType; id: string } = $props();
 

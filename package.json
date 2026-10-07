@@ -35,8 +35,8 @@
 		"vitest": "^4.1.9"
 	},
 	"dependencies": {
+		"@lucide/svelte": "^1.52.0",
 		"@supabase/supabase-js": "^2.117.3",
-		"lucide-svelte": "^1.0.1",
 		"zod": "^4.6.5"
 	},
 	"imports": {

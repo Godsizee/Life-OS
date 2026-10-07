@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { toastState } from '#lib/core/toast.svelte.js';
-	import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-svelte';
+	import { CheckCircle, XCircle, Info, AlertTriangle, X } from '@lucide/svelte';
 	import { flip } from 'svelte/animate';
 	import { fly } from 'svelte/transition';
 	import { DURATION, EASE_STANDARD, motionDuration } from './motion';

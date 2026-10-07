@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Check } from 'lucide-svelte';
+	import { Check } from '@lucide/svelte';
 	import { scale } from 'svelte/transition';
 	import { DURATION, motionDuration } from './motion';
 	import { haptic } from '#lib/core/haptics.js';

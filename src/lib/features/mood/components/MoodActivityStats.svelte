@@ -1,7 +1,7 @@
 <script lang="ts">
 	// W9 — „Womit haengt gute Stimmung zusammen?" (Daylio-Kern-Auswertung).
 	// Wird auf /mood UND /analytics eingehaengt.
-	import { ThumbsDown, ThumbsUp } from 'lucide-svelte';
+	import { ThumbsDown, ThumbsUp } from '@lucide/svelte';
 	import { activityLabel } from '../activities';
 	import { activityStats, formatDelta, formatScore, topActivities, type MoodLike } from '../stats';
 
