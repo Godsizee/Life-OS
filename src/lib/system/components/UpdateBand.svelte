@@ -6,9 +6,22 @@
 	const sichtbar = $derived(updated.current);
 	let laedt = $state(false);
 
+	/** Wartet, bis ein installierender SW fertig ist (oder aufgibt). */
+	function installiert(sw: ServiceWorker): Promise<void> {
+		if (sw.state !== 'installing') return Promise.resolve();
+		return new Promise((fertig) => {
+			sw.addEventListener('statechange', () => sw.state !== 'installing' && fertig());
+		});
+	}
+
 	async function jetztLaden() {
 		laedt = true;
 		const reg = await navigator.serviceWorker?.getRegistration();
+		// Der Browser prüft den SW erst bei der nächsten Navigation. Ohne update() bliebe
+		// nach dem Reload der alte SW aktiv — mit einer Offline-Hülle der neuen Version,
+		// deren Dateien er nicht im Cache hat.
+		await reg?.update().catch(() => {});
+		if (reg?.installing) await installiert(reg.installing);
 		if (reg?.waiting) {
 			// Der neue SW wartet bewusst (kein skipWaiting beim Install) — erst jetzt übernehmen.
 			navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), {
