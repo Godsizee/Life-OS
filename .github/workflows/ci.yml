@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [main, overhaul/2027]
+  pull_request:
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://example.invalid
+          VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key-00000000000000
+      # Plan: 232 KB (Basis 223,3 + 4 %). Nach T101 (supabase-js 2.117 u. a.) Ist 235,8 KB,
+      # deshalb 240. T802 senkt auf 180.
+      - run: node scripts/measure-bundle.mjs --budget-initial-kb 240
