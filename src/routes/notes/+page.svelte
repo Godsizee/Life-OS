@@ -39,7 +39,7 @@
 		localStorage.setItem('lifeos:notes-sort', s);
 	}
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 
 	// Tiefer Link aus der Command-Palette: /notes?note=<id> oeffnet direkt das Sheet.
 	$effect(() => {

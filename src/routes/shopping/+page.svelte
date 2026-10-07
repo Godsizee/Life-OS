@@ -19,7 +19,7 @@
 	let editItem = $state<ShoppingItem | null>(null);
 	let editOpen = $state(false);
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 
 	let activeListId = $state<string | null>(null);
 	let activeAssigneeFilter = $state<'all' | 'me' | 'unassigned'>('all');

@@ -2,7 +2,7 @@ import { goto } from '$app/navigation';
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
 import { toastState } from '#lib/core/toast.svelte.js';
-import { unloadWorkspaceData } from '#lib/core/workspace-data.js';
+import { entladeSitzung } from '#lib/core/sitzung.js';
 import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import { signOut } from './api';
 import { authErrorText } from './errors';
@@ -48,7 +48,7 @@ export async function logout(): Promise<void> {
 	// passierte in dieser Zeit nichts.
 	try {
 		workspaceState.reset();
-		unloadWorkspaceData();
+		entladeSitzung();
 		await outbox.clear();
 		await goto('/login');
 		// Der Toaster haengt im Layout ausserhalb des Nav-Guards und laeuft auch

@@ -7,10 +7,10 @@
  * zeigten ab da still veraltete Daten, bis der Nutzer neu lud. Bei einer
  * geteilten Einkaufsliste heisst das: doppelt gekauft.
  *
- * WARUM EINE REGISTRY: Der eigentliche Abgleich lebt in `workspace-data.ts`,
+ * WARUM EINE REGISTRY: Der eigentliche Abgleich lebt in `system/daten.ts`,
  * die alle Feature-Stores kennt. `realtime.ts` wird umgekehrt VON diesen Stores
  * importiert — ein direkter Aufruf waere ein Importzyklus. Deshalb hinterlegt
- * `workspace-data.ts` hier eine Funktion, und `realtime.ts` kennt nur diese
+ * `system/daten.ts` hier eine Funktion, und `realtime.ts` kennt nur diese
  * Datei.
  */
 
@@ -23,7 +23,7 @@ let abgleich: Abgleich | null = null;
 let letzterLauf = 0;
 let laufend: Promise<void> | null = null;
 
-/** Von loadWorkspaceData() gesetzt, von unloadWorkspaceData() geleert. */
+/** Von ladeAlles() gesetzt, von entladeAlles() geleert. */
 export function setzeAbgleich(fn: Abgleich | null): void {
 	abgleich = fn;
 	letzterLauf = 0;

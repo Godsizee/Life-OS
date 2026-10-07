@@ -32,7 +32,7 @@
 	let showAllQueue = $state(false);
 	let noteText = $state('');
 
-	// Stores kommen zentral aus core/workspace-data.ts. Hier nur die Session:
+	// Stores kommen zentral aus system/daten.ts. Hier nur die Session:
 	// settle() braucht die Runden von heute, also erst nach dem Laden restaurieren.
 	$effect(() => {
 		if (timeTrackingState.loaded) focusSession.restore();

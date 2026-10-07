@@ -60,7 +60,7 @@
 		localStorage.setItem('lifeos:tasks-sort', s);
 	}
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 	const allLabels = $derived(labelUnion(tasksState.tasks));
 
 	const filtered = $derived.by(() => {

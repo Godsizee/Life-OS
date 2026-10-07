@@ -33,7 +33,7 @@
 
 	const id = $derived(page.params.id as string);
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 
 	const habit = $derived(habitsState.habitById(id));
 	const entries = $derived(habit ? habitsState.entriesFor(habit.id) : []);

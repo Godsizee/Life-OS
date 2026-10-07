@@ -16,7 +16,7 @@
 	import StepAusblick from './StepAusblick.svelte';
 	import StepReflexion from './StepReflexion.svelte';
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 	// Nur die Satz-Historie ist bewusst lazy und wird hier angestoßen.
 	$effect(() => {
 		if (fitnessState.loaded) void fitnessState.loadAllSetLogs();

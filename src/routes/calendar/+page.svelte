@@ -36,7 +36,7 @@
 		} catch {}
 	});
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 
 	// ── View-Umschalter (persistiert) ────────────────────────────────
 	type View = 'agenda' | 'month' | 'week';

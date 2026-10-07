@@ -15,7 +15,7 @@ import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 
 /**
  * Sammelt alle bereits geladenen Stores zu einem JSON-Dokument.
- * Bewusst ohne eigene Queries: workspace-data.ts hat alles schon im Speicher.
+ * Bewusst ohne eigene Queries: system/daten.ts hat alles schon im Speicher.
  */
 export function buildExport(): string {
 	const data = {

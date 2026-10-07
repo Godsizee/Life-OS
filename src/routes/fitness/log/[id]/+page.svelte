@@ -12,7 +12,7 @@
 
 	const logId = $derived(page.params.id);
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 	const log = $derived(fitnessState.logs.find((l) => l.id === logId) ?? null);
 	const planName = $derived(
 		log ? (fitnessState.plans.find((p) => p.id === log.plan_id)?.name ?? 'Freies Training') : ''

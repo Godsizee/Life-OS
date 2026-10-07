@@ -32,7 +32,7 @@
 
 	let meilensteinOffen = $state(false);
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 	const goal = $derived(goalsState.goals.find((g) => g.id === goalId) ?? null);
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
 	const track = $derived(goal ? evaluateTrack(goal, progress) : null);

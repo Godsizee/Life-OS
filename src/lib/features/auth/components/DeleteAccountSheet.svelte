@@ -9,7 +9,7 @@
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
-	import { unloadWorkspaceData } from '#lib/core/workspace-data.js';
+	import { entladeSitzung } from '#lib/core/sitzung.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import Button from '#lib/ui/Button.svelte';
 	import Field from '#lib/ui/Field.svelte';
@@ -42,7 +42,7 @@
 			// beim naechsten Login ins Leere laufen.
 			authState.markIntentionalSignOut();
 			workspaceState.reset();
-			unloadWorkspaceData();
+			entladeSitzung();
 			await outbox.clear();
 			open = false;
 			await goto('/login');

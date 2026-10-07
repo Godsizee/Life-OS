@@ -13,7 +13,7 @@
 	import HealthGoalsSheet from '#lib/features/health/components/HealthGoalsSheet.svelte';
 	import SleepEnergyCard from '#lib/features/health/components/SleepEnergyCard.svelte';
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 
 	// Liste ist bereits absteigend sortiert (neueste zuerst).
 	const recent = $derived(healthState.entries.slice(0, 30));

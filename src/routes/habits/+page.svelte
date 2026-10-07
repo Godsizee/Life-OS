@@ -11,7 +11,7 @@
 
 	let createOpen = $state(false);
 
-	// Laden/Entladen liegt zentral in core/workspace-data.ts (+layout.svelte).
+	// Laden/Entladen liegt zentral in system/daten.ts (+layout.svelte).
 	const streakStats = $derived(
 		habitsState.habits
 			.map((h) => {

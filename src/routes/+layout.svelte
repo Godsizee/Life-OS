@@ -6,7 +6,8 @@
 	import { prefersReducedMotion } from '#lib/ui/motion.js';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
-	import { loadWorkspaceData, unloadWorkspaceData } from '#lib/core/workspace-data.js';
+	import { ladeAlles, entladeAlles } from '#lib/system/daten.js';
+	import { starteSystem } from '#lib/system/start.js';
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
@@ -43,6 +44,7 @@
 	let hadSession = false;
 
 	onMount(() => {
+		starteSystem();
 		authState.init();
 		installState.init();
 		pushState.init();
@@ -91,13 +93,13 @@
 			const wasUnexpected = hadSession && !wasIntentional;
 			// Nur beim tatsaechlichen Wechsel von an- zu abgemeldet aufraeumen: sonst
 			// feuert der Effekt auf /login bei jeder Session-Neubewertung erneut
-			// workspaceState.reset() + unloadWorkspaceData() (~40 State-Schreibvorgaenge
+			// workspaceState.reset() + entladeAlles() (~40 State-Schreibvorgaenge
 			// ueber 15 Stores) und geriet in Produktion in eine Effect-Update-Schleife
 			// (svelte.dev/e/effect_update_depth_exceeded), obwohl nie ein Workspace
 			// geladen war.
 			if (hadSession) {
 				workspaceState.reset();
-				unloadWorkspaceData();
+				entladeAlles();
 			}
 			// Ziel mitnehmen, statt es zu verlieren: sonst landet z. B. ein
 			// Einladungslink nach dem Login stumm auf dem Dashboard.
@@ -105,12 +107,12 @@
 				goto(loginUrlFor(page.url.pathname, page.url.search, { expired: wasUnexpected }));
 			}
 		} else if (!workspaceState.workspace && !workspaceState.loading) {
-			// Einmal zentral statt pro Route — siehe core/workspace-data.ts.
+			// Einmal zentral statt pro Route — siehe system/daten.ts.
 			void workspaceState
 				.load()
 				.then(async () => {
 					const id = workspaceState.workspace?.id;
-					if (id) await loadWorkspaceData(id);
+					if (id) await ladeAlles(id);
 					await outbox.replay();
 				})
 				// Ohne catch blieb hier eine unbehandelte Rejection stehen und das
