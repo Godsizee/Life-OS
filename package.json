@@ -3,14 +3,19 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"engines": {
+		"node": ">=22.17"
+	},
 	"scripts": {
 		"dev": "vite dev",
+		"prebuild": "node -e \"console.log('[build] node', process.version)\"",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run",
+		"measure": "node scripts/measure-bundle.mjs",
 		"start": "node build",
 		"import:wger": "tsx scripts/import-wger.ts"
 	},
