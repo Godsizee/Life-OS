@@ -60,11 +60,11 @@
 				var schrift = String(geraet['darstellung.schrift']);
 				if (schrift === '112' || schrift === '125') setze('schrift', schrift);
 				if (geraet['darstellung.bewegung'] === 'reduziert') setze('bewegung', 'reduziert');
-				if (geraet['darstellung.kanten'] === 'eckig') setze('kanten', 'eckig');
+				if (geraet['darstellung.kanten'] === 'gerundet') setze('kanten', 'gerundet');
 				if (geraet['darstellung.muster'] === false) setze('muster', 'aus');
 
 				var signal = spiegel['darstellung.signal'];
-				if (signal === 'limette' || signal === 'orange' || signal === 'pink' || signal === 'blau')
+				if (signal === 'gelb' || signal === 'limette' || signal === 'orange' || signal === 'blau')
 					setze('signal', signal);
 				if (spiegel['darstellung.farbintensitaet'] === 'gedaempft') setze('farben', 'gedaempft');
 				if (spiegel['darstellung.sticker'] === false) setze('sticker', 'aus');

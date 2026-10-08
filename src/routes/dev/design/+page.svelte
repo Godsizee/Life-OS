@@ -26,10 +26,10 @@
 
 	let ansicht = $state<Record<string, string>>({
 		thema: 'hell',
-		kanten: 'gerundet',
+		kanten: 'eckig',
 		dichte: 'komfort',
 		farben: 'kräftig',
-		signal: 'gelb',
+		signal: 'pink',
 		muster: 'an',
 		sticker: 'an'
 	});
@@ -86,10 +86,10 @@
 		el.classList.toggle('dark', a.thema === 'dunkel');
 		const setze = (n: string, v: string | null) =>
 			v === null ? el.removeAttribute('data-' + n) : el.setAttribute('data-' + n, v);
-		setze('kanten', a.kanten === 'eckig' ? 'eckig' : null);
+		setze('kanten', a.kanten === 'gerundet' ? 'gerundet' : null);
 		setze('dichte', a.dichte === 'kompakt' ? 'kompakt' : null);
 		setze('farben', a.farben === 'gedämpft' ? 'gedaempft' : null);
-		setze('signal', a.signal === 'gelb' ? null : a.signal);
+		setze('signal', a.signal === 'pink' ? null : a.signal);
 		setze('muster', a.muster === 'aus' ? 'aus' : null);
 		setze('sticker', a.sticker === 'aus' ? 'aus' : null);
 

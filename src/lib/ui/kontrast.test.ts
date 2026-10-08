@@ -35,7 +35,8 @@ const MODULE = [
 	'analytics',
 	'timeline'
 ];
-const SIGNALE = ['limette', 'orange', 'pink', 'blau'];
+// Pink ist der Standard in :root, die übrigen stehen unter data-signal.
+const SIGNALE = ['gelb', 'limette', 'orange', 'blau'];
 
 describe('Kontrast WCAG 2.x AA', () => {
 	for (const [name, t] of [

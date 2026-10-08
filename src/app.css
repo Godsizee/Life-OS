@@ -136,7 +136,7 @@
 		--text-2: #2e2a24;
 		--text-3: #5a5348;
 		--auf-farbe: #0b0b0b;
-		--signal: #ffd60a;
+		--signal: #ff6fb5; /* Pink ist der Standard (Design-Gate T303); Gelb steht unter data-signal='gelb' */
 		--gefahr: #d92d20;
 		--auf-gefahr: #ffffff;
 		--erfolg: #22c55e;
@@ -162,9 +162,10 @@
 		--rahmen-s: 2px;
 		--schatten: 5px 5px 0 0 var(--tinte);
 		--schatten-s: 3px 3px 0 0 var(--tinte);
-		--kante-s: 4px;
-		--kante-m: 8px;
-		--kante-l: 12px;
+		/* Eckig ist der Standard (Design-Gate T303); gerundet steht unter data-kanten='gerundet' */
+		--kante-s: 0px;
+		--kante-m: 0px;
+		--kante-l: 0px;
 		--muster-farbe: rgba(11, 11, 11, 0.09);
 		--ziel-min: 48px;
 		--dauer-druck: 90ms;
@@ -208,17 +209,17 @@
 	html[data-signal='orange'] {
 		--signal: #ff9a3d;
 	}
-	html[data-signal='pink'] {
-		--signal: #ff6fb5;
+	html[data-signal='gelb'] {
+		--signal: #ffd60a;
 	}
 	html[data-signal='blau'] {
 		--signal: #5b8cff;
 	}
 
-	html[data-kanten='eckig'] {
-		--kante-s: 0px;
-		--kante-m: 0px;
-		--kante-l: 0px;
+	html[data-kanten='gerundet'] {
+		--kante-s: 4px;
+		--kante-m: 8px;
+		--kante-l: 12px;
 	}
 
 	/* Tailwind-v4-Utilities rechnen mit var(--spacing): Die Dichte skaliert alle Abstände.
