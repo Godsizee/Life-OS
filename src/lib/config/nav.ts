@@ -21,3 +21,10 @@ export function resolveNavModules(
 		.map((id) => modules.find((m) => m.id === id))
 		.filter((m): m is ModulMeta => m !== undefined);
 }
+
+/** Modul, zu dem ein Pfad gehört (Präfix-Treffer). `/` ist „Heute“ und wird nie gesperrt, daher hier ausgenommen. */
+export function modulFuerPfad(pfad: string): ModulMeta | undefined {
+	return modules.find(
+		(m) => m.route !== '/' && (pfad === m.route || pfad.startsWith(`${m.route}/`))
+	);
+}

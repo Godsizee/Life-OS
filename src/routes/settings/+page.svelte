@@ -21,6 +21,7 @@
 	import FocusSettingsFields from '#lib/features/profile/components/FocusSettingsFields.svelte';
 	import { modules } from '#lib/config/modules.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
+	import { istAktiv } from '#lib/system/module-aktiv.svelte.js';
 	import { downloadExport } from '#lib/features/profile/export.js';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -241,9 +242,9 @@
 		<div class="flex flex-col divide-y divide-border-color/50">
 			<SettingRow label="Navigation (Unten 1)">
 				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids)[0].id}
+					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[0].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
 							(m): string => m.id
 						);
 						current[0] = e.currentTarget.value;
@@ -258,9 +259,9 @@
 			</SettingRow>
 			<SettingRow label="Navigation (Unten 2)">
 				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids)[1].id}
+					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[1].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
 							(m): string => m.id
 						);
 						current[1] = e.currentTarget.value;
@@ -275,9 +276,9 @@
 			</SettingRow>
 			<SettingRow label="Navigation (Unten 3)">
 				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids)[2].id}
+					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[2].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
 							(m): string => m.id
 						);
 						current[2] = e.currentTarget.value;
@@ -292,9 +293,9 @@
 			</SettingRow>
 			<SettingRow label="Navigation (Unten 4)">
 				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids)[3].id}
+					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[3].id}
 					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids).map(
+						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
 							(m): string => m.id
 						);
 						current[3] = e.currentTarget.value;

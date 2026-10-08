@@ -12,6 +12,7 @@
 	import { parseNLPInput } from '#lib/core/nlp-parse.js';
 	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
+	import { nlpArtErlaubt } from '../module-aktiv.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import Input from '#lib/ui/Input.svelte';
@@ -23,7 +24,10 @@
 	let saving = $state(false);
 	let field = $state<HTMLInputElement | null>(null);
 
-	const parsed = $derived(text.trim() ? parseNLPInput(text.trim()) : null);
+	const parsed = $derived.by(() => {
+		const p = text.trim() ? parseNLPInput(text.trim()) : null;
+		return p && nlpArtErlaubt(p.type) ? p : null;
+	});
 
 	// Dieselbe Zuordnung wie im Dashboard-Quick-Add: die Kategorie-Farben sind
 	// bewusst neutrale Tailwind-Töne, damit sie sich von primary/accent abheben.
@@ -81,7 +85,7 @@
 
 		saving = true;
 		try {
-			const result = await dispatchNLP(value);
+			const result = await dispatchNLP(value, nlpArtErlaubt);
 			if (result) {
 				haptic(15);
 				toastState.success(result);

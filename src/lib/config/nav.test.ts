@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveNavModules } from './nav';
+import { modulFuerPfad, resolveNavModules } from './nav';
 import { bottomNavModuleIds } from './modules';
 
 describe('resolveNavModules', () => {
@@ -17,5 +17,17 @@ describe('resolveNavModules', () => {
 		expect(ids).toHaveLength(4);
 		expect(ids).not.toContain('notes');
 		expect(ids[0]).toBe('fitness');
+	});
+});
+
+describe('modulFuerPfad', () => {
+	it('findet das Modul per Präfix', () => {
+		expect(modulFuerPfad('/fitness')?.id).toBe('fitness');
+		expect(modulFuerPfad('/fitness/exercise/abc')?.id).toBe('fitness');
+	});
+	it('verwechselt keine Namenspräfixe und kennt weder / noch Einstellungen', () => {
+		expect(modulFuerPfad('/tasksfoo')).toBeUndefined();
+		expect(modulFuerPfad('/')).toBeUndefined();
+		expect(modulFuerPfad('/settings')).toBeUndefined();
 	});
 });

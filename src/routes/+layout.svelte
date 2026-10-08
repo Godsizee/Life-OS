@@ -9,6 +9,8 @@
 	import { ladeAlles, entladeAlles } from '#lib/system/daten.js';
 	import { starteSystem } from '#lib/system/start.js';
 	import { richteAutomationenEin } from '#lib/system/automationen.js';
+	import { uebernehmeBestand } from '#lib/system/bestand.js';
+	import ModulTor from '#lib/system/components/ModulTor.svelte';
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
@@ -115,6 +117,8 @@
 					const id = workspaceState.workspace?.id;
 					if (id) {
 						await ladeAlles(id);
+						// Zuerst die Module: ruhende Regeln (Training, Gesundheit) hängen an ihnen.
+						await uebernehmeBestand();
 						await richteAutomationenEin();
 					}
 					await outbox.replay();
@@ -224,7 +228,7 @@
 					? 'max-w-6xl'
 					: 'max-w-4xl'}"
 			>
-				{@render children()}
+				<ModulTor>{@render children()}</ModulTor>
 			</main>
 			{#if showNav}
 				<UntereLeiste

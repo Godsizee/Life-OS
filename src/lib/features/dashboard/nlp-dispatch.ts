@@ -10,11 +10,21 @@ import { notesState } from '#lib/features/notes/store.svelte.js';
 import { goalsState } from '#lib/features/goals/store.svelte.js';
 import { moodState } from '#lib/features/mood/store.svelte.js';
 
-/** Führt die Eingabe aus und gibt ein Erfolgs-Label zurück (oder null bei leer). */
-export async function dispatchNLP(text: string): Promise<string | null> {
+/**
+ * Führt die Eingabe aus und gibt ein Erfolgs-Label zurück (oder null bei leer).
+ * `erlaubt` filtert Arten abgeschalteter Module; sie fallen auf „Aufgabe“ zurück (oder null, wenn auch die aus ist).
+ */
+export async function dispatchNLP(
+	text: string,
+	erlaubt: (art: string) => boolean = () => true
+): Promise<string | null> {
 	const trimmed = text.trim();
 	if (!trimmed) return null;
-	const parsed = parseNLPInput(trimmed);
+	let parsed = parseNLPInput(trimmed);
+	if (!erlaubt(parsed.type)) {
+		if (!erlaubt('task')) return null;
+		parsed = { type: 'task', parsed: { title: trimmed, priority: 'medium' } } as typeof parsed;
+	}
 
 	switch (parsed.type) {
 		case 'task':

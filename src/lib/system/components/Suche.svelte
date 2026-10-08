@@ -6,7 +6,7 @@
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
-	import { modules } from '#lib/config/modules.js';
+	import { aktiveModule, istAktiv, nlpArtErlaubt } from '../module-aktiv.svelte.js';
 	import { parseNLPInput } from '#lib/core/nlp-parse.js';
 	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
@@ -22,12 +22,31 @@
 		{
 			type: 'action' as const,
 			label: 'Fokus-Modus starten',
+			modul: 'focus' as const,
 			icon: '⚡',
 			action: () => goto('/focus')
 		},
-		{ type: 'action' as const, label: 'Weekly Review', icon: '📋', action: () => goto('/review') },
-		{ type: 'action' as const, label: 'Neue Aufgabe', icon: '✓', action: () => goto('/tasks') },
-		{ type: 'action' as const, label: 'Neue Notiz', icon: '📝', action: () => goto('/notes') }
+		{
+			type: 'action' as const,
+			label: 'Weekly Review',
+			modul: 'review' as const,
+			icon: '📋',
+			action: () => goto('/review')
+		},
+		{
+			type: 'action' as const,
+			label: 'Neue Aufgabe',
+			modul: 'tasks' as const,
+			icon: '✓',
+			action: () => goto('/tasks')
+		},
+		{
+			type: 'action' as const,
+			label: 'Neue Notiz',
+			modul: 'notes' as const,
+			icon: '📝',
+			action: () => goto('/notes')
+		}
 	];
 
 	// ── NLP-Aktion (Welle 5.8): Eingabe direkt ausführen ──────────────
@@ -41,13 +60,16 @@
 		goal: 'Ziel',
 		mood: 'Stimmung'
 	};
-	const nlpPreview = $derived(query.trim() ? parseNLPInput(query.trim()) : null);
+	const nlpPreview = $derived.by(() => {
+		const p = query.trim() ? parseNLPInput(query.trim()) : null;
+		return p && nlpArtErlaubt(p.type) ? p : null;
+	});
 
 	async function runNLP() {
 		const text = query.trim();
 		if (!text) return;
 		try {
-			const label = await dispatchNLP(text);
+			const label = await dispatchNLP(text, nlpArtErlaubt);
 			toastState.success(label ?? 'Erledigt');
 		} catch {
 			toastState.error('Eingabe fehlgeschlagen');
@@ -90,7 +112,7 @@
 		}
 
 		// Module-Navigation (immer sichtbar bei leerem Query oder Treffer)
-		for (const m of modules) {
+		for (const m of aktiveModule.meta) {
 			if (fuzzy(m.label, q)) {
 				out.push({ type: 'nav', label: m.label, icon: '→', action: () => goto(m.route) });
 			}
@@ -98,13 +120,14 @@
 
 		// Schnell-Aktionen
 		for (const a of quickActions) {
+			if (a.modul && !istAktiv(a.modul)) continue;
 			if (fuzzy(a.label, q)) {
 				out.push({ ...a });
 			}
 		}
 
 		// Tasks
-		for (const t of tasksState.tasks.filter((t) => t.status !== 'done')) {
+		for (const t of istAktiv('tasks') ? tasksState.tasks.filter((t) => t.status !== 'done') : []) {
 			if (fuzzy(t.title, q)) {
 				out.push({
 					type: 'task',
@@ -117,7 +140,7 @@
 		}
 
 		// Notizen
-		for (const n of notesState.notes) {
+		for (const n of istAktiv('notes') ? notesState.notes : []) {
 			if (fuzzy(n.title, q)) {
 				out.push({
 					type: 'note',
@@ -129,14 +152,14 @@
 		}
 
 		// Termine
-		for (const e of calendarState.events) {
+		for (const e of istAktiv('calendar') ? calendarState.events : []) {
 			if (fuzzy(e.title, q)) {
 				out.push({ type: 'event', label: e.title, icon: '📅', action: () => goto('/calendar') });
 			}
 		}
 
 		// Ziele
-		for (const g of goalsState.goals) {
+		for (const g of istAktiv('goals') ? goalsState.goals : []) {
 			if (fuzzy(g.title, q)) {
 				out.push({
 					type: 'goal',
@@ -148,7 +171,7 @@
 		}
 
 		// Routinen
-		for (const h of habitsState.habits.filter((h) => !h.archived)) {
+		for (const h of istAktiv('habits') ? habitsState.habits.filter((h) => !h.archived) : []) {
 			if (fuzzy(h.name, q)) {
 				out.push({ type: 'habit', label: h.name, icon: '🔁', action: () => goto('/habits') });
 			}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modules } from '#lib/config/modules.js';
+	import { aktiveModule } from '../module-aktiv.svelte.js';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
@@ -101,7 +101,7 @@
 
 	<!-- Module Links -->
 	<nav class="flex-1 space-y-1 overflow-y-auto p-3">
-		{#each modules as item (item.id)}
+		{#each aktiveModule.meta as item (item.id)}
 			{@const Icon = item.icon}
 			{@const active = currentPath === item.route}
 			<a

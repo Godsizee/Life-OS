@@ -7,6 +7,7 @@ import { starteAutomationen } from '#lib/features/automationen/laufzeit.svelte.j
 import { habitsState } from '#lib/features/habits/store.svelte.js';
 import { starteErinnerungsReaktionen } from '#lib/features/reminders/reaktionen.js';
 import { entladeAlles } from './daten.js';
+import { istAktiv } from './module-aktiv.svelte.js';
 import { MODULE } from './module.js';
 
 let gestartet = false;
@@ -25,8 +26,7 @@ export function starteSystem(): void {
 		for (const [id, def] of Object.entries(m.aktionen ?? {})) aktionen.setze(id, def);
 	}
 	starteAutomationen({
-		// Bis T203 (Module ein-/ausschalten) sind alle Module aktiv.
-		modulAktiv: () => true,
+		modulAktiv: istAktiv,
 		oeffneRegel: (regelId) => void goto(`/settings/automationen#${regelId}`)
 	});
 }

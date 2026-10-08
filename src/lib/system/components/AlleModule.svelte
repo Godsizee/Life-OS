@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Settings } from '@lucide/svelte';
-	import { modules } from '#lib/config/modules.js';
+	import { aktiveModule, setzeAktiv } from '../module-aktiv.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
 	import Sheet from '#lib/ui/Sheet.svelte';
 
@@ -18,7 +18,7 @@
 		<!-- 4 Spalten ab 360px, darunter 3 – auf 320px waeren 4 Kacheln zu schmal
 		     fuer Icon plus lesbares Label. -->
 		<ul class="grid grid-cols-3 gap-1 xs:grid-cols-4">
-			{#each modules as module (module.id)}
+			{#each aktiveModule.meta as module (module.id)}
 				{@const Icon = module.icon}
 				{@const active = currentPath === module.route}
 				<li>
@@ -35,6 +35,28 @@
 				</li>
 			{/each}
 		</ul>
+
+		{#if aktiveModule.ausgeschaltet.length > 0}
+			<div class="mt-2 border-t border-border-color px-1 pt-2">
+				<h3 class="px-2 pb-1 text-xs font-semibold text-text-tertiary">Ausgeschaltet</h3>
+				<ul>
+					{#each aktiveModule.ausgeschaltet as module (module.id)}
+						{@const Icon = module.icon}
+						<li class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-text-secondary">
+							<Icon size={20} strokeWidth={2} />
+							<span class="min-w-0 flex-1 truncate text-sm">{module.label}</span>
+							<button
+								type="button"
+								onclick={() => setzeAktiv(module.id, true)}
+								class="min-h-12 shrink-0 rounded-xl px-3 text-sm font-medium text-primary-active"
+							>
+								Einschalten
+							</button>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
 
 		<div class="mt-2 border-t border-border-color pt-2">
 			<a

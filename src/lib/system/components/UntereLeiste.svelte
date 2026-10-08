@@ -2,6 +2,7 @@
 	import { Plus, LayoutGrid } from '@lucide/svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
+	import { istAktiv } from '../module-aktiv.svelte.js';
 	import { keyboardState } from '#lib/core/keyboard.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
 
@@ -15,7 +16,7 @@
 		onMore: () => void;
 	} = $props();
 
-	const navModules = $derived(resolveNavModules(profileState.settings.nav_module_ids));
+	const navModules = $derived(resolveNavModules(profileState.settings.nav_module_ids, istAktiv));
 	const leftItems = $derived(navModules.slice(0, 2));
 	const rightItems = $derived(navModules.slice(2));
 
