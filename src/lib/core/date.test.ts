@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toISODate } from './date';
+import { formatDauer, formatTagKurz, formatUhr, toISODate } from './date';
 
 describe('toISODate', () => {
 	it('liefert das LOKALE Datum, nicht UTC', () => {
@@ -10,5 +10,18 @@ describe('toISODate', () => {
 
 	it('kippt nicht am Monatsanfang', () => {
 		expect(toISODate(new Date(2026, 7, 1, 0, 15, 0))).toBe('2026-08-01');
+	});
+});
+
+describe('Kurzformate für Vorschauen', () => {
+	it('formatTagKurz, formatUhr', () => {
+		const d = new Date(2026, 9, 8, 7, 5); // Do 08.10.2026
+		expect(formatTagKurz(d)).toBe('Do 08.10.');
+		expect(formatUhr(d)).toBe('07:05');
+	});
+	it('formatDauer', () => {
+		expect(formatDauer(30)).toBe('30 min');
+		expect(formatDauer(60)).toBe('1 h');
+		expect(formatDauer(90)).toBe('1 h 30 min');
 	});
 });

@@ -26,20 +26,3 @@ export const aktiveModule = {
 		return modules.filter((m) => !istAktiv(m.id));
 	}
 };
-
-/** Modul hinter einer Erfassen-Art von `parseNLPInput` (bis T206 die Module selbst erkennen). */
-const NLP_MODUL: Record<string, ModulId> = {
-	task: 'tasks',
-	shopping: 'shopping',
-	event: 'calendar',
-	health: 'health',
-	habit: 'habits',
-	note: 'notes',
-	goal: 'goals',
-	mood: 'mood'
-};
-
-export const nlpArtErlaubt = (art: string): boolean => {
-	const id = NLP_MODUL[art];
-	return id ? istAktiv(id) : true;
-};

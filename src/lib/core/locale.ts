@@ -30,3 +30,8 @@ export function formatLocalDateTime(date: Date | string): string {
 		minute: '2-digit'
 	});
 }
+
+/** Zahl für Vorschauen: Dezimalkomma, höchstens eine Nachkommastelle ("75,4"). */
+export function formatZahl(n: number): string {
+	return n.toLocaleString(APP_LOCALE, { maximumFractionDigits: 1 });
+}

@@ -31,13 +31,23 @@ export interface ErfassenVorschau {
 	sicherheit: number;
 	/** modulintern, für ausfuehren() */
 	daten: unknown;
+	/** überschreibt `ErfassenArt.rang` für diesen Treffer (z. B. lange Texte als Notiz) */
+	rang?: number;
 }
 export interface ErfassenArt {
 	id: string;
 	label: string;
+	/**
+	 * Prüfreihenfolge, kleiner = zuerst. Bei mehreren Treffern gewinnt der kleinste Rang
+	 * (Reihenfolge der früheren Einzel-Auswertung: Notiz, Ziel, Stimmung, Gesundheit,
+	 * Einkauf, Termin, Routine, Aufgabe). `sicherheit` entscheidet nur über die Rückfrage.
+	 */
+	rang: number;
 	/** erscheinen im Erfassen-Blatt unter „So kannst du schreiben“ */
 	beispiele: string[];
 	erkennen(text: string, jetzt: Date): ErfassenVorschau | null;
+	/** Optional: den ganzen Text als diese Art deuten, auch wenn `erkennen` nichts findet („Stattdessen als:“). */
+	erzwinge?(text: string): ErfassenVorschau;
 	/** liefert die Erfolgsmeldung */
 	ausfuehren(vorschau: ErfassenVorschau): Promise<string>;
 }

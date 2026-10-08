@@ -262,10 +262,11 @@ function parseTime(text: string): [number, number] | null {
 // MAIN PARSER
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function parseNLPInput(text: string): ParsedInput {
-	const trimmed = text.trim();
-	const lower = trimmed.toLowerCase();
+/** Ergebnis einer Einzel-Erkennung: `null` = diese Art passt nicht. */
+export type Erkennung = ParsedInput | null;
 
+/** Notiz: Präfix `notiz:`, `notiere` … */
+export function erkenneNotiz(trimmed: string): Erkennung {
 	// ── 0. NOTE ──────────────────────────────────────────────────────────────
 	const noteMatch = trimmed.match(/^(?:notiz|notiere|note|aufschreiben|merkzettel)[:\s]+(.+)$/i);
 	if (noteMatch) {
@@ -274,13 +275,21 @@ export function parseNLPInput(text: string): ParsedInput {
 		const body = parts.slice(1).join(' - ') || '';
 		return { type: 'note', parsed: { title, body } };
 	}
+	return null;
+}
 
+/** Ziel: Präfix `ziel:`, `vorsatz` … */
+export function erkenneZiel(trimmed: string): Erkennung {
 	// ── 0. GOAL ──────────────────────────────────────────────────────────────
 	const goalMatch = trimmed.match(/^(?:ziel|goal|vorsatz)[:\s]+(.+)$/i);
 	if (goalMatch) {
 		return { type: 'goal', parsed: { title: goalMatch[1].trim() } };
 	}
+	return null;
+}
 
+/** Stimmung: Auslöser (`stimmung`, `laune` …) plus Skala 1–5 oder Stimmungswort. */
+export function erkenneStimmung(trimmed: string, lower: string): Erkennung {
 	// ── 1. MOOD ──────────────────────────────────────────────────────────────
 	const MOOD_WORD_MAP: Record<string, number> = {
 		super: 5,
@@ -388,7 +397,11 @@ export function parseNLPInput(text: string): ParsedInput {
 				return { type: 'mood', parsed: { score, note: trimmed, activities: tags } };
 		}
 	}
+	return null;
+}
 
+/** Gesundheit: Gewicht, Schlaf, Wasser, Energie, Schritte, Strecke, Puls. */
+export function erkenneGesundheit(trimmed: string, lower: string): Erkennung {
 	// ── 2. HEALTH ────────────────────────────────────────────────────────────
 	const weightMatch =
 		trimmed.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilo|kilogramm)\b/i) ||
@@ -540,7 +553,11 @@ export function parseNLPInput(text: string): ParsedInput {
 			}
 		};
 	}
+	return null;
+}
 
+/** Einkauf: Kaufwort oder Menge + Artikel. */
+export function erkenneEinkauf(trimmed: string, lower: string): Erkennung {
 	// ── 3. SHOPPING ──────────────────────────────────────────────────────────
 	const NUMBER_WORDS: Record<string, number> = {
 		ein: 1,
@@ -619,7 +636,11 @@ export function parseNLPInput(text: string): ParsedInput {
 
 		return { type: 'shopping', parsed: { name, quantity } };
 	}
+	return null;
+}
 
+/** Termin: Datum plus Uhrzeit oder Termin-Stichwort. */
+export function erkenneTermin(trimmed: string, lower: string): Erkennung {
 	// ── 4. CALENDAR EVENT ────────────────────────────────────────────────────
 	const EVENT_KEYWORDS =
 		/\b(termin|meeting|call|besprechung|treffen|arzt|zahnarzt|doktor|konferenz|interview|pr\u00e4sentation|deadline|abgabe|kurs|training|workout|gym|yoga|lunch|dinner|fr\u00fchst\u00fcck|appointment|event|reminder|erinnerung|sport|lauf|rennen|wettkampf|date|verabredung|feier|party|geburtstag|hochzeit|urlaub|flug|zug|reise|ausflug|kino)\b/i;
@@ -678,7 +699,11 @@ export function parseNLPInput(text: string): ParsedInput {
 			parsed: { title: title || trimmed, due_at: due_at.toISOString(), recurring: isRecurring }
 		};
 	}
+	return null;
+}
 
+/** Routine: Name einer aktiven Routine (auch mit „erledigt …“). */
+export function erkenneRoutine(lower: string): Erkennung {
 	// ── 5. HABIT LOG ─────────────────────────────────────────────────────────
 	const HABIT_PREFIX =
 		/^(?:erledigt|gemacht|done|logged?|geloggt|abgehakt|\u2713|\u2705|habe|hab|abgeschlossen|fertig|check)\s+/i;
@@ -690,7 +715,11 @@ export function parseNLPInput(text: string): ParsedInput {
 	if (matchedHabit) {
 		return { type: 'habit', parsed: { habitId: matchedHabit.id, name: matchedHabit.name } };
 	}
+	return null;
+}
 
+/** Rückfall: alles, was keine andere Art ist, wird eine Aufgabe. */
+export function erkenneAufgabe(trimmed: string, lower: string): ParsedInput {
 	// ── 6. TASK (FALLBACK) ───────────────────────────────────────────────────
 	let priority: 'high' | 'medium' | 'low' = 'medium';
 	if (
@@ -758,4 +787,20 @@ export function parseNLPInput(text: string): ParsedInput {
 			is_reminder: isReminder
 		}
 	};
+}
+
+/** Prüfreihenfolge wie bisher: Notiz, Ziel, Stimmung, Gesundheit, Einkauf, Termin, Routine, Aufgabe. */
+export function parseNLPInput(text: string): ParsedInput {
+	const trimmed = text.trim();
+	const lower = trimmed.toLowerCase();
+	return (
+		erkenneNotiz(trimmed) ??
+		erkenneZiel(trimmed) ??
+		erkenneStimmung(trimmed, lower) ??
+		erkenneGesundheit(trimmed, lower) ??
+		erkenneEinkauf(trimmed, lower) ??
+		erkenneTermin(trimmed, lower) ??
+		erkenneRoutine(lower) ??
+		erkenneAufgabe(trimmed, lower)
+	);
 }

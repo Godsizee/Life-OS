@@ -7,9 +7,8 @@
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
-	import { aktiveModule, istAktiv, nlpArtErlaubt } from '../module-aktiv.svelte.js';
-	import { parseNLPInput } from '#lib/core/nlp-parse.js';
-	import { dispatchNLP } from '#lib/features/dashboard/nlp-dispatch.js';
+	import { aktiveModule, istAktiv } from '../module-aktiv.svelte.js';
+	import { deute } from '../erfassen.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
@@ -50,28 +49,14 @@
 		}
 	];
 
-	// ── NLP-Aktion (Welle 5.8): Eingabe direkt ausführen ──────────────
-	const NLP_LABELS: Record<string, string> = {
-		task: 'Aufgabe',
-		shopping: 'Einkauf',
-		event: 'Termin',
-		health: 'Gesundheit',
-		habit: 'Routine',
-		note: 'Notiz',
-		goal: 'Ziel',
-		mood: 'Stimmung'
-	};
-	const nlpPreview = $derived.by(() => {
-		const p = query.trim() ? parseNLPInput(query.trim()) : null;
-		return p && nlpArtErlaubt(p.type) ? p : null;
-	});
+	// ── Erfassen: dieselbe Deutung wie im Erfassen-Blatt ──────────────
+	const deutung = $derived(query.trim() ? (deute(query.trim())[0] ?? null) : null);
 
 	async function runNLP() {
-		const text = query.trim();
-		if (!text) return;
+		const d = deutung;
+		if (!d) return;
 		try {
-			const label = await dispatchNLP(text, nlpArtErlaubt);
-			toastState.success(label ?? 'Erledigt');
+			toastState.success(await d.art.ausfuehren(d.vorschau));
 		} catch {
 			toastState.error('Eingabe fehlgeschlagen');
 		}
@@ -102,12 +87,12 @@
 		const out: Result[] = [];
 
 		// NLP-Aktion zuerst (bei nicht-leerer Eingabe)
-		if (nlpPreview) {
+		if (deutung) {
 			out.push({
 				type: 'action',
 				label: `Ausführen: „${query.trim()}"`,
 				icon: '⚡',
-				sub: `Erkannt: ${NLP_LABELS[nlpPreview.type] ?? 'Aufgabe'}`,
+				sub: `Erkannt: ${deutung.vorschau.art}`,
 				action: () => runNLP()
 			});
 		}
