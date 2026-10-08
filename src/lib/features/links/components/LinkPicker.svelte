@@ -55,7 +55,7 @@
 
 	<ul class="max-h-72 overflow-y-auto py-2">
 		{#each filtered as entity (entity.type + entity.id)}
-			{@const Meta = entityMeta[entity.type]}
+			{@const Meta = entityMeta(entity.type)}
 			{@const Icon = Meta.icon}
 			<li>
 				<button

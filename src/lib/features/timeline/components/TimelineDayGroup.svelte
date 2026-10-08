@@ -37,7 +37,19 @@
 				</div>
 
 				<div class="min-w-0 flex-1 space-y-1">
-					<h4 class="text-sm font-bold text-text-primary">{item.title}</h4>
+					<h4 class="text-sm font-bold text-text-primary">
+						{#if item.href}
+							<a href={item.href} class="hover:underline">{item.title}</a>
+						{:else}
+							{item.title}
+						{/if}
+						{#if item.herkunft?.startsWith('automation:')}
+							<span
+								class="ml-1 rounded bg-surface-2 px-1.5 py-0.5 align-middle text-[10px] font-bold text-text-secondary"
+								title="Von einer Regel geschrieben">AUTO</span
+							>
+						{/if}
+					</h4>
 					{#if item.description}
 						<p class="text-xs text-text-secondary">{item.description}</p>
 					{/if}

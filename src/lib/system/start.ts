@@ -3,6 +3,7 @@ import { aktionen } from '#lib/core/aktionen.js';
 import '#lib/core/geraet.svelte.js'; // registriert den Geräte-Speicher
 import { setzeRoutinenQuelle } from '#lib/core/nlp-parse.js';
 import { setzeEntladen } from '#lib/core/sitzung.js';
+import { verknuepfbar } from '#lib/core/verknuepfbar.js';
 import { starteAutomationen } from '#lib/features/automationen/laufzeit.svelte.js';
 import { habitsState } from '#lib/features/habits/store.svelte.js';
 import { starteErinnerungsReaktionen } from '#lib/features/reminders/reaktionen.js';
@@ -24,6 +25,12 @@ export function starteSystem(): void {
 	// Aktionen aller Manifeste in das Register von core/ — Automationen finden sie über ihre globale ID.
 	for (const m of MODULE) {
 		for (const [id, def] of Object.entries(m.aktionen ?? {})) aktionen.setze(id, def);
+	}
+	// Verknüpfbare Objekte: Abgeschaltete Module bieten nichts mehr an.
+	for (const m of MODULE) {
+		for (const def of m.verknuepfbar ?? []) {
+			verknuepfbar.setze(def.typ, { ...def, alle: () => (istAktiv(m.id) ? def.alle() : []) });
+		}
 	}
 	starteAutomationen({
 		modulAktiv: istAktiv,

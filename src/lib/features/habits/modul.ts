@@ -1,10 +1,12 @@
 import { defineModul } from '#lib/core/modul.js';
+import { routinenBeitraege } from './beitraege.js';
 import { routineErfassen } from './erfassen.js';
 import { habitsAktionen } from './aktionen.js';
 import { habitsState } from './store.svelte.js';
 
 export const habitsModul = defineModul({
 	id: 'habits',
+	...routinenBeitraege,
 	erfassen: [routineErfassen],
 	store: {
 		laden: (ws) => habitsState.load(ws),

@@ -22,7 +22,7 @@
 	import { modules } from '#lib/config/modules.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
 	import { istAktiv } from '#lib/system/module-aktiv.svelte.js';
-	import { downloadExport } from '#lib/features/profile/export.js';
+	import { downloadExport } from '#lib/system/export.js';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import SettingRow from '#lib/ui/SettingRow.svelte';

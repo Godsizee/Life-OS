@@ -1,10 +1,12 @@
 import { defineModul } from '#lib/core/modul.js';
+import { stimmungBeitraege } from './beitraege.js';
 import { stimmungErfassen } from './erfassen.js';
 import { checkinAnfrage } from './checkin-anfrage.svelte.js';
 import { moodState } from './store.svelte.js';
 
 export const moodModul = defineModul({
 	id: 'mood',
+	...stimmungBeitraege,
 	erfassen: [stimmungErfassen],
 	store: {
 		laden: () => moodState.load(),

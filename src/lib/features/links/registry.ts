@@ -1,12 +1,8 @@
-// Welle 5.1 — Auflösung von Entitäten für Universal-Links.
-// Liest die bereits geladenen Feature-Stores; keine eigene Persistenz.
-import { tasksState } from '#lib/features/tasks/store.svelte.js';
-import { notesState } from '#lib/features/notes/store.svelte.js';
-import { calendarState } from '#lib/features/calendar/store.svelte.js';
-import { goalsState } from '#lib/features/goals/store.svelte.js';
-import { habitsState } from '#lib/features/habits/store.svelte.js';
-import { fitnessState } from '#lib/features/fitness/store.svelte.js';
-import { CheckSquare, Notebook, Calendar, Target, Repeat, Dumbbell } from '@lucide/svelte';
+// Auflösung von Objekten für Universal-Links.
+// Liest nur das Register aus core/verknuepfbar (befüllt von system/start.ts aus den Manifesten) —
+// keine Feature-Stores.
+import { Link2 } from '@lucide/svelte';
+import { verknuepfbar } from '#lib/core/verknuepfbar.js';
 import type { IconKomponente } from '#lib/ui/icon.js';
 import type { LinkEntityType, LinkableEntity } from './types';
 
@@ -16,26 +12,18 @@ interface EntityMeta {
 	route: (id: string) => string;
 }
 
-export const entityMeta: Record<LinkEntityType, EntityMeta> = {
-	task: { label: 'Aufgabe', icon: CheckSquare, route: (id) => `/tasks?task=${id}` },
-	note: { label: 'Notiz', icon: Notebook, route: (id) => `/notes?note=${id}` },
-	event: { label: 'Termin', icon: Calendar, route: () => '/calendar' },
-	goal: { label: 'Ziel', icon: Target, route: (id) => `/goals/${id}` },
-	habit: { label: 'Routine', icon: Repeat, route: () => '/habits' },
-	workout_plan: { label: 'Trainingsplan', icon: Dumbbell, route: () => '/fitness' }
-};
+export function entityMeta(type: LinkEntityType): EntityMeta {
+	const def = verknuepfbar.hole(type);
+	if (!def) return { label: 'Objekt', icon: Link2, route: () => '/' };
+	return { label: def.label, icon: def.icon, route: def.href };
+}
 
 function allEntities(): LinkableEntity[] {
-	return [
-		...tasksState.tasks.map((t) => ({ type: 'task' as const, id: t.id, title: t.title })),
-		...notesState.notes.map((n) => ({ type: 'note' as const, id: n.id, title: n.title })),
-		...calendarState.events.map((e) => ({ type: 'event' as const, id: e.id, title: e.title })),
-		...goalsState.goals.map((g) => ({ type: 'goal' as const, id: g.id, title: g.title })),
-		...habitsState.habits
-			.filter((h) => !h.archived)
-			.map((h) => ({ type: 'habit' as const, id: h.id, title: h.name })),
-		...fitnessState.plans.map((p) => ({ type: 'workout_plan' as const, id: p.id, title: p.name }))
-	];
+	return verknuepfbar
+		.alle()
+		.flatMap((def) =>
+			def.alle().map((e) => ({ type: def.typ as LinkEntityType, id: e.id, title: e.titel }))
+		);
 }
 
 export function resolveEntity(type: LinkEntityType, id: string): LinkableEntity | null {

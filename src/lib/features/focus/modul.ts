@@ -1,9 +1,11 @@
 import { defineModul } from '#lib/core/modul.js';
+import { fokusBeitraege } from './beitraege.js';
 import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 import { focusSession } from './session.svelte.js';
 
 export const focusModul = defineModul({
 	id: 'focus',
+	...fokusBeitraege,
 	store: {
 		laden: () => timeTrackingState.load(),
 		neuLaden: () => timeTrackingState.reload(),

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { istVerworfen } from '#lib/features/tasks/status.js';
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
@@ -27,6 +28,17 @@
 	import Skeleton from '#lib/ui/Skeleton.svelte';
 
 	let createOpen = $state(false);
+
+	// Tiefer Link aus der Suche: /calendar?event=<id> öffnet den Termin zum Bearbeiten.
+	let bearbeiteterTermin = $state<string | null>(null);
+	let terminOffen = $state(false);
+	$effect(() => {
+		const id = page.url.searchParams.get('event');
+		if (!id || id === bearbeiteterTermin) return;
+		if (!calendarState.events.some((e) => e.id === id)) return;
+		bearbeiteterTermin = id;
+		terminOffen = true;
+	});
 	let managerOpen = $state(false);
 
 	let hiddenCalendarIds = $state<string[]>([]);
@@ -246,6 +258,17 @@
 <Sheet bind:open={createOpen} title="Neuer Termin">
 	{#snippet children()}
 		<div class="p-4"><EventForm onsubmitted={() => (createOpen = false)} /></div>
+	{/snippet}
+</Sheet>
+
+<Sheet bind:open={terminOffen} title="Termin">
+	{#snippet children()}
+		{@const termin = calendarState.events.find((e) => e.id === bearbeiteterTermin)}
+		{#if termin}
+			<div class="p-4">
+				<EventForm event={termin} onsubmitted={() => (terminOffen = false)} />
+			</div>
+		{/if}
 	{/snippet}
 </Sheet>
 

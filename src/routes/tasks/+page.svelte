@@ -46,14 +46,17 @@
 		if (saved && ['manual', 'due', 'priority', 'title'].includes(saved)) {
 			sortMode = saved as any;
 		}
+	});
 
+	// Tiefer Link aus der Suche: /tasks?task=<id> öffnet die Aufgabe, auch wenn /tasks schon offen ist.
+	let geoeffneteAufgabe: string | null = null;
+	$effect(() => {
 		const taskId = page.url.searchParams.get('task');
-		if (taskId) {
-			const task = tasksState.tasks.find((t) => t.id === taskId);
-			if (task) {
-				openDetail(task);
-			}
-		}
+		if (!taskId || taskId === geoeffneteAufgabe) return;
+		const task = tasksState.tasks.find((t) => t.id === taskId);
+		if (!task) return;
+		geoeffneteAufgabe = taskId;
+		openDetail(task);
 	});
 
 	function setSort(s: typeof sortMode) {

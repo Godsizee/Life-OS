@@ -41,7 +41,7 @@
 		<ul class="flex flex-col gap-1.5">
 			{#each linked as item (item.linkId)}
 				{#if item.entity}
-					{@const Meta = entityMeta[item.otherType]}
+					{@const Meta = entityMeta(item.otherType)}
 					{@const Icon = Meta.icon}
 					<li
 						class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"

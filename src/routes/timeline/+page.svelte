@@ -5,7 +5,9 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 
 	import { timelineState } from '#lib/features/timeline/store.svelte.js';
-	import { groupByDay } from '#lib/features/timeline/build.js';
+	import { alsAnzeige, groupByDay } from '#lib/features/timeline/build.js';
+	import { fromISODate } from '#lib/core/date.js';
+	import { sammleVerlauf } from '#lib/system/verlauf.js';
 	import { TIMELINE_MODULES } from '#lib/features/timeline/modules.js';
 	import TimelineDayGroup from '#lib/features/timeline/components/TimelineDayGroup.svelte';
 	import type { TimelineModule } from '#lib/features/timeline/module-ids.js';
@@ -19,10 +21,18 @@
 		visibleGroups = 20;
 	});
 
+	// Beiträge der eingeschalteten Module (system/verlauf.ts); die Seite fügt nur Fenster und Filter hinzu.
+	const items = $derived(
+		alsAnzeige(
+			sammleVerlauf(
+				fromISODate(timelineState.fenster.von) ?? new Date(0),
+				fromISODate(timelineState.fenster.bis) ?? new Date()
+			)
+		)
+	);
+
 	const filteredItems = $derived(
-		filterModule === 'all'
-			? timelineState.items
-			: timelineState.items.filter((i) => i.module === filterModule)
+		filterModule === 'all' ? items : items.filter((i) => i.module === filterModule)
 	);
 
 	const gruppen = $derived(groupByDay(filteredItems));
@@ -30,8 +40,8 @@
 	const hasMore = $derived(visibleGroups < gruppen.length);
 
 	function counts(mod: string) {
-		if (mod === 'all') return timelineState.items.length;
-		return timelineState.items.filter((i) => i.module === mod).length;
+		if (mod === 'all') return items.length;
+		return items.filter((i) => i.module === mod).length;
 	}
 </script>
 

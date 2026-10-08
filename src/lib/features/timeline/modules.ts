@@ -8,7 +8,6 @@ import {
 	Smile,
 	Target,
 	Zap,
-	CheckCircle,
 	BookOpen
 } from '@lucide/svelte';
 import type { IconKomponente } from '#lib/ui/icon.js';
@@ -56,13 +55,6 @@ export const TIMELINE_MODULES: TimelineModuleMeta[] = [
 		label: 'Ziele',
 		icon: Target,
 		color: 'text-indigo-500',
-		bg: 'bg-indigo-50 dark:bg-indigo-950/20'
-	},
-	{
-		id: 'checkins',
-		label: 'Check-Ins',
-		icon: CheckCircle,
-		color: 'text-indigo-400',
 		bg: 'bg-indigo-50 dark:bg-indigo-950/20'
 	},
 	{

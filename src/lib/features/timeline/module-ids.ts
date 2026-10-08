@@ -8,7 +8,6 @@ export const TIMELINE_MODULE_IDS = [
 	'fitness',
 	'calendar',
 	'focus',
-	'checkins',
 	'journal'
 ] as const;
 
