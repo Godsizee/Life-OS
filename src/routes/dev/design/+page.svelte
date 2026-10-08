@@ -10,6 +10,40 @@
 	import Sticker from '#lib/ui/Sticker.svelte';
 	import StatusBadge, { type Status } from '#lib/ui/StatusBadge.svelte';
 	import Widget from '#lib/ui/Widget.svelte';
+	import Alert from '#lib/ui/Alert.svelte';
+	import Anleitung from '#lib/ui/Anleitung.svelte';
+	import Aufklapper from '#lib/ui/Aufklapper.svelte';
+	import Badge from '#lib/ui/Badge.svelte';
+	import Balken from '#lib/ui/Balken.svelte';
+	import Band from '#lib/ui/Band.svelte';
+	import CheckCircle from '#lib/ui/CheckCircle.svelte';
+	import Chip from '#lib/ui/Chip.svelte';
+	import Field from '#lib/ui/Field.svelte';
+	import GrosseZahl from '#lib/ui/GrosseZahl.svelte';
+	import Haken from '#lib/ui/Haken.svelte';
+	import InfoTip from '#lib/ui/InfoTip.svelte';
+	import Input from '#lib/ui/Input.svelte';
+	import ListRow from '#lib/ui/ListRow.svelte';
+	import Menue from '#lib/ui/Menue.svelte';
+	import MenueEintrag from '#lib/ui/MenueEintrag.svelte';
+	import Modal from '#lib/ui/Modal.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Schritte from '#lib/ui/Schritte.svelte';
+	import SegmentedControl from '#lib/ui/SegmentedControl.svelte';
+	import Select from '#lib/ui/Select.svelte';
+	import SettingRow from '#lib/ui/SettingRow.svelte';
+	import Sheet from '#lib/ui/Sheet.svelte';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
+	import Spinner from '#lib/ui/Spinner.svelte';
+	import Stepper from '#lib/ui/Stepper.svelte';
+	import SwipeToDelete from '#lib/ui/SwipeToDelete.svelte';
+	import Switch from '#lib/ui/Switch.svelte';
+	import Tabs from '#lib/ui/Tabs.svelte';
+	import Tastenhinweis from '#lib/ui/Tastenhinweis.svelte';
+	import Textarea from '#lib/ui/Textarea.svelte';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
+	import Wortmarke from '#lib/ui/Wortmarke.svelte';
+	import { toastState } from '#lib/core/toast.svelte.js';
 
 	const meta = (id: ModulId) => modules.find((m) => m.id === id)!;
 
@@ -119,6 +153,17 @@
 	};
 	const STATUS: Status[] = ['offen', 'erledigt', 'uebersprungen', 'verworfen', 'pausiert', 'auto'];
 	let geklickt = $state(0);
+	let eingabe = $state('');
+	let auswahl = $state('a');
+	let schalterAn = $state(true);
+	let segment = $state<'tag' | 'woche' | 'monat'>('woche');
+	let chipAn = $state(true);
+	let haken = $state(false);
+	let zahl = $state(7.5);
+	let reiter = $state<'heute' | 'woche' | 'monat'>('heute');
+	let blattOffen = $state(false);
+	let panelOffen = $state(false);
+	let modalOffen = $state(false);
 </script>
 
 <svelte:head><title>Styleguide · Life OS</title></svelte:head>
@@ -318,6 +363,287 @@
 			<div class="flex flex-wrap items-center gap-3">
 				{#each STATUS as s (s)}<StatusBadge status={s} />{/each}
 			</div>
+		</div>
+	</section>
+
+	<!-- (c2) Alle übrigen Bausteine (T304) -->
+	<section class="flex flex-col gap-8" aria-labelledby="h-weitere">
+		<h2 id="h-weitere" class="text-2xl font-extrabold [font-stretch:85%]">Weitere Bausteine</h2>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">Formular · Input, Textarea, Select, Field</h3>
+			<div class="grid gap-4 md:grid-cols-2">
+				<Field label="Titel" hint="Kurz und klar.">
+					<Input placeholder="Aufgabe" bind:value={eingabe} />
+				</Field>
+				<Field label="Titel" error="Bitte gib einen Titel ein." id="demo-titel">
+					<Input invalid aria-describedby="demo-titel-error" value="" />
+				</Field>
+				<Field label="Gesperrt">
+					<Input disabled value="Nicht änderbar" />
+				</Field>
+				<Field label="Auswahl">
+					<Select bind:value={auswahl}>
+						<option value="a">Heute</option>
+						<option value="b">Diese Woche</option>
+					</Select>
+				</Field>
+				<div class="md:col-span-2">
+					<Field label="Notiz">
+						<Textarea rows={3} placeholder="Mehrzeilig" />
+					</Field>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">
+				Schalter · Switch, SegmentedControl, Chip, Haken, Stepper
+			</h3>
+			<Box>
+				<div class="flex flex-col gap-1 p-3">
+					<Switch
+						label="Erinnerungen"
+						description="Push, wenn etwas fällig wird"
+						bind:checked={schalterAn}
+					/>
+					<Switch label="Aus" checked={false} />
+					<Switch label="Gesperrt" checked disabled />
+				</div>
+			</Box>
+			<SegmentedControl
+				bind:value={segment}
+				label="Ansicht wählen"
+				options={[
+					{ value: 'tag', label: 'Tag' },
+					{ value: 'woche', label: 'Woche' },
+					{ value: 'monat', label: 'Monat' }
+				]}
+			/>
+			<div class="flex flex-wrap gap-2">
+				<Chip selected={chipAn} onclick={() => (chipAn = !chipAn)}>Alle</Chip>
+				<Chip>Heute</Chip>
+				<Chip selected>Überfällig</Chip>
+			</div>
+			<div class="flex flex-wrap items-center gap-4">
+				<Haken checked={haken} label="Beispiel erledigen" ontoggle={() => (haken = !haken)} />
+				<Haken checked label="Aufgabe" modul="tasks" />
+				<Haken checked label="Routine" modul="habits" />
+				<Haken label="Offen" />
+				<CheckCircle checked={haken} ontoggle={() => (haken = !haken)} />
+			</div>
+			<Stepper
+				value={zahl}
+				limits={{ min: 0, max: 20, step: 0.5 }}
+				suffix="Stunden"
+				label="Schlaf"
+				onchange={(n) => (zahl = n)}
+			/>
+		</div>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">
+				Listen · ListRow, SettingRow, SwipeToDelete, Aufklapper, Tabs
+			</h3>
+			<Box>
+				<div class="px-3">
+					<ListRow>
+						{#snippet leading()}<Haken modul="tasks" label="Steuer machen" />{/snippet}
+						Steuer machen
+						{#snippet trailing()}<StatusBadge status="offen" />{/snippet}
+					</ListRow>
+					<ListRow>
+						{#snippet leading()}<Haken checked modul="tasks" label="Wäsche aufhängen" />{/snippet}
+						Wäsche aufhängen
+						{#snippet trailing()}<StatusBadge status="erledigt" />{/snippet}
+					</ListRow>
+					<ListRow>
+						Letzte Zeile ohne Trennlinie
+						{#snippet trailing()}<Badge variant="success">3</Badge>{/snippet}
+					</ListRow>
+				</div>
+			</Box>
+			<Box>
+				<div class="divide-y-2 divide-tinte">
+					<SettingRow label="Wasserziel" hint="Wie viele Gläser du am Tag trinken möchtest.">
+						<Stepper
+							value={8}
+							limits={{ min: 1, max: 20, step: 1 }}
+							label="Gläser"
+							onchange={() => {}}
+						/>
+					</SettingRow>
+					<SettingRow label="Einheit">
+						<Badge>ml</Badge>
+					</SettingRow>
+				</div>
+			</Box>
+			<SwipeToDelete onDelete={() => toastState.info('Gelöscht (Beispiel)')}>
+				<Box
+					><p class="p-4">
+						Auf dem Handy nach links wischen. Die Taste unten bleibt der andere Weg.
+					</p></Box
+				>
+			</SwipeToDelete>
+			<Button variant="gefahr" size="sm" onclick={() => toastState.info('Gelöscht (Beispiel)')}
+				>Löschen</Button
+			>
+			<Aufklapper titel="Mehr Details">
+				<p>Nativ über <code class="font-mono">&lt;details&gt;</code>, per Tastatur bedienbar.</p>
+			</Aufklapper>
+			<Tabs
+				bind:value={reiter}
+				label="Beispielreiter"
+				tabs={[
+					{ id: 'heute', label: 'Heute' },
+					{ id: 'woche', label: 'Woche' },
+					{ id: 'monat', label: 'Monat' }
+				]}
+			>
+				{#snippet panel(id)}
+					<p>Inhalt des Reiters „{id}“. Pfeiltasten, Pos1 und Ende wechseln den Reiter.</p>
+				{/snippet}
+			</Tabs>
+		</div>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">
+				Rückmeldung · Alert, Toast, Skeleton, Spinner, Anleitung, Band
+			</h3>
+			<Alert variant="error"
+				>Das Speichern hat nicht geklappt. Prüfe die Verbindung und versuche es erneut.</Alert
+			>
+			<Alert variant="warning">Dein Plan übersteigt die freie Zeit um 75 Minuten.</Alert>
+			<Alert variant="info">Dieser Hinweis bleibt, bis du ihn schließt.</Alert>
+			<Alert variant="success">Gespeichert.</Alert>
+			<div class="flex flex-wrap gap-3">
+				<Button size="sm" variant="sekundaer" onclick={() => toastState.success('Gespeichert')}
+					>Toast: Erfolg</Button
+				>
+				<Button size="sm" variant="sekundaer" onclick={() => toastState.error('Das ging schief')}
+					>Toast: Fehler</Button
+				>
+				<Button size="sm" variant="sekundaer" onclick={() => toastState.info('Zur Info')}
+					>Toast: Info</Button
+				>
+			</div>
+			<div class="flex flex-col gap-2" aria-busy="true">
+				<Skeleton height="1.25rem" width="60%" />
+				<Skeleton height="1rem" />
+				<Skeleton height="1rem" width="80%" />
+			</div>
+			<div class="flex items-center gap-6">
+				<Spinner size={18} label="Lädt" />
+				<Spinner size={28} />
+			</div>
+			<Anleitung
+				icon={meta('tasks').icon}
+				titel="Noch keine Aufgaben"
+				was="Aufgaben halten fest, was zu tun ist. Plane sie für heute, gib eine Frist an oder lass sie im Eingang liegen."
+				beispiel={{ onclick: () => toastState.info('Beispiel angelegt') }}
+			>
+				{#snippet ersterSchritt()}<Button size="sm">Aufgabe anlegen</Button>{/snippet}
+			</Anleitung>
+			<Band variante="modus"
+				>Modus: Leiser Tag · bis 23:59 {#snippet aktion()}<Button size="sm" variant="ghost"
+						>Beenden</Button
+					>{/snippet}</Band
+			>
+			<Band variante="status">Offline — Änderungen werden auf diesem Gerät gesammelt (3).</Band>
+			<Band variante="update"
+				>Neue Version bereit {#snippet aktion()}<Button size="sm" variant="ghost">Laden</Button
+					>{/snippet}</Band
+			>
+		</div>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">
+				Überlagerungen · Sheet, Modal, Menü, InfoTip, WarumSticker
+			</h3>
+			<div class="flex flex-wrap items-center gap-3">
+				<Button size="sm" variant="sekundaer" onclick={() => (blattOffen = true)}
+					>Blatt öffnen</Button
+				>
+				<Button size="sm" variant="sekundaer" onclick={() => (panelOffen = true)}
+					>Panel öffnen</Button
+				>
+				<Button size="sm" variant="sekundaer" onclick={() => (modalOffen = true)}
+					>Modal öffnen</Button
+				>
+				<Menue label="Mehr zum Beispiel">
+					<MenueEintrag onclick={() => toastState.info('Bearbeiten')}>Bearbeiten</MenueEintrag>
+					<MenueEintrag onclick={() => toastState.info('Verschieben')}
+						>Auf morgen legen</MenueEintrag
+					>
+					<MenueEintrag gefahr onclick={() => toastState.info('Verwerfen')}>
+						<Trash2 size={16} /> Verwerfen
+					</MenueEintrag>
+				</Menue>
+				<span class="flex items-center gap-2"
+					>Life Score <InfoTip
+						kurz="Ein Tageswert aus deinen Bereichen. Er zählt nur, was an dem Tag vorkommt."
+						hilfeId="life-score"
+					/></span
+				>
+				<WarumSticker erklaerung={warum} kontext="Life Score" />
+			</div>
+			<Sheet bind:open={blattOffen} title="Beispiel-Blatt" variante="blatt">
+				<p class="p-4">
+					Von unten, 3-px-Rahmen oben, Griff, Abdunklung ohne Blur. Escape schließt.
+				</p>
+			</Sheet>
+			<Sheet bind:open={panelOffen} title="Beispiel-Panel" variante="panel">
+				<p class="p-4">
+					Fest rechts, ohne Abdunklung. Escape schließt, der Inhalt bleibt bedienbar.
+				</p>
+			</Sheet>
+			<Modal bind:open={modalOffen} label="Beispiel-Modal">
+				<div class="flex flex-col gap-3 p-4">
+					<h3 class="text-xl font-extrabold [font-stretch:85%]">Modal</h3>
+					<p>Zentriert ab 768 px, darunter von unten.</p>
+					<Button onclick={() => (modalOffen = false)}>Schließen</Button>
+				</div>
+			</Modal>
+		</div>
+
+		<div class="flex flex-col gap-3">
+			<h3 class="mono-label text-text-2">
+				Zahlen und Kopf · GrosseZahl, Balken, Schritte, Tastenhinweis, Wortmarke, PageHeader
+			</h3>
+			<div class="grid gap-4 md:grid-cols-2">
+				<Box
+					><div class="p-4">
+						<GrosseZahl wert={73} einheit="Punkte" vergleich="+4 ggü. letzter Woche" />
+					</div></Box
+				>
+				<Box>
+					<div class="flex flex-col gap-3 p-4">
+						<Balken wert={0} max={8} label="Wasser leer" modul="health" />
+						<Balken wert={5} max={8} label="Wasser heute" modul="health" />
+						<Balken wert={8} max={8} label="Wasser voll" modul="health" />
+					</div>
+				</Box>
+			</div>
+			<Schritte schritte={['Ziel', 'Module', 'Fertig']} aktuell={1} />
+			<p class="flex items-center gap-3">
+				Neu anlegen <Tastenhinweis taste="N" /> Suchen <Tastenhinweis taste="/" /> Hilfe <Tastenhinweis
+					taste="?"
+				/>
+			</p>
+			<div class="flex flex-wrap items-center gap-4">
+				<Wortmarke size="sm" /><Wortmarke /><Wortmarke size="lg" />
+			</div>
+			<Box>
+				<div class="p-4">
+					<PageHeader
+						title="Beispielseite"
+						subtitle="Mono-Untertitel"
+						onhilfe={() => toastState.info('Hilfe folgt mit T501')}
+					>
+						{#snippet band()}<Band variante="modus">Modus: Leiser Tag</Band>{/snippet}
+					</PageHeader>
+				</div>
+			</Box>
 		</div>
 	</section>
 

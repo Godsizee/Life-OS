@@ -41,7 +41,7 @@
 	}
 </script>
 
-<Sheet bind:open title="Schnell erfassen">
+<Sheet bind:open title="Schnell erfassen" variante="blatt">
 	<form onsubmit={submit} class="flex flex-col gap-3 px-4 pb-4">
 		<Input
 			bind:element={field}

@@ -3,8 +3,8 @@
 	// Fitness-/Mail-Apps). `touch-action: pan-y` überlässt vertikalen Scroll dem Browser
 	// und gibt uns nur die horizontale Achse — kein Konflikt mit dem Seiten-Scroll.
 	// Bewusst „aufdecken statt sofort löschen": Wischen enthüllt einen Tap-Ziel-Button,
-	// erst der Tap löscht (verhindert versehentliches Löschen). Der Papierkorb-Button
-	// im Inhalt bleibt zusätzlich erhalten — für Maus/Desktop ohne Wischgeste.
+	// erst der Tap löscht (verhindert versehentliches Löschen). Wischen ist nie der einzige
+	// Weg (WCAG 2.5.7): Der Papierkorb-Button im Inhalt bleibt zusätzlich erhalten.
 	import { Trash2 } from '@lucide/svelte';
 	import { haptic } from '#lib/core/haptics.js';
 
@@ -18,7 +18,7 @@
 		children: import('svelte').Snippet;
 	} = $props();
 
-	const ACTION_WIDTH = 76; // px — Breite der freigelegten Löschfläche
+	const ACTION_WIDTH = 88; // px — Breite der freigelegten Löschfläche
 	let offset = $state(0);
 	let dragging = $state(false);
 	let pastThreshold = false;
@@ -59,16 +59,17 @@
 </script>
 
 <!-- data-noswipe: eigene Wischgeste — der Tab-Wechsel-Swipe (use:swipe) soll hier nicht mitfeuern. -->
-<div data-noswipe class="relative overflow-hidden rounded-2xl">
+<div data-noswipe class="relative overflow-hidden rounded-lg">
 	<!-- Freigelegte Löschaktion -->
 	<div class="absolute inset-y-0 right-0 flex items-stretch" style="width: {ACTION_WIDTH}px;">
 		<button
 			onclick={confirmDelete}
 			aria-label={label}
 			tabindex={offset <= -ACTION_WIDTH / 2 ? 0 : -1}
-			class="flex w-full items-center justify-center bg-red-500 text-white active:bg-red-600"
+			class="mono-label flex w-full flex-col items-center justify-center gap-1 border-l-[length:var(--rahmen)] border-tinte bg-gefahr text-auf-gefahr"
 		>
 			<Trash2 size={18} />
+			Löschen
 		</button>
 	</div>
 
@@ -81,7 +82,7 @@
 		onpointercancel={onPointerUp}
 		style="transform: translateX({offset}px); touch-action: pan-y; transition: {dragging
 			? 'none'
-			: 'transform 0.2s ease'};"
+			: 'transform var(--dauer-basis) var(--kurve)'};"
 		class="relative"
 	>
 		{@render children()}

@@ -17,32 +17,33 @@
 
 	const icons = { error: XCircle, warning: AlertTriangle, info: Info, success: CheckCircle };
 
-	// Fehler und Warnungen unterbrechen den Screenreader, Hinweise nicht. Vorher
-	// trugen alle Meldungen dieselbe Rolle - oder gar keine.
+	// Fehler und Warnungen unterbrechen den Screenreader, Hinweise nicht.
 	const roles = { error: 'alert', warning: 'alert', info: 'status', success: 'status' } as const;
 
-	const styles = {
-		error:
-			'border-red-200 bg-red-50 text-red-700 dark:border-red-800/60 dark:bg-red-950/40 dark:text-red-300',
-		warning:
-			'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-300',
-		info: 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-blue-300',
-		success:
-			'border-primary-200 bg-primary-50 text-primary-800 dark:border-primary-800/60 dark:bg-primary-950/50 dark:text-primary-300'
+	// Das Kopfband trägt Farbe, Symbol und ein Wort: Die Art steht nie nur in der Farbe.
+	const baender = {
+		error: { text: 'Fehler', klasse: 'bg-gefahr text-auf-gefahr' },
+		warning: { text: 'Achtung', klasse: 'bg-mod-shopping text-auf-farbe' },
+		info: { text: 'Hinweis', klasse: 'bg-info text-auf-info' },
+		success: { text: 'Erledigt', klasse: 'bg-erfolg text-auf-erfolg' }
 	};
 
 	const Icon = $derived(icons[variant]);
+	const band = $derived(baender[variant]);
 </script>
 
 <div
 	role={roles[variant]}
 	transition:fly={{ y: -6, duration: motionDuration(DURATION.fast), easing: EASE_STANDARD }}
-	class="flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm leading-snug {styles[
-		variant
-	]}"
+	class="box text-sm leading-snug"
 >
-	<Icon size={16} class="mt-0.5 shrink-0" />
-	<div class="flex min-w-0 flex-1 flex-col gap-1.5">
+	<div
+		class="mono-label flex items-center gap-2 rounded-t-[calc(var(--kante-l)-var(--rahmen))] border-b-[length:var(--rahmen-s)] border-tinte px-3 py-1.5 {band.klasse}"
+	>
+		<Icon size={16} class="shrink-0" />
+		{band.text}
+	</div>
+	<div class="flex min-w-0 flex-col gap-1.5 px-3 py-2.5 text-tinte">
 		{@render children()}
 		{#if action}
 			{@render action()}

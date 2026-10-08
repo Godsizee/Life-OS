@@ -18,6 +18,7 @@
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { keyboardState } from '#lib/core/keyboard.svelte.js';
+	import { panel } from '#lib/core/panel.svelte.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 	import { loginUrlFor } from '#lib/features/auth/redirect.js';
 	import UntereLeiste from '#lib/system/components/UntereLeiste.svelte';
@@ -214,6 +215,7 @@
 		<div
 			class="pt-safe pl-safe pr-safe flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out
 			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
+			{panel.panelOffen ? 'xl:pr-[420px]' : ''}
 			{showNav && !keyboardState.open ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 		>
 			{#if syncBanner}

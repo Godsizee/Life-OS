@@ -13,7 +13,7 @@
 	}
 </script>
 
-<Sheet bind:open title="Alle Module">
+<Sheet bind:open title="Alle Module" variante="blatt">
 	<nav class="px-3 pb-4">
 		<!-- 4 Spalten ab 360px, darunter 3 – auf 320px waeren 4 Kacheln zu schmal
 		     fuer Icon plus lesbares Label. -->

@@ -330,6 +330,29 @@
 		rotate: none;
 		box-shadow: none;
 	}
+
+	/* Spinner: drei Quadrate, nacheinander gefüllt. Mit Beschriftung steht bei reduzierter
+     Bewegung stattdessen der Text „LÄDT …“ da. */
+	.spinner-quadrat {
+		animation: spinner-schritt 480ms linear infinite;
+	}
+	.spinner-statisch {
+		display: none;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.spinner-mit-label .spinner-quadrate {
+			display: none;
+		}
+		.spinner-statisch {
+			display: inline;
+		}
+	}
+	html[data-bewegung='reduziert'] .spinner-mit-label .spinner-quadrate {
+		display: none;
+	}
+	html[data-bewegung='reduziert'] .spinner-statisch {
+		display: inline;
+	}
 }
 
 @layer utilities {
@@ -495,6 +518,17 @@ html[data-bewegung='reduziert'] *::after {
 html[data-bewegung='reduziert'] ::view-transition-old(root),
 html[data-bewegung='reduziert'] ::view-transition-new(root) {
 	animation: none !important;
+}
+
+@keyframes spinner-schritt {
+	0%,
+	33.3% {
+		background-color: currentColor;
+	}
+	33.4%,
+	100% {
+		background-color: transparent;
+	}
 }
 
 @keyframes pulseSubtle {

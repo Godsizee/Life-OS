@@ -99,7 +99,7 @@
 	}
 </script>
 
-<Sheet bind:open title="Nicht gespeicherte Änderungen">
+<Sheet bind:open title="Nicht gespeicherte Änderungen" variante="blatt">
 	<div class="flex flex-col gap-4 px-4 pb-6">
 		{#if laedt}
 			<div class="flex justify-center py-8"><Spinner /></div>

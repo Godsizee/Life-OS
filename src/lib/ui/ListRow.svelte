@@ -16,8 +16,9 @@
 	} = $props();
 </script>
 
+<!-- Zeile mit Trennlinie unten, keine Box je Zeile; die letzte Zeile einer Liste braucht keine Linie. -->
 <div
-	class="flex min-h-12 gap-3 rounded-xl border border-border-color bg-surface-0 p-3 {align ===
+	class="flex min-h-[var(--ziel-min)] gap-3 border-b-[length:var(--rahmen-s)] border-tinte py-3 last:border-b-0 {align ===
 	'start'
 		? 'items-start'
 		: 'items-center'} {className}"

@@ -2,9 +2,8 @@
 	import type { Snippet } from 'svelte';
 	import type { ModulId } from '#lib/config/modules.js';
 	import type { Erklaerung as ErklaerungTyp } from '#lib/core/modul.js';
-	import Erklaerung from './Erklaerung.svelte';
 	import type { IconKomponente } from './icon.js';
-	import Sticker from './Sticker.svelte';
+	import WarumSticker from './WarumSticker.svelte';
 
 	let {
 		modul,
@@ -20,7 +19,7 @@
 		modul: ModulId;
 		titel: string;
 		icon?: IconKomponente;
-		/** Inhalt des `⋯`-Menüs im Kopf (Snippet mit der Menütaste). */
+		/** Inhalt des `⋯`-Menüs im Kopf (z. B. ein `Menue`). */
 		menue?: Snippet;
 		/** Woher die Zahlen kommen, z. B. „Kalender + Aufgaben“. */
 		quelle?: string;
@@ -32,7 +31,6 @@
 		children: Snippet;
 	} = $props();
 
-	let warumOffen = $state(false);
 	const id = $props.id();
 </script>
 
@@ -54,21 +52,9 @@
 				{#if quelle}<span>Quelle: {quelle}</span>{/if}
 				{#if stand}<span>Stand {stand}</span>{/if}
 				{#if warum}
-					<Sticker
-						onclick={() => (warumOffen = !warumOffen)}
-						label="Warum: {titel}"
-						expanded={warumOffen}
-						class="ml-auto"
-					>
-						Warum?
-					</Sticker>
+					<WarumSticker erklaerung={warum} kontext={titel} class="ml-auto" />
 				{/if}
 			</div>
-			{#if warum && warumOffen}
-				<div class="mt-3 border-t-[length:var(--rahmen-s)] border-tinte pt-3">
-					<Erklaerung erklaerung={warum} />
-				</div>
-			{/if}
 		</footer>
 	{/if}
 </section>

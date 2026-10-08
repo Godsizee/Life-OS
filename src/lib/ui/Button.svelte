@@ -39,7 +39,7 @@
 		primaer: 'druckbar border-tinte bg-signal text-auf-farbe',
 		sekundaer: 'druckbar border-tinte bg-flaeche text-tinte',
 		ghost:
-			'border-transparent text-tinte underline decoration-2 underline-offset-4 hover:bg-flaeche-2',
+			'border-transparent text-inherit underline decoration-2 underline-offset-4 hover:bg-flaeche-2',
 		gefahr: 'druckbar border-tinte bg-gefahr text-auf-gefahr'
 	};
 

@@ -14,7 +14,7 @@
 		/** Pflicht: Icon-Buttons haben keinen sichtbaren Text, brauchen also aria-label. */
 		label: string;
 		variant?: 'ghost' | 'surface' | 'primary' | 'danger';
-		/** sm bleibt optisch kleiner, behält aber 44px Trefferfläche über ein Pseudo-Element. */
+		/** sm bleibt optisch kleiner, behält aber eine große Trefferfläche über ein Pseudo-Element. */
 		size?: 'sm' | 'md';
 		type?: 'button' | 'submit';
 		disabled?: boolean;
@@ -24,15 +24,14 @@
 	} = $props();
 
 	const variants = {
-		ghost: 'text-text-tertiary hover:bg-surface-2 hover:text-text-primary',
-		surface: 'bg-surface-2 text-text-primary hover:bg-surface-3',
-		primary:
-			'bg-primary-700 text-white hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700',
-		danger: 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30'
+		ghost: 'border-transparent text-tinte hover:bg-flaeche-2',
+		surface: 'druckbar border-tinte bg-flaeche text-tinte',
+		primary: 'druckbar border-tinte bg-signal text-auf-farbe',
+		danger: 'border-transparent text-gefahr hover:bg-flaeche-2'
 	};
 
 	const sizes = {
-		sm: 'h-9 w-9 after:absolute after:inset-[-4px] after:content-[""]',
+		sm: 'h-9 w-9 after:absolute after:inset-[-6px] after:content-[""]',
 		md: 'h-11 w-11'
 	};
 </script>
@@ -42,7 +41,7 @@
 	{disabled}
 	{onclick}
 	aria-label={label}
-	class="relative flex shrink-0 items-center justify-center rounded-xl transition-transform active:scale-95 disabled:opacity-50 {variants[
+	class="relative flex shrink-0 items-center justify-center rounded-md border-2 disabled:pointer-events-none disabled:opacity-50 {variants[
 		variant
 	]} {sizes[size]} {className}"
 >

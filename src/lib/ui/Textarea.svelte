@@ -5,19 +5,25 @@
 		value = $bindable(''),
 		element = $bindable<HTMLTextAreaElement | null>(null),
 		surface = '0',
+		invalid = false,
 		class: className = '',
 		...rest
 	}: HTMLTextareaAttributes & {
 		value?: string;
 		element?: HTMLTextAreaElement | null;
+		/** '1' = Seitenfarbe als Grund, '0' = Fläche (Standard). */
 		surface?: '0' | '1';
+		invalid?: boolean;
 	} = $props();
 </script>
 
 <textarea
 	bind:this={element}
 	bind:value
-	class="min-h-12 w-full min-w-0 rounded-xl border border-border-color {surface === '1'
-		? 'bg-surface-1'
-		: 'bg-surface-0'} px-4 py-3 text-base text-text-primary transition-colors duration-200 placeholder:text-text-tertiary focus:border-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 {className}"
+	aria-invalid={invalid || undefined}
+	class="min-h-[var(--ziel-min)] w-full min-w-0 rounded-md border-[length:var(--rahmen-s)] {invalid
+		? 'border-gefahr'
+		: 'border-tinte'} {surface === '1'
+		? 'bg-seite'
+		: 'bg-flaeche'} px-4 py-3 text-base text-tinte placeholder:text-text-3 disabled:cursor-not-allowed disabled:opacity-60 {className}"
 	{...rest}></textarea>

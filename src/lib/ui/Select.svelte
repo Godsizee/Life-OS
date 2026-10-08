@@ -4,15 +4,19 @@
 
 	let {
 		value = $bindable(''),
+		invalid = false,
 		class: className = '',
 		children,
 		...rest
-	}: HTMLSelectAttributes & { value?: string; children?: Snippet } = $props();
+	}: HTMLSelectAttributes & { value?: string; invalid?: boolean; children?: Snippet } = $props();
 </script>
 
 <select
 	bind:value
-	class="min-h-12 w-full min-w-0 rounded-xl border border-border-color bg-surface-0 px-4 text-base text-text-primary transition-colors duration-200 focus:border-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 {className}"
+	aria-invalid={invalid || undefined}
+	class="min-h-[var(--ziel-min)] w-full min-w-0 rounded-md border-[length:var(--rahmen-s)] bg-flaeche px-4 text-base text-tinte disabled:cursor-not-allowed disabled:opacity-60 {invalid
+		? 'border-gefahr'
+		: 'border-tinte'} {className}"
 	{...rest}
 >
 	{@render children?.()}

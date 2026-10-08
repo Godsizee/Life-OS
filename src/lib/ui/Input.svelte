@@ -11,7 +11,7 @@
 		value?: string | number | null;
 		/** Zugriff aufs DOM-Element, z. B. um es zu fokussieren. */
 		element?: HTMLInputElement | null;
-		/** Rahmen rot + aria-invalid. Den Fehlertext rendert <Field error="…">. */
+		/** Rahmen in Gefahr-Farbe + aria-invalid. Den Fehlertext rendert <Field error="…">. */
 		invalid?: boolean;
 	} = $props();
 </script>
@@ -20,9 +20,7 @@
 	bind:this={element}
 	bind:value
 	aria-invalid={invalid || undefined}
-	class="min-h-12 w-full min-w-0 rounded-xl border bg-surface-0 px-4 text-base text-text-primary transition-colors duration-200 placeholder:text-text-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-60
-		{invalid
-		? 'border-red-500 focus:border-red-500'
-		: 'border-border-color focus:border-primary-500'} {className}"
+	class="min-h-[var(--ziel-min)] w-full min-w-0 rounded-md border-[length:var(--rahmen-s)] bg-flaeche px-4 text-base text-tinte placeholder:text-text-3 disabled:cursor-not-allowed disabled:opacity-60
+		{invalid ? 'border-gefahr' : 'border-tinte'} {className}"
 	{...rest}
 />

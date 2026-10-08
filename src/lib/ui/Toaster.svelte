@@ -12,21 +12,15 @@
 		warning: AlertTriangle
 	};
 
-	const colorMap = {
-		success:
-			'bg-primary-50 dark:bg-primary-950/60 border-primary-200 dark:border-primary-800 text-primary-800 dark:text-primary-300',
-		error:
-			'bg-red-50 dark:bg-red-950/60 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300',
-		info: 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300',
-		warning:
-			'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300'
-	};
+	// Fehler bekommen ein Kopfband in Gefahr-Farbe (mit Wort), die übrigen nur das Symbol.
+	const aktion =
+		'mono-label min-h-8 shrink-0 rounded-sm px-2 underline decoration-2 underline-offset-4 hover:bg-flaeche-2';
 </script>
 
 <div
 	aria-live="polite"
 	aria-atomic="false"
-	class="fixed right-4 bottom-20 z-50 flex flex-col gap-2 md:bottom-6"
+	class="fixed right-4 bottom-20 z-50 flex flex-col gap-3 md:bottom-6"
 >
 	{#each toastState.toasts as toast (toast.id)}
 		{@const Icon = iconMap[toast.type]}
@@ -34,49 +28,60 @@
 			role={toast.type === 'error' ? 'alert' : 'status'}
 			transition:fly={{ x: 24, duration: motionDuration(DURATION.base), easing: EASE_STANDARD }}
 			animate:flip={{ duration: motionDuration(DURATION.fast) }}
-			class="flex max-w-xs min-w-[220px] items-start gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm
-				   font-medium shadow-lg {colorMap[toast.type]}"
+			class="box max-w-xs min-w-[220px] bg-flaeche text-sm font-medium"
+			style="box-shadow: var(--schatten-s)"
 		>
-			<Icon size={16} class="mt-0.5 shrink-0" />
-			<span class="flex-1 leading-snug">
-				{toast.message}
-				{#if toast.count > 1}
-					<span
-						class="nums-tabular ml-1 rounded-full bg-black/10 px-1.5 py-0.5 text-xs dark:bg-white/15"
-					>
-						{toast.count}×
-					</span>
-				{/if}
-			</span>
-			{#if toast.action}
-				<button
-					onclick={() => {
-						toast.action?.run();
-						toastState.dismiss(toast.id);
-					}}
-					class="min-h-8 shrink-0 rounded-lg px-2 text-sm font-semibold underline underline-offset-2 hover:bg-black/5 dark:hover:bg-white/10"
+			{#if toast.type === 'error'}
+				<div
+					class="mono-label flex items-center gap-2 rounded-t-[calc(var(--kante-l)-var(--rahmen))] border-b-[length:var(--rahmen-s)] border-tinte bg-gefahr px-3 py-1 text-auf-gefahr"
 				>
-					{toast.action.label}
-				</button>
+					<XCircle size={14} /> Fehler
+				</div>
 			{/if}
-			{#if toast.zweiteAktion}
+			<div class="flex items-start gap-2.5 px-3 py-2.5">
+				{#if toast.type !== 'error'}<Icon size={16} class="mt-0.5 shrink-0" />{/if}
+				<span class="flex-1 leading-snug">
+					{toast.message}
+					{#if toast.count > 1}
+						<span class="nums-tabular mono-label ml-1 rounded-sm bg-flaeche-2 px-1.5 py-0.5">
+							{toast.count}×
+						</span>
+					{/if}
+				</span>
 				<button
-					onclick={() => {
-						toast.zweiteAktion?.run();
-						toastState.dismiss(toast.id);
-					}}
-					class="min-h-8 shrink-0 rounded-lg px-2 text-sm font-semibold underline underline-offset-2 hover:bg-black/5 dark:hover:bg-white/10"
+					onclick={() => toastState.dismiss(toast.id)}
+					aria-label="Meldung schließen"
+					class="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm hover:bg-flaeche-2"
 				>
-					{toast.zweiteAktion.label}
+					<X size={14} />
 				</button>
+			</div>
+			{#if toast.action || toast.zweiteAktion}
+				<div class="flex flex-wrap gap-1 px-2 pb-2">
+					{#if toast.action}
+						<button
+							onclick={() => {
+								toast.action?.run();
+								toastState.dismiss(toast.id);
+							}}
+							class={aktion}
+						>
+							{toast.action.label}
+						</button>
+					{/if}
+					{#if toast.zweiteAktion}
+						<button
+							onclick={() => {
+								toast.zweiteAktion?.run();
+								toastState.dismiss(toast.id);
+							}}
+							class={aktion}
+						>
+							{toast.zweiteAktion.label}
+						</button>
+					{/if}
+				</div>
 			{/if}
-			<button
-				onclick={() => toastState.dismiss(toast.id)}
-				aria-label="Meldung schließen"
-				class="shrink-0 opacity-50 transition-opacity hover:opacity-100"
-			>
-				<X size={14} />
-			</button>
 		</div>
 	{/each}
 </div>

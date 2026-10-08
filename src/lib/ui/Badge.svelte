@@ -9,18 +9,20 @@
 		children: Snippet;
 	} = $props();
 
+	// Kleines Etikett im Stil von Sticker/StatusBadge. Für Status mit festen Wörtern
+	// gibt es `StatusBadge`; dies hier trägt freien Text (Zähler, Namen).
 	const variants = {
-		neutral: 'bg-surface-2 text-text-secondary',
-		primary: 'bg-primary-active-bg text-primary-active',
-		accent: 'bg-accent-50 text-accent-700 dark:bg-accent-950/40 dark:text-accent-300',
-		success: 'bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300',
-		warning: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
-		danger: 'bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400'
+		neutral: 'bg-flaeche-2 text-tinte',
+		primary: 'bg-signal text-auf-farbe',
+		accent: 'bg-signal text-auf-farbe',
+		success: 'bg-erfolg text-auf-erfolg',
+		warning: 'bg-mod-shopping text-auf-farbe',
+		danger: 'bg-gefahr text-auf-gefahr'
 	};
 </script>
 
 <span
-	class="nums-tabular inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {variants[
+	class="mono-label nums-tabular inline-flex items-center rounded-sm border-[length:var(--rahmen-s)] border-tinte px-1.5 py-0.5 {variants[
 		variant
 	]}"
 >
