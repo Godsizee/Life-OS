@@ -109,7 +109,7 @@
 						onchange={(e) => {
 							displayNameInput = (e.currentTarget as HTMLInputElement).value;
 						}}
-						class="min-h-9 w-32 px-2"
+						class="min-h-9 w-32! px-2"
 					/>
 					<Button variant="secondary" onclick={() => profileState.setDisplayName(displayNameInput)}>
 						Speichern

@@ -68,7 +68,7 @@
 			type="button"
 			onclick={quickAdd}
 			aria-label="Schnell erfassen"
-			class="elevation-2 hero-gradient relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white transition-all active:scale-90"
+			class="elevation-2 hero-gradient relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full transition-all active:scale-90"
 		>
 			<Plus size={24} strokeWidth={2.5} />
 		</button>

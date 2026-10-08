@@ -274,7 +274,7 @@
 			</div>
 		{:else}
 			<div>
-				<div class="mb-4 flex items-center gap-2 text-sm text-text-secondary">
+				<div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
 					<span>Sortieren:</span>
 					<button
 						class="hover:text-text-primary {sortMode === 'manual'

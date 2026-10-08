@@ -287,7 +287,7 @@
 		{/each}
 	</div>
 
-	<div class="flex items-center gap-1">
+	<div class="flex flex-wrap items-center gap-1">
 		<button
 			onclick={zurueck}
 			class="flex h-10 w-10 items-center justify-center rounded-lg text-text-tertiary hover:bg-surface-2 hover:text-text-primary"
