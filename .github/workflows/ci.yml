@@ -22,5 +22,6 @@ jobs:
           VITE_SUPABASE_URL: https://example.invalid
           VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key-00000000000000
       # Plan: 232 KB (Basis 223,3 + 4 %). Nach T101 (supabase-js 2.117 u. a.) Ist 235,8 KB,
-      # deshalb 240. T802 senkt auf 180.
-      - run: node scripts/measure-bundle.mjs --budget-initial-kb 240
+      # deshalb 240. Nach P2 (T201 Manifeste/Bus, T204 Emitter, T205 Automationen) Ist 247,5 KB,
+      # deshalb 250. T802 senkt auf 180 (Code-Splitting der Manifeste, Sofortstart).
+      - run: node scripts/measure-bundle.mjs --budget-initial-kb 250
