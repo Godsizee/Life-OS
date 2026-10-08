@@ -20,7 +20,7 @@
 </script>
 
 <svelte:boundary onerror={(err) => console.error(`Error in ${title} card:`, err)}>
-	<Card shadow class="flex min-h-[220px] flex-col justify-between p-5">
+	<Card class="flex min-h-[220px] flex-col justify-between p-5">
 		<div>
 			<h3 class="mb-3 flex items-center gap-2 text-sm font-bold tracking-tight text-text-primary">
 				{#if Icon}<Icon size={16} />{/if}

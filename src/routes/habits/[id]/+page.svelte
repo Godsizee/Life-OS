@@ -163,7 +163,7 @@
 		</div>
 
 		<!-- Heatmap -->
-		<Card shadow class="p-4">
+		<Card class="p-4">
 			<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
 				<h3 class="text-sm font-semibold text-text-primary">Aktivität</h3>
 				<!-- Hinweis: VERLAUF_TAGE.habitLogs ist per default 400. Fuer 52W muessten wir >365 laden. -->

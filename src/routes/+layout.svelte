@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { goto, onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { dev } from '$app/env';
 	import { prefersReducedMotion } from '#lib/ui/motion.js';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
@@ -40,6 +41,8 @@
 	// Anmeldung und Onboarding bringen ihren eigenen Rahmen mit (AuthShell);
 	// Navigation waere dort nur Ablenkung von der einen offenen Aufgabe.
 	const chromelessPaths = [...publicPaths, '/onboarding'];
+	// Der Styleguide unter /dev/ läuft nur im Dev-Server und braucht weder Anmeldung noch Navigation.
+	const istDevPfad = (pfad: string) => dev && pfad.startsWith('/dev/');
 	let online = $state(true);
 	// Nur gesetzt, nachdem wir tatsaechlich eine Sitzung gesehen haben — sonst
 	// meldete ein direkter Aufruf einer geschuetzten URL ganz ohne Login
@@ -87,7 +90,7 @@
 
 	$effect(() => {
 		if (authState.loading) return;
-		const isPublic = publicPaths.includes(page.url.pathname);
+		const isPublic = publicPaths.includes(page.url.pathname) || istDevPfad(page.url.pathname);
 		if (!authState.session) {
 			// Ein Klick auf "Abmelden" setzt dieses Flag VOR signOut() — beide Faelle
 			// loesen denselben SIGNED_OUT-Event aus, aber nur der unerwartete soll
@@ -141,7 +144,9 @@
 		});
 	});
 
-	const showNav = $derived(!chromelessPaths.includes(page.url.pathname));
+	const showNav = $derived(
+		!chromelessPaths.includes(page.url.pathname) && !istDevPfad(page.url.pathname)
+	);
 	// F5 — /fitness bekommt mehr Breite (Desktop-Zwei-Spalten im Live-Workout),
 	// statt den mobilen Ein-Spalten-Fluss nur gestreckt breiter darzustellen.
 	const wideRoute = $derived(

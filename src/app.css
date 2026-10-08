@@ -322,10 +322,11 @@
 		background: var(--signal);
 		color: var(--auf-farbe);
 		box-shadow: var(--schatten-s);
-		transform: rotate(-3deg);
+		/* Eigene Eigenschaft statt transform: die Druck-Bewegung bleibt davon unberührt. */
+		rotate: -3deg;
 	}
 	html[data-sticker='aus'] .sticker {
-		transform: none;
+		rotate: none;
 		box-shadow: none;
 	}
 }
