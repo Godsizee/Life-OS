@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istVerworfen } from '#lib/features/tasks/status.js';
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
@@ -174,7 +175,7 @@
 			})),
 			...(layers.tasks
 				? tasksState.tasks
-						.filter((t) => t.due_at)
+						.filter((t) => t.due_at && !istVerworfen(t))
 						.map((t) => ({
 							id: t.id,
 							sourceId: t.id,

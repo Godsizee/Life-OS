@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt } from '#lib/features/tasks/status.js';
 	import type { Kennzahl } from '#lib/features/analytics/week-compare.js';
 	import type { Task } from '#lib/features/tasks/types.js';
 	import type { Goal, JournalEntry } from '#lib/features/goals/types.js';
@@ -46,11 +47,11 @@
 			<ul class="mt-2 flex flex-col gap-1.5">
 				{#each focusLetzteWoche as t (t.id)}
 					<li class="flex items-center gap-2 text-sm">
-						<span class={t.status === 'done' ? 'text-emerald-500' : 'text-text-tertiary'}>
-							{t.status === 'done' ? '✓' : '○'}
+						<span class={istErledigt(t) ? 'text-emerald-500' : 'text-text-tertiary'}>
+							{istErledigt(t) ? '✓' : '○'}
 						</span>
 						<span
-							class="min-w-0 flex-1 truncate {t.status === 'done'
+							class="min-w-0 flex-1 truncate {istErledigt(t)
 								? 'text-text-tertiary line-through'
 								: 'text-text-primary'}"
 						>
@@ -60,7 +61,7 @@
 				{/each}
 			</ul>
 			<p class="mt-2 text-xs text-text-secondary">
-				{focusLetzteWoche.filter((t) => t.status === 'done').length} von {focusLetzteWoche.length} geschafft.
+				{focusLetzteWoche.filter(istErledigt).length} von {focusLetzteWoche.length} geschafft.
 			</p>
 		</div>
 	{/if}

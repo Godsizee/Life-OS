@@ -13,6 +13,7 @@ import { getGoalProgress } from '#lib/features/goals/progress.js';
 import { fitnessFrequencyScore } from '#lib/features/fitness/utils/frequency.js';
 import { waterMl } from '#lib/features/health/stats.js';
 import { weightedTotal } from './score-math';
+import { istErledigt, istVerworfen } from '#lib/features/tasks/status.js';
 
 export interface ScoreBreakdown {
 	tasks: number;
@@ -37,9 +38,9 @@ export function computeLifeScore(dateStr: string): ScoreResult {
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
 		const isCompletedToday = !!t.completed_at && toISODate(new Date(t.completed_at)) === dateStr;
-		return isDue || isCompletedToday;
+		return !istVerworfen(t) && (isDue || isCompletedToday);
 	});
-	const completedTasks = todaysTasks.filter((t) => t.status === 'done');
+	const completedTasks = todaysTasks.filter(istErledigt);
 	const tasksScore =
 		todaysTasks.length > 0 ? (completedTasks.length / todaysTasks.length) * 100 : 100;
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt } from '#lib/features/tasks/status.js';
 	import type { Task, TaskStatus } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { buildTaskTree, subtaskProgress } from '../utils';
@@ -93,7 +94,7 @@
 											{/if}
 											<!-- wrap-break-word: ein langes Wort wuerde sonst aus der schmalen Spalte ragen. -->
 											<p
-												class="min-w-0 text-sm font-medium wrap-break-word {task.status === 'done'
+												class="min-w-0 text-sm font-medium wrap-break-word {istErledigt(task)
 													? 'text-text-tertiary line-through'
 													: 'text-text-primary'}"
 											>

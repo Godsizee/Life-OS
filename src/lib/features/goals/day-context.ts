@@ -11,6 +11,7 @@ import { isDueOn, isCompleted, isSkipped, type HabitCore } from '#lib/features/h
 import { toISODate } from '#lib/core/date.js';
 import { waterMl } from '#lib/features/health/stats.js';
 import type { DayContext } from './types';
+import { istErledigt, istVerworfen } from '#lib/features/tasks/status.js';
 
 export function buildDayContext(dateStr: string): DayContext {
 	const date = new Date(dateStr);
@@ -18,9 +19,9 @@ export function buildDayContext(dateStr: string): DayContext {
 	const todaysTasks = tasksState.tasks.filter((t) => {
 		const isDue = t.due_at?.startsWith(dateStr);
 		const isCompletedToday = !!t.completed_at && toISODate(new Date(t.completed_at)) === dateStr;
-		return isDue || isCompletedToday;
+		return !istVerworfen(t) && (isDue || isCompletedToday);
 	});
-	const tasksDone = todaysTasks.filter((t) => t.status === 'done').length;
+	const tasksDone = todaysTasks.filter(istErledigt).length;
 
 	const active = habitsState.habits.filter((h) => !h.archived);
 	const entryOf = (h: HabitCore & { id: string }, dStr: string) =>

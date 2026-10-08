@@ -1,10 +1,12 @@
 import { toISODate } from '#lib/core/date.js';
+import { istOffen } from '#lib/features/tasks/status.js';
+import type { TaskStatus } from '#lib/features/tasks/types.js';
 
 /** Was das App-Icon zählt. Die Einstellung `benachrichtigung.badge` folgt in T606. */
 export type BadgeModus = 'aus' | 'heute' | 'alles-faellig';
 
 interface BadgeAufgabe {
-	status: string;
+	status: TaskStatus;
 	due_at: string | null;
 }
 
@@ -16,7 +18,7 @@ export function badgeZahl(aufgaben: BadgeAufgabe[], heute: string, modus: BadgeM
 	if (modus === 'aus') return 0;
 	let n = 0;
 	for (const a of aufgaben) {
-		if (a.status === 'done' || !a.due_at) continue;
+		if (!istOffen(a) || !a.due_at) continue;
 		const tag = toISODate(new Date(a.due_at));
 		if (modus === 'heute' ? tag === heute : tag <= heute) n++;
 	}

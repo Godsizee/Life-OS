@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt, istOffen } from '#lib/features/tasks/status.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import type { Task } from '#lib/features/tasks/types.js';
 	import TaskForm from '#lib/features/tasks/components/TaskForm.svelte';
@@ -97,8 +98,8 @@
 		});
 	}
 
-	const openTasks = $derived(sortTasks(filtered.filter((t) => t.status !== 'done')));
-	const doneTasks = $derived(sortTasks(filtered.filter((t) => t.status === 'done')));
+	const openTasks = $derived(sortTasks(filtered.filter(istOffen)));
+	const doneTasks = $derived(sortTasks(filtered.filter(istErledigt)));
 
 	function openDetail(t: Task) {
 		detailTask = t;

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istOffen } from '#lib/features/tasks/status.js';
 	import { goto } from '$app/navigation';
 	import { toISODate, fromISODate } from '#lib/core/date.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
@@ -52,7 +53,7 @@
 
 	const focusLetzteWoche = $derived(tasksState.focusTasks);
 	const goalsInProgress = $derived(goalsState.goals.filter((g) => g.status !== 'done'));
-	const openTasks = $derived(tasksState.tasks.filter((t) => t.status !== 'done' && !t.parent_id));
+	const openTasks = $derived(tasksState.tasks.filter((t) => istOffen(t) && !t.parent_id));
 
 	const letzterReview = $derived(
 		[...goalsState.journalEntries]

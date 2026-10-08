@@ -9,6 +9,7 @@ import {
 	minutesOf,
 	pomodorosOnDate
 } from '#lib/features/timetracking/stats.js';
+import { istErledigt } from '#lib/features/tasks/status.js';
 
 /** Baut die Einträge im Fenster, absteigend nach Datum. Keine Store-Zugriffe. */
 export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineItem[] {
@@ -20,7 +21,7 @@ export function buildTimeline(q: TimelineQuellen, f: TimelineFenster): TimelineI
 
 	// 1. Completed Tasks
 	q.tasks.forEach((t) => {
-		if (t.status === 'done' && (t.completed_at || t.updated_at)) {
+		if (istErledigt(t) && (t.completed_at || t.updated_at)) {
 			const date = toISODate(new Date(t.completed_at ?? t.updated_at));
 			if (isInFenster(date)) {
 				items.push({

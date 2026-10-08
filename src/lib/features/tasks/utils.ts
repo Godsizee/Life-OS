@@ -1,6 +1,7 @@
 import type { Task } from './types';
 import { toISODate } from '#lib/core/date.js';
 import { weekKey } from '#lib/features/analytics/week-window.js';
+import { istErledigt, istOffen, istVerworfen } from '#lib/features/tasks/status.js';
 
 export interface TaskNode {
 	task: Task;
@@ -26,19 +27,20 @@ export function buildTaskTree(tasks: Task[]): TaskNode[] {
 }
 
 export function subtaskProgress(children: Task[]): { done: number; total: number } {
-	return { done: children.filter((c) => c.status === 'done').length, total: children.length };
+	const zaehlend = children.filter((c) => !istVerworfen(c));
+	return { done: zaehlend.filter(istErledigt).length, total: zaehlend.length };
 }
 
 /** Wurde die Aufgabe an diesem lokalen Kalendertag erledigt? */
 export function completedOn(task: Pick<Task, 'status' | 'completed_at'>, dateStr: string): boolean {
-	if (task.status !== 'done' || !task.completed_at) return false;
+	if (!istErledigt(task) || !task.completed_at) return false;
 	return toISODate(new Date(task.completed_at)) === dateStr;
 }
 
 /** Alle Aufgaben, die im Zeitraum [von, bis] erledigt wurden (lokale Kalendertage). */
 export function completedBetween(tasks: Task[], von: string, bis: string): Task[] {
 	return tasks.filter((t) => {
-		if (t.status !== 'done' || !t.completed_at) return false;
+		if (!istErledigt(t) || !t.completed_at) return false;
 		const d = toISODate(new Date(t.completed_at));
 		return d >= von && d <= bis;
 	});
@@ -64,7 +66,7 @@ export function smartViewFilter(tasks: Task[], view: SmartView, now: Date = new 
 		if (!t.due_at) return false;
 		const due = new Date(t.due_at);
 		// Erledigtes ist nie überfällig.
-		if (view === 'overdue') return t.status !== 'done' && due < startOfToday;
+		if (view === 'overdue') return istOffen(t) && due < startOfToday;
 		// "Heute" zeigt ab jetzt NUR den heutigen Tag — Überfälliges hat eine eigene Ansicht.
 		if (view === 'today') return due >= startOfToday && due <= endOfToday;
 		return due > endOfToday && due <= in7;

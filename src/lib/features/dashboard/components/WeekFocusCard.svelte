@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt } from '#lib/features/tasks/status.js';
 	// W10 — macht die im Weekly Review gewählten Top-3 sichtbar und abhakbar,
 	// statt sie im Tagebuch versanden zu lassen.
 	import { Check, Star } from '@lucide/svelte';
@@ -20,7 +21,7 @@
 			class="premium-shadow flex flex-col gap-2 rounded-2xl border border-primary-active/20 bg-primary-active-bg/50 p-4"
 		>
 			{#each focusTasks as task (task.id)}
-				{@const isDone = task.status === 'done'}
+				{@const isDone = istErledigt(task)}
 				<div class="flex items-center">
 					<!-- Der sichtbare Kreis bleibt 24px, das Antippfeld misst aber die
 					     geforderten 48px (negative Margins halten die Optik unveraendert). -->

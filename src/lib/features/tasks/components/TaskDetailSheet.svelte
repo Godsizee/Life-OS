@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt } from '#lib/features/tasks/status.js';
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
@@ -166,7 +167,7 @@
 	}
 
 	function toggleSubtask(sub: Task) {
-		tasksState.setStatus(sub.id, sub.status === 'done' ? 'todo' : 'done');
+		tasksState.setStatus(sub.id, istErledigt(sub) ? 'todo' : 'done');
 	}
 
 	async function del() {
@@ -273,9 +274,9 @@
 					<ul class="mb-2 flex flex-col gap-1">
 						{#each subtasks as sub (sub.id)}
 							<li class="flex items-center gap-2">
-								<CheckCircle checked={sub.status === 'done'} ontoggle={() => toggleSubtask(sub)} />
+								<CheckCircle checked={istErledigt(sub)} ontoggle={() => toggleSubtask(sub)} />
 								<span
-									class="text-sm {sub.status === 'done'
+									class="text-sm {istErledigt(sub)
 										? 'text-text-tertiary line-through'
 										: 'text-text-primary'}">{sub.title}</span
 								>

@@ -6,6 +6,7 @@ import { fitnessFrequencyScore } from '#lib/features/fitness/utils/frequency.js'
 import { goalsState } from './store.svelte';
 import { milestonePercent, sumCheckins, targetPercent } from './checkins';
 import type { Goal } from './types';
+import { istErledigt, istVerworfen } from '#lib/features/tasks/status.js';
 
 export function getGoalProgress(goal: Goal): number {
 	// PR-Ziel: Fortschritt live aus dem aktuellen geschätzten 1RM der Übung.
@@ -31,8 +32,8 @@ export function getGoalProgress(goal: Goal): number {
 	const children = goalsState.goals.filter((g) => g.parent_id === goal.id && !g.archived);
 	if (children.length > 0) return milestonePercent(children);
 
-	const linkedTasks = tasksState.tasks.filter((t) => t.goal_id === goal.id);
-	const linkedDone = linkedTasks.filter((t) => t.status === 'done');
+	const linkedTasks = tasksState.tasks.filter((t) => t.goal_id === goal.id && !istVerworfen(t));
+	const linkedDone = linkedTasks.filter(istErledigt);
 	const linkedHabits = habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived);
 
 	const items: number[] = [];

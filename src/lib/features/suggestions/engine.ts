@@ -15,6 +15,7 @@ import { shoppingState } from '#lib/features/shopping/store.svelte.js';
 import { waterMl } from '#lib/features/health/stats.js';
 import { profileState } from '#lib/features/profile/store.svelte.js';
 import { analyticsState } from '#lib/features/analytics/store.svelte.js';
+import { istOffen } from '#lib/features/tasks/status.js';
 
 export interface Suggestion {
 	id: string;
@@ -54,7 +55,7 @@ export function getSuggestions(): Suggestion[] {
 	const twoDaysAgo = new Date();
 	twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 	const overdueTasks = tasksState.tasks.filter((t) => {
-		if (t.status === 'done' || !t.due_at) return false;
+		if (!istOffen(t) || !t.due_at) return false;
 		const due = new Date(t.due_at);
 		return due < twoDaysAgo;
 	});

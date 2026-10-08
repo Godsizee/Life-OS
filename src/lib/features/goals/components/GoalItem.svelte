@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt, istVerworfen } from '#lib/features/tasks/status.js';
 	import { Archive } from '@lucide/svelte';
 	import type { Goal, GoalStatus } from '../types';
 	import { goalsState } from '../store.svelte';
@@ -19,8 +20,10 @@
 	};
 
 	// Tasks und Habits die diesem Ziel zugeordnet sind
-	const linkedTasks = $derived(tasksState.tasks.filter((t) => t.goal_id === goal.id));
-	const linkedDone = $derived(linkedTasks.filter((t) => t.status === 'done'));
+	const linkedTasks = $derived(
+		tasksState.tasks.filter((t) => t.goal_id === goal.id && !istVerworfen(t))
+	);
+	const linkedDone = $derived(linkedTasks.filter(istErledigt));
 	const linkedHabits = $derived(
 		habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived)
 	);
@@ -115,7 +118,7 @@
 								? 'bg-primary-100 text-primary-700 line-through dark:bg-primary-950/40 dark:text-primary-400'
 								: 'border border-border-color/30 bg-surface-2 text-text-secondary'}"
 						>
-							{task.status === 'done' ? '✓' : '○'}
+							{istErledigt(task) ? '✓' : '○'}
 							{task.title.length > 20 ? task.title.slice(0, 20) + '…' : task.title}
 						</span>
 					{/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt, istOffen } from '#lib/features/tasks/status.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
@@ -45,7 +46,7 @@
 		goal ? habitsState.habits.filter((h) => h.goal_id === goal.id && !h.archived) : []
 	);
 	const unlinkedTasks = $derived(
-		tasksState.tasks.filter((t) => t.status !== 'done' && t.goal_id !== goalId)
+		tasksState.tasks.filter((t) => istOffen(t) && t.goal_id !== goalId)
 	);
 	const unlinkedHabits = $derived(
 		habitsState.habits.filter((h) => !h.archived && h.goal_id !== goalId)
@@ -277,9 +278,9 @@
 						<li
 							class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
 						>
-							<span class="text-xs">{task.status === 'done' ? '✓' : '○'}</span>
+							<span class="text-xs">{istErledigt(task) ? '✓' : '○'}</span>
 							<span
-								class="min-w-0 flex-1 truncate text-sm text-text-primary {task.status === 'done'
+								class="min-w-0 flex-1 truncate text-sm text-text-primary {istErledigt(task)
 									? 'line-through opacity-60'
 									: ''}">{task.title}</span
 							>

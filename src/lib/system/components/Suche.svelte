@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istOffen } from '#lib/features/tasks/status.js';
 	import { goto } from '$app/navigation';
 	import Modal from '#lib/ui/Modal.svelte';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
@@ -127,7 +128,7 @@
 		}
 
 		// Tasks
-		for (const t of istAktiv('tasks') ? tasksState.tasks.filter((t) => t.status !== 'done') : []) {
+		for (const t of istAktiv('tasks') ? tasksState.tasks.filter(istOffen) : []) {
 			if (fuzzy(t.title, q)) {
 				out.push({
 					type: 'task',

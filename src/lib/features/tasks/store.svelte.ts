@@ -12,6 +12,7 @@ import { projectInputSchema, taskInputSchema, type TaskInput } from './schema';
 import type { Project, Task, TaskStatus } from './types';
 import { expandNextOccurrence } from './recurrence';
 import { emit } from '#lib/core/ereignisse.js';
+import { istOffen } from '#lib/features/tasks/status.js';
 
 class TasksState {
 	tasks = $state<Task[]>([]);
@@ -129,6 +130,9 @@ class TasksState {
 			status: 'todo',
 			priority: parsed.priority,
 			due_at: parsed.due_at,
+			planned_for: parsed.planned_for,
+			estimate_min: parsed.estimate_min,
+			scheduled_start: parsed.scheduled_start,
 			assignee_id: null,
 			rrule: parsed.rrule ?? null,
 			position: 0,
@@ -153,6 +157,7 @@ class TasksState {
 		this.tasks = this.tasks.map((t) =>
 			t.id === id ? { ...t, status, updated_at, completed_at } : t
 		);
+		if (status === 'dropped') emit('aufgabe.verworfen', { id, titel: task?.title ?? '' });
 		if (status === 'done') {
 			emit('aufgabe.erledigt', {
 				id,
@@ -192,6 +197,28 @@ class TasksState {
 				}
 			}
 		}
+	}
+
+	/** Aufgabe auf einen Tag legen (Absicht, nicht Frist). `null` nimmt sie wieder vom Tag. */
+	async planen(
+		id: string,
+		plan: {
+			planned_for: string | null;
+			estimate_min?: number | null;
+			scheduled_start?: string | null;
+		}
+	) {
+		const updated_at = new Date().toISOString();
+		const patch = {
+			planned_for: plan.planned_for,
+			// Ohne Tag gibt es keinen Zeitblock.
+			scheduled_start: plan.planned_for ? (plan.scheduled_start ?? null) : null,
+			...(plan.estimate_min !== undefined ? { estimate_min: plan.estimate_min } : {})
+		};
+		this.tasks = this.tasks.map((t) => (t.id === id ? { ...t, ...patch, updated_at } : t));
+		await outbox.runOrQueue('tasks', 'update', { id, ...patch, updated_at }, () =>
+			tasksApi.updateRaw({ id, ...patch, updated_at })
+		);
 	}
 
 	async updateTask(
@@ -281,7 +308,7 @@ class TasksState {
 		const task = this.tasks.find((t) => t.id === id);
 		if (!task) return;
 		const geschwister = this.tasks
-			.filter((t) => t.parent_id === task.parent_id && t.status !== 'done')
+			.filter((t) => t.parent_id === task.parent_id && istOffen(t))
 			.sort((a, b) => a.position - b.position || a.created_at.localeCompare(b.created_at));
 		const i = geschwister.findIndex((t) => t.id === id);
 		const j = i + richtung;

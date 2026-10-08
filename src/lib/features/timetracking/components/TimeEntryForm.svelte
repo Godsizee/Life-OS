@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istOffen } from '#lib/features/tasks/status.js';
 	// W6 — „Zeit nachtragen" (Toggl-Kern in der KISS-Variante).
 	// Kein Sheet-Wrapper: die Komponente wird inline (TaskDetailSheet) UND in einem
 	// Sheet (Fokus-Seite) verwendet — Sheets dürfen nicht verschachtelt werden.
@@ -35,7 +36,7 @@
 	let note = $state('');
 	let saving = $state(false);
 
-	const openTasks = $derived(tasksState.tasks.filter((t) => t.status !== 'done'));
+	const openTasks = $derived(tasksState.tasks.filter((t) => istOffen(t)));
 
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();

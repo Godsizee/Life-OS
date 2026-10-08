@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { TaskStatus } from '#lib/features/tasks/types.js';
 	import { goto } from '$app/navigation';
 	import {
 		Trash2,
@@ -52,7 +53,7 @@
 		allDay?: boolean;
 		location?: string | null;
 		rrule?: string | null;
-		status?: 'todo' | 'doing' | 'done';
+		status?: TaskStatus;
 		priority?: 'high' | 'medium' | 'low';
 		occurrenceDate?: string;
 	}

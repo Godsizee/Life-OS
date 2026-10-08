@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { istErledigt } from '#lib/features/tasks/status.js';
 	import { Trash2, Repeat, AlignLeft, Star } from '@lucide/svelte';
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
@@ -16,7 +17,7 @@
 	}: { task: Task; onopen?: (task: Task) => void; progress?: { done: number; total: number } } =
 		$props();
 
-	const isDone = $derived(task.status === 'done');
+	const isDone = $derived(istErledigt(task));
 	const isOverdue = $derived(!isDone && !!task.due_at && new Date(task.due_at) < new Date());
 	const isFocusWeek = $derived(task.focus_week === weekKey(new Date()));
 	const recurrenceLabel = $derived(formatRRule(task.rrule));

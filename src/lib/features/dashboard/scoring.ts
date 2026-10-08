@@ -1,5 +1,6 @@
 import type { Task } from '#lib/features/tasks/types.js';
 import { weekKey } from '#lib/features/analytics/week-window.js';
+import { istOffen } from '#lib/features/tasks/status.js';
 
 /** Prioritätgewichte */
 const PRIORITY_WEIGHT: Record<string, number> = {
@@ -48,6 +49,6 @@ export function scoreTask(task: Task, now: Date = new Date()): number {
 export function rankTasks(tasks: Task[]): Task[] {
 	const now = new Date();
 	return [...tasks]
-		.filter((t) => t.status !== 'done' && !t.parent_id)
+		.filter((t) => istOffen(t) && !t.parent_id)
 		.sort((a, b) => scoreTask(b, now) - scoreTask(a, now));
 }
