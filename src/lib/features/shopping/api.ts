@@ -1,6 +1,6 @@
 import { supabase } from '#lib/core/supabase.js';
 import { fetchAllPages } from '#lib/core/query.js';
-import type { ShoppingItem, WorkspaceSettings } from './types';
+import type { ShoppingItem } from './types';
 
 export async function listItems(workspaceId: string): Promise<ShoppingItem[]> {
 	return fetchAllPages<ShoppingItem>('shopping_items', (from, to) =>
@@ -47,25 +47,5 @@ export async function deleteChecked(workspaceId: string): Promise<void> {
 		.delete()
 		.eq('workspace_id', workspaceId)
 		.eq('checked', true);
-	if (error) throw error;
-}
-
-export async function getWorkspaceSettings(workspaceId: string): Promise<WorkspaceSettings> {
-	const { data, error } = await supabase
-		.from('workspace_settings')
-		.select('settings')
-		.eq('workspace_id', workspaceId)
-		.maybeSingle();
-	if (error) throw error;
-	return (data?.settings as WorkspaceSettings) ?? {};
-}
-
-export async function upsertWorkspaceSettings(
-	workspaceId: string,
-	settings: WorkspaceSettings
-): Promise<void> {
-	const { error } = await supabase
-		.from('workspace_settings')
-		.upsert({ workspace_id: workspaceId, settings, updated_at: new Date().toISOString() });
 	if (error) throw error;
 }

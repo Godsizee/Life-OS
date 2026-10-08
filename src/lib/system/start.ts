@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { aktionen } from '#lib/core/aktionen.js';
+import '#lib/core/geraet.svelte.js'; // registriert den Geräte-Speicher
 import { setzeRoutinenQuelle } from '#lib/core/nlp-parse.js';
 import { setzeEntladen } from '#lib/core/sitzung.js';
 import { starteAutomationen } from '#lib/features/automationen/laufzeit.svelte.js';

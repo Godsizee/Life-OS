@@ -40,6 +40,25 @@ export async function listMembers(workspaceId: string): Promise<WorkspaceMember[
 	}));
 }
 
+export async function getHaushaltSettings(workspaceId: string): Promise<Record<string, unknown>> {
+	const { data, error } = await supabase
+		.from('workspace_settings')
+		.select('settings')
+		.eq('workspace_id', workspaceId)
+		.maybeSingle();
+	if (error) throw error;
+	return (data?.settings as Record<string, unknown>) ?? {};
+}
+
+/** Serverseitig zusammenführen (Migration 036) — zwei Geräte überschreiben sich so nicht. */
+export async function mergeHaushaltSettings(
+	workspaceId: string,
+	patch: Record<string, unknown>
+): Promise<void> {
+	const { error } = await supabase.rpc('merge_workspace_settings', { ws: workspaceId, patch });
+	if (error) throw error;
+}
+
 /** Nur der Owner darf umbenennen (RLS-Policy "owners can update workspaces"). */
 export async function renameWorkspace(workspaceId: string, name: string): Promise<Workspace> {
 	const { data, error } = await supabase

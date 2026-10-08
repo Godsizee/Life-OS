@@ -5,6 +5,7 @@ import { emit } from '#lib/core/ereignisse.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import { loeschenMitUndo } from '#lib/core/undo.js';
+import { haushaltState } from '#lib/features/workspace/einstellungen.svelte.js';
 import * as shoppingApi from './api';
 import { shoppingItemInputSchema, type ShoppingItemInput } from './schema';
 import type { ShoppingItem, WorkspaceSettings } from './types';
@@ -15,19 +16,17 @@ import {
 	recordPurchase
 } from './categories';
 
-interface WorkspaceSettingsRow {
-	workspace_id: string;
-	settings: WorkspaceSettings;
-	updated_at: string;
-}
-
 class ShoppingState {
 	items = $state<ShoppingItem[]>([]);
-	settings = $state<WorkspaceSettings>({});
 	loading = $state(false);
 	loaded = $state(false);
 	private workspaceId: string | null = null;
 	private unsubs: (() => void)[] = [];
+
+	/** Haushalts-Einstellungen (geladen und synchronisiert von haushaltState). */
+	get settings(): WorkspaceSettings {
+		return haushaltState.settings as WorkspaceSettings;
+	}
 
 	/** Kategorie-Reihenfolge inkl. neu hinzugekommener Katalog-Kategorien. */
 	categoryOrder = $derived(
@@ -47,10 +46,7 @@ class ShoppingState {
 		this.workspaceId = workspaceId;
 		this.loading = true;
 		const ok = await ladeSicher('Einkaufsliste', async () => {
-			[this.items, this.settings] = await Promise.all([
-				shoppingApi.listItems(workspaceId),
-				shoppingApi.getWorkspaceSettings(workspaceId)
-			]);
+			this.items = await shoppingApi.listItems(workspaceId);
 		});
 		this.loading = false;
 
@@ -91,16 +87,6 @@ class ShoppingState {
 				}
 			})
 		);
-		this.unsubs.push(
-			subscribeToTable<WorkspaceSettingsRow>('workspace_settings', this.workspaceId, {
-				onInsert: (row) => {
-					this.settings = row.settings ?? {};
-				},
-				onUpdate: (row) => {
-					this.settings = row.settings ?? {};
-				}
-			})
-		);
 	}
 
 	/** Erneut vom Server laden — Abgleich nach Verbindungsabbruch (core/resync.ts). */
@@ -113,7 +99,6 @@ class ShoppingState {
 		this.unsubs.forEach((u) => u());
 		this.unsubs = [];
 		this.items = [];
-		this.settings = {};
 		this.loaded = false;
 		this.workspaceId = null;
 	}
@@ -154,11 +139,9 @@ class ShoppingState {
 		if (checked) emit('einkauf.abgehakt', { id, name: item.name });
 
 		if (checked && this.workspaceId) {
-			this.settings = {
-				...this.settings,
+			await haushaltState.setSettings({
 				shopping_stats: recordPurchase(this.settings.shopping_stats, { ...item, checked_at })
-			};
-			await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+			});
 		}
 
 		await outbox.runOrQueue(
@@ -179,15 +162,13 @@ class ShoppingState {
 
 		if (item && patch.category && patch.category !== item.category && this.workspaceId) {
 			// Wenn die Kategorie manuell korrigiert wurde, korrigieren wir auch die Statistik
-			this.settings = {
-				...this.settings,
+			await haushaltState.setSettings({
 				shopping_stats: recordPurchase(this.settings.shopping_stats, {
 					name: patch.name ?? item.name,
 					category: patch.category,
 					checked_at: item.checked_at
 				})
-			};
-			await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+			});
 		}
 
 		await outbox.runOrQueue('shopping_items', 'update', { id, ...patch, updated_at }, () =>
@@ -214,8 +195,7 @@ class ShoppingState {
 		} else {
 			staples = staples.filter((s) => s.name.toLowerCase() !== key);
 		}
-		this.settings = { ...this.settings, shopping_staples: staples };
-		await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+		await haushaltState.setSettings({ shopping_staples: staples });
 	}
 
 	async removeItem(id: string) {
@@ -248,14 +228,12 @@ class ShoppingState {
 
 	async setCategoryOrder(order: string[]) {
 		if (!this.workspaceId) return;
-		this.settings = { ...this.settings, shopping_category_order: order };
-		await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+		await haushaltState.setSettings({ shopping_category_order: order });
 	}
 
 	async setLists(lists: { id: string; name: string; icon: string }[]) {
 		if (!this.workspaceId) return;
-		this.settings = { ...this.settings, shopping_lists: lists };
-		await shoppingApi.upsertWorkspaceSettings(this.workspaceId, this.settings);
+		await haushaltState.setSettings({ shopping_lists: lists });
 	}
 }
 

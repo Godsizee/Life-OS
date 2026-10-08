@@ -4,10 +4,19 @@ import { automationenDienst } from '#lib/features/automationen/modul.js';
 import { linksState } from '#lib/features/links/store.svelte.js';
 import { profileState } from '#lib/features/profile/store.svelte.js';
 import { remindersState } from '#lib/features/reminders/store.svelte.js';
+import { haushaltState } from '#lib/features/workspace/einstellungen.svelte.js';
 
-/** Features ohne eigenen Nav-Eintrag. `haushalt` folgt in T202. */
+/** Features ohne eigenen Nav-Eintrag. */
 export const DIENSTE: { id: string; store: StoreLebenszyklus }[] = [
 	{ id: 'automationen', store: automationenDienst },
+	{
+		id: 'haushalt',
+		store: {
+			laden: (ws) => haushaltState.load(ws),
+			neuLaden: (ws) => haushaltState.reload(ws),
+			entladen: () => haushaltState.unload()
+		}
+	},
 	{
 		id: 'profile',
 		store: {

@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { defineEinstellung, registriereSpeicher, setze, wert } from './einstellungen';
+import {
+	defineEinstellung,
+	registriereSpeicher,
+	setze,
+	wert,
+	zuruecksetzen,
+	type EinstellungDef
+} from './einstellungen';
 import { erstelleRegister } from './register';
 
 const def = defineEinstellung({
@@ -31,6 +38,47 @@ describe('Einstellungs-Kern', () => {
 		await setze(def, '06:45');
 		expect(schreiben).toHaveBeenCalledWith({ 'heute.tagesbeginn': '06:45' });
 		await expect(setze(def, '6 Uhr')).rejects.toThrow();
+	});
+});
+
+describe('Einstellungs-Kern: Randfälle', () => {
+	const zahl = defineEinstellung({
+		schluessel: 'heute.limit',
+		ablage: 'nutzer',
+		schema: z.number().int().min(1).max(10),
+		standard: 5,
+		label: 'Limit',
+		stufe: 'modul',
+		abschnitt: 'heute',
+		ui: { art: 'zahl', min: 1, max: 10, schritt: 1 }
+	});
+
+	it('wert() liefert den Standard bei null und bei schemawidrigem Wert', () => {
+		const daten: Record<string, unknown> = { 'heute.limit': null };
+		registriereSpeicher('nutzer', { lesen: (k) => daten[k], schreiben: async () => {} });
+		expect(wert(zahl)).toBe(5);
+		daten['heute.limit'] = 'abc';
+		expect(wert(zahl)).toBe(5);
+		daten['heute.limit'] = 99;
+		expect(wert(zahl)).toBe(5);
+		daten['heute.limit'] = 7;
+		expect(wert(zahl)).toBe(7);
+	});
+
+	it('setze() schreibt bei ungültigem Wert nichts', async () => {
+		const schreiben = vi.fn(async () => {});
+		registriereSpeicher('nutzer', { lesen: () => undefined, schreiben });
+		await expect(setze(zahl, 0)).rejects.toThrow();
+		expect(schreiben).not.toHaveBeenCalled();
+	});
+
+	it('zuruecksetzen() schreibt alle Standards', async () => {
+		const schreiben = vi.fn(async () => {});
+		registriereSpeicher('nutzer', { lesen: () => undefined, schreiben });
+		registriereSpeicher('geraet', { lesen: () => undefined, schreiben });
+		await zuruecksetzen([zahl, def] as EinstellungDef<unknown>[]);
+		expect(schreiben).toHaveBeenCalledWith({ 'heute.limit': 5 });
+		expect(schreiben).toHaveBeenCalledWith({ 'heute.tagesbeginn': '08:00' });
 	});
 });
 
