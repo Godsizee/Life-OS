@@ -6,7 +6,9 @@
 
 	import ScoreRing from '#lib/features/analytics/components/ScoreRing.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import SuggestionCarousel from '#lib/features/suggestions/components/SuggestionCarousel.svelte';
+	import HinweisKarten from '#lib/system/components/HinweisKarten.svelte';
+	import { wert } from '#lib/core/einstellungen.js';
+	import { scoreAnzeigen } from '#lib/system/einstellungen/score.js';
 	import DailyBrief from '#lib/features/dashboard/components/DailyBrief.svelte';
 	import WelcomeModal from '#lib/features/dashboard/components/WelcomeModal.svelte';
 	import QuickAddBar from '#lib/features/dashboard/components/QuickAddBar.svelte';
@@ -96,7 +98,9 @@
 				class="transition-transform duration-300 hover:scale-105"
 				aria-label="Details zum Score"
 			>
-				<ScoreRing score={analyticsState.todayScore} size={90} />
+				{#if wert(scoreAnzeigen)}
+					<ScoreRing score={analyticsState.todayScore} size={90} />
+				{/if}
 			</a>
 		{/snippet}
 	</PageHeader>
@@ -104,7 +108,7 @@
 	<DailyBrief />
 	<FocusMiniCard />
 	<WorkoutMiniCard />
-	<SuggestionCarousel />
+	<HinweisKarten />
 	<StreakBanner />
 
 	{#if isReviewSeason && !goalsState.hatReviewDieseWoche}

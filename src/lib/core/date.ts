@@ -50,3 +50,10 @@ export function fromISODate(iso: string): Date | null {
 	const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
 	return Number.isNaN(d.getTime()) ? null : d;
 }
+
+/** Ist es an `jetzt` schon `hhmm` ("18:00") oder später? Ungültige Angaben gelten als erfüllt. */
+export function nachUhrzeit(jetzt: Date, hhmm: string): boolean {
+	const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+	if (!m) return true;
+	return jetzt.getHours() * 60 + jetzt.getMinutes() >= Number(m[1]) * 60 + Number(m[2]);
+}

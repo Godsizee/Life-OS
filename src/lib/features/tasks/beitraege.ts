@@ -1,15 +1,25 @@
 import { CheckSquare } from '@lucide/svelte';
 import { toISODate } from '#lib/core/date.js';
 import type { ModulManifest } from '#lib/core/modul.js';
+import { scoreBeitrag } from '#lib/core/score.js';
 import { sucheIn } from '#lib/core/suche.js';
+import { fristVerpasst } from './hinweise.js';
 import { istOffen } from './status.js';
 import { tasksState } from './store.svelte.js';
+import { aufgabenKontext, aufgabenScore } from './tag.js';
 import { aufgabenVerlauf } from './timeline.js';
 
-/** Suche, Verknüpfbarkeit, Verlauf und Export der Aufgaben (T207). */
+/** Suche, Verknüpfbarkeit, Verlauf, Export, Score, Hinweise und Tageskontext der Aufgaben. */
 export const aufgabenBeitraege: Pick<
 	ModulManifest,
-	'suche' | 'verknuepfbar' | 'timeline' | 'export'
+	| 'suche'
+	| 'verknuepfbar'
+	| 'timeline'
+	| 'export'
+	| 'score'
+	| 'hinweise'
+	| 'hinweisArten'
+	| 'tageskontext'
 > = {
 	suche: (anfrage) =>
 		sucheIn(
@@ -35,5 +45,16 @@ export const aufgabenBeitraege: Pick<
 		}
 	],
 	timeline: (von, bis) => aufgabenVerlauf(tasksState.tasks, toISODate(von), toISODate(bis)),
-	export: () => ({ tasks: tasksState.tasks, projects: tasksState.projects })
+	export: () => ({ tasks: tasksState.tasks, projects: tasksState.projects }),
+	score: scoreBeitrag('Aufgaben', (datum) => aufgabenScore(tasksState.tasks, datum)),
+	tageskontext: (datum) => aufgabenKontext(tasksState.tasks, datum),
+	hinweise: (jetzt) => fristVerpasst(tasksState.tasks, jetzt),
+	hinweisArten: [
+		{
+			art: 'tasks.frist-verpasst',
+			titel: 'Aufgaben sind länger über der Frist',
+			bedingung: 'Mindestens zwei offene Aufgaben liegen mehr als zwei Tage über ihrer Frist.',
+			standardAktiv: true
+		}
+	]
 };

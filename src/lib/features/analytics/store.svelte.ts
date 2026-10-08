@@ -1,7 +1,7 @@
 import { authState } from '#lib/core/auth.svelte.js';
 import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 import * as analyticsApi from './api';
-import { computeLifeScore } from './scoring';
+import { alsBreakdown, berechneScore } from '#lib/core/score.js';
 import { toISODate } from '#lib/core/date.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
 import { ladeSicher } from '#lib/core/store-load.js';
@@ -38,27 +38,20 @@ class AnalyticsState {
 	private workspaceId: string | null = null;
 	private unsubscribe: (() => void) | null = null;
 
-	todayScore = $derived.by((): number => {
-		const todayStr = toISODate(new Date());
-		const entry = this.scores.find((s) => s.date === todayStr);
-		if (entry) return entry.total;
-		// Fallback to client-side compute if not yet saved in state
+	/** Heutiger Score samt Zeilen nach den aktuellen Gewichten und Modulen (immer frisch gerechnet). */
+	todayErgebnis = $derived.by(() => {
 		try {
-			return computeLifeScore(todayStr).total;
-		} catch {
-			return 0;
-		}
-	});
-
-	todayBreakdown = $derived.by(() => {
-		const todayStr = toISODate(new Date());
-		const entry = this.scores.find((s) => s.date === todayStr);
-		if (entry) return entry.breakdown;
-		try {
-			return computeLifeScore(todayStr).breakdown;
+			return berechneScore(toISODate(new Date()));
 		} catch {
 			return null;
 		}
+	});
+
+	todayScore = $derived.by((): number => {
+		const live = this.todayErgebnis?.gesamt;
+		if (live !== null && live !== undefined) return live;
+		const todayStr = toISODate(new Date());
+		return this.scores.find((s) => s.date === todayStr)?.total ?? 0;
 	});
 
 	async load() {
@@ -125,20 +118,23 @@ class AnalyticsState {
 		const uId = authState.user?.id;
 		if (!wId || !uId) return;
 		const todayStr = toISODate(new Date());
-		const calculated = computeLifeScore(todayStr);
+		const berechnet = berechneScore(todayStr);
+		// Nichts zu bewerten (z. B. alle Bereiche ohne Daten): keine Null speichern, der Tag bleibt eine Lücke.
+		if (!berechnet || berechnet.gesamt === null) return;
+		const total = berechnet.gesamt;
+		const breakdown = alsBreakdown(berechnet);
 
-		// Check if we already have it in local state with the exact same values
+		// Unverändert (Gesamtwert und Aufschlüsselung): nichts zu schreiben.
 		const existing = this.scores.find((s) => s.date === todayStr);
-		if (existing && existing.total === calculated.total) return;
+		if (
+			existing &&
+			existing.total === total &&
+			JSON.stringify(existing.breakdown) === JSON.stringify(breakdown)
+		)
+			return;
 
 		try {
-			const saved = await analyticsApi.upsertScore(
-				wId,
-				uId,
-				todayStr,
-				calculated.total,
-				calculated.breakdown
-			);
+			const saved = await analyticsApi.upsertScore(wId, uId, todayStr, total, breakdown);
 			const idx = this.scores.findIndex((s) => s.date === todayStr);
 			if (idx >= 0) {
 				this.scores = this.scores.map((s) => (s.date === todayStr ? saved : s));
@@ -183,19 +179,21 @@ class AnalyticsState {
 			// sequenziell summierten sich sieben Latenzen auf.
 			const ergebnisse = await Promise.allSettled(
 				offen.map((iso) => {
-					const berechnet = computeLifeScore(iso);
-					return analyticsApi.upsertScore(wId, uId, iso, berechnet.total, berechnet.breakdown);
+					const berechnet = berechneScore(iso);
+					// Ohne Quelle oder ohne bewertbare Daten bleibt der Tag eine Lücke.
+					if (!berechnet || berechnet.gesamt === null) return Promise.resolve(null);
+					return analyticsApi.upsertScore(wId, uId, iso, berechnet.gesamt, alsBreakdown(berechnet));
 				})
 			);
 
 			const neue = ergebnisse
-				.filter((r) => r.status === 'fulfilled')
+				.filter((r) => r.status === 'fulfilled' && r.value !== null)
 				.map((r) => (r as PromiseFulfilledResult<analyticsApi.DBScoreEntry>).value);
 			if (neue.length > 0) {
 				this.scores = [...this.scores, ...neue].sort((a, b) => a.date.localeCompare(b.date));
 			}
 
-			const fehlgeschlagen = ergebnisse.length - neue.length;
+			const fehlgeschlagen = ergebnisse.filter((r) => r.status === 'rejected').length;
 			// Eine Meldung für alle, nicht eine pro Tag — und nicht nur in der Konsole.
 			if (fehlgeschlagen > 0) {
 				console.error('[Analytics] Backfill unvollständig', ergebnisse);

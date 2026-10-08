@@ -2,10 +2,10 @@
 	import Button from '#lib/ui/Button.svelte';
 	import Textarea from '#lib/ui/Textarea.svelte';
 	import { goalsState } from '../store.svelte';
-	import { buildDayContext } from '../day-context';
+	import { holeTageskontext } from '#lib/core/tageskontext.js';
 	import DayContextStrip from './DayContextStrip.svelte';
 	import AttachmentSection from '#lib/features/attachments/components/AttachmentSection.svelte';
-	import type { JournalKind } from '../types';
+	import type { DayContext, JournalKind } from '../types';
 
 	let {
 		date,
@@ -32,7 +32,7 @@
 	let saving = $state(false);
 
 	// Context existiert nur für 'daily'.
-	const context = $derived(kind === 'daily' ? buildDayContext(date) : null);
+	const context = $derived(kind === 'daily' ? holeTageskontext<DayContext>(date) : null);
 
 	$effect(() => {
 		const key = `${date}-${kind}`;

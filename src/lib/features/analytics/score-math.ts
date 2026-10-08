@@ -1,47 +1,4 @@
 import { toISODate } from '#lib/core/date.js';
-import type { ScoreBreakdown } from './scoring';
-
-export type ScoreKey = keyof ScoreBreakdown;
-
-/**
- * Gewichtung der acht Bereiche. Summe muss 1 ergeben — die Prüfung steht im Test.
- * DIE Quelle: Berechnung und Anzeige lesen beide hier.
- */
-export const SCORE_WEIGHTS: Record<ScoreKey, number> = {
-	tasks: 0.22,
-	habits: 0.22,
-	health: 0.13,
-	fitness: 0.1,
-	goals: 0.1,
-	journal: 0.1,
-	mood: 0.08,
-	focus: 0.05
-};
-
-export const SCORE_LABELS: Record<ScoreKey, string> = {
-	tasks: 'Aufgaben',
-	habits: 'Routinen',
-	health: 'Gesundheit',
-	fitness: 'Fitness',
-	goals: 'Ziele',
-	journal: 'Tagebuch',
-	mood: 'Stimmung',
-	focus: 'Fokus'
-};
-
-/** „22 %“ — für die Anzeige. */
-export function weightLabel(key: ScoreKey): string {
-	return `${Math.round(SCORE_WEIGHTS[key] * 100)} %`;
-}
-
-/** Gewichtete Summe eines Breakdowns. Ersetzt die handgeschriebene Formel. */
-export function weightedTotal(b: ScoreBreakdown): number {
-	let summe = 0;
-	for (const key of Object.keys(SCORE_WEIGHTS) as ScoreKey[]) {
-		summe += b[key] * SCORE_WEIGHTS[key];
-	}
-	return Math.round(summe);
-}
 
 export interface ScorePoint {
 	date: string;

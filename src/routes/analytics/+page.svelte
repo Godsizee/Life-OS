@@ -26,13 +26,8 @@
 	} from '@lucide/svelte';
 	import { APP_LOCALE } from '#lib/core/locale.js';
 	import { toISODate } from '#lib/core/date.js';
-	import {
-		SCORE_WEIGHTS,
-		SCORE_LABELS,
-		weightLabel,
-		scoreSeries,
-		type ScoreKey
-	} from '#lib/features/analytics/score-math.js';
+	import type { ModulId } from '#lib/config/modules.js';
+	import { scoreSeries } from '#lib/features/analytics/score-math.js';
 	import { toCsv } from '#lib/features/analytics/report.js';
 
 	let zeitraum = $state<30 | 90 | 365>(30);
@@ -60,18 +55,8 @@
 
 	const moodStatsEntries = $derived(filterSince(moodState.entries, zeitraum));
 
-	const breakdown = $derived(
-		analyticsState.todayBreakdown ?? {
-			tasks: 0,
-			habits: 0,
-			health: 0,
-			fitness: 0,
-			mood: 0,
-			goals: 0,
-			journal: 0,
-			focus: 0
-		}
-	);
+	// Heutige Zeilen nach den aktuellen Gewichten und Modulen; jede trägt ihre Erklärung.
+	const zeilen = $derived(analyticsState.todayErgebnis?.zeilen ?? []);
 
 	const yesterdayStr = $derived.by(() => {
 		const d = new Date();
@@ -84,17 +69,17 @@
 		return entry?.breakdown ?? null;
 	});
 
-	function trend(key: ScoreKey): 'up' | 'down' | 'flat' {
+	function trend(key: ModulId, today: number | null): 'up' | 'down' | 'flat' {
 		const yb = yesterdayBreakdown;
-		if (!yb) return 'flat';
-		const today = breakdown[key] ?? 0;
-		const yesterday = yb[key] ?? 0;
+		const yesterday = yb ? yb[key] : null;
+		if (today === null || typeof yesterday !== 'number') return 'flat';
 		if (today > yesterday + 3) return 'up';
 		if (today < yesterday - 3) return 'down';
 		return 'flat';
 	}
 
-	const KATEGORIE_STIL: Record<ScoreKey, { icon: typeof Target; color: string; bg: string }> = {
+	type Stil = { icon: typeof Target; color: string; bg: string };
+	const KATEGORIE_STIL: Partial<Record<ModulId, Stil>> = {
 		tasks: { icon: Target, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
 		habits: { icon: Repeat, color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-950/20' },
 		health: { icon: Heart, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-950/20' },
@@ -105,14 +90,23 @@
 		focus: { icon: Zap, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' }
 	};
 
+	const STANDARD_STIL: Stil = {
+		icon: Activity,
+		color: 'text-slate-500',
+		bg: 'bg-slate-50 dark:bg-slate-950/20'
+	};
+
 	const categories = $derived(
-		(Object.keys(SCORE_WEIGHTS) as ScoreKey[])
-			.sort((a, b) => SCORE_WEIGHTS[b] - SCORE_WEIGHTS[a])
-			.map((key) => ({
-				key,
-				name: SCORE_LABELS[key],
-				weight: weightLabel(key),
-				...KATEGORIE_STIL[key]
+		zeilen
+			.slice()
+			.sort((a, b) => b.gewicht - a.gewicht)
+			.map((z) => ({
+				key: z.modul,
+				name: z.label,
+				wert: z.wert,
+				erklaerung: z.erklaerung,
+				weight: z.anteil > 0 ? `${Math.round(z.anteil * 100)} %` : 'zählt nicht',
+				...(KATEGORIE_STIL[z.modul] ?? STANDARD_STIL)
 			}))
 	);
 
@@ -217,8 +211,8 @@
 		<div class="grid gap-4 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-4">
 			{#each categories as cat (cat.key)}
 				{@const Icon = cat.icon}
-				{@const val = breakdown[cat.key] ?? 0}
-				{@const t = trend(cat.key)}
+				{@const val = cat.wert === null ? null : Math.round(cat.wert)}
+				{@const t = trend(cat.key, cat.wert)}
 				<div class="glass-card premium-shadow flex items-center justify-between rounded-2xl p-4">
 					<div class="flex items-center gap-3">
 						<div class="flex h-10 w-10 items-center justify-center rounded-xl {cat.bg} {cat.color}">
@@ -230,7 +224,9 @@
 								<span class="text-[10px] text-text-tertiary">({cat.weight})</span>
 							</div>
 							<div class="flex items-center gap-1">
-								<span class="text-lg font-extrabold text-text-primary tabular-nums">{val}%</span>
+								<span class="text-lg font-extrabold text-text-primary tabular-nums"
+									>{val === null ? '–' : `${val}%`}</span
+								>
 								{#if t === 'up'}
 									<TrendingUp size={13} class="text-primary-500" />
 								{:else if t === 'down'}
@@ -239,6 +235,9 @@
 									<Minus size={13} class="text-text-faint" />
 								{/if}
 							</div>
+							<p class="mt-0.5 max-w-44 text-[10px] leading-snug text-text-tertiary">
+								{cat.erklaerung}
+							</p>
 						</div>
 					</div>
 
@@ -246,7 +245,7 @@
 					<div class="h-10 w-1 overflow-hidden rounded-full bg-surface-3">
 						<div
 							class="w-full rounded-full bg-primary-600 transition-all duration-1000"
-							style="height: {val}%"
+							style="height: {val ?? 0}%"
 						></div>
 					</div>
 				</div>

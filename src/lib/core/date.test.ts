@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDauer, formatTagKurz, formatUhr, toISODate } from './date';
+import { formatDauer, formatTagKurz, formatUhr, nachUhrzeit, toISODate } from './date';
 
 describe('toISODate', () => {
 	it('liefert das LOKALE Datum, nicht UTC', () => {
@@ -23,5 +23,16 @@ describe('Kurzformate für Vorschauen', () => {
 		expect(formatDauer(30)).toBe('30 min');
 		expect(formatDauer(60)).toBe('1 h');
 		expect(formatDauer(90)).toBe('1 h 30 min');
+	});
+});
+
+describe('nachUhrzeit', () => {
+	it('vergleicht lokale Uhrzeit mit hh:mm', () => {
+		expect(nachUhrzeit(new Date(2026, 9, 8, 17, 59), '18:00')).toBe(false);
+		expect(nachUhrzeit(new Date(2026, 9, 8, 18, 0), '18:00')).toBe(true);
+		expect(nachUhrzeit(new Date(2026, 9, 8, 9, 5), '9:05')).toBe(true);
+	});
+	it('ungültige Angabe gilt als erfüllt', () => {
+		expect(nachUhrzeit(new Date(2026, 9, 8, 1, 0), 'abends')).toBe(true);
 	});
 });
