@@ -13,7 +13,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="apple-mobile-web-app-title" content="Life OS" />
-		<meta id="theme-color-meta" name="theme-color" content="#F6F6F8" />
+		<meta id="theme-color-meta" name="theme-color" content="#FFF4E0" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
@@ -21,28 +21,62 @@
 		<link rel="manifest" href="/manifest.webmanifest" />
 
 		<script>
+			// Setzt Thema und Darstellungs-Attribute vor dem ersten Rendern (kein Aufblitzen).
+			// Quellen: Geräte-Einstellungen und die Kopie der Nutzer-Einstellungen
+			// (das Profil ist beim ersten Rendern noch nicht geladen). Jeder Zugriff darf scheitern.
 			(function () {
-				const stored = localStorage.getItem('theme');
-				const dark =
-					stored === 'dark' ||
-					(!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
-				if (dark) {
-					document.documentElement.classList.add('dark');
-				} else {
-					document.documentElement.classList.remove('dark');
+				var el = document.documentElement;
+				var lies = function (schluessel) {
+					try {
+						return JSON.parse(localStorage.getItem(schluessel) || '{}') || {};
+					} catch (e) {
+						return {};
+					}
+				};
+				var geraet = lies('lifeos:geraet:v1');
+				var spiegel = lies('lifeos:darstellung-spiegel');
+				var setze = function (name, wert) {
+					el.setAttribute('data-' + name, wert);
+				};
+
+				var thema = geraet['darstellung.thema'];
+				if (thema !== 'hell' && thema !== 'dunkel' && thema !== 'system') {
+					// Alt-Schlüssel aus der Zeit vor T301; themeState übernimmt ihn einmalig.
+					var alt = null;
+					try {
+						alt = localStorage.getItem('theme');
+					} catch (e) {}
+					thema = alt === 'dark' ? 'dunkel' : alt === 'light' ? 'hell' : 'system';
 				}
-				// Status-Bar-Farbe passend zum Theme setzen, damit die installierte App
-				// nahtlos wirkt (kein weißer Balken im Dark Mode).
+				var dunkel = thema === 'dunkel';
+				if (thema === 'system') {
+					try {
+						dunkel = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					} catch (e) {}
+				}
+				el.classList.toggle('dark', dunkel);
+
+				if (geraet['darstellung.dichte'] === 'kompakt') setze('dichte', 'kompakt');
+				var schrift = String(geraet['darstellung.schrift']);
+				if (schrift === '112' || schrift === '125') setze('schrift', schrift);
+				if (geraet['darstellung.bewegung'] === 'reduziert') setze('bewegung', 'reduziert');
+				if (geraet['darstellung.kanten'] === 'eckig') setze('kanten', 'eckig');
+				if (geraet['darstellung.muster'] === false) setze('muster', 'aus');
+
+				var signal = spiegel['darstellung.signal'];
+				if (signal === 'limette' || signal === 'orange' || signal === 'pink' || signal === 'blau')
+					setze('signal', signal);
+				if (spiegel['darstellung.farbintensitaet'] === 'gedaempft') setze('farben', 'gedaempft');
+				if (spiegel['darstellung.sticker'] === false) setze('sticker', 'aus');
+
+				// Status-Bar-Farbe passend zum Thema, damit die installierte App nahtlos wirkt.
 				var meta = document.getElementById('theme-color-meta');
-				if (meta) meta.setAttribute('content', dark ? '#0E0E12' : '#F6F6F8');
+				if (meta) meta.setAttribute('content', dunkel ? '#141414' : '#FFF4E0');
 			})();
 		</script>
 		%sveltekit.head%
 	</head>
-	<body
-		data-sveltekit-preload-data="hover"
-		class="bg-[var(--surface-1)] text-[var(--text-primary)] antialiased transition-colors duration-300"
-	>
+	<body data-sveltekit-preload-data="hover" class="bg-seite text-tinte antialiased">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

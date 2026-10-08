@@ -201,9 +201,7 @@
 {#if authState.loading}
 	<AuthSplash />
 {:else}
-	<div
-		class="flex min-h-dvh bg-[var(--surface-1)] text-[var(--text-primary)] transition-colors duration-300"
-	>
+	<div class="flex min-h-dvh bg-seite text-tinte">
 		{#if showNav}
 			<Seitenleiste currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 		{/if}

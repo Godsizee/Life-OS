@@ -23,7 +23,7 @@
 
 <div class="relative flex items-center justify-center" style="width: {size}px; height: {size}px;">
 	<svg class="-rotate-90" width={size} height={size} viewBox="0 0 144 144" aria-hidden="true">
-		<circle cx="72" cy="72" r={RADIUS} fill="none" stroke="var(--border-color)" stroke-width="8" />
+		<circle cx="72" cy="72" r={RADIUS} fill="none" stroke="var(--flaeche-2)" stroke-width="8" />
 		<circle
 			cx="72"
 			cy="72"

@@ -4,18 +4,37 @@
 
 /* Lokal gebuendelt statt ueber ein CDN geladen: kein Drittanbieter-Request beim
    Seitenaufruf, damit keine Nutzer-IP an Dritte abfliesst (DSGVO).
-   Lizenz: SIL OFL 1.1 — siehe LICENSE-plus-jakarta-sans.txt im selben Ordner. */
+   Lizenz: SIL OFL 1.1 — siehe LICENSE-*.txt im selben Ordner. Die Bricolage-Datei
+   hat die Achsen wdth + wght (ohne opsz), damit beide Schriften zusammen unter 160 KB bleiben. */
 @font-face {
-	font-family: 'Plus Jakarta Sans';
+	font-family: 'Bricolage Grotesque';
 	font-style: normal;
 	font-weight: 200 800;
+	font-stretch: 75% 100%;
 	font-display: swap;
-	src: url('./lib/assets/fonts/plus-jakarta-sans-variable.woff2') format('woff2-variations');
+	src: url('./lib/assets/fonts/bricolage-grotesque-latin.woff2') format('woff2');
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+		U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	font-style: normal;
+	font-weight: 100 800;
+	font-display: swap;
+	src: url('./lib/assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+		U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @theme {
 	--breakpoint-xs: 360px;
 	--breakpoint-md: 768px;
+
+	--font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
 
 	/* Fluide Typo-Skala. --text-base bleibt bewusst fix bei 1rem: faellt die
      Schriftgroesse eines Eingabefelds unter 16px, zoomt iOS beim Fokussieren
@@ -23,88 +42,195 @@
 	--text-base: 1rem;
 	--text-lg: clamp(1.0625rem, 1.02rem + 0.25vw, 1.125rem);
 	--text-xl: clamp(1.1875rem, 1.12rem + 0.35vw, 1.375rem);
-	--text-2xl: clamp(1.375rem, 1.26rem + 0.55vw, 1.75rem);
-	--text-3xl: clamp(1.75rem, 1.55rem + 0.9vw, 2.25rem);
+	--text-2xl: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+	--text-3xl: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+	--text-display: clamp(2.5rem, 2rem + 3vw, 4rem);
 
-	/* Semantic Theme-Farben */
-	--color-surface-0: var(--surface-0);
-	--color-surface-1: var(--surface-1);
-	--color-surface-2: var(--surface-2);
-	--color-surface-3: var(--surface-3);
-	--color-text-primary: var(--text-primary);
-	--color-text-secondary: var(--text-secondary);
-	--color-text-tertiary: var(--text-tertiary);
-	--color-border-color: var(--border-color);
-	--color-primary-active: var(--primary-active);
-	--color-primary-active-bg: var(--primary-active-bg);
+	/* Radien folgen den Kanten-Tokens: die Einstellung „eckig“ macht alles hart. */
+	--radius-xs: var(--kante-s);
+	--radius-sm: var(--kante-s);
+	--radius-md: var(--kante-m);
+	--radius-lg: var(--kante-m);
+	--radius-xl: var(--kante-m);
+	--radius-2xl: var(--kante-l);
+	--radius-3xl: var(--kante-l);
+	--radius-control: var(--kante-m);
+	--radius-card: var(--kante-l);
 
-	--radius-control: 0.75rem;
-	--radius-card: 1rem;
+	/* Semantische Farben → bg-seite, bg-flaeche, text-tinte, border-tinte, bg-mod-tasks … */
+	--color-seite: var(--seite);
+	--color-flaeche: var(--flaeche);
+	--color-flaeche-2: var(--flaeche-2);
+	--color-tinte: var(--tinte);
+	--color-text-2: var(--text-2);
+	--color-text-3: var(--text-3);
+	--color-auf-farbe: var(--auf-farbe);
+	--color-signal: var(--signal);
+	--color-gefahr: var(--gefahr);
+	--color-auf-gefahr: var(--auf-gefahr);
+	--color-erfolg: var(--erfolg);
+	--color-auf-erfolg: var(--auf-erfolg);
+	--color-info: var(--info);
+	--color-auf-info: var(--auf-info);
+	--color-mod-dashboard: var(--mod-dashboard);
+	--color-mod-tasks: var(--mod-tasks);
+	--color-mod-notes: var(--mod-notes);
+	--color-mod-habits: var(--mod-habits);
+	--color-mod-calendar: var(--mod-calendar);
+	--color-mod-shopping: var(--mod-shopping);
+	--color-mod-goals: var(--mod-goals);
+	--color-mod-journal: var(--mod-journal);
+	--color-mod-focus: var(--mod-focus);
+	--color-mod-review: var(--mod-review);
+	--color-mod-mood: var(--mod-mood);
+	--color-mod-health: var(--mod-health);
+	--color-mod-fitness: var(--mod-fitness);
+	--color-mod-analytics: var(--mod-analytics);
+	--color-mod-timeline: var(--mod-timeline);
 
-	/* ── Soft Depth: Indigo-Primärfarbe ──────────────────────────── */
-	--color-primary-50: #eef2ff;
-	--color-primary-100: #e0e7ff;
-	--color-primary-200: #c7d2fe;
-	--color-primary-300: #a5b4fc;
-	--color-primary-400: #818cf8;
-	--color-primary-500: #6366f1;
-	--color-primary-600: #4f46e5;
-	--color-primary-700: #4338ca;
-	--color-primary-800: #3730a3;
-	--color-primary-900: #312e81;
-	--color-primary-950: #1e1b4b;
+	/* ── Alt-Namen (bis P7 die Module umgestellt sind) ─────────────── */
+	--color-surface-0: var(--flaeche);
+	--color-surface-1: var(--seite);
+	--color-surface-2: var(--flaeche-2);
+	--color-surface-3: var(--flaeche-2);
+	--color-text-primary: var(--tinte);
+	--color-text-secondary: var(--text-2);
+	--color-text-tertiary: var(--text-3);
+	--color-border-color: var(--tinte);
+	--color-primary-active: var(--tinte);
+	--color-primary-active-bg: var(--signal);
 
-	/* ── Soft Depth: Rose-Akzentfarbe ────────────────────────────── */
-	--color-accent-50: #fff1f2;
-	--color-accent-100: #ffe4e6;
-	--color-accent-200: #fecdd3;
-	--color-accent-300: #fda4af;
-	--color-accent-400: #fb7185;
-	--color-accent-500: #f43f5e;
-	--color-accent-600: #e11d48;
-	--color-accent-700: #be123c;
-	--color-accent-800: #9f1239;
-	--color-accent-900: #881337;
-	--color-accent-950: #4c0519;
+	/* primary → warme Tinten-Graustufen: bg-primary-600 + text-white bleibt kontrastreich */
+	--color-primary-50: #f7f3ea;
+	--color-primary-100: #ede7da;
+	--color-primary-200: #dcd4c3;
+	--color-primary-300: #c2b9a6;
+	--color-primary-400: #a39a88;
+	--color-primary-500: #6b6456;
+	--color-primary-600: #2e2a24;
+	--color-primary-700: #1f1c18;
+	--color-primary-800: #151310;
+	--color-primary-900: #0e0d0b;
+	--color-primary-950: #0b0b0b;
+
+	/* accent → Signal-Töne */
+	--color-accent-50: #fffbe0;
+	--color-accent-100: #fff5b8;
+	--color-accent-200: #ffec85;
+	--color-accent-300: #ffe352;
+	--color-accent-400: #ffda24;
+	--color-accent-500: #ffd60a;
+	--color-accent-600: #e6bf00;
+	--color-accent-700: #b39400;
+	--color-accent-800: #806a00;
+	--color-accent-900: #4d4000;
+	--color-accent-950: #262000;
 }
 
 @layer base {
 	:root {
-		--surface-0: #ffffff;
-		--surface-1: #f6f6f8;
-		--surface-2: #ececf1;
-		--surface-3: #e2e2ea;
-		--text-primary: #111114;
-		--text-secondary: #55555f;
-		--text-tertiary: #8e8e99;
-		--border-color: #e7e7ec;
-		--accent-glow: rgba(99, 102, 241, 0.08);
-		--primary-active: #4f46e5;
-		--primary-active-bg: #eef2ff;
-
-		/* Tiefe in drei Stufen statt pro Komponente geratener Schatten:
-       1 = Karten, 2 = Erhabenes (FAB), 3 = Overlays (Sheet/Modal). */
-		--elevation-1: 0 4px 20px -2px rgba(17, 17, 20, 0.06), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
-		--elevation-2: 0 8px 24px -4px rgba(17, 17, 20, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
-		--elevation-3: 0 -8px 40px -8px rgba(17, 17, 20, 0.16), 0 -2px 12px -4px rgba(0, 0, 0, 0.06);
+		--seite: #fff4e0;
+		--flaeche: #ffffff;
+		--flaeche-2: #f3ead7;
+		--tinte: #0b0b0b;
+		--text-2: #2e2a24;
+		--text-3: #5a5348;
+		--auf-farbe: #0b0b0b;
+		--signal: #ffd60a;
+		--gefahr: #d92d20;
+		--auf-gefahr: #ffffff;
+		--erfolg: #22c55e;
+		--auf-erfolg: #0b0b0b;
+		--info: #3b82f6;
+		--auf-info: #0b0b0b;
+		--mod-dashboard: #ffd60a;
+		--mod-tasks: #5b8cff;
+		--mod-notes: #3ee6c1;
+		--mod-habits: #ff6fb5;
+		--mod-calendar: #9f86ff;
+		--mod-shopping: #ff9a3d;
+		--mod-goals: #2fd27a;
+		--mod-journal: #e8d3a9;
+		--mod-focus: #d46bff;
+		--mod-review: #a9c1d9;
+		--mod-mood: #ffa3a3;
+		--mod-health: #35d3f0;
+		--mod-fitness: #ff5a36;
+		--mod-analytics: #b8f03e;
+		--mod-timeline: #c9c4ba;
+		--rahmen: 3px;
+		--rahmen-s: 2px;
+		--schatten: 5px 5px 0 0 var(--tinte);
+		--schatten-s: 3px 3px 0 0 var(--tinte);
+		--kante-s: 4px;
+		--kante-m: 8px;
+		--kante-l: 12px;
+		--muster-farbe: rgba(11, 11, 11, 0.09);
+		--ziel-min: 48px;
+		--dauer-druck: 90ms;
+		--dauer-schnell: 140ms;
+		--dauer-basis: 220ms;
+		--kurve: cubic-bezier(0.2, 0, 0, 1);
+		--kurve-pop: cubic-bezier(0.3, 1.6, 0.6, 1);
 	}
 
 	html.dark {
-		--surface-0: #17171d;
-		--surface-1: #0e0e12;
-		--surface-2: #1f1f27;
-		--surface-3: #2a2a34;
-		--text-primary: #f4f4f6;
-		--text-secondary: #b4b4bf;
-		--text-tertiary: #6e6e7a;
-		--border-color: #26262e;
-		--accent-glow: rgba(129, 140, 248, 0.12);
-		--primary-active: #818cf8;
-		--primary-active-bg: rgba(49, 46, 129, 0.35);
+		--seite: #141414;
+		--flaeche: #1f1f1f;
+		--flaeche-2: #2a2a2a;
+		--tinte: #f2eadb;
+		--text-2: #d9d1c2;
+		--text-3: #a9a196;
+		--muster-farbe: rgba(242, 234, 219, 0.06);
+	}
 
-		--elevation-1: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3);
-		--elevation-2: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
-		--elevation-3: 0 -8px 40px -8px rgba(0, 0, 0, 0.7), 0 -2px 12px -4px rgba(0, 0, 0, 0.45);
+	html[data-farben='gedaempft'] {
+		--mod-dashboard: #fff0a8;
+		--mod-tasks: #c9d9ff;
+		--mod-notes: #c4f5ea;
+		--mod-habits: #ffd0e7;
+		--mod-calendar: #ddd3ff;
+		--mod-shopping: #ffd9b5;
+		--mod-goals: #bdf1d4;
+		--mod-journal: #f4ead6;
+		--mod-focus: #efd0ff;
+		--mod-review: #dce6f0;
+		--mod-mood: #ffd9d9;
+		--mod-health: #c2f1fa;
+		--mod-fitness: #ffc7b8;
+		--mod-analytics: #e3f9b8;
+		--mod-timeline: #e6e2da;
+	}
+
+	html[data-signal='limette'] {
+		--signal: #b8f03e;
+	}
+	html[data-signal='orange'] {
+		--signal: #ff9a3d;
+	}
+	html[data-signal='pink'] {
+		--signal: #ff6fb5;
+	}
+	html[data-signal='blau'] {
+		--signal: #5b8cff;
+	}
+
+	html[data-kanten='eckig'] {
+		--kante-s: 0px;
+		--kante-m: 0px;
+		--kante-l: 0px;
+	}
+
+	/* Tailwind-v4-Utilities rechnen mit var(--spacing): Die Dichte skaliert alle Abstände.
+     Touch-Ziele hängen deshalb an --ziel-min, nicht an der Skala (Falle F15). */
+	html[data-dichte='kompakt'] {
+		--spacing: 0.21875rem;
+	}
+	html[data-schrift='112'] {
+		font-size: 112.5%;
+	}
+	html[data-schrift='125'] {
+		font-size: 125%;
 	}
 
 	html {
@@ -115,17 +241,20 @@
 	}
 
 	body {
-		background-color: var(--surface-1);
-		color: var(--text-primary);
-		transition:
-			background-color 0.3s ease,
-			color 0.3s ease;
-		font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+		background-color: var(--seite);
+		background-image: radial-gradient(circle at 1px 1px, var(--muster-farbe) 1px, transparent 0);
+		background-size: 18px 18px;
+		color: var(--tinte);
+		font-family: var(--font-sans);
+		font-optical-sizing: auto;
 		/* Native-App-Gefühl: kein Gummiband-Scrollen des Bodys, keine horizontale
        Überlauf-Verschiebung und kein blaues Tap-Highlight beim Antippen. */
 		overscroll-behavior-y: none;
 		overflow-x: hidden;
 		-webkit-tap-highlight-color: transparent;
+	}
+	html[data-muster='aus'] body {
+		background-image: none;
 	}
 
 	/* Doppeltipp-Zoom-Verzögerung auf interaktiven Elementen entfernen –
@@ -140,12 +269,64 @@
 		touch-action: manipulation;
 	}
 
-	/* Bis hierhin hatte die App keinen einzigen sichtbaren Fokus-Indikator auf
-     Buttons oder Links - Tastatur-Navigation war blind. :where() haelt die
-     Spezifitaet bei 0, damit Komponenten die Regel jederzeit ueberschreiben. */
-	:where(a, button, [role='button'], summary):focus-visible {
-		outline: 2px solid var(--primary-active);
-		outline-offset: 2px;
+	/* :where() haelt die Spezifitaet bei 0, damit Komponenten die Regel jederzeit
+     ueberschreiben koennen. Der Fokus ist nie nur Farbe: 3 px Tinte mit Abstand. */
+	:where(a, button, [role='button'], summary, input, select, textarea, [tabindex]):focus-visible {
+		outline: 3px solid var(--tinte);
+		outline-offset: 3px;
+	}
+}
+
+@layer components {
+	.box {
+		background: var(--flaeche);
+		border: var(--rahmen) solid var(--tinte);
+		border-radius: var(--kante-l);
+	}
+
+	/* Physische Affordanz: Drückbares hat einen harten Versatzschatten und sinkt beim Drücken ein. */
+	.druckbar {
+		box-shadow: var(--schatten-s);
+		transition:
+			transform var(--dauer-druck) var(--kurve),
+			box-shadow var(--dauer-druck) var(--kurve);
+	}
+	.druckbar:active {
+		transform: translate(3px, 3px);
+		box-shadow: 0 0 0 0 var(--tinte);
+	}
+	@media (hover: hover) {
+		.druckbar:hover {
+			transform: translate(-1px, -1px);
+			box-shadow: 4px 4px 0 0 var(--tinte);
+		}
+	}
+
+	/* Die „Maschinenstimme“: Labels, Status, Formeln, Herkunft. */
+	.mono-label {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.sticker {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		padding: 0.125rem 0.5rem;
+		border: var(--rahmen-s) solid var(--tinte);
+		background: var(--signal);
+		color: var(--auf-farbe);
+		box-shadow: var(--schatten-s);
+		transform: rotate(-3deg);
+	}
+	html[data-sticker='aus'] .sticker {
+		transform: none;
+		box-shadow: none;
 	}
 }
 
@@ -175,8 +356,7 @@
 
 	/* Waagerecht scrollende Chip-Reihen (Timeline-Filter, Einkaufslisten) sollen
      wie in einer nativen App wischbar sein, ohne dass auf dem Desktop eine
-     Scrollbar die Reihe optisch zerschneidet. Die Klasse wurde bereits an drei
-     Stellen benutzt, war aber nie definiert. */
+     Scrollbar die Reihe optisch zerschneidet. */
 	.scrollbar-hide {
 		scrollbar-width: none;
 		-ms-overflow-style: none;
@@ -192,62 +372,6 @@
 		font-variant-numeric: tabular-nums;
 		font-feature-settings: 'tnum' 1;
 	}
-}
-
-@layer utilities {
-	/* Glass ist Navigation und Overlay-Chrome vorbehalten, nicht gewöhnlichen
-     Content-Karten (siehe docs/LifeOS_Frontend_Guidelines.md).
-     .glass-card bleibt als Alias bestehen, bis die Routen-Wellen die rund 40
-     regelwidrigen Content-Nutzungen auf <Card> umgestellt haben. */
-	.glass-chrome,
-	.glass-card {
-		background: rgba(255, 255, 255, 0.7);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.5);
-	}
-
-	html.dark .glass-chrome,
-	html.dark .glass-card {
-		background: rgba(23, 23, 29, 0.7);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(42, 42, 52, 0.5);
-	}
-
-	/* Die Elevation-Stufen als Klassen. .premium-shadow bleibt Alias auf Stufe 1,
-     damit die rund 60 bestehenden Nutzungen unverändert weiterlaufen. */
-	.elevation-1,
-	.premium-shadow {
-		box-shadow: var(--elevation-1);
-	}
-
-	.elevation-2 {
-		box-shadow: var(--elevation-2);
-	}
-
-	.elevation-3 {
-		box-shadow: var(--elevation-3);
-	}
-
-	.interactive-card {
-		transition:
-			transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-			box-shadow 0.2s ease,
-			border-color 0.2s ease;
-	}
-
-	.interactive-card:active {
-		transform: scale(0.98);
-	}
-
-	.animate-pulse-subtle {
-		animation: pulseSubtle 2s infinite ease-in-out;
-	}
-
-	.hero-gradient {
-		background: linear-gradient(135deg, #4f46e5 0%, #e11d48 130%);
-	}
 
 	/* Fehlerhafte Eingabe wackelt kurz - dieselbe Kurve wie alle anderen
      Micro-Interactions (EASE_STANDARD aus ui/motion.ts). */
@@ -258,6 +382,51 @@
 	/* Gestaffelter Auftakt der Auth-Screens. Der Versatz kommt per --stagger. */
 	.auth-enter {
 		animation: authEnter 320ms cubic-bezier(0.32, 0.72, 0, 1) var(--stagger, 0ms) both;
+	}
+
+	.animate-pulse-subtle {
+		animation: pulseSubtle 2s infinite ease-in-out;
+	}
+
+	/* ── Alt-Klassen auf den neuen Stil umgeleitet (T302) ─────────────
+     Kein Glas, kein Blur, keine Verläufe, keine weichen Schatten. Entfallen mit P7. */
+	.premium-shadow,
+	.elevation-1 {
+		box-shadow: none;
+		border: var(--rahmen-s) solid var(--tinte);
+	}
+
+	.elevation-2 {
+		box-shadow: var(--schatten);
+		border: var(--rahmen-s) solid var(--tinte);
+	}
+
+	.elevation-3 {
+		box-shadow: none;
+		border-top: var(--rahmen) solid var(--tinte);
+	}
+
+	.glass-chrome,
+	.glass-card {
+		background: var(--flaeche);
+		border: var(--rahmen-s) solid var(--tinte);
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+
+	.hero-gradient {
+		background: var(--signal);
+		color: var(--auf-farbe);
+		border: var(--rahmen-s) solid var(--tinte);
+		box-shadow: var(--schatten-s);
+	}
+
+	.interactive-card {
+		transition: transform var(--dauer-druck) var(--kurve);
+	}
+
+	.interactive-card:active {
+		transform: translate(2px, 2px);
 	}
 }
 
@@ -298,7 +467,7 @@
 	*::before,
 	*::after {
 		animation-duration: 0.01ms !important;
-		animation-delay: 0.01ms !important; /* NEU - sonst bleibt eine sichtbare Leerpause */
+		animation-delay: 0.01ms !important; /* sonst bleibt eine sichtbare Leerpause */
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
 		scroll-behavior: auto !important;
@@ -308,6 +477,22 @@
 	::view-transition-new(root) {
 		animation: none !important;
 	}
+}
+
+/* Dieselbe Dämpfung auf Wunsch der Nutzerin bzw. des Nutzers (darstellung.bewegung = reduziert). */
+html[data-bewegung='reduziert'] *,
+html[data-bewegung='reduziert'] *::before,
+html[data-bewegung='reduziert'] *::after {
+	animation-duration: 0.01ms !important;
+	animation-delay: 0.01ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.01ms !important;
+	scroll-behavior: auto !important;
+}
+
+html[data-bewegung='reduziert'] ::view-transition-old(root),
+html[data-bewegung='reduziert'] ::view-transition-new(root) {
+	animation: none !important;
 }
 
 @keyframes pulseSubtle {
@@ -357,19 +542,10 @@
 	}
 }
 
-@keyframes authRedirectBar {
-	from {
-		transform: scaleX(0);
-	}
-	to {
-		transform: scaleX(1);
-	}
-}
-
 /* Markdown-Rendering (renderMarkdownSafe) — greift auf {@html}-Inhalte, die keine
    Utility-Klassen tragen koennen. Nur Typografie, keine Farben ausserhalb der Tokens. */
 .markdown-body {
-	color: var(--text-secondary);
+	color: var(--text-2);
 	font-size: 0.875rem;
 	line-height: 1.6;
 	overflow-wrap: anywhere;
@@ -382,7 +558,7 @@
 .markdown-body h3,
 .markdown-body h4,
 .markdown-body h5 {
-	color: var(--text-primary);
+	color: var(--tinte);
 	font-weight: 700;
 	line-height: 1.3;
 }
@@ -398,29 +574,28 @@
 }
 
 .markdown-body a {
-	color: var(--primary-600);
+	color: var(--tinte);
 	text-decoration: underline;
-}
-html.dark .markdown-body a {
-	color: var(--primary-400);
+	text-decoration-thickness: 2px;
 }
 
 .markdown-body strong {
-	color: var(--text-primary);
+	color: var(--tinte);
 	font-weight: 700;
 }
 
 .markdown-body code {
-	background: var(--surface-2);
-	border-radius: 0.375rem;
+	background: var(--flaeche-2);
+	border-radius: var(--kante-s);
 	padding: 0.05rem 0.3rem;
+	font-family: var(--font-mono);
 	font-size: 0.8125em;
 }
 
 .markdown-body pre {
-	background: var(--surface-2);
-	border: 1px solid var(--border-color);
-	border-radius: 0.75rem;
+	background: var(--flaeche-2);
+	border: var(--rahmen-s) solid var(--tinte);
+	border-radius: var(--kante-m);
 	padding: 0.75rem;
 	overflow-x: auto;
 }
@@ -431,15 +606,15 @@ html.dark .markdown-body a {
 }
 
 .markdown-body blockquote {
-	border-left: 3px solid var(--border-color);
+	border-left: var(--rahmen) solid var(--tinte);
 	padding-left: 0.75rem;
-	color: var(--text-tertiary);
+	color: var(--text-3);
 	font-style: italic;
 }
 
 .markdown-body hr {
 	border: 0;
-	border-top: 1px solid var(--border-color);
+	border-top: var(--rahmen-s) solid var(--tinte);
 }
 
 .markdown-body ul,
@@ -476,10 +651,10 @@ html.dark .markdown-body a {
 	width: 1.125rem;
 	height: 1.125rem;
 	flex-shrink: 0;
-	accent-color: var(--primary-600);
+	accent-color: var(--tinte);
 }
 
 .markdown-body ul.md-checklist input[type='checkbox']:checked + span {
-	color: var(--text-tertiary);
+	color: var(--text-3);
 	text-decoration: line-through;
 }
