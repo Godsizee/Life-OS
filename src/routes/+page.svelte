@@ -35,6 +35,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import InfoTip from '#lib/ui/InfoTip.svelte';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import { ShoppingCart, Notebook, Lock } from '@lucide/svelte';
 	import { checklistProgress } from '#lib/features/notes/markdown.js';
@@ -77,6 +78,11 @@
 <div class="space-y-6">
 	<PageHeader title={greeting} subtitle="{todayLabel} · {plan.kapazitaet.satz}">
 		{#snippet trailing()}
+			<InfoTip
+				kurz="Freie Zeit ist dein Tagesfenster minus Termine. Aufgaben ohne Schätzung zählen mit der Standarddauer."
+				hilfeId="system.kapazitaet"
+				label="Mehr zur freien Zeit"
+			/>
 			{#if wert(scoreAnzeigen)}
 				<a
 					href="/analytics"

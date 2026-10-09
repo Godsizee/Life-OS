@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InfoTip from '#lib/ui/InfoTip.svelte';
 	import { beispiele } from '../erfassen.js';
 	import type { ErfassenSitzung } from '../erfassen-sitzung.svelte.js';
 
@@ -38,7 +39,14 @@
 				{/each}
 			</dl>
 			{#if sitzung.unsicher}
-				<p class="text-sm text-text-secondary">Ich bin unsicher — als was soll ich es anlegen?</p>
+				<p class="flex items-center gap-2 text-sm text-text-secondary">
+					<span>Ich bin unsicher — als was soll ich es anlegen?</span>
+					<InfoTip
+						kurz="Ohne deine Wahl legt Life OS es als Aufgabe ohne Termin an. Sie liegt dann im Eingang, bis du sie einordnest."
+						hilfeId="system.eingang"
+						label="Mehr zum Eingang"
+					/>
+				</p>
 			{/if}
 		</div>
 
