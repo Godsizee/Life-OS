@@ -43,8 +43,6 @@
 		class="min-w-0 flex-1 truncate font-medium text-text-primary hover:text-primary-active hover:underline"
 	>
 		{goal.title}
-		{#if goal.goal_type === 'pr'}<span class="ml-1 text-xs">🏋️</span>{/if}
-		{#if goal.goal_type === 'target'}<span class="ml-1 text-xs">🎯</span>{/if}
 	</a>
 	{#snippet trailing()}
 		<div class="flex items-center gap-1">
@@ -91,7 +89,7 @@
 					? `noch ${track.daysLeft} Tage`
 					: track.daysLeft === 0
 						? 'heute fällig'
-						: `${-track.daysLeft} Tage überfällig`}
+						: `Frist seit ${-track.daysLeft} Tagen vorbei`}
 			</span>
 		{/if}
 		{#if goal.goal_type === 'target'}
@@ -142,7 +140,7 @@
 						<span
 							class="inline-flex items-center gap-1 rounded-full border border-pink-100 bg-pink-50 px-2 py-0.5 text-[10px] font-medium text-pink-700 dark:border-pink-900/30 dark:bg-pink-950/20 dark:text-pink-400"
 						>
-							🔁 {habit.name} ({progress}%)
+							{habit.name} ({progress}%)
 						</span>
 					{/each}
 					{#if linkedHabits.length > 4}

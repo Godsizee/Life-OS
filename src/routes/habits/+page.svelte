@@ -59,7 +59,7 @@
 			<h2 class="text-sm font-semibold text-text-primary">Aktivität — letzte 12 Wochen</h2>
 			{#if totalActiveStreaks > 0}
 				<span class="text-xs text-text-secondary"
-					>{totalActiveStreaks} aktive Streak{totalActiveStreaks !== 1 ? 's' : ''}</span
+					>{totalActiveStreaks} laufende Serie{totalActiveStreaks !== 1 ? 'n' : ''}</span
 				>
 			{/if}
 		</div>
@@ -74,9 +74,9 @@
 						<span
 							class="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400"
 						>
-							🔥 {streak}
+							{streak}
 							{habit.schedule.type === 'weekly_count' ? 'Wochen' : 'Tage'}
-							<span class="ml-1 text-text-tertiary opacity-70">· Best {best}</span>
+							<span class="ml-1 text-text-tertiary opacity-70">· Bestwert {best}</span>
 						</span>
 					</div>
 				{/each}

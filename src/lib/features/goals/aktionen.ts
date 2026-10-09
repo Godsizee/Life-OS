@@ -21,7 +21,7 @@ async function setzeFortschritt(
 	if (aenderungen.length === 0) return { geaendert: false, beschreibung: leer };
 	for (const a of aenderungen) {
 		await goalsState.updateProgress(a.id, a.neu);
-		if (a.neu >= 100) toastState.success(`🎯 Ziel „${a.titel}" erreicht!`);
+		if (a.neu >= 100) toastState.success(`Ziel „${a.titel}" erreicht.`);
 	}
 	return {
 		geaendert: true,

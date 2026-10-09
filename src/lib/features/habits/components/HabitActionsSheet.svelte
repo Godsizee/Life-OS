@@ -55,7 +55,7 @@
 					</div>
 					<div class="flex flex-col">
 						<span class="text-sm font-semibold text-text-primary">Statistiken ansehen</span>
-						<span class="text-xs text-text-secondary">Verlauf & Streaks im Detail</span>
+						<span class="text-xs text-text-secondary">Verlauf und Serien im Detail</span>
 					</div>
 				</a>
 

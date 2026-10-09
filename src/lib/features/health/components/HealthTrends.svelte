@@ -57,7 +57,7 @@
 	<!-- Schlaf -->
 	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<div class="mb-2 flex items-baseline justify-between gap-3">
-			<h3 class="text-sm font-semibold text-text-primary">😴 Schlaf</h3>
+			<h3 class="text-sm font-semibold text-text-primary">Schlaf</h3>
 			<span class="text-xs text-text-secondary">
 				Ø 7 Tage: <span class="font-bold text-text-primary"
 					>{formatMetric('sleep_h', sleepAvg)}</span
@@ -81,7 +81,7 @@
 	<!-- Wasser -->
 	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<div class="mb-2 flex items-baseline justify-between gap-3">
-			<h3 class="text-sm font-semibold text-text-primary">💧 Wasser</h3>
+			<h3 class="text-sm font-semibold text-text-primary">Wasser</h3>
 			<span class="text-xs text-text-secondary">
 				Ø 7 Tage: <span class="font-bold text-text-primary"
 					>{formatMetric('water_ml', waterAvg, {
@@ -114,7 +114,7 @@
 	<!-- Energie -->
 	<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 		<div class="mb-2 flex items-baseline justify-between gap-3">
-			<h3 class="text-sm font-semibold text-text-primary">⚡ Energie</h3>
+			<h3 class="text-sm font-semibold text-text-primary">Energie</h3>
 			<span class="text-xs text-text-secondary">
 				Ø 7 Tage: <span class="font-bold text-text-primary"
 					>{formatMetric('energy', energyAvg)}</span
@@ -133,7 +133,7 @@
 	{#if weightSeries.length > 0}
 		<div class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
 			<div class="mb-2 flex items-baseline justify-between gap-3">
-				<h3 class="text-sm font-semibold text-text-primary">⚖️ Gewicht</h3>
+				<h3 class="text-sm font-semibold text-text-primary">Gewicht</h3>
 				{#if weight}
 					<span
 						class="text-xs font-bold {weight.delta < 0

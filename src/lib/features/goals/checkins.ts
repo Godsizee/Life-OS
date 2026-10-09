@@ -102,7 +102,7 @@ export function evaluateTrack(
 			expected: 100,
 			actual: clampedActual,
 			daysLeft,
-			label: `${Math.abs(daysLeft)} Tage überfällig`
+			label: `Frist seit ${Math.abs(daysLeft)} Tagen vorbei`
 		};
 	}
 

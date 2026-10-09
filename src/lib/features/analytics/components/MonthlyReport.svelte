@@ -30,7 +30,7 @@
 		{ icon: Trophy, label: 'Neue PRs', value: `${report.newPRs}`, sub: 'Rekorde' },
 		{
 			icon: Flame,
-			label: 'Längste Streak',
+			label: 'Längste Serie',
 			value: `${report.longestStreak.days}`,
 			sub: report.longestStreak.name
 		}

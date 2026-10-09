@@ -67,7 +67,7 @@
 <div class="flex flex-col gap-4">
 	<!-- Energie -->
 	<div>
-		<div class="mb-1.5 block text-sm font-medium text-text-primary">⚡ Energie</div>
+		<div class="mb-1.5 block text-sm font-medium text-text-primary">Energie</div>
 		<div class="flex gap-2">
 			{#each [1, 2, 3, 4, 5] as e (e)}
 				<button
@@ -87,7 +87,7 @@
 	<!-- Wasser -->
 	<div>
 		<div class="mb-1.5 block text-sm font-medium text-text-primary">
-			💧 Wasser ({profileState.waterUnit === 'ml' ? 'ml' : 'Gläser'})
+			Wasser ({profileState.waterUnit === 'ml' ? 'ml' : 'Gläser'})
 		</div>
 		{#if profileState.waterUnit === 'ml'}
 			<div class="flex flex-col gap-2">
@@ -139,7 +139,10 @@
 					<span class="ml-1 text-xs text-text-tertiary">/ {profileState.waterGoalGlasses}</span>
 					<div class="mt-1 flex flex-wrap justify-center gap-0.5">
 						{#each Array.from({ length: Math.min(Math.round(water / profileState.glassSizeMl), 12) }, (_, i) => i) as i (i)}
-							<span class="text-base">💧</span>
+							<span
+								class="inline-block h-4 w-3 border-[length:var(--rahmen-s)] border-tinte bg-mod-health"
+								aria-hidden="true"
+							></span>
 						{/each}
 					</div>
 				</div>
@@ -154,12 +157,12 @@
 	</div>
 
 	<!-- Schlaf -->
-	<Field label="😴 Schlaf (Stunden)" hint="Ziel: {profileState.sleepGoalH} h">
+	<Field label="Schlaf (Stunden)" hint="Ziel: {profileState.sleepGoalH} h">
 		<Input type="number" bind:value={sleep} min="0" max="24" step="0.5" placeholder="z.B. 7.5" />
 	</Field>
 
 	<!-- Gewicht (optional) -->
-	<Field label="⚖️ Gewicht ({profileState.weightUnit}, optional)">
+	<Field label="Gewicht ({profileState.weightUnit}, optional)">
 		<Input
 			type="number"
 			bind:value={weight}
@@ -172,7 +175,7 @@
 
 	<Button onclick={save} disabled={saving}>
 		{#snippet children()}
-			{saving ? 'Speichere…' : '✓ Speichern'}
+			{saving ? 'Speichere…' : 'Speichern'}
 		{/snippet}
 	</Button>
 </div>

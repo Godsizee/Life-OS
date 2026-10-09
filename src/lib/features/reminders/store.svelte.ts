@@ -93,7 +93,7 @@ class RemindersState {
 		for (const r of this.mine) {
 			if (!isDue(r) || this.announced.has(r.id)) continue;
 			this.announced.add(r.id);
-			toastState.info(`🔔 ${r.title}`);
+			toastState.info(`Erinnerung: ${r.title}`);
 		}
 	}
 

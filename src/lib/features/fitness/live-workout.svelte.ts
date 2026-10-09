@@ -97,7 +97,7 @@ class LiveWorkoutState {
 				this.stopRest();
 				void alarm({
 					title: '⏱️ Pause vorbei',
-					body: 'Weiter geht’s!',
+					body: 'Weiter geht’s.',
 					url: '/fitness',
 					tag: 'lifeos-rest'
 				});

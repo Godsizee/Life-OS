@@ -20,7 +20,9 @@ export async function ladeSicher(modul: string, laden: () => Promise<void>): Pro
 		return true;
 	} catch (err) {
 		console.error(`[${modul}] Laden fehlgeschlagen`, err);
-		toastState.error(`${modul} konnte nicht geladen werden`);
+		toastState.error(
+			`${modul} konnte nicht geladen werden. Prüfe die Verbindung und lade die Seite neu.`
+		);
 		return false;
 	}
 }

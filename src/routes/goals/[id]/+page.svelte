@@ -163,7 +163,7 @@
 										? `noch ${track.daysLeft} Tage`
 										: track.daysLeft === 0
 											? 'heute fällig'
-											: `${-track.daysLeft} Tage überfällig`})
+											: `Frist seit ${-track.daysLeft} Tagen vorbei`})
 								</span>
 							{/if}
 						</div>
@@ -315,7 +315,6 @@
 						<li
 							class="flex items-center gap-2 rounded-lg border border-border-color bg-surface-1 px-2.5 py-1.5"
 						>
-							<span class="text-xs">🔁</span>
 							<span class="min-w-0 flex-1 truncate text-sm text-text-primary">{habit.name}</span>
 							<span class="shrink-0 text-xs text-text-tertiary">{hp}%</span>
 							<button

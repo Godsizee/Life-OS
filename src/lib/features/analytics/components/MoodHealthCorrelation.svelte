@@ -131,7 +131,6 @@
 		<div
 			class="glass-card premium-shadow flex items-center gap-3 rounded-2xl p-5 text-sm text-text-secondary"
 		>
-			<span class="text-2xl">🔬</span>
 			<span>Logg mindestens 3 Tage Stimmung + Gesundheit, um Korrelationen zu sehen.</span>
 		</div>
 	{:else}

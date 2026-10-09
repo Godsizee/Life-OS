@@ -91,7 +91,7 @@
 <WelcomeModal />
 
 <div class="space-y-6">
-	<PageHeader title="{greeting} 👋" subtitle={todayLabel}>
+	<PageHeader title={greeting} subtitle={todayLabel}>
 		{#snippet trailing()}
 			<a
 				href="/analytics"
@@ -125,7 +125,7 @@
 			href="/review"
 			class="flex items-center gap-2 text-xs font-medium text-text-tertiary hover:text-text-secondary"
 		>
-			<span>✓ Weekly Review erledigt</span>
+			<span>Weekly Review erledigt</span>
 		</a>
 	{/if}
 

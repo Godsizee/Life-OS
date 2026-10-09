@@ -34,9 +34,9 @@
 
 	const types: { value: GoalType; label: string }[] = [
 		{ value: 'standard', label: 'Standard' },
-		{ value: 'target', label: '🎯 Zielwert' },
-		{ value: 'pr', label: '🏋️ Kraft (PR)' },
-		{ value: 'fitness_frequency', label: '📅 Frequenz' }
+		{ value: 'target', label: 'Zielwert' },
+		{ value: 'pr', label: 'Kraft (PR)' },
+		{ value: 'fitness_frequency', label: 'Frequenz' }
 	];
 
 	async function submit(event: SubmitEvent) {

@@ -71,7 +71,7 @@
 
 		const userId = authState.user?.id;
 		if (!userId) {
-			formError = 'Die Sitzung ist abgelaufen. Bitte erneut anmelden.';
+			formError = 'Die Sitzung ist abgelaufen. Melde dich bitte neu an.';
 			return;
 		}
 

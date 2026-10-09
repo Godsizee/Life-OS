@@ -27,7 +27,7 @@
 	</div>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-secondary">🌟 Was lief diese Woche gut?</span>
+		<span class="text-sm font-medium text-text-secondary">Was lief diese Woche gut?</span>
 		<Textarea
 			bind:value={reflGood}
 			rows={3}
@@ -36,9 +36,7 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-secondary"
-			>💪 Was war schwer oder hat nicht geklappt?</span
-		>
+		<span class="text-sm font-medium text-text-secondary">Was war diese Woche schwierig?</span>
 		<Textarea
 			bind:value={reflHard}
 			rows={3}
@@ -47,7 +45,7 @@
 	</label>
 
 	<label class="flex flex-col gap-1.5">
-		<span class="text-sm font-medium text-text-secondary">🔄 Was ändere ich nächste Woche?</span>
+		<span class="text-sm font-medium text-text-secondary">Was ändere ich nächste Woche?</span>
 		<Textarea
 			bind:value={reflChange}
 			rows={3}
@@ -67,7 +65,7 @@
 			disabled={saving}
 			class="min-h-12 flex-1 rounded-xl bg-primary-600 text-sm font-medium text-white active:bg-primary-700 disabled:opacity-60"
 		>
-			{saving ? 'Speichere…' : '✓ Abschließen'}
+			{saving ? 'Speichere…' : 'Abschließen'}
 		</button>
 	</div>
 

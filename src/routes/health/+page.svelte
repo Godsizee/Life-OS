@@ -131,7 +131,7 @@
 								{formatDate(entry.date, { weekday: 'short', day: 'numeric', month: 'short' })}
 							</span>
 							<span class="flex items-center gap-2 text-xs text-text-secondary">
-								{#if entry.energy != null}<span>⚡{entry.energy}/5</span>{/if}
+								{#if entry.energy != null}<span>Energie {entry.energy}/5</span>{/if}
 								{#if entry.weight_kg != null}<span
 										>{formatMetric('weight_kg', num(entry.weight_kg), {
 											weightUnit: profileState.weightUnit
@@ -143,7 +143,7 @@
 						<div class="mt-1.5 flex flex-col gap-1">
 							{#if sleep !== null}
 								<div class="flex items-center gap-2">
-									<span class="w-5 text-xs">😴</span>
+									<span class="mono-label w-14 text-text-2">Schlaf</span>
 									<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
 										<div
 											class="h-full {sleep >= profileState.sleepGoalH
@@ -159,7 +159,7 @@
 							{/if}
 							{#if waterVal !== null}
 								<div class="flex items-center gap-2">
-									<span class="w-5 text-xs">💧</span>
+									<span class="mono-label w-14 text-text-2">Wasser</span>
 									<div class="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
 										<div
 											class="h-full {waterVal >= profileState.waterGoalMl

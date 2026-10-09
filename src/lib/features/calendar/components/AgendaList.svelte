@@ -237,7 +237,7 @@
 										onclick={() => {
 											tasksState.setStatus(item.sourceId, isCompleted ? 'todo' : 'done');
 											toastState.success(
-												isCompleted ? 'Aufgabe als offen markiert' : 'Aufgabe erledigt ✓'
+												isCompleted ? 'Aufgabe als offen markiert' : 'Aufgabe erledigt'
 											);
 										}}
 										class="shrink-0 text-text-tertiary transition-all hover:text-primary-500 active:scale-90"

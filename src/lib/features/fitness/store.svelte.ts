@@ -30,7 +30,7 @@ import { workoutsThisWeek } from './utils/frequency';
 /** Feuert Toasts für neue persönliche Rekorde (Modul-UI; die Folgen für Ziele laufen über die Regeln). */
 export function announcePRs(prs: ExerciseBest[]): void {
 	for (const pr of prs) {
-		toastState.success(`🎉 Neuer PR: ${pr.exercise_name} — ${pr.est_1rm} kg (geschätztes 1RM)`);
+		toastState.success(`Neuer PR: ${pr.exercise_name} — ${pr.est_1rm} kg (geschätztes 1RM)`);
 	}
 }
 

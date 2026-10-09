@@ -91,7 +91,7 @@
 				<Select bind:value={goalId}>
 					<option value="">Kein Ziel</option>
 					{#each activeGoals as goal (goal.id)}
-						<option value={goal.id}>🎯 {goal.title}</option>
+						<option value={goal.id}>{goal.title}</option>
 					{/each}
 				</Select>
 			{/if}

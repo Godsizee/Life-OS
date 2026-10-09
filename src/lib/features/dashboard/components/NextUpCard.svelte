@@ -21,7 +21,7 @@
 					onclick={async () => {
 						await tasksState.setStatus(nextTask.id, 'done');
 						await analyticsState.saveTodayScore();
-						toastState.success(`"${nextTask.title}" erledigt ✓`);
+						toastState.success(`"${nextTask.title}" erledigt`);
 					}}
 					class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-primary-active bg-surface-0 text-primary-active transition-all hover:bg-primary-active-bg active:scale-90"
 					aria-label="Erledigt"
@@ -42,7 +42,7 @@
 							<p
 								class="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary-active"
 							>
-								<span>🎯</span> <span>{linkedGoal.title}</span>
+								<span>{linkedGoal.title}</span>
 							</p>
 						{/if}
 					{/if}

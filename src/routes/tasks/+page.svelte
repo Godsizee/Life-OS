@@ -189,7 +189,7 @@
 		>
 
 		<Chip selected={smartView === 'focus_week'} onclick={() => (smartView = 'focus_week')}
-			>⭐ Wochenfokus</Chip
+			>Wochenfokus</Chip
 		>
 	</section>
 

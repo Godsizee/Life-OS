@@ -94,11 +94,7 @@
 	);
 
 	// Restzeit im Tab-Titel
-	const pageTitle = $derived(
-		focusSession.active
-			? `${clock} ${focusSession.isFocus ? '🎯' : '☕'} Fokus – Life OS`
-			: 'Fokus – Life OS'
-	);
+	const pageTitle = $derived(focusSession.active ? `${clock} Fokus – Life OS` : 'Fokus – Life OS');
 
 	// Tagesziel-Berechnung (F-02)
 	const dailyGoalMin = $derived(profileState.focusDailyGoalMinutes);
@@ -215,8 +211,8 @@
 				{phaseLabel(focusSession.phase)}
 			</p>
 			<p class="truncate text-sm text-text-secondary">
-				⏱ Heute {formatMinutes(todayMin)}
-				{#if pomodorosToday > 0}· 🍅 ×{pomodorosToday}{/if}
+				Heute {formatMinutes(todayMin)}
+				{#if pomodorosToday > 0}· {pomodorosToday} {pomodorosToday === 1 ? 'Runde' : 'Runden'}{/if}
 				· Woche {formatMinutes(timeTrackingState.totalWeekMin)}
 			</p>
 
@@ -262,13 +258,13 @@
 					<span
 						class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
 					>
-						☕ {phaseLabel(focusSession.phase)}
+						{phaseLabel(focusSession.phase)}
 					</span>
 				{:else}
 					<span
 						class="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-primary-950/40 dark:text-primary-300"
 					>
-						🎯 Fokus
+						Fokus
 					</span>
 				{/if}
 				{#if focusSession.paused}
@@ -286,7 +282,7 @@
 					{@const task = sessionTask ?? currentTask}
 					{#if linkedGoal && task?.id === currentTask?.id}
 						<p class="mb-2 text-xs font-medium text-primary-600 dark:text-primary-400">
-							🎯 {linkedGoal.title}
+							{linkedGoal.title}
 						</p>
 					{/if}
 					<h2 class="text-xl leading-snug font-semibold text-text-primary">{task?.title}</h2>
@@ -363,7 +359,7 @@
 						disabled={!currentTask}
 						class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-border-color bg-surface-1 text-sm font-medium text-text-secondary active:bg-surface-2 disabled:opacity-40"
 					>
-						✓ Aufgabe erledigt
+						Aufgabe erledigt
 					</button>
 					<button
 						onclick={skipTask}
@@ -481,7 +477,7 @@
 	<div class="space-y-4 px-4 pb-6">
 		{#if pendingNoteTask}
 			<p class="text-xs font-semibold text-primary-600 dark:text-primary-400">
-				🎯 Aufgabe: {pendingNoteTask.title}
+				Aufgabe: {pendingNoteTask.title}
 			</p>
 		{/if}
 		<label class="block">

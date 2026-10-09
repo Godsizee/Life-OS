@@ -119,12 +119,12 @@
 			<Card class="flex flex-col items-center justify-center p-4 text-center">
 				<Flame class="mb-2 text-amber-500" size={24} />
 				<span class="text-2xl font-bold text-text-primary">{currentStreak}</span>
-				<span class="text-xs text-text-secondary">Aktueller Streak ({unitStr})</span>
+				<span class="text-xs text-text-secondary">Aktuelle Serie ({unitStr})</span>
 			</Card>
 			<Card class="flex flex-col items-center justify-center p-4 text-center">
 				<Trophy class="mb-2 text-primary-500" size={24} />
 				<span class="text-2xl font-bold text-text-primary">{longestStreak}</span>
-				<span class="text-xs text-text-secondary">Bester Streak ({unitStr})</span>
+				<span class="text-xs text-text-secondary">Beste Serie ({unitStr})</span>
 			</Card>
 			<Card class="flex flex-col items-center justify-center p-4 text-center">
 				<CheckSquare class="mb-2 text-green-500" size={24} />

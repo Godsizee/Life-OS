@@ -20,8 +20,8 @@
 	>
 		<Flame class="animate-pulse text-amber-500" size={18} />
 		<div>
-			<span class="font-bold">{longestStreak.streak} Tage Streak!</span>
-			<span class="opacity-80">Weiter so mit "{longestStreak.name}".</span>
+			<span class="font-bold">{longestStreak.streak} Tage am Stück</span>
+			<span class="opacity-80">Routine „{longestStreak.name}“.</span>
 		</div>
 	</div>
 {/if}

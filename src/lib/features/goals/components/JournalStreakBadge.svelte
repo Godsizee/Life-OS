@@ -11,7 +11,7 @@
 			{streak.isActive
 			? 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/40 dark:bg-orange-950/30 dark:text-orange-400'
 			: 'border-border-color/30 bg-surface-2 text-text-secondary'}"
-		title="Längste Streak: {streak.longest} Tage"
+		title="Längste Serie: {streak.longest} Tage"
 	>
 		<Flame size={12} class={streak.isActive ? 'text-orange-500' : 'text-text-tertiary'} />
 		{#if streak.current > 0}

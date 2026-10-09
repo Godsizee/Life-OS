@@ -158,7 +158,7 @@
 		<div class="mt-3 flex flex-wrap gap-2 border-t border-border-color/40 pt-3 text-xs">
 			{#if remindersState.todayCount > 0}
 				<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
-					🔔 {remindersState.todayCount} Erinnerung{remindersState.todayCount !== 1 ? 'en' : ''} heute
+					{remindersState.todayCount} Erinnerung{remindersState.todayCount !== 1 ? 'en' : ''} heute
 				</span>
 			{/if}
 			{#if focusToday > 0}
@@ -166,14 +166,14 @@
 					href="/focus"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					⏱ {formatMinutes(focusToday)} fokussiert
+					{formatMinutes(focusToday)} fokussiert
 				</a>
 			{:else if topTasks.length > 0}
 				<a
 					href="/focus"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					🎯 Fokus starten
+					Fokus starten
 				</a>
 			{/if}
 			{#if openShopping > 0}
@@ -181,7 +181,7 @@
 					href="/shopping"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					🛒 {openShopping} Artikel
+					{openShopping} Artikel
 				</a>
 			{/if}
 			{#if !moodLogged}
@@ -189,7 +189,7 @@
 					href="/mood"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					🙂 Stimmung erfassen
+					Stimmung erfassen
 				</a>
 			{/if}
 			{#if waterToday !== null && waterToday < waterGoal}
@@ -197,7 +197,7 @@
 					href="/health"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					💧 {formatMetric('water_ml', waterToday, {
+					{formatMetric('water_ml', waterToday, {
 						waterUnit: profileState.waterUnit,
 						glassSizeMl: profileState.glassSizeMl
 					})} / {formatMetric('water_ml', waterGoal, {
@@ -208,7 +208,7 @@
 			{/if}
 			{#if dueHabits.length > 0}
 				<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
-					🔁 {dueHabits.length} Routine{dueHabits.length !== 1 ? 'n' : ''} offen
+					{dueHabits.length} Routine{dueHabits.length !== 1 ? 'n' : ''} offen
 				</span>
 			{/if}
 			{#if plannedTodayPlanId}
@@ -224,11 +224,11 @@
 					href="/fitness"
 					class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary hover:text-text-primary"
 				>
-					🏋️ Training fällig
+					Training fällig
 				</a>
 			{/if}
 			<span class="rounded-full bg-surface-2 px-2.5 py-1 font-medium text-text-secondary">
-				📅 {weeklyDone}/{weeklyGoal} diese Woche
+				{weeklyDone}/{weeklyGoal} diese Woche
 			</span>
 		</div>
 	</section>

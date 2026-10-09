@@ -26,7 +26,7 @@
 
 	{#if openTasks.length === 0}
 		<p class="rounded-xl border border-border-color bg-surface-0 p-4 text-sm text-text-secondary">
-			Keine offenen Aufgaben — sieht gut aus! 🎉
+			Keine offenen Aufgaben.
 		</p>
 	{:else}
 		<ul class="flex flex-col gap-2">

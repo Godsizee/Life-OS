@@ -7,7 +7,7 @@
  */
 
 const BY_CODE: Record<string, string> = {
-	invalid_credentials: 'E-Mail oder Passwort stimmt nicht.',
+	invalid_credentials: 'E-Mail oder Passwort stimmt nicht. Prüfe deine Eingabe.',
 	email_not_confirmed: 'Diese E-Mail-Adresse ist noch nicht bestätigt.',
 	email_exists: 'Für diese E-Mail-Adresse gibt es bereits ein Konto.',
 	user_already_exists: 'Für diese E-Mail-Adresse gibt es bereits ein Konto.',
@@ -15,7 +15,7 @@ const BY_CODE: Record<string, string> = {
 	same_password: 'Das ist das bisherige Passwort.',
 	user_not_found: 'Zu diesen Daten gibt es kein Konto.',
 	user_banned: 'Dieses Konto ist gesperrt.',
-	session_expired: 'Die Sitzung ist abgelaufen. Bitte erneut anmelden.',
+	session_expired: 'Die Sitzung ist abgelaufen. Melde dich bitte neu an.',
 	signup_disabled: 'Auf diesem Server ist die Registrierung abgeschaltet.',
 	email_provider_disabled: 'Auf diesem Server ist die Anmeldung per E-Mail abgeschaltet.',
 	email_address_invalid: 'Diese E-Mail-Adresse akzeptiert der Server nicht.',
@@ -23,21 +23,23 @@ const BY_CODE: Record<string, string> = {
 	over_request_rate_limit: 'Zu viele Versuche. Bitte einen Moment warten.',
 	over_email_send_rate_limit: 'Zu viele E-Mails in kurzer Zeit. Bitte einen Moment warten.',
 	validation_failed: 'Die Eingaben sind unvollständig oder ungültig.',
-	request_timeout: 'Der Server hat zu lange gebraucht. Bitte erneut versuchen.',
-	captcha_failed: 'Die Sicherheitsprüfung ist fehlgeschlagen. Bitte erneut versuchen.'
+	request_timeout: 'Der Server hat zu lange gebraucht. Versuche es noch einmal.',
+	captcha_failed: 'Die Sicherheitsprüfung ist nicht durchgegangen. Versuche es noch einmal.'
 };
 
 /** WebAuthn meldet Abbrüche als DOMException — für Nutzer sonst völlig kryptisch. */
 const BY_DOM_EXCEPTION: Record<string, string> = {
-	NotAllowedError: 'Der Passkey wurde nicht bestätigt oder die Zeit lief ab.',
+	NotAllowedError:
+		'Der Passkey wurde nicht bestätigt oder die Zeit lief ab. Versuche es noch einmal.',
 	InvalidStateError: 'Für dieses Gerät ist bereits ein Passkey hinterlegt.',
 	SecurityError: 'Passkeys sind für diese Adresse nicht freigegeben.',
-	AbortError: 'Der Vorgang wurde abgebrochen.',
+	AbortError: 'Der Vorgang wurde abgebrochen. Starte ihn bei Bedarf neu.',
 	NotSupportedError: 'Dieses Gerät unterstützt keine Passkeys.'
 };
 
 const NETWORK = 'Keine Verbindung zum Server. Prüfe deine Internetverbindung.';
-const FALLBACK = 'Das hat leider nicht geklappt. Bitte später erneut versuchen.';
+const FALLBACK =
+	'Das hat nicht geklappt. Versuche es in einem Moment erneut oder lade die Seite neu.';
 
 /** Fuer den Auth-Guard: gleicher Text wie bei einem `session_expired`-Fehler
  * vom Server, aber hier ausgeloest durch den Client (siehe redirect.ts). */
@@ -77,7 +79,7 @@ export function authErrorText(error: unknown): string {
 
 	if (e.status === 429) return BY_CODE.over_request_rate_limit;
 	if (typeof e.status === 'number' && e.status >= 500) {
-		return 'Der Server hat einen Fehler gemeldet. Bitte später erneut versuchen.';
+		return 'Der Server hat einen Fehler gemeldet. Versuche es in einem Moment erneut.';
 	}
 
 	return FALLBACK;

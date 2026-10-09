@@ -42,7 +42,6 @@
 
 <Modal bind:open label="Verknüpfen">
 	<div class="flex items-center gap-3 border-b border-border-color px-4 py-3">
-		<span class="text-text-secondary">🔗</span>
 		<input
 			bind:this={inputEl}
 			bind:value={query}

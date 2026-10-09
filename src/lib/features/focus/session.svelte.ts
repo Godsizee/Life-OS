@@ -232,7 +232,7 @@ class FocusSessionState {
 			}
 
 			await alarm({
-				title: wasFocus ? '🎯 Runde geschafft' : '☕ Pause vorbei',
+				title: wasFocus ? 'Runde geschafft' : 'Pause vorbei',
 				body: wasFocus ? `${minuten} Minuten fokussiert. Zeit für eine Pause.` : 'Weiter geht’s.',
 				url: '/focus',
 				tag: 'lifeos-focus'

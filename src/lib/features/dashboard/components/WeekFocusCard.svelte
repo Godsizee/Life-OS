@@ -29,7 +29,7 @@
 						onclick={async () => {
 							await tasksState.setStatus(task.id, isDone ? 'todo' : 'done');
 							await analyticsState.saveTodayScore();
-							if (!isDone) toastState.success(`"${task.title}" erledigt ✓`);
+							if (!isDone) toastState.success(`"${task.title}" erledigt`);
 						}}
 						class="-my-3 -ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
 						aria-label={isDone ? 'Als offen markieren' : 'Erledigt'}
