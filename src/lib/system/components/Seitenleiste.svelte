@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { aktiveModule } from '../module-aktiv.svelte.js';
+	import { nachBereich } from '#lib/config/bereiche.js';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
-	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import {
 		LogOut,
@@ -11,15 +11,19 @@
 		Moon,
 		ChevronLeft,
 		ChevronRight,
-		CloudLightning,
-		Settings
+		Settings,
+		CircleHelp
 	} from '@lucide/svelte';
 	import Spinner from '#lib/ui/Spinner.svelte';
+	import Wortmarke from '#lib/ui/Wortmarke.svelte';
+	import Tastenhinweis from '#lib/ui/Tastenhinweis.svelte';
 
 	let {
 		currentPath = '/',
 		collapsed = $bindable(false)
 	}: { currentPath?: string; collapsed?: boolean } = $props();
+
+	const gruppen = $derived(nachBereich(aktiveModule.meta));
 
 	$effect(() => {
 		if (typeof window === 'undefined') return;
@@ -44,200 +48,210 @@
 			localStorage.setItem('sidebar_collapsed', String(collapsed));
 		} catch {}
 	}
+
+	const eintrag =
+		'group relative flex min-h-10 items-center gap-3 border-[length:var(--rahmen-s)] px-3 py-1.5 text-sm font-semibold';
+	const tooltip =
+		'absolute left-16 z-50 hidden border-[length:var(--rahmen-s)] border-tinte bg-flaeche px-2 py-1 text-xs font-medium whitespace-nowrap text-tinte group-hover:block group-focus-visible:block';
 </script>
 
 <aside
-	class="fixed top-0 bottom-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 pt-safe pl-safe transition-all duration-300 ease-in-out md:flex md:flex-col
+	class="fixed top-0 bottom-0 left-0 z-30 hidden border-r-[length:var(--rahmen)] border-tinte bg-flaeche pt-safe pl-safe transition-all duration-300 ease-in-out md:flex md:flex-col
 		{collapsed ? 'w-20' : 'w-64'}"
 	style="view-transition-name: sidebar"
 >
-	<!-- Header / Logo.
-	     Eingeklappt bleiben von den 80px Leistenbreite nach px-4 nur 48px uebrig -
-	     Logo (36px) und Umschalter (28px) nebeneinander liefen dort ueber. Deshalb
-	     stehen sie eingeklappt untereinander in einer Spalte. -->
+	<!-- Kopf: Wortmarke und Haushalt. Eingeklappt bleibt nur der Umschalter mit dem Logo. -->
 	<div
-		class="flex h-16 items-center border-b border-border-color px-4
+		class="flex h-16 shrink-0 items-center border-b-[length:var(--rahmen-s)] border-tinte px-3
 			{collapsed ? 'justify-center' : 'justify-between'}"
 	>
 		{#if !collapsed}
-			<div class="flex min-w-0 items-center gap-2.5 overflow-hidden">
-				<img
-					src="/favicon.svg"
-					alt="Life OS Logo"
-					class="premium-shadow h-9 w-9 shrink-0 rounded-xl object-cover"
-				/>
-				<div class="flex min-w-0 flex-col">
-					<span class="truncate text-sm font-bold tracking-tight text-text-primary">Life OS</span>
-					<span class="truncate text-[10px] text-text-secondary">
-						{workspaceState.workspace?.name ?? 'Lädt...'}
-					</span>
-				</div>
+			<div class="flex min-w-0 flex-col items-start gap-1">
+				<Wortmarke size="sm" />
+				<span class="mono-label max-w-full truncate text-text-3">
+					{workspaceState.workspace?.name ?? 'Lädt …'}
+				</span>
 			</div>
 			<button
 				onclick={toggleCollapse}
-				class="hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-text-tertiary hover:bg-surface-2 hover:text-text-primary md:flex"
+				class="flex h-12 w-12 shrink-0 items-center justify-center hover:bg-flaeche-2"
 				aria-label="Seitenleiste einklappen"
 			>
-				<ChevronLeft size={16} />
+				<ChevronLeft size={18} />
 			</button>
 		{:else}
 			<button
 				onclick={toggleCollapse}
-				class="group relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-surface-2"
+				class="group relative flex h-12 w-12 shrink-0 items-center justify-center hover:bg-flaeche-2"
 				aria-label="Seitenleiste ausklappen"
 			>
 				<img
 					src="/favicon.svg"
 					alt=""
-					class="premium-shadow h-9 w-9 rounded-xl object-cover transition-opacity group-hover:opacity-0"
+					class="h-9 w-9 object-cover transition-opacity group-hover:opacity-0"
 				/>
 				<ChevronRight
 					size={18}
-					class="absolute text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100"
+					class="absolute opacity-0 transition-opacity group-hover:opacity-100"
 				/>
 			</button>
 		{/if}
 	</div>
 
-	<!-- Module Links -->
-	<nav class="flex-1 space-y-1 overflow-y-auto p-3">
-		{#each aktiveModule.meta as item (item.id)}
-			{@const Icon = item.icon}
-			{@const active = currentPath === item.route}
-			<a
-				href={item.route}
-				class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200
-					{collapsed ? 'justify-center' : ''}
-					{active
-					? 'bg-primary-active-bg font-semibold text-primary-active'
-					: 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'}"
-			>
-				<!-- Active Indicator Line -->
-				{#if active}
-					<div class="absolute top-2 bottom-2 left-0 w-1 rounded-r bg-primary-active"></div>
-				{/if}
-
-				<Icon size={20} class="shrink-0 {active ? 'text-primary-active' : 'text-text-tertiary'}" />
-
+	<!-- Module nach Bereich. Der Punkt zeigt die Modulfarbe, der aktive Eintrag ist damit gefüllt. -->
+	<nav aria-label="Module" class="flex-1 overflow-y-auto p-3">
+		{#each gruppen as gruppe, i (gruppe.bereich.id)}
+			<section aria-labelledby={collapsed ? undefined : `seite-bereich-${gruppe.bereich.id}`}>
 				{#if !collapsed}
-					<span class="truncate">{item.label}</span>
-				{:else}
-					<!-- Tooltip on Collapse -->
-					<div
-						class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
-					>
-						{item.label}
-					</div>
+					<h2 id="seite-bereich-{gruppe.bereich.id}" class="mono-label px-1 pt-3 pb-1 text-text-3">
+						{gruppe.bereich.label}
+					</h2>
+				{:else if i > 0}
+					<hr class="my-2 border-t-[length:var(--rahmen-s)] border-tinte/30" />
 				{/if}
-			</a>
+				<ul class="flex flex-col gap-1">
+					{#each gruppe.eintraege as item (item.id)}
+						{@const Icon = item.icon}
+						{@const active = currentPath === item.route}
+						<li>
+							<a
+								href={item.route}
+								aria-current={active ? 'page' : undefined}
+								aria-label={collapsed ? item.label : undefined}
+								style:background-color={active ? `var(${item.farbe})` : undefined}
+								class="{eintrag} {collapsed ? 'justify-center' : ''}
+									{active ? 'border-tinte text-auf-farbe' : 'border-transparent text-tinte hover:bg-flaeche-2'}"
+							>
+								{#if !collapsed}
+									<span
+										class="h-3 w-3 shrink-0 border-[length:var(--rahmen-s)] border-tinte"
+										style:background-color="var({item.farbe})"
+										aria-hidden="true"
+									></span>
+								{/if}
+								<Icon size={20} class="shrink-0" />
+								{#if !collapsed}
+									<span class="truncate">{item.label}</span>
+								{:else}
+									<span class={tooltip} aria-hidden="true">{item.label}</span>
+								{/if}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</section>
 		{/each}
 	</nav>
 
-	<!-- Sync / Info Status (only show when active/syncing) -->
-	{#if outbox.status === 'syncing'}
-		<div class="animate-pulse-subtle flex items-center gap-2 px-6 py-2 text-xs text-primary-active">
-			<CloudLightning size={14} />
-			{#if !collapsed}
-				<span>Synchronisiere...</span>
-			{/if}
-		</div>
-	{/if}
-
-	<!-- Footer.
-	     Die Tooltips im eingeklappten Zustand brauchen `group relative` auf dem
-	     jeweiligen Element - ohne `group` blieben sie dauerhaft unsichtbar, ohne
-	     `relative` haengten sie am oberen Rand der Leiste statt neben ihrem Eintrag. -->
-	<div class="space-y-2 border-t border-border-color p-3">
-		<!-- Settings -->
-		<a
-			href="/settings"
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed
-				? 'justify-center'
-				: ''} {currentPath === '/settings'
-				? 'bg-primary-active-bg font-semibold text-primary-active'
-				: ''}"
-		>
-			<Settings
-				size={20}
-				class="shrink-0 {currentPath === '/settings'
-					? 'text-primary-active'
-					: 'text-text-tertiary'}"
-			/>
-			{#if !collapsed}
-				<span class="truncate">Einstellungen</span>
-			{:else}
-				<div
-					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+	<!-- Fuß: Hilfe, Einstellungen, Design, Abmelden. Die Tooltips im eingeklappten Zustand
+	     brauchen `group relative` auf dem Element. -->
+	<div class="shrink-0 border-t-[length:var(--rahmen-s)] border-tinte p-3">
+		{#if !collapsed}
+			<p class="mono-label flex flex-wrap items-center gap-x-2 gap-y-1 px-1 pb-2 text-text-3">
+				<span><Tastenhinweis taste="N" /> Neu</span>
+				<span><Tastenhinweis taste="/" /> Suchen</span>
+			</p>
+		{/if}
+		<ul class="flex flex-col gap-1">
+			<li>
+				<a
+					href="/hilfe"
+					aria-current={currentPath.startsWith('/hilfe') ? 'page' : undefined}
+					aria-label={collapsed ? 'Hilfe' : undefined}
+					class="{eintrag} border-transparent hover:bg-flaeche-2 {collapsed
+						? 'justify-center'
+						: ''}"
 				>
-					Einstellungen
-				</div>
-			{/if}
-		</a>
-		<!-- Dark Mode Toggle -->
-		<button
-			onclick={() => themeState.toggle()}
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-2 hover:text-text-primary {collapsed
-				? 'justify-center'
-				: ''}"
-		>
-			{#if themeState.isDark}
-				<Sun size={20} class="shrink-0 text-amber-500" />
-			{:else}
-				<Moon size={20} class="shrink-0 text-text-tertiary" />
-			{/if}
-			{#if !collapsed}
-				<span class="truncate">{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}</span>
-			{:else}
-				<div
-					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+					<CircleHelp size={20} class="shrink-0" />
+					{#if !collapsed}<span class="truncate">Hilfe</span>{:else}<span
+							class={tooltip}
+							aria-hidden="true">Hilfe</span
+						>{/if}
+				</a>
+			</li>
+			<li>
+				<a
+					href="/settings"
+					aria-current={currentPath === '/settings' ? 'page' : undefined}
+					aria-label={collapsed ? 'Einstellungen' : undefined}
+					class="{eintrag} {collapsed ? 'justify-center' : ''}
+						{currentPath === '/settings'
+						? 'border-tinte bg-signal text-auf-farbe'
+						: 'border-transparent hover:bg-flaeche-2'}"
 				>
-					{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}
-				</div>
-			{/if}
-		</button>
-
-		<!-- Log Out -->
-		<button
-			onclick={logout}
-			disabled={logoutState.loading}
-			aria-busy={logoutState.loading}
-			class="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/20 {collapsed
-				? 'justify-center'
-				: ''}"
-		>
-			{#if logoutState.loading}
-				<Spinner size={20} />
-			{:else}
-				<LogOut size={20} class="shrink-0" />
-			{/if}
-			{#if !collapsed}
-				<span class="truncate">{logoutState.loading ? 'Melde ab…' : 'Abmelden'}</span>
-			{:else}
-				<div
-					class="elevation-2 absolute left-16 z-50 hidden rounded-md border border-border-color bg-surface-0 px-2 py-1 text-xs whitespace-nowrap text-text-primary group-hover:block"
+					<Settings size={20} class="shrink-0" />
+					{#if !collapsed}<span class="truncate">Einstellungen</span>{:else}<span
+							class={tooltip}
+							aria-hidden="true">Einstellungen</span
+						>{/if}
+				</a>
+			</li>
+			<li>
+				<button
+					onclick={() => themeState.toggle()}
+					aria-label={collapsed
+						? themeState.isDark
+							? 'Helles Design'
+							: 'Dunkles Design'
+						: undefined}
+					class="{eintrag} w-full border-transparent hover:bg-flaeche-2 {collapsed
+						? 'justify-center'
+						: ''}"
 				>
-					Abmelden
-				</div>
-			{/if}
-		</button>
+					{#if themeState.isDark}
+						<Sun size={20} class="shrink-0" />
+					{:else}
+						<Moon size={20} class="shrink-0" />
+					{/if}
+					{#if !collapsed}
+						<span class="truncate">{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}</span>
+					{:else}
+						<span class={tooltip} aria-hidden="true"
+							>{themeState.isDark ? 'Helles Design' : 'Dunkles Design'}</span
+						>
+					{/if}
+				</button>
+			</li>
+			<li>
+				<button
+					onclick={logout}
+					disabled={logoutState.loading}
+					aria-busy={logoutState.loading}
+					aria-label={collapsed ? 'Abmelden' : undefined}
+					class="{eintrag} w-full border-transparent text-gefahr hover:bg-flaeche-2 disabled:opacity-50 {collapsed
+						? 'justify-center'
+						: ''}"
+				>
+					{#if logoutState.loading}
+						<Spinner size={20} />
+					{:else}
+						<LogOut size={20} class="shrink-0" />
+					{/if}
+					{#if !collapsed}
+						<span class="truncate">{logoutState.loading ? 'Melde ab …' : 'Abmelden'}</span>
+					{:else}
+						<span class={tooltip} aria-hidden="true">Abmelden</span>
+					{/if}
+				</button>
+			</li>
+		</ul>
 
-		<!-- User Avatar/Info -->
 		{#if authState.user}
-			<div class="flex items-center gap-3 px-1 pt-2 {collapsed ? 'justify-center' : ''}">
+			<div
+				class="mt-2 flex items-center gap-3 border-t-[length:var(--rahmen-s)] border-tinte px-1 pt-3 {collapsed
+					? 'justify-center'
+					: ''}"
+			>
 				<!-- Zweites `?.`: bei leerer (nicht nur fehlender) E-Mail griff die
 				     Optional-Chain nicht und .toUpperCase() lief auf undefined. -->
 				<div
-					class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-active-bg text-sm font-bold text-primary-active"
+					class="flex h-9 w-9 shrink-0 items-center justify-center border-[length:var(--rahmen-s)] border-tinte bg-signal text-sm font-extrabold text-auf-farbe"
+					aria-hidden="true"
 				>
 					{authState.user.email?.[0]?.toUpperCase() ?? 'U'}
 				</div>
 				{#if !collapsed}
-					<div class="flex min-w-0 flex-col">
-						<span class="truncate text-xs font-semibold text-text-primary">
-							{authState.user.email}
-						</span>
-						<span class="truncate text-[10px] text-text-secondary">Mitglied</span>
-					</div>
+					<span class="min-w-0 truncate text-xs font-semibold">{authState.user.email}</span>
 				{/if}
 			</div>
 		{/if}

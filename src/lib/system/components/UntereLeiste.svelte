@@ -2,6 +2,7 @@
 	import { Plus, LayoutGrid } from '@lucide/svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { resolveNavModules } from '#lib/config/nav.js';
+	import type { ModulMeta } from '#lib/config/modules.js';
 	import { istAktiv } from '../module-aktiv.svelte.js';
 	import { keyboardState } from '#lib/core/keyboard.svelte.js';
 	import { haptic } from '#lib/core/haptics.js';
@@ -33,75 +34,67 @@
 		haptic(10);
 		onMore();
 	}
+
+	// Gemeinsame Form aller Tabs: 48 px hoch, aktiv in der Modulfarbe gefüllt mit Rahmen.
+	const tabKlasse =
+		'relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-0.5 border-[length:var(--rahmen-s)] px-0 py-1';
 </script>
 
+{#snippet tab(item: ModulMeta)}
+	{@const Icon = item.icon}
+	{@const active = currentPath === item.route}
+	<a
+		href={item.route}
+		onclick={tap}
+		aria-current={active ? 'page' : undefined}
+		style:background-color={active ? `var(${item.farbe})` : undefined}
+		class="{tabKlasse} {active ? 'border-tinte text-auf-farbe' : 'border-transparent text-tinte'}"
+	>
+		<Icon size={20} strokeWidth={active ? 2.5 : 2} />
+		<span
+			class="mono-label hidden w-full truncate text-center text-[11px] tracking-normal xs:block min-[390px]:text-xs"
+			>{item.label}</span
+		>
+	</a>
+{/snippet}
+
 <nav
-	class="select-none-native fixed right-0 bottom-0 left-0 z-30 border-t border-border-color bg-surface-0 pr-safe pb-[env(safe-area-inset-bottom)] pl-safe transition duration-300 md:hidden
+	aria-label="Hauptnavigation"
+	class="select-none-native fixed right-0 bottom-0 left-0 z-30 border-t-[length:var(--rahmen)] border-tinte bg-flaeche pr-safe pb-[env(safe-area-inset-bottom)] pl-safe transition duration-300 md:hidden
 		{keyboardState.open ? 'translate-y-full' : 'translate-y-0'}"
 	style="view-transition-name: bottom-nav"
 >
-	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1 xs:px-3">
+	<div class="relative mx-auto flex h-16 max-w-lg items-center justify-around gap-0.5 px-1">
 		{#each leftItems as item (item.id)}
-			{@const Icon = item.icon}
-			{@const active = currentPath === item.route}
-			<a
-				href={item.route}
-				onclick={tap}
-				aria-current={active ? 'page' : undefined}
-				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-transform active:scale-95
-					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
-			>
-				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block"
-					>{item.label}</span
-				>
-				{#if active}
-					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"
-					></span>
-				{/if}
-			</a>
+			{@render tab(item)}
 		{/each}
 
-		<!-- Mitte: Schnellerfassung. Etwas festhalten ist die haeufigste Aktion der
-		     App und gehoert deshalb in Daumenreichweite – Fokus liegt im Modul-Grid. -->
+		<!-- Mitte: Erfassen. Etwas festhalten ist die häufigste Aktion der App und gehört in
+		     Daumenreichweite. Das Quadrat ragt 12 px über die Leiste. -->
 		<button
 			type="button"
 			onclick={quickAdd}
 			aria-label="Schnell erfassen"
-			class="elevation-2 hero-gradient relative -top-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full transition-all active:scale-90"
+			class="druckbar relative -top-3 flex h-14 w-14 shrink-0 items-center justify-center border-[length:var(--rahmen)] border-tinte bg-signal text-auf-farbe"
 		>
-			<Plus size={24} strokeWidth={2.5} />
+			<Plus size={26} strokeWidth={3} />
 		</button>
 
 		{#each rightItems as item (item.id)}
-			{@const Icon = item.icon}
-			{@const active = currentPath === item.route}
-			<a
-				href={item.route}
-				onclick={tap}
-				aria-current={active ? 'page' : undefined}
-				class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 transition-transform active:scale-95
-					{active ? 'text-primary-600 dark:text-primary-400' : 'text-text-secondary'}"
-			>
-				<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-				<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block"
-					>{item.label}</span
-				>
-				{#if active}
-					<span class="absolute bottom-1.5 h-1 w-4 rounded bg-primary-600 dark:bg-primary-400"
-					></span>
-				{/if}
-			</a>
+			{@render tab(item)}
 		{/each}
 
 		<button
 			type="button"
 			onclick={more}
 			aria-label="Alle Module"
-			class="relative flex min-h-12 min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 text-text-secondary transition-transform active:scale-95"
+			class="{tabKlasse} border-transparent text-tinte"
 		>
 			<LayoutGrid size={20} strokeWidth={2} />
-			<span class="hidden w-full truncate text-center text-[10px] font-medium xs:block">Mehr</span>
+			<span
+				class="mono-label hidden w-full truncate text-center text-[11px] tracking-normal xs:block min-[390px]:text-xs"
+				>Alle</span
+			>
 		</button>
 	</div>
 </nav>

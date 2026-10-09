@@ -6,8 +6,8 @@
 		aktion,
 		children
 	}: {
-		/** `modus` = aktiver Modus (Signal), `status` = Zustand, `update` = neue Version (Info). */
-		variante?: 'modus' | 'status' | 'update';
+		/** `modus` = aktiver Modus (Signal), `status` = Zustand, `update` = neue Version (Info), `fehler` = etwas ging nicht (Gefahr). */
+		variante?: 'modus' | 'status' | 'update' | 'fehler';
 		/** Rechts, z. B. eine Taste „Beenden“. */
 		aktion?: Snippet;
 		children: Snippet;
@@ -16,7 +16,8 @@
 	const farben = {
 		modus: 'bg-signal text-auf-farbe',
 		status: 'bg-flaeche-2 text-tinte',
-		update: 'bg-info text-auf-info'
+		update: 'bg-info text-auf-info',
+		fehler: 'bg-gefahr text-auf-gefahr'
 	};
 </script>
 

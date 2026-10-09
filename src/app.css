@@ -355,6 +355,13 @@
 	}
 }
 
+/* Fokus nie von der unteren Leiste verdecken (WCAG 2.2, SC 2.4.11): Der Browser scrollt ein fokussiertes Element über die Leiste. */
+@media (max-width: 767px) {
+	html {
+		scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+	}
+}
+
 /* Safe-Area-Insets als wiederverwendbare Utilities (Notch, Kamera-Cutout,
    Gesten-Leiste – relevant für installierte PWA im Vollbild). Als @utility, damit
    Varianten wie md:pl-64 oder xl:pr-[420px] sie überstimmen (sonst bleibt das Padding bei 0). */

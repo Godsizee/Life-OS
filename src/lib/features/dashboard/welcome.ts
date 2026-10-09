@@ -21,7 +21,7 @@ export function markWelcomeSeen(): void {
 	} catch {}
 }
 
-/** Macht den weggeklickten Hinweis wieder sichtbar (Einstiegspunkt in `/more`). */
+/** Macht den weggeklickten Hinweis wieder sichtbar (Einstiegspunkt in den Einstellungen). */
 export function resetWelcome(): void {
 	try {
 		localStorage.removeItem(WELCOME_STORAGE_KEY);

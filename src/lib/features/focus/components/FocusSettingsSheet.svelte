@@ -1,5 +1,5 @@
 <script lang="ts">
-	// W6 — Fokus-Dauern. Bewusst hier statt in /more: vier Werte würden die
+	// W6 — Fokus-Dauern. Bewusst hier statt in den Einstellungen: vier Werte würden die
 	// Einstellungsliste dominieren, und gebraucht werden sie genau auf dieser Seite.
 	import Sheet from '#lib/ui/Sheet.svelte';
 	import FocusSettingsFields from '#lib/features/profile/components/FocusSettingsFields.svelte';

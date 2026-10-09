@@ -29,7 +29,7 @@
 	import SyncIssuesSheet from '#lib/ui/SyncIssuesSheet.svelte';
 	import Toaster from '#lib/ui/Toaster.svelte';
 	import AuthSplash from '#lib/features/auth/components/AuthSplash.svelte';
-	import UpdateBand from '#lib/system/components/UpdateBand.svelte';
+	import Baender from '#lib/system/components/Baender.svelte';
 	import { starteAppBadge } from '#lib/system/badge.svelte.js';
 	let { children } = $props();
 
@@ -49,6 +49,25 @@
 	// meldete ein direkter Aufruf einer geschuetzten URL ganz ohne Login
 	// faelschlich "Sitzung abgelaufen" statt schlicht "bitte anmelden".
 	let hadSession = false;
+
+	/** Tippt die Person gerade in ein Feld? Dann gehören Buchstaben dem Feld, nicht den Kürzeln. */
+	function inEingabe(ziel: EventTarget | null): boolean {
+		if (!(ziel instanceof HTMLElement)) return false;
+		return ziel.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(ziel.tagName);
+	}
+
+	/** Globale Tastenkürzel: `/` Suche, `n` Erfassen. `?` (Hilfe) folgt mit T501. */
+	function kuerzel(e: KeyboardEvent) {
+		if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || inEingabe(e.target)) return;
+		if (!showNav || paletteOpen || quickAddOpen || moduleGridOpen) return;
+		if (e.key === '/') {
+			e.preventDefault();
+			paletteOpen = true;
+		} else if (e.key === 'n') {
+			e.preventDefault();
+			quickAddOpen = true;
+		}
+	}
 
 	onMount(() => {
 		starteSystem();
@@ -77,7 +96,9 @@
 			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 				e.preventDefault();
 				paletteOpen = !paletteOpen;
+				return;
 			}
+			kuerzel(e);
 		});
 		// hooks.client.ts faengt nur, was beim Navigieren/Rendern hochblubbert.
 		// Ein nicht-awaitetes Store-Promise landet dagegen hier — vorher als
@@ -134,6 +155,15 @@
 		hadSession = !!authState.session;
 	});
 
+	// Kurzbefehl der installierten App („Erfassen“, `/?erfassen=1`): Blatt einmal öffnen, den Parameter
+	// danach entfernen, damit ein Neuladen es nicht erneut öffnet.
+	$effect(() => {
+		if (page.url.searchParams.get('erfassen') !== '1') return;
+		if (authState.loading || !authState.session) return;
+		quickAddOpen = true;
+		void goto(page.url.pathname, { replaceState: true, reset: false });
+	});
+
 	onNavigate((navigation) => {
 		if (navigation.shallow && navigation.type === 'goto') return;
 		if (!document.startViewTransition || prefersReducedMotion()) return;
@@ -154,48 +184,6 @@
 		page.url.pathname.startsWith('/fitness') || page.url.pathname.startsWith('/tasks')
 	);
 	let sidebarCollapsed = $state(false);
-
-	interface SyncBanner {
-		text: string;
-		class: string;
-		/** true = Tippen öffnet die Liste der unzustellbaren Änderungen. */
-		zeigeProbleme: boolean;
-	}
-
-	const syncBanner = $derived.by<SyncBanner | null>(() => {
-		const wartend = outbox.pending > 0 ? ` (${outbox.pending})` : '';
-		if (!online) {
-			return {
-				text: `Offline – Änderungen werden offline gespeichert${wartend}`,
-				class: 'bg-surface-3 text-text-primary',
-				zeigeProbleme: false
-			};
-		}
-		if (outbox.status === 'syncing') {
-			return {
-				text: `Synchronisiere…${wartend}`,
-				class: 'bg-primary-700 text-white',
-				zeigeProbleme: false
-			};
-		}
-		if (outbox.status === 'error') {
-			return {
-				text: `Sync fehlgeschlagen${wartend} – tippen für erneuten Versuch`,
-				class: 'bg-red-600 text-white',
-				zeigeProbleme: false
-			};
-		}
-		// Unzustellbares bleibt sichtbar, statt still verloren zu gehen.
-		if (outbox.dead > 0) {
-			const mehrzahl = outbox.dead !== 1;
-			return {
-				text: `${outbox.dead} Änderung${mehrzahl ? 'en' : ''} konnte${mehrzahl ? 'n' : ''} nicht gespeichert werden – tippen für Details`,
-				class: 'bg-amber-600 text-white',
-				zeigeProbleme: true
-			};
-		}
-		return null;
-	});
 </script>
 
 <Suche bind:open={paletteOpen} />
@@ -209,6 +197,14 @@
 {:else}
 	<div class="flex min-h-dvh bg-seite text-tinte">
 		{#if showNav}
+			<a
+				href="#inhalt"
+				class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:border-[length:var(--rahmen)] focus:border-tinte focus:bg-signal focus:px-4 focus:py-3 focus:font-semibold focus:text-auf-farbe"
+			>
+				Zum Inhalt springen
+			</a>
+		{/if}
+		{#if showNav}
 			<Seitenleiste currentPath={page.url.pathname} bind:collapsed={sidebarCollapsed} />
 		{/if}
 
@@ -218,18 +214,11 @@
 			{panel.panelOffen ? 'xl:pr-[420px]' : ''}
 			{showNav && !keyboardState.open ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"
 		>
-			{#if syncBanner}
-				<button
-					onclick={() => (syncBanner.zeigeProbleme ? (syncIssuesOpen = true) : outbox.replay())}
-					style="view-transition-name: sync-banner"
-					class="min-h-8 w-full px-4 py-1.5 text-center text-xs font-medium {syncBanner.class}"
-				>
-					{syncBanner.text}
-				</button>
-			{/if}
-			<UpdateBand />
+			<Baender {online} onProbleme={() => (syncIssuesOpen = true)} />
 			<main
-				class="mx-auto w-full flex-1 {showNav ? 'p-4 md:p-8' : ''} {wideRoute
+				id="inhalt"
+				tabindex="-1"
+				class="mx-auto w-full flex-1 outline-none {showNav ? 'p-4 md:p-8' : ''} {wideRoute
 					? 'max-w-6xl'
 					: 'max-w-4xl'}"
 			>
