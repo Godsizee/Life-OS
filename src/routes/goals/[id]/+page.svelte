@@ -9,7 +9,9 @@
 	import { getGoalProgress } from '#lib/features/goals/progress.js';
 	import { calculateHabitProgress30Days } from '#lib/features/habits/streak.js';
 	import { workoutsThisWeek } from '#lib/features/fitness/utils/frequency.js';
-	import { evaluateTrack } from '#lib/features/goals/checkins.js';
+	import { benoetigtProTag, evaluateTrack, sumCheckins } from '#lib/features/goals/checkins.js';
+	import { trackErklaerung } from '#lib/features/goals/erklaerung.js';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
 	import LinkedItems from '#lib/features/links/components/LinkedItems.svelte';
 	import GoalTargetCard from '#lib/features/goals/components/GoalTargetCard.svelte';
 	import GoalForm from '#lib/features/goals/components/GoalForm.svelte';
@@ -37,6 +39,22 @@
 	const goal = $derived(goalsState.goals.find((g) => g.id === goalId) ?? null);
 	const progress = $derived(goal ? getGoalProgress(goal) : 0);
 	const track = $derived(goal ? evaluateTrack(goal, progress) : null);
+	const warum = $derived.by(() => {
+		if (!goal || !track) return null;
+		const rate =
+			goal.goal_type === 'target' && goal.target_value
+				? benoetigtProTag(
+						goal.target_value,
+						sumCheckins(goalsState.checkinsFor(goal.id)),
+						track.daysLeft
+					)
+				: null;
+		return trackErklaerung(
+			goal,
+			track,
+			rate === null ? null : { wert: rate, einheit: goal.target_unit ?? '' }
+		);
+	});
 
 	const unterziele = $derived(
 		goalsState.goals.filter((g) => g.parent_id === goalId && !g.archived)
@@ -178,8 +196,9 @@
 					></div>
 				</div>
 				{#if track}
-					<div class="mt-2">
+					<div class="mt-2 flex flex-wrap items-center gap-2">
 						<OnTrackBadge {track} />
+						{#if warum}<WarumSticker kontext="Auf Kurs" erklaerung={warum} />{/if}
 					</div>
 				{/if}
 			</div>

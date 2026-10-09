@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { pausenListe } from '#lib/core/ruhe.js';
+	import { serieErklaerung } from '#lib/features/habits/erklaerung.js';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
 	import {
 		bestStreak,
 		calculateStreak,
@@ -43,6 +46,7 @@
 	const allTimeDone = $derived(habit ? totalCompleted(habit, entries) : 0);
 	const allTimeSkipped = $derived(entries.filter((d) => isSkipped(d)).length);
 
+	const serieWarum = $derived(habit ? serieErklaerung(habit, entries, pausenListe()) : null);
 	const unitStr = $derived(habit ? streakUnit(habit.schedule) : 'Tage');
 	const isWeeklyCount = $derived(habit?.schedule.type === 'weekly_count');
 
@@ -113,6 +117,12 @@
 				{/if}
 			{/snippet}
 		</PageHeader>
+
+		{#if serieWarum}
+			<div class="flex flex-wrap items-center gap-2">
+				<WarumSticker kontext="Serie" zeigeKontext erklaerung={serieWarum} />
+			</div>
+		{/if}
 
 		<!-- Top Cards -->
 		<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">

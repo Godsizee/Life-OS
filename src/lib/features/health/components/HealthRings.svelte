@@ -1,6 +1,8 @@
 <script lang="ts">
 	// W9 — Tagesfortschritt gegen die Ziele aus profiles.settings.
 	import { Droplet, Moon, Scale, Zap } from '@lucide/svelte';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
+	import { ringeErklaerung } from '../erklaerung';
 	import MetricRing from './MetricRing.svelte';
 	import { healthState } from '../store.svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
@@ -38,6 +40,20 @@
 		formatMetric('water_ml', waterMlValue, {
 			waterUnit: profileState.waterUnit,
 			glassSizeMl: profileState.glassSizeMl
+		})
+	);
+	const warum = $derived(
+		ringeErklaerung({
+			wasserZiel:
+				profileState.waterUnit === 'ml'
+					? `${profileState.waterGoalMl} ml`
+					: `${profileState.waterGoalGlasses} Gläser`,
+			schlafZielH: sleepGoal,
+			gewichtZiel: weightGoal === null ? null : weightGoalFormatted,
+			gewichtStart:
+				startWeight === null
+					? null
+					: formatMetric('weight_kg', startWeight, { weightUnit: profileState.weightUnit })
 		})
 	);
 </script>
@@ -78,4 +94,7 @@
 					: 'Ziel erreicht'}
 		icon={Scale}
 	/>
+</div>
+<div class="mt-3">
+	<WarumSticker kontext="Ringe" zeigeKontext erklaerung={warum} />
 </div>

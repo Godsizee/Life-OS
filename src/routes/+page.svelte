@@ -101,6 +101,10 @@
 		{/snippet}
 	</PageHeader>
 
+	{#await import('#lib/system/components/heute/ZahlenWarum.svelte') then { default: ZahlenWarum }}
+		<ZahlenWarum {plan} />
+	{/await}
+
 	{#if willkommen.sichtbar}
 		{#await import('#lib/system/components/heute/WillkommenZurueck.svelte') then { default: WillkommenZurueck }}
 			<WillkommenZurueck />

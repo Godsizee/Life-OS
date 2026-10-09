@@ -7,11 +7,14 @@
 	let {
 		erklaerung,
 		kontext,
+		zeigeKontext = false,
 		class: className = ''
 	}: {
 		erklaerung: ErklaerungTyp;
 		/** Worauf sich das „Warum?“ bezieht, z. B. „Life Score“. Steht im zugänglichen Namen. */
 		kontext: string;
+		/** Zeigt den Kontext im Sticker („Warum? Life Score“), wenn mehrere nebeneinander stehen. */
+		zeigeKontext?: boolean;
 		class?: string;
 	} = $props();
 
@@ -19,7 +22,7 @@
 </script>
 
 <Sticker onclick={() => (offen = true)} label="Warum: {kontext}" expanded={offen} class={className}>
-	Warum?
+	Warum?{zeigeKontext ? ` ${kontext}` : ''}
 </Sticker>
 
 <Sheet bind:open={offen} title="Warum: {kontext}">

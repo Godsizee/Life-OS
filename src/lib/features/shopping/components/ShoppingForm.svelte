@@ -2,7 +2,9 @@
 	import Button from '#lib/ui/Button.svelte';
 	import Input from '#lib/ui/Input.svelte';
 	import Select from '#lib/ui/Select.svelte';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
 	import { shoppingState } from '../store.svelte';
+	import { kategorieErklaerung } from '../erklaerung';
 	import { guessCategoryWithHistory, CATEGORY_IDS, CATEGORY_LABELS, UNITS } from '../categories';
 
 	let { onsubmitted, listId }: { onsubmitted?: () => void; listId?: string } = $props();
@@ -16,6 +18,8 @@
 	const autoCategory = $derived(
 		name.trim() ? guessCategoryWithHistory(name, shoppingState.settings.shopping_stats) : 'other'
 	);
+
+	const warum = $derived(kategorieErklaerung(name, shoppingState.settings.shopping_stats));
 
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
@@ -63,5 +67,11 @@
 			<option value={id}>{CATEGORY_LABELS[id]}</option>
 		{/each}
 	</Select>
+	{#if warum && !category}
+		<div class="flex items-center gap-2">
+			<span class="text-sm text-text-2">Kategorie automatisch gewählt</span>
+			<WarumSticker kontext="Kategorie" erklaerung={warum} />
+		</div>
+	{/if}
 	<Input type="text" placeholder="Notiz (optional)" bind:value={note} />
 </form>

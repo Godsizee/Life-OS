@@ -76,7 +76,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
 /** Standard-Reihenfolge = typischer Ladenrundgang; pro Workspace überschreibbar. */
 export const DEFAULT_CATEGORY_ORDER: string[] = [...CATEGORY_IDS];
 
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
+export const CATEGORY_KEYWORDS: Record<string, string[]> = {
 	produce: [
 		'apfel',
 		'äpfel',

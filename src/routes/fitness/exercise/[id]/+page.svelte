@@ -5,6 +5,8 @@
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 	import { healthState } from '#lib/features/health/store.svelte.js';
 	import { exerciseProgression } from '#lib/features/fitness/utils/progression.js';
+	import { einRmErklaerung } from '#lib/features/fitness/erklaerung.js';
+	import WarumSticker from '#lib/ui/WarumSticker.svelte';
 	import Linie from '#lib/ui/charts/Linie.svelte';
 	import { ArrowLeft, Trophy, Scale } from '@lucide/svelte';
 
@@ -135,7 +137,10 @@
 							<Trophy size={16} class="text-amber-500" />
 							<span>Aktuelles PR (geschätztes 1RM)</span>
 						</span>
-						<span class="font-mono text-sm text-text-primary">{pr.est_1rm} kg</span>
+						<span class="flex items-center gap-2">
+							<span class="font-mono text-sm text-text-primary">{pr.est_1rm} kg</span>
+							<WarumSticker kontext="1RM" erklaerung={einRmErklaerung(pr)} />
+						</span>
 					</div>
 				{/if}
 				{#if relativeStrength !== null}
