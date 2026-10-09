@@ -2,6 +2,7 @@
 // und lebt im Store statt im Komponenten-State: damit überlebt sie Reload, Navigation
 // und App-Wechsel. Draft in localStorage. Vorbild: fitness/live-workout.svelte.ts (F2/F6).
 import { alarm } from '#lib/core/alert.svelte.js';
+import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
 import { profileState } from '#lib/features/profile/store.svelte.js';
 import { timeTrackingState } from '#lib/features/timetracking/store.svelte.js';
 import {
@@ -127,7 +128,7 @@ class FocusSessionState {
 			const asked = localStorage.getItem('lifeos:notify-asked');
 			if (!asked) {
 				localStorage.setItem('lifeos:notify-asked', '1');
-				void Notification.requestPermission();
+				void erlaubnis.frageNach('timer');
 			}
 		}
 		this.taskId = taskId;

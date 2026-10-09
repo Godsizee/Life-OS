@@ -10,7 +10,12 @@
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import { workspaceState } from '#lib/features/workspace/store.svelte.js';
-	import { hilfeNiveau, type HilfeNiveau } from '#lib/system/einstellungen/hilfe.js';
+	import {
+		hilfeNiveau,
+		neuigkeitenGesehen,
+		type HilfeNiveau
+	} from '#lib/system/einstellungen/hilfe.js';
+	import { neueste } from '#lib/system/neuigkeiten.js';
 	import { setupAbgeschlossen, setupAbsichten } from '#lib/system/einstellungen/setup.js';
 	import { istAktiv, setzeAktiv } from '#lib/system/module-aktiv.svelte.js';
 	import {
@@ -125,7 +130,7 @@
 				}
 				if (fragen.includes('fitness')) await profileState.setWeeklyWorkoutGoal(wochenziel);
 			}
-			if (!ansehen) await setze(setupAbgeschlossen, toISODate(new Date()));
+			if (!ansehen) await markiereEingerichtet();
 			await goto('/');
 		} catch {
 			fehler = 'Das hat nicht geklappt. Prüfe die Verbindung und versuche es noch einmal.';
@@ -133,9 +138,16 @@
 		}
 	}
 
+	/** Neue Konten kennen das Neue schon: „Was ist neu“ erscheint erst nach dem nächsten Update. */
+	async function markiereEingerichtet() {
+		await setze(setupAbgeschlossen, toISODate(new Date()));
+		const n = neueste();
+		if (n) await setze(neuigkeitenGesehen, n.version);
+	}
+
 	/** Alles beim Standard lassen: Die Einrichtung gilt als erledigt, die Module bleiben, wie sie sind. */
 	async function ueberspringen() {
-		if (!ansehen) await setze(setupAbgeschlossen, toISODate(new Date()));
+		if (!ansehen) await markiereEingerichtet();
 		await goto('/');
 	}
 

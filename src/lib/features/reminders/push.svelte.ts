@@ -1,4 +1,5 @@
 import { VITE_VAPID_PUBLIC_KEY } from '$app/env/public';
+import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
 import { supabase } from '#lib/core/supabase.js';
 import * as remindersApi from './api.js';
 
@@ -29,7 +30,8 @@ class PushState {
 		if (!this.supported || !VAPID_PUBLIC_KEY) return;
 		this.loading = true;
 		try {
-			this.permission = await Notification.requestPermission();
+			const antwort = await erlaubnis.frageNach('push');
+			if (antwort !== 'nicht-unterstuetzt') this.permission = antwort;
 			if (this.permission !== 'granted') return;
 
 			const registration = await navigator.serviceWorker.ready;

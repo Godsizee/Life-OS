@@ -46,3 +46,15 @@ export const ersteSchritteAus = defineEinstellung<boolean>({
 	abschnitt: 'hilfe',
 	ui: { art: 'schalter' }
 });
+
+/** Zuletzt gesehene Version von „Was ist neu“ — gilt nur für dieses Gerät. */
+export const neuigkeitenGesehen = defineEinstellung<string>({
+	schluessel: 'neuigkeiten.gesehen',
+	ablage: 'geraet',
+	schema: z.string(),
+	standard: '',
+	label: 'Zuletzt gesehene Neuigkeit',
+	stufe: 'erweitert',
+	abschnitt: 'hilfe',
+	ui: { art: 'eigen' }
+});

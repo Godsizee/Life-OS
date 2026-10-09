@@ -11,12 +11,15 @@
 	import { starteSystem } from '#lib/system/start.js';
 	import { richteAutomationenEin } from '#lib/system/automationen.js';
 	import { uebernehmeBestand } from '#lib/system/bestand.js';
+	import { neuigkeitenGesehen } from '#lib/system/einstellungen/hilfe.js';
 	import { setupAbgeschlossen } from '#lib/system/einstellungen/setup.js';
+	import { zeigeNeuigkeit } from '#lib/system/neuigkeiten.js';
 	import { setupSteht } from '#lib/system/setup-kern.js';
 	import { wert } from '#lib/core/einstellungen.js';
 	import ModulTor from '#lib/system/components/ModulTor.svelte';
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
+	import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
@@ -207,12 +210,29 @@
 		page.url.pathname.startsWith('/fitness') || page.url.pathname.startsWith('/tasks')
 	);
 	let sidebarCollapsed = $state(false);
+	// „Was ist neu“: einmal je Gerät und Version, nur für Konten mit abgeschlossener Einrichtung und auf Seiten mit Navigation.
+	const zeigeNeues = $derived(
+		setupPruefbar &&
+			showNav &&
+			!setupSteht(wert(setupAbgeschlossen)) &&
+			zeigeNeuigkeit(wert(neuigkeitenGesehen))
+	);
 </script>
 
 <Suche bind:open={paletteOpen} />
 <Erfassen bind:open={quickAddOpen} />
 <AlleModule bind:open={moduleGridOpen} currentPath={page.url.pathname} />
 <SyncIssuesSheet bind:open={syncIssuesOpen} />
+{#if erlaubnis.art}
+	{#await import('#lib/system/components/ErlaubnisErklaerung.svelte') then { default: ErlaubnisErklaerung }}
+		<ErlaubnisErklaerung art={erlaubnis.art} />
+	{/await}
+{/if}
+{#if zeigeNeues}
+	{#await import('#lib/system/components/NeuigkeitenSheet.svelte') then { default: NeuigkeitenSheet }}
+		<NeuigkeitenSheet />
+	{/await}
+{/if}
 <Toaster />
 
 {#if authState.loading}

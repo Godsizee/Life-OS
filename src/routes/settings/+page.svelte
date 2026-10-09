@@ -3,6 +3,7 @@
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
+	import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { profileState, HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
@@ -46,8 +47,8 @@
 
 	async function requestTimerSignals() {
 		if (typeof window !== 'undefined' && 'Notification' in window) {
-			const res = await Notification.requestPermission();
-			timerSignalsPermission = res;
+			const res = await erlaubnis.frageNach('timer');
+			if (res !== 'nicht-unterstuetzt') timerSignalsPermission = res;
 		}
 	}
 
