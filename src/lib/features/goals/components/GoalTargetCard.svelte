@@ -1,7 +1,7 @@
 <script lang="ts">
 	// W8 — Zielwert-Ziel auf einen Blick: Stand, kumulativer Verlauf, Check-in-Historie.
 	import { Plus, Trash2, Target, ChevronDown, ChevronUp } from '@lucide/svelte';
-	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
 	import GoalCheckinSheet from './GoalCheckinSheet.svelte';
 	import { goalsState } from '../store.svelte';
 	import {
@@ -78,10 +78,12 @@
 
 	{#if hasData}
 		<div class="mt-4">
-			<TrendChart
-				{points}
-				goalLine={goal.target_value ?? undefined}
-				formatValue={(v) => formatTargetProgress(v, null, goal.target_unit)}
+			<Linie
+				punkte={points}
+				ziel={goal.target_value ?? undefined}
+				formatWert={(v) => formatTargetProgress(v, null, goal.target_unit)}
+				farbe="goals"
+				beschreibung="Verlauf der Check-ins bis zum Ziel"
 			/>
 		</div>
 

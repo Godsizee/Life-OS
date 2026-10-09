@@ -36,7 +36,7 @@
 </script>
 
 <nav
-	class="pl-safe pr-safe select-none-native fixed right-0 bottom-0 left-0 z-30 border-t border-border-color bg-surface-0 pb-[env(safe-area-inset-bottom)] transition duration-300 md:hidden
+	class="select-none-native fixed right-0 bottom-0 left-0 z-30 border-t border-border-color bg-surface-0 pr-safe pb-[env(safe-area-inset-bottom)] pl-safe transition duration-300 md:hidden
 		{keyboardState.open ? 'translate-y-full' : 'translate-y-0'}"
 	style="view-transition-name: bottom-nav"
 >

@@ -3,6 +3,7 @@
 	import type { Habit } from '../types';
 	import { Check } from '@lucide/svelte';
 	import { isCompleted, isSkipped, targetOf } from '../streak';
+	import Ring from '#lib/ui/charts/Ring.svelte';
 
 	interface Props {
 		habit: Habit;
@@ -31,9 +32,6 @@
 		}
 		if (onLog) onLog();
 	}
-
-	const circumference = 2 * Math.PI * 14;
-	const offset = $derived(circumference - (pct / 100) * circumference);
 </script>
 
 <button
@@ -58,36 +56,18 @@
 			{/if}
 		</div>
 	{:else}
-		<!-- Mengen-Routinen: SVG Progress Ring -->
-		<svg class="h-10 w-10 -rotate-90 transform" viewBox="0 0 32 32">
-			<!-- Track -->
-			<circle
-				cx="16"
-				cy="16"
-				r="14"
-				class={skipped ? 'text-surface-2' : 'text-surface-1'}
-				stroke="currentColor"
-				stroke-width="3"
-				fill="none"
-			/>
-			<!-- Progress -->
-			<circle
-				cx="16"
-				cy="16"
-				r="14"
-				class="text-primary-500 transition-all duration-300"
-				stroke="currentColor"
-				stroke-width="3"
-				fill="none"
-				stroke-dasharray={circumference}
-				stroke-dashoffset={skipped ? circumference : offset}
-				stroke-linecap="round"
-			/>
-		</svg>
-		{#if skipped}
-			<span class="absolute text-[10px] font-bold text-text-tertiary">S</span>
-		{:else}
-			<span class="absolute text-[10px] font-bold text-text-secondary">{current}</span>
-		{/if}
+		<!-- Mengen-Routinen: Fortschrittsring -->
+		<Ring
+			wert={skipped ? 0 : pct}
+			groesse={40}
+			strich={11}
+			rahmen={false}
+			farbe="habits"
+			beschreibung={skipped ? 'Heute übersprungen' : `${current} von ${target}`}
+		>
+			{#snippet mitte()}
+				<span class="text-[11px] font-bold tabular-nums">{skipped ? 'S' : current}</span>
+			{/snippet}
+		</Ring>
 	{/if}
 </button>

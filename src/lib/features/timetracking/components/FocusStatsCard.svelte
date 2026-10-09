@@ -5,7 +5,7 @@
 	import { formatMinutes, minutesByDay, minutesByTask, startOfWeek } from '../stats';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { toISODate } from '#lib/core/date.js';
-	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
 	import { Zap } from '@lucide/svelte';
 
 	let { days = 7, title = 'Fokuszeit' }: { days?: number; title?: string } = $props();
@@ -63,7 +63,12 @@
 
 	{#if hasData}
 		<div class="mt-4">
-			<TrendChart {points} formatValue={(v) => formatMinutes(v)} />
+			<Linie
+				punkte={points}
+				formatWert={(v) => formatMinutes(v)}
+				farbe="focus"
+				beschreibung={`Fokuszeit pro Tag der letzten ${days} Tage`}
+			/>
 		</div>
 
 		{#if topTasks.length > 0}

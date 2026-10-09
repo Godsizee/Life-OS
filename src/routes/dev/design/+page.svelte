@@ -43,6 +43,11 @@
 	import Textarea from '#lib/ui/Textarea.svelte';
 	import WarumSticker from '#lib/ui/WarumSticker.svelte';
 	import Wortmarke from '#lib/ui/Wortmarke.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
+	import DiagrammBalken from '#lib/ui/charts/Balken.svelte';
+	import Ring from '#lib/ui/charts/Ring.svelte';
+	import Raster from '#lib/ui/charts/Raster.svelte';
+	import type { RasterZelle } from '#lib/ui/charts/raster-kern.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 
 	const meta = (id: ModulId) => modules.find((m) => m.id === id)!;
@@ -164,6 +169,49 @@
 	let blattOffen = $state(false);
 	let panelOffen = $state(false);
 	let modalOffen = $state(false);
+
+	// ── Diagramme (T305): Beispieldaten ──────────────────────────────────────────────
+	const tage14 = Array.from({ length: 14 }, (_, i) => `${i + 1}. Okt.`);
+	const verlauf = tage14.map((label, i) => ({
+		label,
+		value: i === 5 || i === 6 ? null : [62, 70, 66, 74, 80, 0, 0, 72, 78, 84, 81, 88, 86, 91][i]
+	}));
+	const vergleich = tage14.map((label, i) => ({ label, value: 60 + i * 2 }));
+	const gewicht = [84.2, 83.9, 84.0, 83.4, 83.1, 82.8].map((value, i) => ({
+		label: `Woche ${i + 1}`,
+		value
+	}));
+	const volumen = [
+		{ label: 'Brust', wert: 4200 },
+		{ label: 'Rücken', wert: 5100 },
+		{ label: 'Beine', wert: 7800 },
+		{ label: 'Schultern', wert: 2100 }
+	];
+	const wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((label, i) => ({
+		label,
+		wert: [3.2, 3.6, null, 4.1, 3.9, 4.4, 3.5][i] as number | null,
+		text: [3.2, 3.6, null, 4.1, 3.9, 4.4, 3.5][i]?.toFixed(1).replace('.', ',') ?? '–',
+		farbe: 'var(--mod-mood)'
+	}));
+	const rasterZellen: RasterZelle[] = Array.from({ length: 84 }, (_, i) => {
+		const wert = (i * 7 + (i % 5) * 3) % 11;
+		return {
+			id: `z${i}`,
+			spalte: Math.floor(i / 7),
+			zeile: i % 7,
+			farbe:
+				wert > 8
+					? 'var(--mod-habits)'
+					: wert > 5
+						? 'color-mix(in srgb, var(--mod-habits) 55%, var(--flaeche))'
+						: wert > 2
+							? 'color-mix(in srgb, var(--mod-habits) 25%, var(--flaeche))'
+							: null,
+			label: `Tag ${i + 1}`,
+			text: `${wert} von 10 erledigt`,
+			heute: i === 83
+		};
+	});
 </script>
 
 <svelte:head><title>Styleguide · Life OS</title></svelte:head>
@@ -642,6 +690,112 @@
 					>
 						{#snippet band()}<Band variante="modus">Modus: Leiser Tag</Band>{/snippet}
 					</PageHeader>
+				</div>
+			</Box>
+		</div>
+	</section>
+
+	<!-- (e) Diagramme (T305) -->
+	<section class="flex flex-col gap-6" aria-labelledby="h-diagramme">
+		<h2 id="h-diagramme" class="text-2xl font-extrabold [font-stretch:85%]">Diagramme</h2>
+		<div class="grid gap-6 md:grid-cols-2">
+			<Box titel="Linie" modul="analytics">
+				<div class="p-3">
+					<Linie
+						punkte={verlauf}
+						min={0}
+						max={100}
+						farbe="analytics"
+						beschreibung="Beispiel: Life Score von 14 Tagen mit zwei Tagen ohne Wert"
+						{vergleich}
+						ziel={80}
+					/>
+				</div>
+			</Box>
+			<Box titel="Linie, Sparkline" modul="health">
+				<div class="p-3">
+					<div class="w-40">
+						<Linie
+							punkte={gewicht}
+							hoehe={80}
+							kompakt
+							farbe="health"
+							beschreibung="Beispiel: Gewichtsverlauf über sechs Wochen"
+						/>
+					</div>
+				</div>
+			</Box>
+			<Box titel="Balken, waagerecht" modul="fitness">
+				<div class="p-3">
+					<DiagrammBalken
+						daten={volumen}
+						farbe="fitness"
+						formatWert={(v) => `${v.toLocaleString('de-DE')} kg`}
+						beschreibung="Beispiel: Wochenvolumen je Muskelgruppe"
+					/>
+				</div>
+			</Box>
+			<Box titel="Balken, senkrecht" modul="mood">
+				<div class="p-3">
+					<DiagrammBalken
+						daten={wochentage}
+						richtung="vertikal"
+						max={5}
+						hoehe={120}
+						beschreibung="Beispiel: Durchschnittliche Stimmung je Wochentag"
+					/>
+				</div>
+			</Box>
+			<Box titel="Ringe" modul="focus">
+				<div class="p-3">
+					<div class="flex flex-wrap items-center gap-6">
+						<Ring
+							wert={72}
+							groesse={120}
+							text="72"
+							unter="Score"
+							beschreibung="Beispiel: Score 72 von 100"
+						/>
+						<Ring wert={40} farbe="health" beschreibung="Beispiel: 40 Prozent">
+							{#snippet mitte()}<span class="text-sm font-extrabold">40 %</span>{/snippet}
+						</Ring>
+						<Ring
+							wert={100}
+							groesse={40}
+							strich={11}
+							rahmen={false}
+							farbe="habits"
+							text="3"
+							beschreibung="Beispiel: 3 von 3"
+						/>
+						<Ring
+							wert={0}
+							groesse={56}
+							strich={9}
+							farbe="signal"
+							text="0"
+							beschreibung="Beispiel: noch nichts"
+						/>
+					</div>
+				</div>
+			</Box>
+			<Box titel="Raster" modul="habits">
+				<div class="p-3">
+					<Raster
+						spalten={12}
+						zeilen={7}
+						zellen={rasterZellen}
+						spaltenLabels={[
+							{ index: 0, text: 'Jul' },
+							{ index: 5, text: 'Aug' },
+							{ index: 9, text: 'Sep' }
+						]}
+						beschreibung="Beispiel: Erledigte Routinen der letzten 12 Wochen"
+						legende={[
+							{ farbe: null, text: 'Wenig' },
+							{ farbe: 'var(--mod-habits)', text: 'Viel' }
+						]}
+					/>
 				</div>
 			</Box>
 		</div>

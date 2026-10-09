@@ -1,44 +1,33 @@
 <script lang="ts">
 	import { moodDistribution, type MoodLike } from '../stats';
-	import { MOOD_LABELS, MOOD_EMOJIS } from '../types';
-	import { MOOD_CLASSES } from '../colors';
+	import { MOOD_LABELS } from '../types';
+	import { moodHex } from '../colors';
+	import Balken from '#lib/ui/charts/Balken.svelte';
 
 	let { entries }: { entries: MoodLike[] } = $props();
 
 	const dist = $derived(moodDistribution(entries));
 	const total = $derived(dist.reduce((a, b) => a + b, 0));
+
+	const daten = $derived(
+		[5, 4, 3, 2, 1].map((score) => {
+			const count = dist[score - 1];
+			const percent = total === 0 ? 0 : Math.round((count / total) * 100);
+			return {
+				label: MOOD_LABELS[score],
+				wert: count,
+				text: `${count} (${percent} %)`,
+				farbe: moodHex(score)
+			};
+		})
+	);
 </script>
 
 <div class="space-y-2">
-	<h3 class="text-xs font-bold tracking-wider text-text-tertiary uppercase">
-		Stimmungs-Verteilung
-	</h3>
-
-	{#if total === 0}
-		<p class="text-xs text-text-tertiary">Keine Daten im Zeitraum.</p>
-	{:else}
-		<div class="flex flex-col gap-2">
-			{#each [5, 4, 3, 2, 1] as score (score)}
-				{@const count = dist[score - 1]}
-				{@const percent = Math.round((count / total) * 100)}
-				<div class="flex items-center gap-2 text-xs">
-					<span class="w-24 shrink-0 truncate font-medium text-text-secondary">
-						{MOOD_EMOJIS[score]}
-						{MOOD_LABELS[score]}
-					</span>
-					<div
-						class="h-3.5 flex-1 overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
-					>
-						<div
-							class="h-full transition-all duration-500 {MOOD_CLASSES[score]}"
-							style="width: {percent}%"
-						></div>
-					</div>
-					<span class="w-12 shrink-0 text-right text-text-tertiary tabular-nums">
-						{count} ({percent}%)
-					</span>
-				</div>
-			{/each}
-		</div>
-	{/if}
+	<h3 class="mono-label text-text-3">Stimmungs-Verteilung</h3>
+	<Balken
+		{daten}
+		max={Math.max(1, total)}
+		beschreibung="Verteilung der Stimmungsstufen im Zeitraum, {total} Einträge"
+	/>
 </div>

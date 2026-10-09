@@ -70,7 +70,7 @@
 			type="button"
 			onclick={close}
 			aria-label="Schließen"
-			class="pt-safe absolute top-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white active:scale-95"
+			class="absolute top-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 pt-safe text-white active:scale-95"
 		>
 			<X size={22} />
 		</button>
@@ -98,7 +98,7 @@
 			>
 				<ChevronRight size={24} />
 			</button>
-			<span class="pb-safe absolute bottom-4 text-xs font-medium text-white/70">
+			<span class="absolute bottom-4 pb-safe text-xs font-medium text-white/70">
 				{index + 1} / {items.length}
 			</span>
 		{/if}

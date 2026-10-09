@@ -1,7 +1,8 @@
 <script lang="ts">
-	// W9 — Fortschrittsring je Metrik. Handgerolltes SVG (stroke-dasharray),
-	// Muster: analytics/components/ScoreRing.svelte, aber generisch und kleiner.
+	// W9 — Fortschrittsring je Metrik (ui/charts/Ring) mit Beschriftung darunter.
 	import type { IconKomponente } from '#lib/ui/icon.js';
+	import Ring from '#lib/ui/charts/Ring.svelte';
+	import type { ChartFarbe } from '#lib/ui/charts/farbe.js';
 
 	let {
 		percent,
@@ -10,7 +11,7 @@
 		goalLabel,
 		icon: IconComponent,
 		size = 88,
-		colorClass = 'stroke-primary-600 dark:stroke-primary-400'
+		farbe = 'health'
 	}: {
 		percent: number;
 		label: string;
@@ -18,49 +19,26 @@
 		goalLabel?: string;
 		icon?: IconKomponente;
 		size?: number;
-		colorClass?: string;
+		farbe?: ChartFarbe;
 	} = $props();
-
-	const RADIUS = 40;
-	const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-	const offset = $derived(
-		CIRCUMFERENCE - (Math.max(0, Math.min(100, percent)) / 100) * CIRCUMFERENCE
-	);
 </script>
 
 <div class="flex flex-col items-center gap-1.5">
-	<div class="relative flex items-center justify-center" style="width: {size}px; height: {size}px;">
-		<svg class="-rotate-90" width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
-			<circle
-				cx="50"
-				cy="50"
-				r={RADIUS}
-				fill="none"
-				stroke="currentColor"
-				stroke-width="9"
-				class="text-surface-3"
-			/>
-			<circle
-				cx="50"
-				cy="50"
-				r={RADIUS}
-				fill="none"
-				stroke-width="9"
-				stroke-linecap="round"
-				stroke-dasharray={CIRCUMFERENCE}
-				stroke-dashoffset={offset}
-				class="transition-all duration-700 ease-out {colorClass}"
-			/>
-		</svg>
-		<div class="absolute flex flex-col items-center">
+	<Ring
+		wert={percent}
+		groesse={size}
+		{farbe}
+		beschreibung="{label}: {value}{goalLabel ? `, ${goalLabel}` : ''}"
+	>
+		{#snippet mitte()}
 			{#if IconComponent}
-				<IconComponent size={14} class="text-text-tertiary" />
+				<IconComponent size={14} class="text-text-3" />
 			{/if}
-			<span class="text-sm font-extrabold text-text-primary tabular-nums">{value}</span>
-		</div>
-	</div>
-	<span class="text-xs font-semibold text-text-secondary">{label}</span>
+			<span class="text-sm font-extrabold tabular-nums">{value}</span>
+		{/snippet}
+	</Ring>
+	<span class="mono-label text-tinte">{label}</span>
 	{#if goalLabel}
-		<span class="text-[10px] text-text-tertiary">{goalLabel}</span>
+		<span class="text-xs text-text-2">{goalLabel}</span>
 	{/if}
 </div>

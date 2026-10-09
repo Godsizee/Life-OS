@@ -213,7 +213,7 @@
 		{/if}
 
 		<div
-			class="pt-safe pl-safe pr-safe flex min-w-0 flex-1 flex-col transition-all duration-300 ease-in-out
+			class="flex min-w-0 flex-1 flex-col pt-safe pr-safe pl-safe transition-all duration-300 ease-in-out
 			{showNav ? (sidebarCollapsed ? 'md:pl-20' : 'md:pl-64') : ''}
 			{panel.panelOffen ? 'xl:pr-[420px]' : ''}
 			{showNav && !keyboardState.open ? 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' : ''}"

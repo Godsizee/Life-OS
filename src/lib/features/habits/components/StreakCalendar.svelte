@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { toISODate } from '#lib/core/date.js';
+	import { fromISODate, formatTagKurz, toISODate } from '#lib/core/date.js';
 	import { isDueOn, isSkipped, isCompleted, type HabitDay } from '#lib/features/habits/streak.js';
 	import type { Habit } from '#lib/features/habits/types.js';
-	import { themeState } from '#lib/core/theme.svelte.js';
+	import Raster from '#lib/ui/charts/Raster.svelte';
+	import { monatsLabels, type RasterZelle } from '#lib/ui/charts/raster-kern.js';
 
 	let {
 		habits,
@@ -14,180 +15,78 @@
 		weeks?: number;
 	} = $props();
 
-	// ── Datums-Grid ──────────────────────────────────────────────────
-	const DAYS = $derived(weeks * 7);
+	const heute = new Date();
+	const heuteIso = toISODate(heute);
 
-	const today = new Date();
-
-	// Starte am ersten Tag des Grid (Tage zurück, dann ausrichten auf Montag)
-	const gridStart = $derived.by(() => {
-		const start = new Date(today);
-		start.setDate(today.getDate() - DAYS + 1);
-		return start;
-	});
-
-	// Alle Tage als ISO-Strings
-	const allDays = $derived(
-		Array.from({ length: DAYS }, (_, i) => {
-			const d = new Date(gridStart);
-			d.setDate(gridStart.getDate() + i);
+	// Die letzten `weeks` * 7 Tage, heute zuletzt; je 7 Tage = 1 Spalte.
+	const tage = $derived(
+		Array.from({ length: weeks * 7 }, (_, i) => {
+			const d = new Date(heute);
+			d.setDate(heute.getDate() - weeks * 7 + 1 + i);
 			return toISODate(d);
 		})
 	);
+	const wochen = $derived(Array.from({ length: weeks }, (_, w) => tage.slice(w * 7, w * 7 + 7)));
 
-	// Tage nach Wochen gruppieren (je 7 Tage = 1 Spalte im Grid)
-	const weeksGrid = $derived.by(() => {
-		const wg: string[][] = [];
-		for (let w = 0; w < weeks; w++) {
-			wg.push(allDays.slice(w * 7, w * 7 + 7));
+	// Pro Tag: wie viele Routinen waren fällig und wie viele davon erledigt.
+	function zaehle(tag: string): { due: number; logged: number } {
+		const datum = fromISODate(tag) ?? new Date(tag);
+		let due = 0;
+		let logged = 0;
+		for (const h of habits) {
+			const day = entriesFor(h.id).find((d) => d.date === tag);
+			if (isSkipped(day)) continue;
+			if (h.schedule.type === 'weekly_count' || isDueOn(h.schedule, datum)) {
+				due++;
+				if (isCompleted(h, day)) logged++;
+			}
 		}
-		return wg;
-	});
-
-	// ── Heatmap-Daten berechnen ────────────────────────────────────────
-	// Pro Tag: wie viele Habits waren fällig und wie viele davon geloggt
-	interface DayData {
-		date: string;
-		due: number;
-		logged: number;
-		pct: number; // 0–100
+		return { due, logged };
 	}
 
-	const dayData = $derived(
-		allDays.reduce<Record<string, DayData>>((acc, dateStr) => {
-			const dateObj = new Date(dateStr);
-			let due = 0;
-			let logged = 0;
-			for (const h of habits) {
-				const day = entriesFor(h.id).find((d) => d.date === dateStr);
-				if (isSkipped(day)) continue;
-				if (h.schedule.type === 'weekly_count' || isDueOn(h.schedule, dateObj)) {
-					due++;
-					if (isCompleted(h, day)) logged++;
-				}
-			}
-			acc[dateStr] = {
-				date: dateStr,
-				due,
-				logged,
-				pct: due > 0 ? Math.round((logged / due) * 100) : -1
+	// Stufen in der Modulfarbe der Routinen: je mehr erledigt, desto kräftiger.
+	const STUFEN = [
+		{ text: 'Nichts erledigt', farbe: 'var(--flaeche)' },
+		{ text: 'Unter 50 %', farbe: 'color-mix(in srgb, var(--mod-habits) 30%, var(--flaeche))' },
+		{ text: '50 bis 79 %', farbe: 'color-mix(in srgb, var(--mod-habits) 60%, var(--flaeche))' },
+		{ text: 'Ab 80 %', farbe: 'var(--mod-habits)' }
+	];
+	function farbeFuer(due: number, logged: number): string | null {
+		if (due === 0) return null;
+		const pct = Math.round((logged / due) * 100);
+		if (pct === 0) return STUFEN[0].farbe;
+		if (pct < 50) return STUFEN[1].farbe;
+		if (pct < 80) return STUFEN[2].farbe;
+		return STUFEN[3].farbe;
+	}
+
+	const zellen = $derived<RasterZelle[]>(
+		tage.map((tag, i) => {
+			const { due, logged } = zaehle(tag);
+			const datum = fromISODate(tag);
+			return {
+				id: tag,
+				spalte: Math.floor(i / 7),
+				zeile: i % 7,
+				farbe: farbeFuer(due, logged),
+				label: datum ? formatTagKurz(datum) : tag,
+				text: due > 0 ? `${logged} von ${due} Routinen erledigt` : 'keine Routine fällig',
+				heute: tag === heuteIso
 			};
-			return acc;
-		}, {})
+		})
 	);
 
-	// ── Farb-Mapping ──────────────────────────────────────────────────
-	function cellColor(data: DayData): string {
-		const isDark = themeState.isDark;
-		if (data.pct < 0) return isDark ? '#1F1F27' : '#ECECF1'; // kein Habit fällig → neutral
-		if (data.pct === 0) return isDark ? '#4c1d24' : '#fee2e2'; // 0% → rot-hint
-		if (data.pct < 50) return isDark ? '#3730A3' : '#C7D2FE'; // < 50% → schwaches Indigo
-		if (data.pct < 80) return isDark ? '#4F46E5' : '#818CF8'; // < 80% → mittleres Indigo
-		return isDark ? '#818CF8' : '#4F46E5'; // 80%+ → sattes Indigo
-	}
-
-	const legendColors = $derived(
-		themeState.isDark
-			? ['#1F1F27', '#4c1d24', '#3730A3', '#4F46E5', '#818CF8']
-			: ['#ECECF1', '#fee2e2', '#C7D2FE', '#818CF8', '#4F46E5']
+	const erledigteTage = $derived(
+		zellen.filter((z) => z.farbe !== null && z.farbe !== STUFEN[0].farbe).length
 	);
-
-	// ── Monats-Label (erste Woche des Monats) ────────────────────────
-	const monthLabels = $derived.by(() => {
-		const labels: { week: number; label: string }[] = [];
-		for (let w = 0; w < weeksGrid.length; w++) {
-			const firstDay = new Date(weeksGrid[w][0]);
-			if (firstDay.getDate() <= 7 || w === 0) {
-				labels.push({
-					week: w,
-					label: firstDay.toLocaleDateString('de-DE', { month: 'short' })
-				});
-			}
-		}
-		return labels;
-	});
-
-	// ── Tooltip-State ─────────────────────────────────────────────────
-	let tooltip = $state<{ date: string; logged: number; due: number } | null>(null);
-
-	const CELL_SIZE = 11;
-	const CELL_GAP = 2;
-	const STEP = CELL_SIZE + CELL_GAP;
-	const LABEL_HEIGHT = 16;
-	const svgWidth = $derived(weeks * STEP);
-	const svgHeight = LABEL_HEIGHT + 7 * STEP;
 </script>
 
-<div class="w-full overflow-x-auto">
-	<svg
-		width={svgWidth}
-		height={svgHeight}
-		viewBox="0 0 {svgWidth} {svgHeight}"
-		aria-label="Habit-Heatmap der letzten {weeks} Wochen"
-	>
-		<!-- Monats-Labels -->
-		{#each monthLabels as { week, label }}
-			<text
-				x={week * STEP}
-				y={LABEL_HEIGHT - 3}
-				font-size="9"
-				fill="currentColor"
-				class="text-text-tertiary"
-				font-family="system-ui, sans-serif">{label}</text
-			>
-		{/each}
-
-		<!-- Zellen -->
-		{#each weeksGrid as weekCol, wi}
-			{#each weekCol as dateStr, di}
-				{@const data = dayData[dateStr]}
-				{@const isToday = dateStr === toISODate(today)}
-				<rect
-					x={wi * STEP}
-					y={LABEL_HEIGHT + di * STEP}
-					width={CELL_SIZE}
-					height={CELL_SIZE}
-					rx="2"
-					ry="2"
-					fill={cellColor(data)}
-					stroke={isToday ? '#059669' : 'none'}
-					stroke-width={isToday ? 1.5 : 0}
-					class="transition-opacity hover:opacity-80"
-					onmouseenter={() => (tooltip = data)}
-					onmouseleave={() => (tooltip = null)}
-					role="img"
-					aria-label="{dateStr}: {data.logged}/{data.due} Habits"
-				/>
-			{/each}
-		{/each}
-	</svg>
-
-	<!-- Tooltip -->
-	{#if tooltip}
-		<div class="mt-1 text-xs text-text-secondary">
-			<span class="font-medium"
-				>{new Date(tooltip.date).toLocaleDateString('de-DE', {
-					weekday: 'short',
-					day: 'numeric',
-					month: 'short'
-				})}</span
-			>
-			{#if tooltip.due > 0}
-				— {tooltip.logged}/{tooltip.due} Habits ({tooltip.logged > 0
-					? Math.round((tooltip.logged / tooltip.due) * 100)
-					: 0}%)
-			{:else}
-				— kein Habit fällig
-			{/if}
-		</div>
-	{/if}
-
-	<!-- Legende -->
-	<div class="mt-2 flex items-center gap-2 text-[10px] text-text-tertiary">
-		<span>Weniger</span>
-		{#each legendColors as color}
-			<span class="inline-block h-2.5 w-2.5 rounded-sm" style="background:{color}"></span>
-		{/each}
-		<span>Mehr</span>
-	</div>
-</div>
+<Raster
+	spalten={weeks}
+	zeilen={7}
+	{zellen}
+	spaltenLabels={monatsLabels(wochen)}
+	beschreibung="Erledigte Routinen der letzten {weeks} Wochen: an {erledigteTage} Tagen mindestens eine"
+	legende={[{ farbe: null, text: 'Nichts fällig' }, ...STUFEN]}
+	tabellenKopf={['Tag', 'Erledigt']}
+/>

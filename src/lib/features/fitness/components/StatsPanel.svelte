@@ -2,7 +2,7 @@
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 	import WorkoutFrequencyHeatmap from '#lib/features/fitness/components/WorkoutFrequencyHeatmap.svelte';
 	import MuscleGroupVolumeChart from '#lib/features/fitness/components/MuscleGroupVolumeChart.svelte';
-	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
 	import {
 		currentWeekVolumeByMuscleGroup,
 		weeklyCardioStats
@@ -67,14 +67,24 @@
 				<h3 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 					Strecke pro Woche
 				</h3>
-				<TrendChart points={cardioDistancePoints} formatValue={(v) => `${v} km`} />
+				<Linie
+					punkte={cardioDistancePoints}
+					formatWert={(v) => `${v} km`}
+					farbe="fitness"
+					beschreibung="Strecke pro Woche in Kilometern"
+				/>
 			</div>
 			{#if cardioPacePoints.length > 0}
 				<div class="glass-card premium-shadow rounded-2xl p-4">
 					<h3 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						Pace-Trend
 					</h3>
-					<TrendChart points={cardioPacePoints} formatValue={formatPaceValue} />
+					<Linie
+						punkte={cardioPacePoints}
+						formatWert={formatPaceValue}
+						farbe="fitness"
+						beschreibung="Pace pro Woche"
+					/>
 				</div>
 			{/if}
 		</div>

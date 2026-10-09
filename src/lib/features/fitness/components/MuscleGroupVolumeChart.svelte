@@ -1,35 +1,17 @@
 <script lang="ts">
-	// Welle F3 — Wochen-Volumen pro Muskelgruppe als Balken (gleiches Fortschrittsbalken-Muster
-	// wie die Ziel-Fortschrittsanzeige in routes/goals/[id]/+page.svelte).
+	// Wochen-Volumen pro Muskelgruppe als Balken (ui/charts/Balken).
+	import Balken from '#lib/ui/charts/Balken.svelte';
 	import type { MuscleGroupVolume } from '../utils/volume';
 
 	let { data }: { data: MuscleGroupVolume[] } = $props();
-	const max = $derived(Math.max(...data.map((d) => d.volumeKg), 1));
+
+	const daten = $derived(data.map((d) => ({ label: d.muscleGroup, wert: d.volumeKg })));
 </script>
 
-{#if data.length === 0}
-	<p class="text-xs text-text-tertiary">
-		Noch kein Kraft-Volumen diese Woche (nur Übungen aus dem Katalog zählen für die Muskelgruppe).
-	</p>
-{:else}
-	<div class="space-y-3">
-		{#each data as d (d.muscleGroup)}
-			<div class="space-y-1">
-				<div class="flex items-center justify-between text-xs">
-					<span class="font-semibold text-text-primary">{d.muscleGroup}</span>
-					<span class="text-text-tertiary tabular-nums"
-						>{d.volumeKg.toLocaleString('de-DE')} kg</span
-					>
-				</div>
-				<div
-					class="h-2 w-full overflow-hidden rounded-full border border-border-color/20 bg-surface-2"
-				>
-					<div
-						class="h-full bg-primary-600 transition-all duration-500 dark:bg-primary-500"
-						style="width: {(d.volumeKg / max) * 100}%"
-					></div>
-				</div>
-			</div>
-		{/each}
-	</div>
-{/if}
+<Balken
+	{daten}
+	farbe="fitness"
+	formatWert={(v) => `${v.toLocaleString('de-DE')} kg`}
+	beschreibung="Trainingsvolumen dieser Woche je Muskelgruppe in Kilogramm"
+	leerText="Noch kein Kraft-Volumen diese Woche (nur Übungen aus dem Katalog zählen für die Muskelgruppe)."
+/>

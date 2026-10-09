@@ -51,7 +51,6 @@
 			? `${profileState.waterGoalMl} ml`
 			: `${profileState.waterGoalGlasses} Gläser`}"
 		icon={Droplet}
-		colorClass="stroke-blue-500"
 	/>
 	<MetricRing
 		percent={goalPercent(sleep, sleepGoal)}
@@ -59,14 +58,12 @@
 		value={formatMetric('sleep_h', sleep)}
 		goalLabel="Ziel {sleepGoal} h"
 		icon={Moon}
-		colorClass="stroke-purple-500"
 	/>
 	<MetricRing
 		percent={energy === null ? 0 : (energy / 5) * 100}
 		label="Energie"
 		value={energy === null ? '—' : `${Math.round(energy)}/5`}
 		icon={Zap}
-		colorClass="stroke-amber-500"
 	/>
 	<MetricRing
 		percent={weightPct}
@@ -80,6 +77,5 @@
 					? `noch ${toGoal} ${profileState.weightUnit}`
 					: 'Ziel erreicht'}
 		icon={Scale}
-		colorClass="stroke-cyan-500"
 	/>
 </div>

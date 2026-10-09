@@ -62,7 +62,7 @@ export interface SeriesPoint {
 	value: number;
 }
 
-/** Punkte fuer TrendChart. Tage ohne Wert werden ausgelassen (keine Null-Luecken). */
+/** Punkte fuer die Linie (ui/charts). Tage ohne Wert werden ausgelassen (keine Null-Luecken). */
 export function metricSeries(
 	entries: HealthLike[],
 	metric: HealthMetric,

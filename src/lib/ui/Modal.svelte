@@ -73,7 +73,7 @@
 			aria-label={label}
 			tabindex="-1"
 			onkeydown={handleKeydown}
-			class="pb-safe fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-[var(--kante-l)] border-t-[length:var(--rahmen)] border-tinte bg-flaeche outline-none"
+			class="fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-[var(--kante-l)] border-t-[length:var(--rahmen)] border-tinte bg-flaeche pb-safe outline-none"
 			transition:fly={{ y: 300, duration: motionDuration(DURATION.base), easing: EASE_STANDARD }}
 		>
 			{@render children?.()}

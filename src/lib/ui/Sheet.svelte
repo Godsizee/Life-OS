@@ -151,7 +151,7 @@
 			aria-label={title}
 			tabindex="-1"
 			onkeydown={handleKeydown}
-			class="pb-safe fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-[var(--kante-l)] border-t-[length:var(--rahmen)] border-tinte bg-flaeche outline-none"
+			class="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-[var(--kante-l)] border-t-[length:var(--rahmen)] border-tinte bg-flaeche pb-safe outline-none"
 			style="transform: translateY({dragOffset}px); transition: transform {dragOffset === 0
 				? `${motionDuration(DURATION.fast)}ms`
 				: '0ms'} {EASE_STANDARD_CSS}"

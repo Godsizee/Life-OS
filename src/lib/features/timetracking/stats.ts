@@ -62,7 +62,7 @@ export interface DayPoint {
 	value: number;
 }
 
-/** Letzte `days` Tage (heute rechts) — direkt als Punkte für TrendChart nutzbar. */
+/** Letzte `days` Tage (heute rechts) — direkt als Punkte für die Linie (ui/charts) nutzbar. */
 export function minutesByDay(
 	entries: TimeEntryLike[],
 	days = 7,

@@ -47,7 +47,7 @@
 </script>
 
 <aside
-	class="pt-safe pl-safe fixed top-0 bottom-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 transition-all duration-300 ease-in-out md:flex md:flex-col
+	class="fixed top-0 bottom-0 left-0 z-30 hidden border-r border-border-color bg-surface-0 pt-safe pl-safe transition-all duration-300 ease-in-out md:flex md:flex-col
 		{collapsed ? 'w-20' : 'w-64'}"
 	style="view-transition-name: sidebar"
 >

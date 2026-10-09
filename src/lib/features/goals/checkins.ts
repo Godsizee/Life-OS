@@ -130,7 +130,7 @@ export interface CheckinPoint {
 
 /**
  * Kumulierter Verlauf der letzten `days` Tage (heute rechts) — direkt als Punkte
- * für TrendChart nutzbar. Check-ins VOR dem Fenster bilden den Startwert, damit die
+ * für die Linie (ui/charts) nutzbar. Check-ins VOR dem Fenster bilden den Startwert, damit die
  * Kurve den echten Gesamtstand zeigt.
  */
 export function cumulativePoints(
@@ -213,7 +213,7 @@ export function verboteneEltern(
 	return raus;
 }
 
-/** Kumulierte Summe je Check-in-Tag — direkt als TrendChart-Punkte nutzbar. */
+/** Kumulierte Summe je Check-in-Tag — direkt als Punkte für die Linie nutzbar. */
 export function cumulativeSeries(list: CheckinLike[]): CheckinPoint[] {
 	const proTag = new Map<string, number>();
 	for (const c of list) proTag.set(c.date, (proTag.get(c.date) ?? 0) + checkinValue(c));

@@ -1,7 +1,7 @@
 <script lang="ts">
-	// W9 — 30-Tage-Trends je Metrik. Nutzt TrendChart aus F3 wieder
+	// W9 — 30-Tage-Trends je Metrik. Nutzt den Baustein Linie aus ui/charts
 	// (kein Chart-Framework im Projekt).
-	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
 	import { healthState } from '../store.svelte';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import {
@@ -64,7 +64,12 @@
 				>
 			</span>
 		</div>
-		<TrendChart points={sleepSeries} formatValue={(v) => formatMetric('sleep_h', v)} />
+		<Linie
+			punkte={sleepSeries}
+			formatWert={(v) => formatMetric('sleep_h', v)}
+			farbe="health"
+			beschreibung="Schlaf der letzten 30 Tage in Stunden"
+		/>
 		{#if sleepGoalHit.tracked > 0}
 			<p class="mt-2 text-[11px] text-text-tertiary">
 				Ziel ({profileState.sleepGoalH} h) an {sleepGoalHit.hit} von {sleepGoalHit.tracked} erfassten
@@ -86,13 +91,15 @@
 				>
 			</span>
 		</div>
-		<TrendChart
-			points={waterSeries}
-			formatValue={(v) =>
+		<Linie
+			punkte={waterSeries}
+			formatWert={(v) =>
 				formatMetric('water_ml', v, {
 					waterUnit: profileState.waterUnit,
 					glassSizeMl: profileState.glassSizeMl
 				})}
+			farbe="health"
+			beschreibung="Getrunkene Menge der letzten 30 Tage"
 		/>
 		{#if waterGoalHit.tracked > 0}
 			<p class="mt-2 text-[11px] text-text-tertiary">
@@ -114,7 +121,12 @@
 				>
 			</span>
 		</div>
-		<TrendChart points={energySeries} formatValue={(v) => formatMetric('energy', v)} />
+		<Linie
+			punkte={energySeries}
+			formatWert={(v) => formatMetric('energy', v)}
+			farbe="health"
+			beschreibung="Energie der letzten 30 Tage auf einer Skala von 1 bis 5"
+		/>
 	</div>
 
 	<!-- Gewicht -->
@@ -134,11 +146,13 @@
 					</span>
 				{/if}
 			</div>
-			<TrendChart
-				points={weightSeries}
-				overlay={weightSmoothed}
-				goalLine={profileState.weightGoalKg ?? undefined}
-				formatValue={(v) => formatMetric('weight_kg', v, { weightUnit: profileState.weightUnit })}
+			<Linie
+				punkte={weightSeries}
+				vergleich={weightSmoothed}
+				ziel={profileState.weightGoalKg ?? undefined}
+				formatWert={(v) => formatMetric('weight_kg', v, { weightUnit: profileState.weightUnit })}
+				farbe="health"
+				beschreibung="Gewicht der letzten 30 Tage mit geglättetem Verlauf"
 			/>
 		</div>
 	{/if}

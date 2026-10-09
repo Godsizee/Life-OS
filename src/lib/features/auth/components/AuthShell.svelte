@@ -14,7 +14,7 @@
 	} = $props();
 </script>
 
-<div class="pt-safe pb-safe flex min-h-dvh flex-col justify-center px-4 py-10">
+<div class="flex min-h-dvh flex-col justify-center px-4 py-10 pt-safe pb-safe">
 	<div class="mx-auto flex w-full max-w-sm flex-col gap-6">
 		<div class="auth-enter flex items-center gap-3" style="--stagger: 0ms">
 			<img src="/favicon.svg" alt="" class="elevation-1 h-11 w-11 rounded-2xl" />

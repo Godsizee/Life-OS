@@ -1,11 +1,11 @@
 <script lang="ts">
 	// Welle F3 — Übungs-Detail: Verlauf + 1RM-/Volumen-/Pace-Progression.
-	// Kein Chart-Framework im Projekt (F1-Recherche) — Muster: handgerolltes Inline-SVG (TrendChart).
+	// Kein Chart-Framework im Projekt (F1-Recherche) — Diagramme über ui/charts/Linie.
 	import { page } from '$app/state';
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 	import { healthState } from '#lib/features/health/store.svelte.js';
 	import { exerciseProgression } from '#lib/features/fitness/utils/progression.js';
-	import TrendChart from '#lib/features/fitness/components/TrendChart.svelte';
+	import Linie from '#lib/ui/charts/Linie.svelte';
 	import { ArrowLeft, Trophy, Scale } from '@lucide/svelte';
 
 	const exerciseId = $derived(page.params.id);
@@ -151,15 +151,22 @@
 					<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						1RM-Progression
 					</h2>
-					<TrendChart points={e1rmPoints} formatValue={(v) => `${v} kg`} />
+					<Linie
+						punkte={e1rmPoints}
+						formatWert={(v) => `${v} kg`}
+						farbe="fitness"
+						beschreibung="Geschätztes Einmalmaximum je Training"
+					/>
 				</div>
 				<div class="glass-card premium-shadow rounded-2xl p-4">
 					<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						Volumen je Session
 					</h2>
-					<TrendChart
-						points={volumePoints}
-						formatValue={(v) => `${v.toLocaleString('de-DE')} kg`}
+					<Linie
+						punkte={volumePoints}
+						formatWert={(v) => `${v.toLocaleString('de-DE')} kg`}
+						farbe="fitness"
+						beschreibung="Trainingsvolumen je Training in Kilogramm"
 					/>
 				</div>
 			{:else if entry.exercise_type === 'cardio'}
@@ -167,20 +174,35 @@
 					<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						Pace-Trend
 					</h2>
-					<TrendChart points={pacePoints} formatValue={formatPaceValue} />
+					<Linie
+						punkte={pacePoints}
+						formatWert={formatPaceValue}
+						farbe="fitness"
+						beschreibung="Pace je Training"
+					/>
 				</div>
 				<div class="glass-card premium-shadow rounded-2xl p-4">
 					<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						Strecke je Session
 					</h2>
-					<TrendChart points={distancePoints} formatValue={(v) => `${v} km`} />
+					<Linie
+						punkte={distancePoints}
+						formatWert={(v) => `${v} km`}
+						farbe="fitness"
+						beschreibung="Strecke je Training in Kilometern"
+					/>
 				</div>
 			{:else}
 				<div class="glass-card premium-shadow rounded-2xl p-4">
 					<h2 class="mb-3 text-xs font-bold tracking-wider text-text-tertiary uppercase">
 						Dauer je Session
 					</h2>
-					<TrendChart points={durationPoints} formatValue={(v) => `${v} Min.`} />
+					<Linie
+						punkte={durationPoints}
+						formatWert={(v) => `${v} Min.`}
+						farbe="fitness"
+						beschreibung="Dauer je Training in Minuten"
+					/>
 				</div>
 			{/if}
 

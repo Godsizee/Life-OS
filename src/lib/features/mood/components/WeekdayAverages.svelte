@@ -1,30 +1,27 @@
 <script lang="ts">
-	// W9 — Ø-Stimmung je Wochentag. Reine Balken, kein SVG noetig.
+	// W9 — Ø-Stimmung je Wochentag als senkrechte Balken (ui/charts/Balken).
 	import { averageByWeekday, formatScore, WEEKDAY_SHORT, type MoodLike } from '../stats';
 	import { moodHex } from '../colors';
-	import { themeState } from '#lib/core/theme.svelte.js';
+	import Balken from '#lib/ui/charts/Balken.svelte';
 
 	let { entries }: { entries: MoodLike[] } = $props();
 
 	const averages = $derived(averageByWeekday(entries));
-	const hasData = $derived(averages.some((a) => a !== null));
+	const daten = $derived(
+		averages.map((avg, i) => ({
+			label: WEEKDAY_SHORT[i],
+			wert: avg,
+			text: formatScore(avg),
+			farbe: avg === null ? undefined : moodHex(Math.round(avg))
+		}))
+	);
 </script>
 
-{#if hasData}
-	<div class="flex items-end justify-between gap-1.5" style="height: 96px;">
-		{#each averages as avg, i}
-			<div class="flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
-				<span class="text-[10px] text-text-tertiary tabular-nums">{formatScore(avg)}</span>
-				<div
-					class="w-full rounded-t-md transition-all"
-					style="height: {avg === null
-						? 2
-						: Math.max(4, (avg / 5) * 60)}px; background-color: {avg === null
-						? 'transparent'
-						: moodHex(Math.round(avg), themeState.isDark)}"
-				></div>
-				<span class="text-[10px] font-semibold text-text-secondary">{WEEKDAY_SHORT[i]}</span>
-			</div>
-		{/each}
-	</div>
-{/if}
+<Balken
+	{daten}
+	richtung="vertikal"
+	max={5}
+	hoehe={120}
+	beschreibung="Durchschnittliche Stimmung je Wochentag auf einer Skala von 1 bis 5"
+	leerText="Noch keine Einträge für einen Wochentag."
+/>
