@@ -24,6 +24,7 @@
 	import AgendaZeilen from '#lib/system/components/heute/AgendaZeilen.svelte';
 	import CheckinBox from '#lib/system/components/heute/CheckinBox.svelte';
 	import JetztKarte from '#lib/system/components/heute/JetztKarte.svelte';
+	import RitualBand from '#lib/system/components/heute/RitualBand.svelte';
 	import { heuteTagesplan } from '#lib/system/agenda-heute.js';
 	import { ueberbuchtUm } from '#lib/system/heute-logik.js';
 	import { scoreAnzeigen } from '#lib/system/einstellungen/score.js';
@@ -88,15 +89,17 @@
 		{/snippet}
 	</PageHeader>
 
+	<RitualBand jetzt={now} />
+
 	{#if ueberbucht > 0}
 		<Band variante="status">
 			Dein Plan übersteigt die freie Zeit um {formatMinutes(ueberbucht)} — anpassen?
 			{#snippet aktion()}
 				<a
-					href="/tasks"
+					href="/heute/planen?schritt=3"
 					class="mono-label inline-flex min-h-[var(--ziel-min)] items-center underline decoration-2 underline-offset-4"
 				>
-					Aufgaben ansehen
+					Plan anpassen
 				</a>
 			{/snippet}
 		</Band>

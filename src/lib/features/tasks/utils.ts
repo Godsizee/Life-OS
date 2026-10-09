@@ -99,3 +99,10 @@ export function filterTasks(tasks: Task[], query: string): Task[] {
 			(t.labels ?? []).some((l) => l.toLowerCase().includes(q))
 	);
 }
+
+/**
+ * Im Eingang liegt, was noch keinen Platz hat: offen, ohne Projekt, ohne Tag, ohne Frist,
+ * keine Unteraufgabe und nicht für den Wochenfokus gewählt.
+ */
+export const imEingang = (t: Task) =>
+	istOffen(t) && !t.project_id && !t.planned_for && !t.due_at && !t.parent_id && !t.focus_week;

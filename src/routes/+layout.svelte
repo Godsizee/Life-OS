@@ -41,7 +41,7 @@
 	const publicPaths = ['/login', '/register', '/invite'];
 	// Anmeldung und Onboarding bringen ihren eigenen Rahmen mit (AuthShell);
 	// Navigation waere dort nur Ablenkung von der einen offenen Aufgabe.
-	const chromelessPaths = [...publicPaths, '/onboarding'];
+	const chromelessPaths = [...publicPaths, '/onboarding', '/heute/planen', '/heute/abschluss'];
 	// Der Styleguide unter /dev/ läuft nur im Dev-Server und braucht weder Anmeldung noch Navigation.
 	const istDevPfad = (pfad: string) => dev && pfad.startsWith('/dev/');
 	let online = $state(true);

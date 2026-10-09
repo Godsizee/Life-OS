@@ -4,7 +4,7 @@ import { expandEvents } from '#lib/features/calendar/occurrences.js';
 import { calendarState } from '#lib/features/calendar/store.svelte.js';
 import { fitnessState } from '#lib/features/fitness/store.svelte.js';
 import { linksState } from '#lib/features/links/store.svelte.js';
-import { baueTagesplan, type Tagesplan } from './agenda.js';
+import { baueTagesplan, type Tagesfenster, type Tagesplan } from './agenda.js';
 import { mitGeplantemPlan, sammleAgendaIn, tagesfenster } from './agenda-kern.js';
 import { aktiveModule, istAktiv } from './module-aktiv.svelte.js';
 
@@ -30,12 +30,15 @@ function geplanterPlan(tag: Date): { id: string; name: string } | null {
 	return null;
 }
 
-/** Tagesplan für „Heute“: Beiträge der aktiven Module, Tagesfenster und Standarddauer aus den Einstellungen. */
-export function heuteTagesplan(tag: Date = new Date()): Tagesplan {
+/**
+ * Tagesplan für „Heute“: Beiträge der aktiven Module, Tagesfenster und Standarddauer aus den Einstellungen.
+ * `fenster` überschreibt das Fenster für diesen Aufruf (Schritt „Kapazität“ in „Tag planen“).
+ */
+export function heuteTagesplan(tag: Date = new Date(), fenster?: Tagesfenster): Tagesplan {
 	const eintraege = mitGeplantemPlan(sammleAgendaIn(aktiveModule.liste, tag), geplanterPlan(tag));
 	return baueTagesplan(
 		eintraege,
-		tagesfenster(tag, wert(tagesbeginn), wert(tagesende)),
+		fenster ?? tagesfenster(tag, wert(tagesbeginn), wert(tagesende)),
 		wert(standardDauerMin)
 	);
 }

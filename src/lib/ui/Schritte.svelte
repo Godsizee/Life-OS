@@ -10,7 +10,7 @@
 	} = $props();
 </script>
 
-<ol class="flex items-center gap-2" aria-label="Schritte">
+<ol class="flex flex-wrap items-center gap-2" aria-label="Schritte">
 	{#each schritte as name, i (name)}
 		{@const erledigt = i < aktuell}
 		{@const jetzt = i === aktuell}
