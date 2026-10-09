@@ -27,6 +27,7 @@
 	import RitualBand from '#lib/system/components/heute/RitualBand.svelte';
 	import { heuteTagesplan } from '#lib/system/agenda-heute.js';
 	import { ueberbuchtUm } from '#lib/system/heute-logik.js';
+	import { willkommen } from '#lib/system/willkommen.svelte.js';
 	import { scoreAnzeigen } from '#lib/system/einstellungen/score.js';
 
 	import Anleitung from '#lib/ui/Anleitung.svelte';
@@ -94,6 +95,12 @@
 			{/if}
 		{/snippet}
 	</PageHeader>
+
+	{#if willkommen.sichtbar}
+		{#await import('#lib/system/components/heute/WillkommenZurueck.svelte') then { default: WillkommenZurueck }}
+			<WillkommenZurueck />
+		{/await}
+	{/if}
 
 	<RitualBand jetzt={now} />
 

@@ -58,7 +58,7 @@
 <header class="mb-6 flex flex-col gap-3">
 	<div class="flex items-center justify-between gap-3">
 		<div class="min-w-0">
-			<h1 class="truncate text-3xl leading-tight font-extrabold text-tinte [font-stretch:85%]">
+			<h1 class="text-3xl leading-tight font-extrabold wrap-anywhere text-tinte [font-stretch:85%]">
 				{title}
 			</h1>
 			{#if subtitle}

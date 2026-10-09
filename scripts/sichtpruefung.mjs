@@ -14,6 +14,7 @@
 //   KEYS='Slash,n'   Tasten drücken (Playwright-Namen, z. B. Slash für „/“)
 //   EVAL='(…)'       JS-Ausdruck, dessen Ergebnis ausgegeben wird
 //   ELEMENT='sel'    nur dieses Element fotografieren; FULL=1 ganze Seite; SUFFIX=-x Namenszusatz
+//   GERAET='{"geraet.zuletztAktiv":"2026-10-03"}'  Geräte-Einstellungen vorbelegen (JSON)
 //   DEBUG_UEBER=1    Elemente nennen, die rechts über den Rand ragen
 import { pathToFileURL } from 'node:url';
 import { mkdirSync } from 'node:fs';
@@ -63,6 +64,7 @@ const profil = {
 const heute = new Date();
 const tagIso = (d) =>
 	`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const vorTagen = (n) => new Date(heute.getFullYear(), heute.getMonth(), heute.getDate() - n, 12);
 const um = (h, m = 0) =>
 	new Date(heute.getFullYear(), heute.getMonth(), heute.getDate(), h, m).toISOString();
 const basis = {
@@ -114,7 +116,9 @@ const MOCK = process.env.MOCK_DATA
 					planned_for: tagIso(heute),
 					status: 'done',
 					completed_at: um(8, 30)
-				})
+				}),
+				aufgabe('t6', { title: 'Altes Vorhaben', planned_for: tagIso(vorTagen(5)) }),
+				aufgabe('t7', { title: 'Frist verpasst', due_at: vorTagen(4).toISOString() })
 			],
 			calendars: [{ ...basis, id: 'c1', name: 'Privat', color: null, ics_url: null }],
 			events: [
@@ -179,12 +183,19 @@ for (const thema of themen.split(',')) {
 			serviceWorkers: 'block'
 		});
 		await ctx.addInitScript(
-			({ session, thema }) => {
+			({ session, thema, geraet }) => {
 				localStorage.setItem('sb-sb-auth-token', JSON.stringify(session));
 				localStorage.setItem('lifeos:welcome:v1', '1');
-				localStorage.setItem('lifeos:geraet:v1', JSON.stringify({ 'darstellung.thema': thema }));
+				// Nur beim ersten Laden setzen, sonst überschreibt jeder Seitenwechsel „zuletzt aktiv“.
+				if (!sessionStorage.getItem('sicht:init')) {
+					sessionStorage.setItem('sicht:init', '1');
+					localStorage.setItem(
+						'lifeos:geraet:v1',
+						JSON.stringify({ 'darstellung.thema': thema, ...geraet })
+					);
+				}
 			},
-			{ session, thema }
+			{ session, thema, geraet: JSON.parse(process.env.GERAET || '{}') }
 		);
 		await ctx.route(`${SB}/**`, (route) => {
 			const req = route.request();

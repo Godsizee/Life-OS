@@ -16,6 +16,7 @@ import { istAktiv } from './module-aktiv.svelte.js';
 import { MODULE } from './module.js';
 import { berechneModulScore } from './score.js';
 import { baueTageskontext } from './tageskontext.js';
+import { willkommen } from './willkommen.svelte.js';
 
 let gestartet = false;
 
@@ -44,5 +45,12 @@ export function starteSystem(): void {
 	starteAutomationen({
 		modulAktiv: istAktiv,
 		oeffneRegel: (regelId) => void goto(`/settings/automationen#${regelId}`)
+	});
+
+	// „Willkommen zurück“ (T407): letzten aktiven Tag beim Start lesen, beim Verlassen festhalten.
+	willkommen.aufwachen();
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'hidden') willkommen.schlafen();
+		else willkommen.aufwachen();
 	});
 }

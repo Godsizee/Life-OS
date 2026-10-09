@@ -2,8 +2,10 @@ import { neueId } from '#lib/core/id.js';
 import { authState } from '#lib/core/auth.svelte.js';
 import { outbox } from '#lib/core/outbox.svelte.js';
 import { subscribeToTable } from '#lib/core/realtime.js';
+import { pausenListe } from '#lib/core/ruhe.js';
 import { ladeSicher } from '#lib/core/store-load.js';
 import * as habitsApi from './api';
+import { mitPausen } from './pausen';
 import { habitInputSchema, habitPatchSchema, type HabitInput, type HabitPatch } from './schema';
 import { isCompleted, isSkipped, toHabitDays, toISODate, type HabitDay } from './streak';
 import type { Habit, HabitLog, HabitLogStatus } from './types';
@@ -119,7 +121,7 @@ class HabitsState {
 
 	/** Alle Tages-Einträge einer Routine in der Form, die `streak.ts` erwartet. */
 	entriesFor(habitId: string): HabitDay[] {
-		return toHabitDays(this.logs.filter((l) => l.habit_id === habitId));
+		return mitPausen(toHabitDays(this.logs.filter((l) => l.habit_id === habitId)), pausenListe());
 	}
 
 	/** Nur die Daten, an denen die Routine wirklich ERLEDIGT war (Menge erreicht, nicht übersprungen). */

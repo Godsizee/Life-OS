@@ -107,6 +107,31 @@ export const standardDauerMin = defineEinstellung<number>({
 	ui: { art: 'zahl', min: 5, max: 240, schritt: 5, einheit: 'min' }
 });
 
+/** Letzter Tag, an dem die App auf diesem Gerät offen war ('yyyy-mm-dd'). Quelle für „Willkommen zurück“. */
+export const zuletztAktiv = defineEinstellung<string>({
+	schluessel: 'geraet.zuletztAktiv',
+	ablage: 'geraet',
+	schema: z.string(),
+	standard: '',
+	label: 'Zuletzt aktiv',
+	stufe: 'erweitert',
+	abschnitt: 'heute',
+	ui: { art: 'eigen' }
+});
+
+/** Nach so vielen Tagen Pause zeigt Heute „Willkommen zurück“. */
+export const wiederkehrTage = defineEinstellung<number>({
+	schluessel: 'heute.wiederkehrTage',
+	ablage: 'nutzer',
+	schema: z.int().check(z.minimum(1), z.maximum(30)),
+	standard: 3,
+	label: 'Willkommen zurück nach',
+	hinweis: 'Nach so vielen Tagen ohne die App bietet Heute einen Neustart an.',
+	stufe: 'erweitert',
+	abschnitt: 'heute',
+	ui: { art: 'zahl', min: 1, max: 30, schritt: 1, einheit: 'Tage' }
+});
+
 /** „Nicht jetzt“ auf der Jetzt-Karte: Einträge, die dieses Gerät bis zum Zeitpunkt `bis` nicht mehr als Jetzt zeigt. */
 export const nichtJetzt = defineEinstellung<{ key: string; bis: string }[]>({
 	schluessel: 'heute.nichtJetzt',
