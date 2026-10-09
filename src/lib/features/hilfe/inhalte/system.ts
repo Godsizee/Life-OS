@@ -217,6 +217,32 @@ export const SYSTEM_THEMEN: HilfeThema[] = [
 		verwandt: ['system.erfassen']
 	},
 	{
+		id: 'system.geteilt-persoenlich',
+		titel: 'Was der Haushalt sieht',
+		kurz: 'Manches teilt ihr im Haushalt, manches sieht nur du. Hier steht genau, was wohin gehört.',
+		abschnitte: [
+			{
+				titel: 'Das sehen alle im Haushalt',
+				text: '- Aufgaben und Projekte\n- Termine und Kalender\n- Routinen **und was darin abgehakt ist**\n- Ziele und ihre Check-ins\n- Einkaufslisten\n- Trainingspläne\n- Erinnerungen\n- Notizen, außer privaten\n- Verknüpfungen zwischen Einträgen und die Haushalts-Einstellungen'
+			},
+			{
+				titel: 'Das siehst nur du',
+				text: '- Tagebuch\n- Tagesrituale (geplant, abgeschlossen, Absicht)\n- Stimmung\n- Gesundheit\n- Training: deine Einträge und Rekorde\n- Fokuszeiten (Zeiterfassung)\n- Life Score\n- Private Notizen (nur der Ersteller)'
+			},
+			{
+				titel: 'Woher das stammt',
+				text: 'Die Aufteilung folgt den Zugriffsregeln der Datenbank. Sie gelten unabhängig von dieser App: Was dort als persönlich eingetragen ist, kann niemand sonst lesen.'
+			}
+		],
+		begriffe: [
+			{
+				wort: 'Haushalt',
+				erklaerung: 'Die Gruppe von Personen, die sich einen Bereich in Life OS teilen.'
+			}
+		],
+		verwandt: ['system.datenschutz', 'system.module']
+	},
+	{
 		id: 'system.datenschutz',
 		titel: 'Deine Daten',
 		kurz: 'Wo deine Daten liegen, was geteilt ist und wie du sie exportierst oder löschst.',
@@ -229,6 +255,6 @@ export const SYSTEM_THEMEN: HilfeThema[] = [
 				text: 'Unter **Einstellungen** exportierst du alles als JSON oder löschst dein Konto. Beides betrifft deine Daten vollständig.'
 			}
 		],
-		verwandt: ['system.offline']
+		verwandt: ['system.geteilt-persoenlich', 'system.offline']
 	}
 ];
