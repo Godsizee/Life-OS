@@ -3,6 +3,7 @@ import { toISODate } from '#lib/core/date.js';
 import type { ModulManifest } from '#lib/core/modul.js';
 import { scoreBeitrag } from '#lib/core/score.js';
 import { sucheIn } from '#lib/core/suche.js';
+import { aufgabenAgenda } from './agenda.js';
 import { fristVerpasst } from './hinweise.js';
 import { istOffen } from './status.js';
 import { tasksState } from './store.svelte.js';
@@ -20,6 +21,7 @@ export const aufgabenBeitraege: Pick<
 	| 'hinweise'
 	| 'hinweisArten'
 	| 'tageskontext'
+	| 'agenda'
 > = {
 	suche: (anfrage) =>
 		sucheIn(
@@ -48,6 +50,7 @@ export const aufgabenBeitraege: Pick<
 	export: () => ({ tasks: tasksState.tasks, projects: tasksState.projects }),
 	score: scoreBeitrag('Aufgaben', (datum) => aufgabenScore(tasksState.tasks, datum)),
 	tageskontext: (datum) => aufgabenKontext(tasksState.tasks, datum),
+	agenda: (tag) => aufgabenAgenda(tasksState.tasks, tag),
 	hinweise: (jetzt) => fristVerpasst(tasksState.tasks, jetzt),
 	hinweisArten: [
 		{

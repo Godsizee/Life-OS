@@ -5,6 +5,7 @@ import { wert } from '#lib/core/einstellungen.js';
 import type { ModulManifest } from '#lib/core/modul.js';
 import { scoreBeitrag } from '#lib/core/score.js';
 import { sucheIn } from '#lib/core/suche.js';
+import { routinenAgenda } from './agenda.js';
 import { serieOffen } from './hinweise.js';
 import { habitsState } from './store.svelte.js';
 import { routinenKontext, routinenScore } from './tag.js';
@@ -22,6 +23,7 @@ export const routinenBeitraege: Pick<
 	| 'hinweise'
 	| 'hinweisArten'
 	| 'tageskontext'
+	| 'agenda'
 > = {
 	suche: (anfrage) =>
 		sucheIn(
@@ -51,6 +53,7 @@ export const routinenBeitraege: Pick<
 	export: () => ({ habits: habitsState.habits, habit_logs: habitsState.logs }),
 	score: scoreBeitrag('Routinen', (datum) => routinenScore(habitsState.habits, tageVon, datum)),
 	tageskontext: (datum) => routinenKontext(habitsState.habits, tageVon, datum),
+	agenda: (tag) => routinenAgenda(habitsState.habits, tageVon, tag),
 	hinweise: (jetzt) =>
 		serieOffen(habitsState.habits, tageVon, jetzt, wert(abendAb)).map((h) => ({
 			...h,

@@ -4,6 +4,7 @@ import type { ModulManifest } from '#lib/core/modul.js';
 import { scoreBeitrag } from '#lib/core/score.js';
 import { sucheIn } from '#lib/core/suche.js';
 import { profileState } from '#lib/features/profile/store.svelte.js';
+import { trainingAgenda } from './agenda.js';
 import { trainingPause } from './hinweise.js';
 import { fitnessState } from './store.svelte.js';
 import { trainingKontext, trainingScore } from './tag.js';
@@ -19,6 +20,7 @@ export const trainingBeitraege: Pick<
 	| 'hinweise'
 	| 'hinweisArten'
 	| 'tageskontext'
+	| 'agenda'
 > = {
 	suche: (anfrage) =>
 		sucheIn(
@@ -50,6 +52,7 @@ export const trainingBeitraege: Pick<
 		trainingScore(fitnessState.logs, profileState.weeklyWorkoutGoal, datum)
 	),
 	tageskontext: (datum) => trainingKontext(fitnessState.logs, datum),
+	agenda: (tag) => trainingAgenda(fitnessState.logs, profileState.weeklyWorkoutGoal, tag),
 	hinweise: (jetzt) => trainingPause(fitnessState.plans, fitnessState.logs, jetzt),
 	hinweisArten: [
 		{

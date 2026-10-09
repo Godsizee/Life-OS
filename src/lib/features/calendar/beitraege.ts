@@ -2,13 +2,16 @@ import { Calendar } from '@lucide/svelte';
 import { formatTagKurz, formatUhr, toISODate } from '#lib/core/date.js';
 import type { ModulManifest } from '#lib/core/modul.js';
 import { sucheIn } from '#lib/core/suche.js';
+import { kalenderAgenda } from './agenda.js';
 import { calendarState } from './store.svelte.js';
 import { termineVerlauf } from './timeline.js';
 
 export const kalenderBeitraege: Pick<
 	ModulManifest,
-	'suche' | 'verknuepfbar' | 'timeline' | 'export'
+	'suche' | 'verknuepfbar' | 'timeline' | 'export' | 'agenda'
 > = {
+	agenda: (tag) =>
+		kalenderAgenda(calendarState.events, calendarState.overrides, calendarState.calendars, tag),
 	suche: (anfrage) =>
 		sucheIn(
 			calendarState.events,
