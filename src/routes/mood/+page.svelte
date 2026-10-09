@@ -218,7 +218,7 @@
 
 	<!-- Aktivitaets-Statistik -->
 	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<div class="mb-3 flex items-center justify-between gap-3">
+		<div class="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
 			<div class="flex items-center gap-2">
 				<h2 class="text-sm font-semibold text-text-primary">Was beeinflusst deine Stimmung?</h2>
 				<button

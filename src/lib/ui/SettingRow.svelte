@@ -11,8 +11,9 @@
 	} = $props();
 </script>
 
-<div class="flex min-h-14 items-center justify-between gap-4 px-2 py-2">
-	<div class="min-w-0">
+<div class="flex min-h-14 flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2 py-2">
+	<!-- Passt die Steuerung nicht neben das Label (320 px), rutscht sie darunter, statt es zu verdecken. -->
+	<div class="min-w-32 flex-1">
 		<p class="text-sm font-semibold text-tinte">{label}</p>
 		{#if hint}
 			<p class="mt-0.5 text-xs text-text-2">{hint}</p>

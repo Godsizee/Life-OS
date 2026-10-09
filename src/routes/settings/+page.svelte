@@ -312,6 +312,7 @@
 			<SettingRow label="Dunkles Design">
 				<Switch
 					label="Dunkles Design"
+					labelVersteckt
 					checked={themeState.isDark}
 					onchange={() => themeState.toggle()}
 				/>
@@ -356,6 +357,7 @@
 				{:else}
 					<Switch
 						label="Timer-Signale"
+						labelVersteckt
 						checked={timerSignalsPermission === 'granted'}
 						disabled={timerSignalsPermission === 'denied'}
 						onchange={requestTimerSignals}
@@ -369,6 +371,7 @@
 			>
 				<Switch
 					label="Weekly-Review-Erinnerung"
+					labelVersteckt
 					checked={!!weeklyReviewReminder}
 					onchange={toggleWeeklyReviewReminder}
 				/>
@@ -383,6 +386,7 @@
 				>
 					<Switch
 						label="Push-Benachrichtigungen"
+						labelVersteckt
 						checked={pushState.subscribed}
 						disabled={pushState.loading}
 						onchange={() =>

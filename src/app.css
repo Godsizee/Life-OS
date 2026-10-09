@@ -355,22 +355,23 @@
 	}
 }
 
-@layer utilities {
-	/* Safe-Area-Insets als wiederverwendbare Utilities (Notch, Kamera-Cutout,
-     Gesten-Leiste – relevant für installierte PWA im Vollbild). */
-	.pt-safe {
-		padding-top: env(safe-area-inset-top);
-	}
-	.pb-safe {
-		padding-bottom: env(safe-area-inset-bottom);
-	}
-	.pl-safe {
-		padding-left: env(safe-area-inset-left);
-	}
-	.pr-safe {
-		padding-right: env(safe-area-inset-right);
-	}
+/* Safe-Area-Insets als wiederverwendbare Utilities (Notch, Kamera-Cutout,
+   Gesten-Leiste – relevant für installierte PWA im Vollbild). Als @utility, damit
+   Varianten wie md:pl-64 oder xl:pr-[420px] sie überstimmen (sonst bleibt das Padding bei 0). */
+@utility pt-safe {
+	padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pl-safe {
+	padding-left: env(safe-area-inset-left);
+}
+@utility pr-safe {
+	padding-right: env(safe-area-inset-right);
+}
 
+@layer utilities {
 	/* Nicht selektierbare UI-Chrome (Navigation, Buttons) – verhindert das
      versehentliche Markieren von Labels beim Tippen/Wischen. */
 	.select-none-native {

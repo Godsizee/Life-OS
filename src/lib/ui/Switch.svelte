@@ -5,6 +5,7 @@
 		checked = $bindable(false),
 		label,
 		description,
+		labelVersteckt = false,
 		disabled = false,
 		onchange
 	}: {
@@ -12,6 +13,8 @@
 		label: string;
 		/** Optionaler Beisatz unter dem Label – erklärt die Folge des Schaltens. */
 		description?: string;
+		/** Nur für Hilfstechnik: Das sichtbare Label steht schon daneben (z. B. in `SettingRow`). */
+		labelVersteckt?: boolean;
 		disabled?: boolean;
 		onchange?: (checked: boolean) => void;
 	} = $props();
@@ -30,9 +33,11 @@
 	aria-checked={checked}
 	{disabled}
 	onclick={toggle}
-	class="flex min-h-[var(--ziel-min)] w-full items-center justify-between gap-4 text-left disabled:opacity-50"
+	class="flex min-h-[var(--ziel-min)] items-center justify-between gap-4 text-left disabled:opacity-50 {labelVersteckt
+		? ''
+		: 'w-full'}"
 >
-	<span class="flex min-w-0 flex-col">
+	<span class="flex min-w-0 flex-col {labelVersteckt ? 'sr-only' : ''}">
 		<span class="truncate text-sm font-semibold text-tinte">{label}</span>
 		{#if description}
 			<span class="truncate text-xs text-text-2">{description}</span>

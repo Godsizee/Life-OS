@@ -71,7 +71,7 @@
 
 	<button
 		type="button"
-		class="flex items-center text-left text-sm text-primary-600 hover:underline"
+		class="flex min-h-[var(--ziel-min)] items-center text-left text-sm font-semibold text-tinte underline underline-offset-4"
 		onclick={() => (showMore = !showMore)}
 	>
 		{showMore ? 'Weniger Optionen ▲' : 'Mehr Optionen ▼'}
