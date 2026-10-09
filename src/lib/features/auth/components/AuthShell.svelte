@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Wortmarke from '#lib/ui/Wortmarke.svelte';
 
 	let {
 		title,
@@ -16,12 +17,9 @@
 
 <div class="flex min-h-dvh flex-col justify-center px-4 py-10 pt-safe pb-safe">
 	<div class="mx-auto flex w-full max-w-sm flex-col gap-6">
-		<div class="auth-enter flex items-center gap-3" style="--stagger: 0ms">
-			<img src="/favicon.svg" alt="" class="elevation-1 h-11 w-11 rounded-2xl" />
-			<div class="flex min-w-0 flex-col">
-				<span class="text-base font-bold tracking-tight text-text-primary">Life OS</span>
-				<span class="truncate text-xs text-text-secondary">Dein persönliches Betriebssystem</span>
-			</div>
+		<div class="auth-enter flex flex-col items-start gap-3" style="--stagger: 0ms">
+			<Wortmarke size="lg" />
+			<span class="mono-label min-w-0 truncate text-text-3">Dein persönliches Betriebssystem</span>
 		</div>
 
 		<div class="auth-enter flex flex-col gap-1" style="--stagger: 60ms">

@@ -3,26 +3,25 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#FFF4E0" />
 		<title>Offline — Life OS</title>
 		<link rel="icon" href="/favicon.svg" />
 		<style>
+			/* Eigenständige Seite ohne die App-Schriften: Systemschrift und Systemmono. */
 			:root {
 				color-scheme: light dark;
-				--bg: #f6f6f8;
-				--card: #ffffff;
-				--text: #1a1a1f;
-				--muted: #6b6b76;
-				--border: #e3e3e8;
-				--accent: #4f46e5;
+				--seite: #fff4e0;
+				--flaeche: #ffffff;
+				--tinte: #0b0b0b;
+				--text-2: #2e2a24;
+				--signal: #ff6fb5;
 			}
 			@media (prefers-color-scheme: dark) {
 				:root {
-					--bg: #131317;
-					--card: #1c1c22;
-					--text: #f2f2f5;
-					--muted: #9a9aa6;
-					--border: #2c2c34;
-					--accent: #818cf8;
+					--seite: #141414;
+					--flaeche: #1f1f1f;
+					--tinte: #f2eadb;
+					--text-2: #d9d1c2;
 				}
 			}
 			* {
@@ -35,8 +34,8 @@
 				align-items: center;
 				justify-content: center;
 				padding: 1.5rem;
-				background: var(--bg);
-				color: var(--text);
+				background: var(--seite);
+				color: var(--tinte);
 				font-family:
 					system-ui,
 					-apple-system,
@@ -46,50 +45,69 @@
 			main {
 				width: 100%;
 				max-width: 26rem;
-				padding: 2rem 1.5rem;
-				border: 1px solid var(--border);
-				border-radius: 1rem;
-				background: var(--card);
-				text-align: center;
+				padding: 1.75rem 1.5rem 2rem;
+				border: 3px solid var(--tinte);
+				background: var(--flaeche);
 			}
-			.icon {
-				font-size: 2.5rem;
-				line-height: 1;
+			.sticker {
+				display: inline-block;
+				padding: 0.125rem 0.5rem;
+				border: 2px solid #0b0b0b;
+				background: var(--signal);
+				color: #0b0b0b;
+				box-shadow: 3px 3px 0 var(--tinte);
+				font-family: ui-monospace, 'Cascadia Mono', Menlo, monospace;
+				font-size: 0.75rem;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				transform: rotate(-3deg);
 			}
 			h1 {
-				margin: 1rem 0 0.5rem;
-				font-size: 1.25rem;
+				margin: 1.25rem 0 0.5rem;
+				font-size: 1.75rem;
+				font-weight: 800;
+				line-height: 1.1;
 			}
 			p {
 				margin: 0 0 1.5rem;
-				color: var(--muted);
-				font-size: 0.9375rem;
+				color: var(--text-2);
+				font-size: 1rem;
 				line-height: 1.6;
 			}
 			button {
 				min-height: 48px;
 				width: 100%;
 				padding: 0 1.25rem;
-				border: none;
-				border-radius: 0.75rem;
-				background: var(--accent);
-				color: #fff;
-				font-size: 0.9375rem;
+				border: 2px solid #0b0b0b;
+				background: var(--signal);
+				color: #0b0b0b;
+				box-shadow: 3px 3px 0 var(--tinte);
+				font: inherit;
 				font-weight: 600;
 				cursor: pointer;
 			}
-			button:hover {
-				filter: brightness(1.08);
+			button:active {
+				transform: translate(3px, 3px);
+				box-shadow: none;
 			}
 			button:focus-visible {
-				outline: 2px solid var(--text);
-				outline-offset: 2px;
+				outline: 3px solid var(--tinte);
+				outline-offset: 3px;
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.sticker {
+					transform: none;
+				}
+				button:active {
+					transform: none;
+				}
 			}
 		</style>
 	</head>
 	<body>
 		<main>
-			<div class="icon" aria-hidden="true">📡</div>
+			<span class="sticker">Offline</span>
 			<h1>Keine Verbindung</h1>
 			<p>
 				Life OS ist gerade nicht erreichbar. Bereits gespeicherte Änderungen bleiben erhalten und

@@ -6,8 +6,8 @@
 	"name": "Life OS",
 	"short_name": "Life",
 	"description": "Midweight Life OS",
-	"theme_color": "#F6F6F8",
-	"background_color": "#F6F6F8",
+	"theme_color": "#FFF4E0",
+	"background_color": "#FFF4E0",
 	"display": "standalone",
 	"icons": [
 		{ "src": "/pwa-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
@@ -16,18 +16,18 @@
 	],
 	"shortcuts": [
 		{
+			"name": "Heute",
+			"url": "/",
+			"icons": [{ "src": "/pwa-96x96.png", "sizes": "96x96", "type": "image/png" }]
+		},
+		{
+			"name": "Erfassen",
+			"url": "/?erfassen=1",
+			"icons": [{ "src": "/pwa-96x96.png", "sizes": "96x96", "type": "image/png" }]
+		},
+		{
 			"name": "Fokus",
 			"url": "/focus",
-			"icons": [{ "src": "/pwa-96x96.png", "sizes": "96x96", "type": "image/png" }]
-		},
-		{
-			"name": "Aufgaben",
-			"url": "/tasks",
-			"icons": [{ "src": "/pwa-96x96.png", "sizes": "96x96", "type": "image/png" }]
-		},
-		{
-			"name": "Kalender",
-			"url": "/calendar",
 			"icons": [{ "src": "/pwa-96x96.png", "sizes": "96x96", "type": "image/png" }]
 		}
 	]

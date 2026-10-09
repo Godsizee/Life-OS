@@ -1,3 +1,7 @@
+<script lang="ts">
+	import Wortmarke from '#lib/ui/Wortmarke.svelte';
+</script>
+
 <!--
 	Ueberbrueckt die Sitzungspruefung beim Kaltstart. Vorher rendert das Layout
 	die geschuetzte Seite bereits, waehrend der Guard noch prueft — der Nutzer sah
@@ -9,7 +13,7 @@
 -->
 <div class="flex min-h-dvh flex-col items-center justify-center gap-3 px-4">
 	<div class="auth-enter flex flex-col items-center gap-3" style="--stagger: 180ms">
-		<img src="/favicon.svg" alt="" class="elevation-1 animate-pulse-subtle h-14 w-14 rounded-2xl" />
-		<span class="text-sm text-text-secondary">Life OS wird geladen…</span>
+		<Wortmarke size="lg" />
+		<span class="mono-label text-text-3">Wird geladen …</span>
 	</div>
 </div>
