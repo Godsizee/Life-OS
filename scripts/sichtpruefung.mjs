@@ -15,6 +15,7 @@
 //   EVAL='(…)'       JS-Ausdruck, dessen Ergebnis ausgegeben wird
 //   ELEMENT='sel'    nur dieses Element fotografieren; FULL=1 ganze Seite; SUFFIX=-x Namenszusatz
 //   GERAET='{"geraet.zuletztAktiv":"2026-10-03"}'  Geräte-Einstellungen vorbelegen (JSON)
+//   SETTINGS='{…}'   Profil-Einstellungen (Standard: Bestandskonto). '{}' = neues Konto → Assistent
 //   DEBUG_UEBER=1    Elemente nennen, die rechts über den Rand ragen
 import { pathToFileURL } from 'node:url';
 import { mkdirSync } from 'node:fs';
@@ -57,7 +58,7 @@ const ws = {
 };
 const profil = {
 	display_name: 'Test',
-	settings: { 'setup.abgeschlossen': 'bestand-2026-10-08' },
+	settings: JSON.parse(process.env.SETTINGS || '{"setup.abgeschlossen":"bestand-2026-10-08"}'),
 	user_id: uid
 };
 

@@ -16,7 +16,6 @@
 	import DashboardCard from '#lib/features/dashboard/components/DashboardCard.svelte';
 	import HealthTiles from '#lib/features/dashboard/components/HealthTiles.svelte';
 	import WeekFocusCard from '#lib/features/dashboard/components/WeekFocusCard.svelte';
-	import WelcomeModal from '#lib/features/dashboard/components/WelcomeModal.svelte';
 	import FocusMiniCard from '#lib/features/focus/components/FocusMiniCard.svelte';
 	import WorkoutMiniCard from '#lib/features/fitness/components/WorkoutMiniCard.svelte';
 	import ShoppingList from '#lib/features/shopping/components/ShoppingList.svelte';
@@ -28,7 +27,10 @@
 	import { heuteTagesplan } from '#lib/system/agenda-heute.js';
 	import { ueberbuchtUm } from '#lib/system/heute-logik.js';
 	import { willkommen } from '#lib/system/willkommen.svelte.js';
+	import { ersteSchritteAus } from '#lib/system/einstellungen/hilfe.js';
 	import { scoreAnzeigen } from '#lib/system/einstellungen/score.js';
+	import { setupAbgeschlossen } from '#lib/system/einstellungen/setup.js';
+	import { setupDatum } from '#lib/system/setup-kern.js';
 
 	import Anleitung from '#lib/ui/Anleitung.svelte';
 	import Band from '#lib/ui/Band.svelte';
@@ -56,6 +58,10 @@
 	const plan = $derived(heuteTagesplan(now));
 	const leer = $derived(plan.zeitlich.length + plan.flexibel.length === 0);
 	const ueberbucht = $derived(ueberbuchtUm(plan));
+	// „Erste Schritte“ nur nach dem Assistenten (nicht für Bestandskonten) und bis die Person sie ausblendet.
+	const zeigeAssistentFolge = $derived(
+		setupDatum(wert(setupAbgeschlossen)) !== '' && !wert(ersteSchritteAus)
+	);
 
 	const shoppingHighlights = $derived(shoppingState.items.filter((i) => !i.checked).slice(0, 5));
 	const pinnedNotes = $derived(notesState.notes.filter((n) => n.pinned).slice(0, 3));
@@ -74,7 +80,6 @@
 </script>
 
 <svelte:head><title>Heute - Life OS</title></svelte:head>
-<WelcomeModal />
 
 <div class="space-y-6">
 	<PageHeader title={greeting} subtitle="{todayLabel} · {plan.kapazitaet.satz}">
@@ -99,6 +104,12 @@
 	{#if willkommen.sichtbar}
 		{#await import('#lib/system/components/heute/WillkommenZurueck.svelte') then { default: WillkommenZurueck }}
 			<WillkommenZurueck />
+		{/await}
+	{/if}
+
+	{#if zeigeAssistentFolge}
+		{#await import('#lib/system/components/heute/ErsteSchritte.svelte') then { default: ErsteSchritte }}
+			<ErsteSchritte />
 		{/await}
 	{/if}
 

@@ -15,8 +15,9 @@ import { bestandsPatch } from './bestand-logik.js';
  * Bestandskonten behalten nach dem Update alle Module (T203). Läuft nach `ladeAlles()` und nur auf
  * vollständig geladenen Daten: Ein fehlgeschlagener Ladevorgang sähe sonst wie „Konto ohne Daten“ aus,
  * und die Übernahme fiele für immer aus. `system` darf mehrere Stores lesen — Features dürfen es nicht.
+ * Liefert `true`, wenn die Prüfung auf vollständigen Daten lief (nur dann darf der Setup-Assistent entscheiden).
  */
-export async function uebernehmeBestand(): Promise<void> {
+export async function uebernehmeBestand(): Promise<boolean> {
 	try {
 		const stores = [
 			profileState,
@@ -30,7 +31,7 @@ export async function uebernehmeBestand(): Promise<void> {
 			healthState,
 			fitnessState
 		];
-		if (!stores.every((s) => s.loaded)) return;
+		if (!stores.every((s) => s.loaded)) return false;
 		const anzahl =
 			tasksState.tasks.length +
 			notesState.notes.length +
@@ -44,8 +45,10 @@ export async function uebernehmeBestand(): Promise<void> {
 			fitnessState.logs.length;
 		const patch = bestandsPatch(profileState.settings, anzahl > 0, toISODate(new Date()));
 		if (patch) await profileState.setSettings(patch);
+		return true;
 	} catch (err) {
 		// Darf den App-Start nie stören; beim nächsten Start versucht es die Übernahme erneut.
 		console.error('[module] Bestandsübernahme fehlgeschlagen', err);
+		return false;
 	}
 }

@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
-	import { resetWelcome } from '#lib/features/dashboard/welcome.js';
 	import { installState } from '#lib/core/install.svelte.js';
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
@@ -317,16 +316,8 @@
 					onchange={() => themeState.toggle()}
 				/>
 			</SettingRow>
-			<SettingRow label="Willkommens-Hinweis">
-				<Button
-					variant="secondary"
-					onclick={async () => {
-						resetWelcome();
-						await goto('/');
-					}}
-				>
-					Erneut zeigen
-				</Button>
+			<SettingRow label="Einrichtung">
+				<Button variant="secondary" onclick={() => goto('/start?ansehen=1')}>Ansehen</Button>
 			</SettingRow>
 			{#if installState.canInstall}
 				<SettingRow label="App installieren">

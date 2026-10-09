@@ -11,6 +11,9 @@
 	import { starteSystem } from '#lib/system/start.js';
 	import { richteAutomationenEin } from '#lib/system/automationen.js';
 	import { uebernehmeBestand } from '#lib/system/bestand.js';
+	import { setupAbgeschlossen } from '#lib/system/einstellungen/setup.js';
+	import { setupSteht } from '#lib/system/setup-kern.js';
+	import { wert } from '#lib/core/einstellungen.js';
 	import ModulTor from '#lib/system/components/ModulTor.svelte';
 	import { fordereAbgleich } from '#lib/core/resync.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
@@ -42,7 +45,13 @@
 	const publicPaths = ['/login', '/register', '/invite'];
 	// Anmeldung und Onboarding bringen ihren eigenen Rahmen mit (AuthShell);
 	// Navigation waere dort nur Ablenkung von der einen offenen Aufgabe.
-	const chromelessPaths = [...publicPaths, '/onboarding', '/heute/planen', '/heute/abschluss'];
+	const chromelessPaths = [
+		...publicPaths,
+		'/onboarding',
+		'/start',
+		'/heute/planen',
+		'/heute/abschluss'
+	];
 	// Der Styleguide unter /dev/ läuft nur im Dev-Server und braucht weder Anmeldung noch Navigation.
 	const istDevPfad = (pfad: string) => dev && pfad.startsWith('/dev/');
 	let online = $state(true);
@@ -50,6 +59,8 @@
 	// meldete ein direkter Aufruf einer geschuetzten URL ganz ohne Login
 	// faelschlich "Sitzung abgelaufen" statt schlicht "bitte anmelden".
 	let hadSession = false;
+	// true, sobald die Bestandsprüfung auf vollständig geladenen Daten lief — erst dann darf der Setup-Assistent entscheiden.
+	let setupPruefbar = $state(false);
 
 	/** Tippt die Person gerade in ein Feld? Dann gehören Buchstaben dem Feld, nicht den Kürzeln. */
 	function inEingabe(ziel: EventTarget | null): boolean {
@@ -147,7 +158,7 @@
 					if (id) {
 						await ladeAlles(id);
 						// Zuerst die Module: ruhende Regeln (Training, Gesundheit) hängen an ihnen.
-						await uebernehmeBestand();
+						setupPruefbar = await uebernehmeBestand();
 						await richteAutomationenEin();
 					}
 					await outbox.replay();
@@ -157,6 +168,14 @@
 				.catch(() => {});
 		}
 		hadSession = !!authState.session;
+	});
+
+	// Neue Konten ohne Wert „Einrichtung abgeschlossen“ landen im Assistenten. Bestandskonten haben ihn seit T203.
+	$effect(() => {
+		if (!setupPruefbar || !authState.session) return;
+		const pfad = page.url.pathname;
+		if (chromelessPaths.includes(pfad) || istDevPfad(pfad)) return;
+		if (setupSteht(wert(setupAbgeschlossen))) void goto('/start', { replaceState: true });
 	});
 
 	// Kurzbefehl der installierten App („Erfassen“, `/?erfassen=1`): Blatt einmal öffnen, den Parameter
