@@ -21,6 +21,7 @@
 	import { panel } from '#lib/core/panel.svelte.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
 	import { loginUrlFor } from '#lib/features/auth/redirect.js';
+	import { hilfeLinkFuer } from '#lib/system/hilfe-link.js';
 	import UntereLeiste from '#lib/system/components/UntereLeiste.svelte';
 	import Seitenleiste from '#lib/system/components/Seitenleiste.svelte';
 	import Suche from '#lib/system/components/Suche.svelte';
@@ -56,7 +57,7 @@
 		return ziel.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(ziel.tagName);
 	}
 
-	/** Globale Tastenkürzel: `/` Suche, `n` Erfassen. `?` (Hilfe) folgt mit T501. */
+	/** Globale Tastenkürzel: `/` Suche, `n` Erfassen, `?` Hilfe zur aktuellen Seite. */
 	function kuerzel(e: KeyboardEvent) {
 		if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || inEingabe(e.target)) return;
 		if (!showNav || paletteOpen || quickAddOpen || moduleGridOpen) return;
@@ -66,6 +67,9 @@
 		} else if (e.key === 'n') {
 			e.preventDefault();
 			quickAddOpen = true;
+		} else if (e.key === '?') {
+			e.preventDefault();
+			void goto(hilfeLinkFuer(page.url.pathname));
 		}
 	}
 

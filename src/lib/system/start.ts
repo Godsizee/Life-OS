@@ -3,6 +3,7 @@ import { aktionen } from '#lib/core/aktionen.js';
 import '#lib/core/geraet.svelte.js'; // registriert den Geräte-Speicher
 import { setzeRoutinenQuelle } from '#lib/core/nlp-parse.js';
 import { setzeScoreQuelle } from '#lib/core/score.js';
+import { setzeHilfeQuelle } from '#lib/core/hilfe.js';
 import { setzeEntladen } from '#lib/core/sitzung.js';
 import { setzeTageskontextQuelle } from '#lib/core/tageskontext.js';
 import { verknuepfbar } from '#lib/core/verknuepfbar.js';
@@ -10,6 +11,7 @@ import { starteAutomationen } from '#lib/features/automationen/laufzeit.svelte.j
 import { habitsState } from '#lib/features/habits/store.svelte.js';
 import { starteErinnerungsReaktionen } from '#lib/features/reminders/reaktionen.js';
 import { entladeAlles } from './daten.js';
+import { hilfeLinkFuer } from './hilfe-link.js';
 import { istAktiv } from './module-aktiv.svelte.js';
 import { MODULE } from './module.js';
 import { berechneModulScore } from './score.js';
@@ -36,6 +38,7 @@ export function starteSystem(): void {
 			verknuepfbar.setze(def.typ, { ...def, alle: () => (istAktiv(m.id) ? def.alle() : []) });
 		}
 	}
+	setzeHilfeQuelle(hilfeLinkFuer);
 	setzeScoreQuelle(berechneModulScore);
 	setzeTageskontextQuelle(baueTageskontext);
 	starteAutomationen({

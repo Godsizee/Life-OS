@@ -1,10 +1,10 @@
 import type { ModulId, ModulMeta } from '#lib/config/modules.js';
-import type { ModulManifest, SuchTreffer } from '#lib/core/modul.js';
+import type { HilfeThema, ModulManifest, SuchTreffer } from '#lib/core/modul.js';
 import { passung } from '#lib/core/text.js';
 
 /** Rein, ohne Store- und Icon-Importe (testbar in Node). Gebunden an die aktiven Module wird in suche.ts. */
 
-export type ErgebnisArt = 'ausfuehren' | 'treffer' | 'modul' | 'befehl';
+export type ErgebnisArt = 'ausfuehren' | 'treffer' | 'modul' | 'befehl' | 'hilfe';
 
 export interface Ergebnis {
 	/** stabil, auch für `aria-activedescendant` */
@@ -60,6 +60,18 @@ export function trefferJeModul(
 		}
 	}
 	return out;
+}
+
+/** Hilfethemen als Suchergebnisse (Präfix `?`); `gefunden` kommt bereits sortiert aus `sucheThemen`. */
+export function hilfeEintraege(gefunden: HilfeThema[]): Ergebnis[] {
+	return gefunden.map((t) => ({
+		id: `hilfe-${t.id}`,
+		art: 'hilfe' as const,
+		gruppe: 'Hilfe',
+		label: t.titel,
+		sub: t.kurz,
+		href: `/hilfe/${t.id}`
+	}));
 }
 
 /** „Gehe zu“-Einträge der aktiven Module; mit Anfrage nur die passenden. */

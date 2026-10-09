@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { hilfeHref } from '#lib/core/hilfe.js';
 	import { CircleHelp } from '@lucide/svelte';
 	import IconButton from './IconButton.svelte';
 
@@ -18,6 +21,10 @@
 		/** Fester Platz rechts: öffnet die Hilfe des Moduls. Ohne Handler bleibt die Taste weg. */
 		onhilfe?: () => void;
 	} = $props();
+
+	// Ohne eigenen Handler führt die `?`-Taste zur Hilfe der aktuellen Seite (gleiche Stelle auf jeder Seite, SC 3.2.6).
+	const hilfeZiel = $derived(onhilfe ? null : hilfeHref(page.url.pathname));
+	const hilfeOeffnen = $derived(onhilfe ?? (hilfeZiel ? () => void goto(hilfeZiel) : undefined));
 
 	// Sobald der grosse Titel hochgescrollt ist, blendet eine schmale Leiste mit
 	// Kurztitel ein – der Seitenkontext bleibt sichtbar, ohne dauerhaft Hoehe zu
@@ -60,8 +67,8 @@
 		</div>
 		<div class="flex shrink-0 items-center gap-2">
 			{#if trailing}{@render trailing()}{/if}
-			{#if onhilfe}
-				<IconButton label="Hilfe zu dieser Seite" variant="surface" onclick={onhilfe}>
+			{#if hilfeOeffnen}
+				<IconButton label="Hilfe zu dieser Seite" variant="surface" onclick={hilfeOeffnen}>
 					<CircleHelp size={20} />
 				</IconButton>
 			{/if}

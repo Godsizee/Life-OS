@@ -1,8 +1,11 @@
 import { modules } from '#lib/config/modules.js';
 import { deute } from './erfassen.js';
+import { sucheThemen } from './hilfe-kern.js';
+import { geladeneThemen } from './hilfe-themen.svelte.js';
 import { aktiveModule } from './module-aktiv.svelte.js';
 import {
 	befehle,
+	hilfeEintraege,
 	modulEintraege,
 	moduswahl,
 	trefferJeModul,
@@ -17,11 +20,14 @@ const labelVon = (id: string) => modules.find((m) => m.id === id)?.label ?? id;
 /**
  * Alles, was die Suche zeigt, in Anzeigereihenfolge:
  * Erfassen (erkannte Eingabe) → Module → Treffer je Modul. `>` zeigt nur Befehle,
- * `?` nur Hilfethemen (kommen mit T501).
+ * `?` nur Hilfethemen.
  */
 export function sammleErgebnisse(roh: string): { modus: SuchModus; ergebnisse: Ergebnis[] } {
 	const { modus, anfrage } = moduswahl(roh);
-	if (modus === 'hilfe') return { modus, ergebnisse: [] };
+	if (modus === 'hilfe') {
+		const themen = geladeneThemen();
+		return { modus, ergebnisse: themen ? hilfeEintraege(sucheThemen(themen, anfrage)) : [] };
+	}
 	if (modus === 'befehle') {
 		return { modus, ergebnisse: befehle(aktiveModule.meta, anfrage) };
 	}
