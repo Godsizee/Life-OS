@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { page } from '$app/state';
 	import { istVerworfen } from '#lib/features/tasks/status.js';
 	import { calendarState } from '#lib/features/calendar/store.svelte.js';
@@ -252,6 +253,8 @@
 		</div>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="calendar" />
 
 <CalendarManagerSheet bind:open={managerOpen} bind:hiddenCalendarIds />
 

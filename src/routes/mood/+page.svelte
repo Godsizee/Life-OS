@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { moodState } from '#lib/features/mood/store.svelte.js';
 	import { checkinAnfrage } from '#lib/features/mood/checkin-anfrage.svelte.js';
 	import Alert from '#lib/ui/Alert.svelte';
@@ -90,6 +91,8 @@
 </svelte:head>
 
 <PageHeader title="Wie geht's dir?" subtitle={formatDate(new Date())} />
+
+<ModulIntro modul="mood" />
 
 {#if checkinAnfrage.anlass}
 	<div class="mb-4">

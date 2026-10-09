@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
@@ -217,6 +218,7 @@
 </svelte:head>
 
 <div class="mx-auto w-full max-w-5xl px-4 py-6">
+	<ModulIntro modul="focus" />
 	<!-- Kopfzeile: Statistik + Tagesziel + Einstellungen -->
 	<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 		<div class="min-w-0 flex-1">

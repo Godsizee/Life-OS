@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { habitsState } from '#lib/features/habits/store.svelte.js';
 	import { calculateStreak, bestStreak } from '#lib/features/habits/streak.js';
 	import HabitForm from '#lib/features/habits/components/HabitForm.svelte';
@@ -43,6 +44,8 @@
 		</button>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="habits" />
 
 <Sheet bind:open={createOpen} title="Neue Gewohnheit">
 	{#snippet children()}

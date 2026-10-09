@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { healthState } from '#lib/features/health/store.svelte.js';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
 	import HealthForm from '#lib/features/health/components/HealthForm.svelte';
@@ -49,6 +50,8 @@
 </svelte:head>
 
 <PageHeader title="Körper & Gesundheit" subtitle="Täglicher Check-in" />
+
+<ModulIntro modul="health" />
 
 <div class="flex flex-col gap-4">
 	<!-- Tagesziele -->

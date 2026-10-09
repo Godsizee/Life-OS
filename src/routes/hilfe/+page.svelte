@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { modules } from '#lib/config/modules.js';
+	import { setze } from '#lib/core/einstellungen.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { hilfeGesehen } from '#lib/system/einstellungen/hilfe.js';
 	import { alleThemen } from '#lib/system/hilfe.js';
 	import { gruppiereThemen, sucheThemen } from '#lib/system/hilfe-kern.js';
 	import Anleitung from '#lib/ui/Anleitung.svelte';
@@ -7,6 +10,11 @@
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 
 	let suche = $state('');
+
+	async function tippsErneut() {
+		await setze(hilfeGesehen, []);
+		toastState.success('Die Einführungen der Module erscheinen wieder.');
+	}
 
 	const treffer = $derived(sucheThemen(alleThemen(), suche));
 	const gruppen = $derived(gruppiereThemen(treffer));
@@ -33,6 +41,13 @@
 		<a href="/hilfe/zusammenspiel" class="mono-label underline decoration-2 underline-offset-4">
 			So hängt Life OS zusammen
 		</a>
+		<button
+			type="button"
+			class="mono-label underline decoration-2 underline-offset-4"
+			onclick={tippsErneut}
+		>
+			Tipps erneut zeigen
+		</button>
 	</p>
 
 	{#if gruppen.length === 0}

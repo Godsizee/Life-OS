@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
@@ -134,6 +135,8 @@
 			</p>
 		</div>
 	</div>
+
+	<ModulIntro modul="fitness" />
 
 	<!-- Navigation -->
 	<div role="tablist" class="flex gap-1 rounded-2xl border border-border-color bg-surface-2/60 p-1">

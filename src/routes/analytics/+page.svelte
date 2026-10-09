@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { analyticsState } from '#lib/features/analytics/store.svelte.js';
 	import { moodState } from '#lib/features/mood/store.svelte.js';
 	import { fitnessState } from '#lib/features/fitness/store.svelte.js';
@@ -159,6 +160,8 @@
 			</div>
 		{/snippet}
 	</PageHeader>
+
+	<ModulIntro modul="analytics" />
 
 	<div class="md:hidden">
 		{@render zeitraumToggle()}

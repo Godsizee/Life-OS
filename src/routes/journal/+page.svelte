@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import JournalList from '#lib/features/goals/components/JournalList.svelte';
 	import JournalPromptBar from '#lib/features/goals/components/JournalPromptBar.svelte';
@@ -54,6 +55,8 @@
 		<JournalStreakBadge {streak} />
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="journal" />
 
 <div class="mb-4 space-y-4">
 	<JournalPromptBar onOpen={(d) => openJournal(d, 'daily')} />

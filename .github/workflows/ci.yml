@@ -23,6 +23,6 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key-00000000000000
       # Plan: 232 KB (Basis 223,3 + 4 %). Nach T101 (supabase-js 2.117 u. a.) Ist 235,8 KB,
       # deshalb 240. Nach P2 (T201 Manifeste/Bus, T204 Emitter, T205 Automationen) Ist 247,5 KB,
-      # deshalb 250. Nach T206 (acht Erfassen-Arten, Aufgaben-Parser) Ist 253,8 KB, deshalb 256. Nach T207/T208 (Suche, Verlauf, Export, Score, Hinweise über Manifeste) Ist 263,0 KB, deshalb 266. Nach T304 (alle Bausteine im neuen Stil, Popover/Panel) Ist 268,2 KB, deshalb 272. Nach T402 (alte Heute-Kacheln entfallen) Ist 262,1 KB, deshalb 266. Nach T401–T508 (Rituale, Hilfe, Umwandeln) Ist 265,6 KB, deshalb 268. Nach dem Wechsel auf zod/mini (statt zod classic, −15 KB) Ist 252,4 KB, deshalb 256.
+      # deshalb 250. Nach T206 (acht Erfassen-Arten, Aufgaben-Parser) Ist 253,8 KB, deshalb 256. Nach T207/T208 (Suche, Verlauf, Export, Score, Hinweise über Manifeste) Ist 263,0 KB, deshalb 266. Nach T304 (alle Bausteine im neuen Stil, Popover/Panel) Ist 268,2 KB, deshalb 272. Nach T402 (alte Heute-Kacheln entfallen) Ist 262,1 KB, deshalb 266. Nach T401–T508 (Rituale, Hilfe, Umwandeln) Ist 265,6 KB, deshalb 268. Nach dem Wechsel auf zod/mini (statt zod classic, −15 KB) Ist 252,4 KB, deshalb 256. Nach T407–T507 (Willkommen zurück, Assistent, Was ist neu, Einführungen) und dem Umbau der Hilfe-Links Ist 245,3 KB, deshalb 249.
       # T802 senkt auf 180 (Code-Splitting der Manifeste, Sofortstart).
-      - run: node scripts/measure-bundle.mjs --budget-initial-kb 256
+      - run: node scripts/measure-bundle.mjs --budget-initial-kb 249

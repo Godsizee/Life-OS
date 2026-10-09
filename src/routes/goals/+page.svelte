@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
@@ -41,6 +42,8 @@
 		</div>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="goals" />
 
 <Sheet bind:open={createOpen} title="Neues Ziel">
 	{#snippet children()}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { istErledigt, istOffen } from '#lib/features/tasks/status.js';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import type { Task } from '#lib/features/tasks/types.js';
@@ -154,6 +155,8 @@
 		</button>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="tasks" />
 
 <Sheet bind:open={createOpen} title="Neue Aufgabe"
 	><div class="p-4"><TaskForm onsubmitted={() => (createOpen = false)} /></div></Sheet

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { page } from '$app/state';
 	import { Hash, Plus } from '@lucide/svelte';
 	import { notesState } from '#lib/features/notes/store.svelte.js';
@@ -82,6 +83,8 @@
 		</button>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="notes" />
 
 <Sheet bind:open={createOpen} title="Neue Notiz">
 	{#snippet children()}

@@ -4,6 +4,9 @@
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
 	import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
+	import { setze } from '#lib/core/einstellungen.js';
+	import { toastState } from '#lib/core/toast.svelte.js';
+	import { hilfeGesehen } from '#lib/system/einstellungen/hilfe.js';
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
 	import { themeState } from '#lib/core/theme.svelte.js';
 	import { profileState, HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
@@ -319,6 +322,17 @@
 			</SettingRow>
 			<SettingRow label="Einrichtung">
 				<Button variant="secondary" onclick={() => goto('/start?ansehen=1')}>Ansehen</Button>
+			</SettingRow>
+			<SettingRow label="Einführungen der Module">
+				<Button
+					variant="secondary"
+					onclick={async () => {
+						await setze(hilfeGesehen, []);
+						toastState.success('Die Einführungen der Module erscheinen wieder.');
+					}}
+				>
+					Erneut zeigen
+				</Button>
 			</SettingRow>
 			{#if installState.canInstall}
 				<SettingRow label="App installieren">

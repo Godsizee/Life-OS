@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { istOffen } from '#lib/features/tasks/status.js';
 	import { goto } from '$app/navigation';
 	import { toISODate, fromISODate } from '#lib/core/date.js';
@@ -124,6 +125,10 @@
 <svelte:head>
 	<title>Weekly Review - Life OS</title>
 </svelte:head>
+
+{#if step === 1}
+	<ModulIntro modul="review" />
+{/if}
 
 <!-- Progress-Bar -->
 <div class="mb-6">

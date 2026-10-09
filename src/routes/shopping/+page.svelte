@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { shoppingState } from '#lib/features/shopping/store.svelte.js';
 	import { authState } from '#lib/core/auth.svelte.js';
 	import type { ShoppingItem } from '#lib/features/shopping/types.js';
@@ -95,6 +96,8 @@
 		</button>
 	{/snippet}
 </PageHeader>
+
+<ModulIntro modul="shopping" />
 
 <Sheet bind:open={createOpen} title="Neuer Artikel">
 	{#snippet children()}

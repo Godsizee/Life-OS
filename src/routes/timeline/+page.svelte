@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ModulIntro from '#lib/system/components/ModulIntro.svelte';
 	import { History } from '@lucide/svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
@@ -82,6 +83,8 @@
 			</div>
 		{/snippet}
 	</PageHeader>
+
+	<ModulIntro modul="timeline" />
 
 	<div class="md:hidden">
 		{@render rangeToggle()}
