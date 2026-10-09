@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { tasksState } from '#lib/features/tasks/store.svelte.js';
 	import { goalsState } from '#lib/features/goals/store.svelte.js';
 	import { profileState } from '#lib/features/profile/store.svelte.js';
@@ -49,6 +50,18 @@
 		currentTask?.goal_id ? goalsState.goals.find((g) => g.id === currentTask.goal_id) : null
 	);
 	const remainingInQueue = $derived(Math.max(0, filteredQueue.length - currentIndex));
+
+	// Von „Heute“ kommt `?task=<id>`: Diese Aufgabe steht dann als Erste an (einmalig, sonst wäre das Weiterschalten blockiert).
+	let wunschAngewandt = false;
+	$effect(() => {
+		const wunsch = page.url.searchParams.get('task');
+		if (!wunsch || wunschAngewandt || focusSession.active) return;
+		const index = filteredQueue.findIndex((t) => t.id === wunsch);
+		if (index >= 0) {
+			currentIndex = index;
+			wunschAngewandt = true;
+		}
+	});
 
 	// Die Session hält ihre eigene Aufgabe fest; die Queue darf sie nicht überschreiben,
 	// solange eine Phase läuft.

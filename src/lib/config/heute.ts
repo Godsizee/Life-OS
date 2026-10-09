@@ -106,3 +106,15 @@ export const standardDauerMin = defineEinstellung<number>({
 	abschnitt: 'tasks',
 	ui: { art: 'zahl', min: 5, max: 240, schritt: 5, einheit: 'min' }
 });
+
+/** „Nicht jetzt“ auf der Jetzt-Karte: Einträge, die dieses Gerät bis zum Zeitpunkt `bis` nicht mehr als Jetzt zeigt. */
+export const nichtJetzt = defineEinstellung<{ key: string; bis: string }[]>({
+	schluessel: 'heute.nichtJetzt',
+	ablage: 'geraet',
+	schema: z.array(z.object({ key: z.string(), bis: z.string() })),
+	standard: [],
+	label: 'Zurückgestellte Jetzt-Einträge',
+	stufe: 'erweitert',
+	abschnitt: 'heute',
+	ui: { art: 'eigen' }
+});
