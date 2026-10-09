@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { istErledigt } from '#lib/features/tasks/status.js';
 	import type { Task } from '../types';
 	import { tasksState } from '../store.svelte';
@@ -21,8 +22,16 @@
 	import MemberSelect from '#lib/features/workspace/components/MemberSelect.svelte';
 	import RecurrenceField from './RecurrenceField.svelte';
 
-	let { task = $bindable(), open = $bindable(false) }: { task: Task | null; open?: boolean } =
-		$props();
+	let {
+		task = $bindable(),
+		open = $bindable(false),
+		extras
+	}: {
+		task: Task | null;
+		open?: boolean;
+		/** Zusätzliche Aktionen der Seite (z. B. „Umwandeln in …“), damit die Aufgaben-Komponente nichts aus `system/` kennen muss. */
+		extras?: Snippet<[Task]>;
+	} = $props();
 
 	let title = $state('');
 	let description = $state('');
@@ -331,6 +340,10 @@
 					defaultTime="09:00"
 				/>
 			</div>
+
+			{#if extras}
+				<div class="mt-4 border-t border-border-color pt-4">{@render extras(task)}</div>
+			{/if}
 
 			<div class="mt-4 flex items-center justify-between border-t border-border-color pt-4">
 				<div class="flex items-center gap-1">

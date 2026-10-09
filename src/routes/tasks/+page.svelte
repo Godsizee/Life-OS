@@ -6,6 +6,7 @@
 	import TaskList from '#lib/features/tasks/components/TaskList.svelte';
 	import TaskBoard from '#lib/features/tasks/components/TaskBoard.svelte';
 	import TaskDetailSheet from '#lib/features/tasks/components/TaskDetailSheet.svelte';
+	import UmwandelnMenue from '#lib/system/components/UmwandelnMenue.svelte';
 	import ProjectForm from '#lib/features/tasks/components/ProjectForm.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Chip from '#lib/ui/Chip.svelte';
@@ -160,7 +161,11 @@
 <Sheet bind:open={projectSheetOpen} title="Neues Projekt"
 	><div class="p-4"><ProjectForm onsubmitted={() => (projectSheetOpen = false)} /></div></Sheet
 >
-<TaskDetailSheet bind:open={detailOpen} task={detailTask} />
+<TaskDetailSheet bind:open={detailOpen} task={detailTask}>
+	{#snippet extras(aufgabe)}
+		<UmwandelnMenue task={aufgabe} onfertig={() => (detailOpen = false)} />
+	{/snippet}
+</TaskDetailSheet>
 
 <div class="mb-4 flex flex-col gap-3">
 	<Input placeholder="Aufgaben durchsuchen…" bind:value={search} />

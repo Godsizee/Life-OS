@@ -41,8 +41,10 @@ export class ErfassenSitzung {
 	async ausfuehren(): Promise<string | null> {
 		const d = this.aktuell;
 		if (!d) return null;
+		// Unsicher und ohne Wahl: Als Aufgabe ohne Angaben landet es im Eingang (`imEingang`).
+		const imEingang = this.unsicher && d.art.id === 'aufgabe';
 		const meldung = await d.art.ausfuehren(d.vorschau);
 		this.zuruecksetzen();
-		return meldung;
+		return imEingang ? 'Im Eingang abgelegt — später zuordnen.' : meldung;
 	}
 }

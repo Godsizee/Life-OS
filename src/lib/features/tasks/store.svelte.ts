@@ -327,16 +327,20 @@ class TasksState {
 	 * Löschen mit Rücknahmefenster — für die Wischgeste in der Liste, die sich
 	 * mobil leicht versehentlich auslöst. Siehe core/undo.ts.
 	 */
-	removeTaskWithUndo(id: string) {
+	removeTaskWithUndo(
+		id: string,
+		optionen: { text?: string; beiRueckgaengig?: () => void | Promise<void> } = {}
+	) {
 		const task = this.tasks.find((t) => t.id === id);
 		if (!task) return;
 		loeschenMitUndo({
-			text: 'Aufgabe gelöscht',
+			text: optionen.text ?? 'Aufgabe gelöscht',
 			ausblenden: () => (this.tasks = this.tasks.filter((t) => t.id !== id)),
 			// An die alte Stelle zurück, nicht ans Ende: die Liste sortiert nach
 			// position, ein Anhängen würde die Reihenfolge sichtbar verändern.
 			wiederherstellen: () => {
 				if (!this.tasks.some((t) => t.id === id)) this.tasks = [...this.tasks, task];
+				void optionen.beiRueckgaengig?.();
 			},
 			festschreiben: async () => {
 				// Erst hier, nicht beim Ausblenden: bis zum Ablauf des Fensters ist das Löschen umkehrbar.
