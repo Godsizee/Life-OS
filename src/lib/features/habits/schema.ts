@@ -1,23 +1,26 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 export const habitScheduleSchema = z.discriminatedUnion('type', [
 	z.object({ type: z.literal('daily') }),
-	z.object({ type: z.literal('weekly'), days: z.array(z.number().int().min(0).max(6)).min(1) }),
-	z.object({ type: z.literal('weekly_count'), times: z.number().int().min(1).max(7) })
+	z.object({
+		type: z.literal('weekly'),
+		days: z.array(z.int().check(z.minimum(0), z.maximum(6))).check(z.minLength(1))
+	}),
+	z.object({ type: z.literal('weekly_count'), times: z.int().check(z.minimum(1), z.maximum(7)) })
 ]);
 
 export const habitInputSchema = z.object({
-	name: z.string().min(1).max(100),
-	schedule: habitScheduleSchema.default({ type: 'daily' }),
-	color: z.string().nullable().default(null),
+	name: z.string().check(z.minLength(1), z.maxLength(100)),
+	schedule: z._default(habitScheduleSchema, { type: 'daily' }),
+	color: z._default(z.nullable(z.string()), null),
 	/** null = Häkchen-Routine. Werte <= 1 werden wie null behandelt. */
-	target_value: z.number().positive().max(10000).nullable().default(null),
-	unit: z.string().max(20).nullable().default(null),
-	goal_id: z.string().uuid().nullable().optional()
+	target_value: z._default(z.nullable(z.number().check(z.positive(), z.maximum(10000))), null),
+	unit: z._default(z.nullable(z.string().check(z.maxLength(20))), null),
+	goal_id: z.optional(z.nullable(z.uuid()))
 });
 
 export type HabitInput = z.infer<typeof habitInputSchema>;
 
 /** Teil-Update für die Detailseite (alle Felder optional). */
-export const habitPatchSchema = habitInputSchema.partial();
+export const habitPatchSchema = z.partial(habitInputSchema);
 export type HabitPatch = z.infer<typeof habitPatchSchema>;

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 export const emailSchema = z.email('Bitte eine gültige E-Mail-Adresse eingeben.');
 
@@ -6,8 +6,7 @@ export const emailSchema = z.email('Bitte eine gültige E-Mail-Adresse eingeben.
 // darüber wird stillschweigend abgeschnitten. Lieber hier ehrlich abweisen.
 export const passwordSchema = z
 	.string()
-	.min(8, 'Mindestens 8 Zeichen.')
-	.max(72, 'Höchstens 72 Zeichen.');
+	.check(z.minLength(8, 'Mindestens 8 Zeichen.'), z.maxLength(72, 'Höchstens 72 Zeichen.'));
 
 export const credentialsSchema = z.object({
 	email: emailSchema,
@@ -24,12 +23,20 @@ export type Credentials = z.infer<typeof credentialsSchema>;
 // laese "Mindestens 8 Zeichen." statt einer Erklaerung fuer die Sackgasse.
 export const loginCredentialsSchema = z.object({
 	email: emailSchema,
-	password: z.string().min(1, 'Bitte ein Passwort eingeben.')
+	password: z.string().check(z.minLength(1, 'Bitte ein Passwort eingeben.'))
 });
 
+const kurzerName = z
+	.string()
+	.check(
+		z.trim(),
+		z.minLength(2, 'Mindestens 2 Zeichen.'),
+		z.maxLength(60, 'Höchstens 60 Zeichen.')
+	);
+
 export const onboardingSchema = z.object({
-	displayName: z.string().trim().min(2, 'Mindestens 2 Zeichen.').max(60, 'Höchstens 60 Zeichen.'),
-	workspaceName: z.string().trim().min(2, 'Mindestens 2 Zeichen.').max(60, 'Höchstens 60 Zeichen.')
+	displayName: kurzerName,
+	workspaceName: kurzerName
 });
 
 export type OnboardingInput = z.infer<typeof onboardingSchema>;

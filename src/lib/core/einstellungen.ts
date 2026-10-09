@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import type { ZodMiniType } from 'zod/mini';
 
 export type Ablage = 'nutzer' | 'haushalt' | 'geraet';
 export type Stufe = 'schnell' | 'modul' | 'erweitert';
@@ -15,7 +15,7 @@ export interface EinstellungDef<T> {
 	/** Bestand bleibt (z. B. 'water_unit'); NEU immer '<modul>.<name>' — flach, nie verschachtelt (Falle F10). */
 	schluessel: string;
 	ablage: Ablage;
-	schema: z.ZodType<T>;
+	schema: ZodMiniType<T>;
 	standard: T;
 	label: string;
 	/** EIN Satz: was bewirkt das? (erscheint unter dem Regler) */

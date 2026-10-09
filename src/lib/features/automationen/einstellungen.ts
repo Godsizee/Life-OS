@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { defineEinstellung, setze, wert, type EinstellungDef } from '#lib/core/einstellungen.js';
 import type { Regel, RegelUeberschreibung } from './types.js';
 
@@ -28,9 +28,9 @@ export const automationEingerichtet = defineEinstellung<boolean>({
 });
 
 const ueberschreibungSchema = z.object({
-	aktiv: z.boolean().optional(),
-	modus: z.enum(['auto', 'fragen']).optional(),
-	parameter: z.record(z.string(), z.unknown()).optional()
+	aktiv: z.optional(z.boolean()),
+	modus: z.optional(z.enum(['auto', 'fragen'])),
+	parameter: z.optional(z.record(z.string(), z.unknown()))
 });
 
 /** Flacher Schlüssel je Regel: 'automation.<regelId>' (Zielbild C7, Speicher). */

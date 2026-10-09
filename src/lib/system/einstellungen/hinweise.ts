@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { defineEinstellung, type EinstellungDef } from '#lib/core/einstellungen.js';
 import type { ModulManifest } from '#lib/core/modul.js';
 

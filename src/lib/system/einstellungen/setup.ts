@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { defineEinstellung } from '#lib/core/einstellungen.js';
 
 /** Leer = Einrichtung steht aus. `bestand-<Datum>` = Bestandskonto übernommen, sonst setzt der Assistent (T503) das Datum. */

@@ -1,14 +1,14 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum muss yyyy-mm-dd sein');
+const isoDate = z.string().check(z.regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum muss yyyy-mm-dd sein'));
 
 export const healthInputSchema = z.object({
 	date: isoDate,
-	weight_kg: z.number().positive().max(500).nullable().default(null),
-	sleep_h: z.number().min(0).max(24).nullable().default(null),
+	weight_kg: z._default(z.nullable(z.number().check(z.positive(), z.maximum(500))), null),
+	sleep_h: z._default(z.nullable(z.number().check(z.minimum(0), z.maximum(24))), null),
 	// 0 ist ausdrücklich erlaubt (H-02). Obergrenze 15 l = physiologisches Maximum.
-	water_ml: z.number().int().min(0).max(15000).nullable().default(null),
-	energy: z.number().int().min(1).max(5).nullable().default(null)
+	water_ml: z._default(z.nullable(z.int().check(z.minimum(0), z.maximum(15000))), null),
+	energy: z._default(z.nullable(z.int().check(z.minimum(1), z.maximum(5))), null)
 });
 
 export type HealthInput = z.infer<typeof healthInputSchema>;

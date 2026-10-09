@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { defineEinstellung } from '#lib/core/einstellungen.js';
 
 /** Ab wann Abendhinweise kommen (z. B. „Serie ist heute noch offen“). */
 export const abendAb = defineEinstellung<string>({
 	schluessel: 'heute.abendAb',
 	ablage: 'nutzer',
-	schema: z.string().regex(/^\d{2}:\d{2}$/),
+	schema: z.string().check(z.regex(/^\d{2}:\d{2}$/)),
 	standard: '18:00',
 	label: 'Abendhinweise ab',
 	hinweis: 'Ab dieser Uhrzeit weist die App auf offene Routinen mit laufender Serie hin.',
@@ -18,7 +18,7 @@ export const abendAb = defineEinstellung<string>({
 export const maxHinweise = defineEinstellung<number>({
 	schluessel: 'heute.maxHinweise',
 	ablage: 'nutzer',
-	schema: z.number().int().min(0).max(5),
+	schema: z.int().check(z.minimum(0), z.maximum(5)),
 	standard: 2,
 	label: 'Hinweise auf Heute',
 	hinweis: 'Höchstzahl der Hinweise, die zugleich erscheinen. 0 zeigt keine.',
@@ -27,7 +27,7 @@ export const maxHinweise = defineEinstellung<number>({
 	ui: { art: 'zahl', min: 0, max: 5, schritt: 1 }
 });
 
-const zeit = z.string().regex(/^\d{2}:\d{2}$/);
+const zeit = z.string().check(z.regex(/^\d{2}:\d{2}$/));
 
 /** Beginn des planbaren Tages — Grundlage der freien Zeit im Tagesplan. */
 export const tagesbeginn = defineEinstellung<string>({
@@ -98,7 +98,7 @@ export const abschlussAb = defineEinstellung<string>({
 export const standardDauerMin = defineEinstellung<number>({
 	schluessel: 'aufgaben.standardDauerMin',
 	ablage: 'nutzer',
-	schema: z.number().int().min(5).max(240),
+	schema: z.int().check(z.minimum(5), z.maximum(240)),
 	standard: 30,
 	label: 'Dauer ohne Schätzung',
 	hinweis: 'So viel wird für Aufgaben ohne Schätzung eingeplant.',

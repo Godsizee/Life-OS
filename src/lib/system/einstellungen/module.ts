@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { modules, type ModulId } from '#lib/config/modules.js';
 import { defineEinstellung } from '#lib/core/einstellungen.js';
 

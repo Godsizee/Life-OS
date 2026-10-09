@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import {
 	defineEinstellung,
 	registriereSpeicher,
@@ -13,7 +13,7 @@ import { erstelleRegister } from './register';
 const def = defineEinstellung({
 	schluessel: 'heute.tagesbeginn',
 	ablage: 'geraet',
-	schema: z.string().regex(/^\d{2}:\d{2}$/),
+	schema: z.string().check(z.regex(/^\d{2}:\d{2}$/)),
 	standard: '08:00',
 	label: 'Tagesbeginn',
 	stufe: 'modul',
@@ -45,7 +45,7 @@ describe('Einstellungs-Kern: Randfälle', () => {
 	const zahl = defineEinstellung({
 		schluessel: 'heute.limit',
 		ablage: 'nutzer',
-		schema: z.number().int().min(1).max(10),
+		schema: z.int().check(z.minimum(1), z.maximum(10)),
 		standard: 5,
 		label: 'Limit',
 		stufe: 'modul',

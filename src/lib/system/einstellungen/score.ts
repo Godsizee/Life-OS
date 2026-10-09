@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import type { ModulId } from '#lib/config/modules.js';
 import { defineEinstellung, type EinstellungDef } from '#lib/core/einstellungen.js';
 
@@ -20,7 +20,7 @@ export function scoreGewichtDef(id: ModulId, label: string): EinstellungDef<numb
 	return defineEinstellung<number>({
 		schluessel: scoreSchluessel(id),
 		ablage: 'nutzer',
-		schema: z.number().int().min(0).max(5),
+		schema: z.int().check(z.minimum(0), z.maximum(5)),
 		standard: STANDARD_GEWICHT[id] ?? 0,
 		label,
 		hinweis: 'Wie stark dieser Bereich in den Life Score eingeht. 0 nimmt ihn heraus.',
