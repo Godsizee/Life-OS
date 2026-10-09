@@ -26,9 +26,12 @@
 		aria-label="Hilfethemen durchsuchen"
 	/>
 
-	<p>
+	<p class="flex flex-wrap gap-x-6 gap-y-2">
 		<a href="/hilfe/begriffe" class="mono-label underline decoration-2 underline-offset-4">
 			Alle Begriffe
+		</a>
+		<a href="/hilfe/zusammenspiel" class="mono-label underline decoration-2 underline-offset-4">
+			So hängt Life OS zusammen
 		</a>
 	</p>
 
