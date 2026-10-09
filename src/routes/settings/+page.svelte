@@ -4,11 +4,12 @@
 	import { logout, logoutState } from '#lib/features/auth/logout.svelte.js';
 	import { installState } from '#lib/core/install.svelte.js';
 	import { erlaubnis } from '#lib/core/erlaubnis.svelte.js';
-	import { setze } from '#lib/core/einstellungen.js';
+	import { setze, wert } from '#lib/core/einstellungen.js';
+	import { entfernePause, fuegePauseHinzu, ruhePausen, type Pause } from '#lib/core/ruhe.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
+	import { themeState, type ThemaModus } from '#lib/core/theme.svelte.js';
 	import { hilfeGesehen } from '#lib/system/einstellungen/hilfe.js';
 	import { pushState } from '#lib/features/reminders/push.svelte.js';
-	import { themeState } from '#lib/core/theme.svelte.js';
 	import { profileState, HEALTH_LIMITS } from '#lib/features/profile/store.svelte.js';
 	import {
 		HEIGHT_LIMITS,
@@ -26,16 +27,29 @@
 	import { resolveNavModules } from '#lib/config/nav.js';
 	import { istAktiv } from '#lib/system/module-aktiv.svelte.js';
 	import { downloadExport } from '#lib/system/export.js';
+	import { abschnitte, type Abschnitt } from '#lib/system/einstellungen/abschnitte.js';
+	import EinstellungsAbschnitt from '#lib/system/components/EinstellungsAbschnitt.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import SettingRow from '#lib/ui/SettingRow.svelte';
 	import NumberSetting from '#lib/ui/NumberSetting.svelte';
 	import SegmentedControl from '#lib/ui/SegmentedControl.svelte';
 	import Input from '#lib/ui/Input.svelte';
+	import Select from '#lib/ui/Select.svelte';
 	import Switch from '#lib/ui/Switch.svelte';
 	import DeleteAccountSheet from '#lib/features/auth/components/DeleteAccountSheet.svelte';
 
 	let deleteAccountOpen = $state(false);
+	let suche = $state('');
+
+	const register = $derived(abschnitte());
+	const finde = (id: string): Abschnitt => register.find((a) => a.id === id) as Abschnitt;
+	const statisch = (id: string, titel: string, hinweis: string): Abschnitt => ({
+		id,
+		titel,
+		hinweis,
+		defs: []
+	});
 
 	let displayNameInput = $state(profileState.displayName ?? '');
 	$effect(() => {
@@ -92,6 +106,40 @@
 			offset_minutes: 0
 		});
 	}
+
+	// ── Navigation unten ────────────────────────────────────────────────────
+	const navIds = $derived(
+		resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map((m): string => m.id)
+	);
+	function setzeNavPlatz(platz: number, id: string) {
+		const neu = [...navIds];
+		neu[platz] = id;
+		void profileState.setSettings({ nav_module_ids: neu });
+	}
+
+	// ── Ruhe: Pausen ────────────────────────────────────────────────────────
+	const GRUENDE: { wert: Pause['grund']; label: string }[] = [
+		{ wert: 'urlaub', label: 'Urlaub' },
+		{ wert: 'krank', label: 'Krank' },
+		{ wert: 'abwesend', label: 'Abwesend' },
+		{ wert: 'sonstiges', label: 'Sonstiges' }
+	];
+	const grundLabel = (g: Pause['grund']) => GRUENDE.find((x) => x.wert === g)?.label ?? g;
+	const pausen = $derived([...wert(ruhePausen)].sort((a, b) => b.von.localeCompare(a.von)));
+	const kurz = (iso: string) => iso.split('-').reverse().join('.');
+
+	let pauseGrund = $state<Pause['grund']>('urlaub');
+	let pauseVon = $state('');
+	let pauseBis = $state('');
+	const pauseOk = $derived(!!pauseVon && !!pauseBis && pauseVon <= pauseBis);
+
+	async function pauseEintragen() {
+		if (!pauseOk) return;
+		await fuegePauseHinzu({ von: pauseVon, bis: pauseBis, grund: pauseGrund });
+		pauseVon = '';
+		pauseBis = '';
+		toastState.success('Pause eingetragen. Deine Serien bleiben erhalten.');
+	}
 </script>
 
 <svelte:head>
@@ -101,14 +149,25 @@
 <PageHeader title="Einstellungen" subtitle={workspaceState.workspace?.name ?? ''} />
 
 <div class="flex flex-col gap-6">
+	<Input
+		type="search"
+		bind:value={suche}
+		placeholder="Einstellung suchen"
+		aria-label="Einstellungen durchsuchen"
+	/>
+
 	<!-- Profil -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Profil</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
+	<EinstellungsAbschnitt
+		abschnitt={statisch('profil', 'Profil', 'Dein Name und deine Körpergröße.')}
+		{suche}
+		eigeneStichwoerter="Anzeigename E-Mail Körpergröße Name"
+	>
+		{#snippet eigene()}
 			<SettingRow label="Anzeigename">
 				<div class="flex items-center gap-2">
 					<Input
 						value={displayNameInput}
+						aria-label="Anzeigename"
 						onchange={(e) => {
 							displayNameInput = (e.currentTarget as HTMLInputElement).value;
 						}}
@@ -127,212 +186,31 @@
 					value={profileState.heightCm ?? 170}
 					limits={HEIGHT_LIMITS}
 					suffix="cm"
+					label="Körpergröße"
 					onchange={(v) => profileState.setNumber('height_cm', v, HEIGHT_LIMITS)}
 				/>
 			</SettingRow>
-		</div>
-	</section>
-
-	<!-- Einheiten -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Einheiten</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
-			<SettingRow label="Wasser">
-				<SegmentedControl
-					label="Einheit Wasser"
-					options={[
-						{ value: 'glasses', label: 'Gläser' },
-						{ value: 'ml', label: 'Milliliter' }
-					]}
-					value={profileState.waterUnit}
-					onchange={(v) => profileState.setWaterUnit(v as 'glasses' | 'ml')}
-				/>
-			</SettingRow>
-			{#if profileState.waterUnit === 'glasses'}
-				<SettingRow label="Glasgröße">
-					<NumberSetting
-						value={profileState.glassSizeMl}
-						limits={GLASS_SIZE_LIMITS}
-						suffix="ml"
-						onchange={(v) => profileState.setNumber('glass_size_ml', v, GLASS_SIZE_LIMITS)}
-					/>
-				</SettingRow>
-			{/if}
-			<SettingRow label="Gewicht">
-				<SegmentedControl
-					label="Einheit Gewicht"
-					options={[
-						{ value: 'kg', label: 'kg' },
-						{ value: 'lb', label: 'lb' }
-					]}
-					value={profileState.weightUnit}
-					onchange={(v) => profileState.setWeightUnit(v as 'kg' | 'lb')}
-				/>
-			</SettingRow>
-		</div>
-	</section>
-
-	<!-- Ziele -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Ziele</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
-			<SettingRow label="Wasser pro Tag">
-				{#if profileState.waterUnit === 'ml'}
-					<NumberSetting
-						value={profileState.waterGoalMl}
-						limits={WATER_GOAL_ML_LIMITS}
-						suffix="ml"
-						onchange={(v) => profileState.setNumber('water_goal_ml', v, WATER_GOAL_ML_LIMITS)}
-					/>
-				{:else}
-					<NumberSetting
-						value={profileState.waterGoalGlasses}
-						limits={HEALTH_LIMITS.water_goal_glasses}
-						suffix="Gläser"
-						onchange={(v) => profileState.setHealthSetting('water_goal_glasses', v)}
-					/>
-				{/if}
-			</SettingRow>
-
-			<SettingRow label="Schlaf pro Nacht">
-				<NumberSetting
-					value={profileState.sleepGoalH}
-					limits={HEALTH_LIMITS.sleep_goal_h}
-					suffix="h"
-					onchange={(v) => profileState.setHealthSetting('sleep_goal_h', v)}
-				/>
-			</SettingRow>
-
-			<SettingRow label="Zielgewicht (optional)">
-				<div class="flex items-center gap-2">
-					<Input
-						type="number"
-						min="0"
-						max="500"
-						step="0.1"
-						placeholder="—"
-						value={profileState.weightGoalKg ?? ''}
-						onchange={(e) => {
-							const raw = (e.currentTarget as HTMLInputElement).value.trim();
-							profileState.setWeightGoal(raw === '' ? null : Number(raw));
-						}}
-						class="min-h-9 w-24 px-2 text-center"
-					/>
-					<span class="text-xs text-text-tertiary">kg</span>
-				</div>
-			</SettingRow>
-
-			<SettingRow label="Trainings pro Woche">
-				<NumberSetting
-					value={profileState.weeklyWorkoutGoal}
-					limits={{ min: 1, max: 14, step: 1 }}
-					suffix="Workouts"
-					onchange={(v) => profileState.setWeeklyWorkoutGoal(v)}
-				/>
-			</SettingRow>
-		</div>
-	</section>
-
-	<!-- Fokus -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Fokus</h2>
-		<FocusSettingsFields />
-	</section>
+		{/snippet}
+	</EinstellungsAbschnitt>
 
 	<!-- Darstellung -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Darstellung</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
-			<SettingRow label="Navigation (Unten 1)">
-				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[0].id}
-					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
-							(m): string => m.id
-						);
-						current[0] = e.currentTarget.value;
-						profileState.setSettings({ nav_module_ids: current });
-					}}
-					class="rounded-lg border border-border-color bg-surface-2 px-2 py-1 text-sm text-text-primary"
-				>
-					{#each modules as m (m.id)}
-						<option value={m.id}>{m.label}</option>
-					{/each}
-				</select>
-			</SettingRow>
-			<SettingRow label="Navigation (Unten 2)">
-				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[1].id}
-					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
-							(m): string => m.id
-						);
-						current[1] = e.currentTarget.value;
-						profileState.setSettings({ nav_module_ids: current });
-					}}
-					class="rounded-lg border border-border-color bg-surface-2 px-2 py-1 text-sm text-text-primary"
-				>
-					{#each modules as m (m.id)}
-						<option value={m.id}>{m.label}</option>
-					{/each}
-				</select>
-			</SettingRow>
-			<SettingRow label="Navigation (Unten 3)">
-				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[2].id}
-					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
-							(m): string => m.id
-						);
-						current[2] = e.currentTarget.value;
-						profileState.setSettings({ nav_module_ids: current });
-					}}
-					class="rounded-lg border border-border-color bg-surface-2 px-2 py-1 text-sm text-text-primary"
-				>
-					{#each modules as m (m.id)}
-						<option value={m.id}>{m.label}</option>
-					{/each}
-				</select>
-			</SettingRow>
-			<SettingRow label="Navigation (Unten 4)">
-				<select
-					value={resolveNavModules(profileState.settings.nav_module_ids, istAktiv)[3].id}
-					onchange={(e) => {
-						const current = resolveNavModules(profileState.settings.nav_module_ids, istAktiv).map(
-							(m): string => m.id
-						);
-						current[3] = e.currentTarget.value;
-						profileState.setSettings({ nav_module_ids: current });
-					}}
-					class="rounded-lg border border-border-color bg-surface-2 px-2 py-1 text-sm text-text-primary"
-				>
-					{#each modules as m (m.id)}
-						<option value={m.id}>{m.label}</option>
-					{/each}
-				</select>
-			</SettingRow>
-
-			<SettingRow label="Dunkles Design">
-				<Switch
-					label="Dunkles Design"
-					labelVersteckt
-					checked={themeState.isDark}
-					onchange={() => themeState.toggle()}
+	<EinstellungsAbschnitt
+		abschnitt={finde('darstellung')}
+		{suche}
+		eigeneStichwoerter="Thema hell dunkel system App installieren"
+	>
+		{#snippet eigene()}
+			<SettingRow label="Thema" hint="Folgt sonst der Einstellung deines Geräts." gestapelt>
+				<SegmentedControl
+					label="Thema"
+					value={themeState.modus}
+					options={[
+						{ value: 'system', label: 'System' },
+						{ value: 'hell', label: 'Hell' },
+						{ value: 'dunkel', label: 'Dunkel' }
+					]}
+					onchange={(v) => void themeState.setzeModus(v as ThemaModus)}
 				/>
-			</SettingRow>
-			<SettingRow label="Einrichtung">
-				<Button variant="secondary" onclick={() => goto('/start?ansehen=1')}>Ansehen</Button>
-			</SettingRow>
-			<SettingRow label="Einführungen der Module">
-				<Button
-					variant="secondary"
-					onclick={async () => {
-						await setze(hilfeGesehen, []);
-						toastState.success('Die Einführungen der Module erscheinen wieder.');
-					}}
-				>
-					Erneut zeigen
-				</Button>
 			</SettingRow>
 			{#if installState.canInstall}
 				<SettingRow label="App installieren">
@@ -343,13 +221,112 @@
 					<div></div>
 				</SettingRow>
 			{/if}
-		</div>
-	</section>
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<!-- Module -->
+	<EinstellungsAbschnitt
+		abschnitt={finde('module')}
+		{suche}
+		eigeneStichwoerter="Navigation unten Leiste Plätze"
+	>
+		{#snippet eigene()}
+			{#each [0, 1, 2, 3] as platz (platz)}
+				<SettingRow
+					label="Navigation unten, Platz {platz + 1}"
+					hint={platz === 0 ? 'Die vier Plätze unten in der App.' : undefined}
+				>
+					<Select
+						aria-label="Navigation unten, Platz {platz + 1}"
+						value={navIds[platz]}
+						onchange={(e) => setzeNavPlatz(platz, e.currentTarget.value)}
+						class="w-44"
+					>
+						{#each modules.filter((m) => istAktiv(m.id)) as m (m.id)}
+							<option value={m.id}>{m.label}</option>
+						{/each}
+					</Select>
+				</SettingRow>
+			{/each}
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<EinstellungsAbschnitt abschnitt={finde('heute')} {suche} />
+	<EinstellungsAbschnitt abschnitt={finde('hinweise')} {suche} />
+	<EinstellungsAbschnitt abschnitt={finde('score')} {suche} />
+
+	<!-- Ruhe & Pausen -->
+	<EinstellungsAbschnitt
+		abschnitt={statisch(
+			'ruhe',
+			'Ruhe & Pausen',
+			'Während einer Pause bleiben Serien deiner Routinen erhalten.'
+		)}
+		{suche}
+		eigeneStichwoerter="Pause Urlaub Krank abwesend Serie"
+	>
+		{#snippet eigene()}
+			<div class="flex flex-col gap-3 p-2">
+				{#if pausen.length === 0}
+					<p class="text-sm text-text-2">Keine Pause eingetragen.</p>
+				{:else}
+					<ul class="m-0 flex list-none flex-col p-0">
+						{#each pausen as p (p.von + p.bis)}
+							<li
+								class="flex flex-wrap items-center justify-between gap-2 border-b-[length:var(--rahmen-s)] border-tinte/20 py-2 last:border-b-0"
+							>
+								<span class="font-semibold">
+									{kurz(p.von)} – {kurz(p.bis)}
+									<span class="mono-label ml-2 text-text-3">{grundLabel(p.grund)}</span>
+								</span>
+								<Button size="sm" variant="ghost" onclick={() => entfernePause(p)}>Löschen</Button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+				<form
+					class="flex flex-col gap-2"
+					onsubmit={(e) => {
+						e.preventDefault();
+						void pauseEintragen();
+					}}
+				>
+					<h3 class="mono-label text-text-3">Pause hinzufügen</h3>
+					<div class="flex flex-wrap items-end gap-2">
+						<label class="mono-label flex flex-col gap-1">
+							Von
+							<Input type="date" bind:value={pauseVon} class="w-auto" />
+						</label>
+						<label class="mono-label flex flex-col gap-1">
+							Bis
+							<Input type="date" bind:value={pauseBis} class="w-auto" />
+						</label>
+						<label class="mono-label flex flex-col gap-1">
+							Grund
+							<Select bind:value={pauseGrund} class="w-auto">
+								{#each GRUENDE as g (g.wert)}
+									<option value={g.wert}>{g.label}</option>
+								{/each}
+							</Select>
+						</label>
+						<Button type="submit" variant="sekundaer" disabled={!pauseOk}>Eintragen</Button>
+					</div>
+				</form>
+			</div>
+		{/snippet}
+	</EinstellungsAbschnitt>
 
 	<!-- Benachrichtigungen -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Benachrichtigungen</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
+	<EinstellungsAbschnitt
+		abschnitt={statisch(
+			'benachrichtigungen',
+			'Benachrichtigungen',
+			'Wann und wie dich Life OS erinnert. Vorher erklärt die App, wozu.'
+		)}
+		{suche}
+		eigeneStichwoerter="Timer Signale Push Weekly Review Erinnerung"
+	>
+		{#snippet eigene()}
 			<SettingRow
 				label="Timer-Signale"
 				hint={timerSignalsPermission === 'granted'
@@ -359,7 +336,7 @@
 						: 'Signalisiert Runden- und Pausenende lokal, auch wenn die App im Hintergrund ist.'}
 			>
 				{#if timerSignalsPermission === 'unsupported'}
-					<span class="text-xs text-text-tertiary">Nicht unterstützt</span>
+					<span class="text-xs text-text-3">Nicht unterstützt</span>
 				{:else}
 					<Switch
 						label="Timer-Signale"
@@ -400,49 +377,214 @@
 					/>
 				</SettingRow>
 				{#if pushState.permission === 'denied'}
-					<p class="mt-2 px-2 text-xs text-red-500">
+					<p class="mt-2 px-2 text-xs text-gefahr">
 						Benachrichtigungen sind im Browser blockiert. Bitte erlauben.
 					</p>
 				{/if}
 			{:else}
 				<SettingRow label="Push-Benachrichtigungen">
-					<span class="text-xs text-text-tertiary">Nicht unterstützt</span>
+					<span class="text-xs text-text-3">Nicht unterstützt</span>
 				</SettingRow>
 			{/if}
-		</div>
-	</section>
+		{/snippet}
+	</EinstellungsAbschnitt>
 
 	<!-- Verknüpfungen -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Verknüpfungen</h2>
-		<SettingRow
-			label="Module verbinden"
-			hint="z. B. Training hakt eine Routine ab. Sichtbar, abschaltbar, mit Rückgängig."
-		>
-			<a
-				href="/settings/automationen"
-				class="inline-flex min-h-10 items-center text-sm font-semibold text-primary-700 underline underline-offset-2 dark:text-primary-300"
+	<EinstellungsAbschnitt
+		abschnitt={finde('automationen')}
+		{suche}
+		eigeneStichwoerter="Module verbinden Regeln Automationen"
+	>
+		{#snippet eigene()}
+			<SettingRow
+				label="Module verbinden"
+				hint="z. B. Training hakt eine Routine ab. Sichtbar, abschaltbar, mit Rückgängig."
 			>
-				Öffnen
-			</a>
-		</SettingRow>
-	</section>
+				<a
+					href="/settings/automationen"
+					class="mono-label inline-flex min-h-10 items-center underline decoration-2 underline-offset-4"
+				>
+					Öffnen
+				</a>
+			</SettingRow>
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<!-- Hilfe -->
+	<EinstellungsAbschnitt
+		abschnitt={finde('hilfe')}
+		{suche}
+		eigeneStichwoerter="Einrichtung Assistent Einführungen Tipps"
+	>
+		{#snippet eigene()}
+			<SettingRow
+				label="Einrichtung"
+				hint="Den Assistenten noch einmal durchgehen, ohne etwas zurückzusetzen."
+			>
+				<Button variant="secondary" onclick={() => goto('/start?ansehen=1')}>Ansehen</Button>
+			</SettingRow>
+			<SettingRow label="Einführungen der Module">
+				<Button
+					variant="secondary"
+					onclick={async () => {
+						await setze(hilfeGesehen, []);
+						toastState.success('Die Einführungen der Module erscheinen wieder.');
+					}}
+				>
+					Erneut zeigen
+				</Button>
+			</SettingRow>
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<!-- Einheiten -->
+	<EinstellungsAbschnitt
+		abschnitt={statisch('einheiten', 'Einheiten', 'Wie Wasser und Gewicht angezeigt werden.')}
+		{suche}
+		eigeneStichwoerter="Wasser Gläser Milliliter Gewicht kg lb Glasgröße"
+	>
+		{#snippet eigene()}
+			<SettingRow label="Wasser" gestapelt>
+				<SegmentedControl
+					label="Einheit Wasser"
+					options={[
+						{ value: 'glasses', label: 'Gläser' },
+						{ value: 'ml', label: 'Milliliter' }
+					]}
+					value={profileState.waterUnit}
+					onchange={(v) => profileState.setWaterUnit(v as 'glasses' | 'ml')}
+				/>
+			</SettingRow>
+			{#if profileState.waterUnit === 'glasses'}
+				<SettingRow label="Glasgröße">
+					<NumberSetting
+						value={profileState.glassSizeMl}
+						limits={GLASS_SIZE_LIMITS}
+						suffix="ml"
+						label="Glasgröße"
+						onchange={(v) => profileState.setNumber('glass_size_ml', v, GLASS_SIZE_LIMITS)}
+					/>
+				</SettingRow>
+			{/if}
+			<SettingRow label="Gewicht" gestapelt>
+				<SegmentedControl
+					label="Einheit Gewicht"
+					options={[
+						{ value: 'kg', label: 'kg' },
+						{ value: 'lb', label: 'lb' }
+					]}
+					value={profileState.weightUnit}
+					onchange={(v) => profileState.setWeightUnit(v as 'kg' | 'lb')}
+				/>
+			</SettingRow>
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<!-- Ziele -->
+	<EinstellungsAbschnitt
+		abschnitt={statisch('ziele', 'Ziele', 'Tagesziele für Gesundheit und Training.')}
+		{suche}
+		eigeneStichwoerter="Wasser Schlaf Zielgewicht Training Workouts pro Woche"
+	>
+		{#snippet eigene()}
+			<SettingRow label="Wasser pro Tag">
+				{#if profileState.waterUnit === 'ml'}
+					<NumberSetting
+						value={profileState.waterGoalMl}
+						limits={WATER_GOAL_ML_LIMITS}
+						suffix="ml"
+						label="Wasser pro Tag"
+						onchange={(v) => profileState.setNumber('water_goal_ml', v, WATER_GOAL_ML_LIMITS)}
+					/>
+				{:else}
+					<NumberSetting
+						value={profileState.waterGoalGlasses}
+						limits={HEALTH_LIMITS.water_goal_glasses}
+						suffix="Gläser"
+						label="Wasser pro Tag"
+						onchange={(v) => profileState.setHealthSetting('water_goal_glasses', v)}
+					/>
+				{/if}
+			</SettingRow>
+
+			<SettingRow label="Schlaf pro Nacht">
+				<NumberSetting
+					value={profileState.sleepGoalH}
+					limits={HEALTH_LIMITS.sleep_goal_h}
+					suffix="h"
+					label="Schlaf pro Nacht"
+					onchange={(v) => profileState.setHealthSetting('sleep_goal_h', v)}
+				/>
+			</SettingRow>
+
+			<SettingRow label="Zielgewicht (optional)">
+				<div class="flex items-center gap-2">
+					<Input
+						type="number"
+						min="0"
+						max="500"
+						step="0.1"
+						placeholder="—"
+						aria-label="Zielgewicht"
+						value={profileState.weightGoalKg ?? ''}
+						onchange={(e) => {
+							const raw = (e.currentTarget as HTMLInputElement).value.trim();
+							profileState.setWeightGoal(raw === '' ? null : Number(raw));
+						}}
+						class="min-h-9 w-24 px-2 text-center"
+					/>
+					<span class="text-xs text-text-3">kg</span>
+				</div>
+			</SettingRow>
+
+			<SettingRow label="Trainings pro Woche">
+				<NumberSetting
+					value={profileState.weeklyWorkoutGoal}
+					limits={{ min: 1, max: 14, step: 1 }}
+					suffix="Workouts"
+					label="Trainings pro Woche"
+					onchange={(v) => profileState.setWeeklyWorkoutGoal(v)}
+				/>
+			</SettingRow>
+		{/snippet}
+	</EinstellungsAbschnitt>
+
+	<!-- Fokus -->
+	<EinstellungsAbschnitt
+		abschnitt={statisch('fokus', 'Fokus', 'Länge der Runden und Pausen.')}
+		{suche}
+		eigeneStichwoerter="Runde Pause Minuten Tagesziel Fokus Timer"
+	>
+		{#snippet eigene()}
+			<FocusSettingsFields />
+		{/snippet}
+	</EinstellungsAbschnitt>
 
 	<!-- Haushalt -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">
-			Haushalt: {workspaceState.workspace?.name ?? ''}
-		</h2>
-		<div class="flex flex-col gap-4">
-			<MemberList members={workspaceState.members} />
-			<InviteForm />
-		</div>
-	</section>
+	<EinstellungsAbschnitt
+		abschnitt={statisch(
+			'haushalt',
+			`Haushalt: ${workspaceState.workspace?.name ?? ''}`,
+			'Wer dazugehört und was geteilt wird.'
+		)}
+		{suche}
+		eigeneStichwoerter="Mitglieder Partner einladen"
+	>
+		{#snippet eigene()}
+			<div class="flex flex-col gap-4 p-3">
+				<MemberList members={workspaceState.members} />
+				<InviteForm />
+			</div>
+		{/snippet}
+	</EinstellungsAbschnitt>
 
-	<!-- Konto -->
-	<section class="rounded-xl border border-border-color bg-surface-0 p-4 shadow-sm">
-		<h2 class="mb-3 text-sm font-semibold text-text-primary">Konto</h2>
-		<div class="flex flex-col divide-y divide-border-color/50">
+	<!-- Konto & Daten -->
+	<EinstellungsAbschnitt
+		abschnitt={statisch('konto', 'Konto & Daten', 'Export, Löschen und Abmelden.')}
+		{suche}
+		eigeneStichwoerter="Export Daten Konto löschen abmelden"
+	>
+		{#snippet eigene()}
 			<SettingRow label="Daten exportieren" hint="Lädt alle Bereiche als JSON herunter">
 				<Button variant="secondary" onclick={() => downloadExport()}>Exportieren</Button>
 			</SettingRow>
@@ -451,20 +593,19 @@
 				<Button variant="danger" onclick={() => (deleteAccountOpen = true)}>Löschen</Button>
 			</SettingRow>
 
-			<div class="mt-2 pt-4">
+			<div class="p-2 pt-4">
 				<Button variant="secondary" class="w-full" onclick={logout} loading={logoutState.loading}>
 					{#snippet children()}
 						{logoutState.loading ? 'Melde ab…' : 'Abmelden'}
 					{/snippet}
 				</Button>
 			</div>
-		</div>
-	</section>
+		{/snippet}
+	</EinstellungsAbschnitt>
 
-	<p class="pb-8 text-center text-xs text-text-tertiary">
-		Übungsdatenbank basiert auf <a
-			href="https://wger.de"
-			class="underline hover:text-text-secondary">wger.de</a
+	<p class="pb-8 text-center text-xs text-text-3">
+		Übungsdatenbank basiert auf <a href="https://wger.de" class="underline hover:text-text-2"
+			>wger.de</a
 		> (CC-BY-SA).
 	</p>
 </div>

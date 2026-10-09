@@ -10,6 +10,13 @@ const gewichtDefs = new Map(
 	MODULE.filter((m) => m.score).map((m) => [m.id, scoreGewichtDef(m.id, m.score!.label)])
 );
 
+/** Gewichts-Einstellungen der eingeschalteten Module mit Score-Beitrag (für die Oberfläche). */
+export const gewichtDefsAktiv = () =>
+	aktiveModule.liste.flatMap((m) => {
+		const def = gewichtDefs.get(m.id);
+		return def ? [def] : [];
+	});
+
 export const gewichtVon = (id: ModulId): number => {
 	const def = gewichtDefs.get(id);
 	return def ? wert(def) : 0;

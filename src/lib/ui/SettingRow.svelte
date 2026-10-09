@@ -2,11 +2,14 @@
 	let {
 		label,
 		hint,
+		gestapelt = false,
 		children
 	}: {
 		label: string;
 		/** Ein Satz, der sagt, was die Einstellung bewirkt (Pflicht, wenn sie nicht selbsterklärend ist). */
 		hint?: string;
+		/** Die Steuerung steht unter dem Label, in voller Breite (für Auswahl mit mehreren Optionen). */
+		gestapelt?: boolean;
 		children: import('svelte').Snippet;
 	} = $props();
 </script>
@@ -19,5 +22,5 @@
 			<p class="mt-0.5 text-xs text-text-2">{hint}</p>
 		{/if}
 	</div>
-	<div class="shrink-0">{@render children()}</div>
+	<div class={gestapelt ? 'w-full' : 'shrink-0'}>{@render children()}</div>
 </div>

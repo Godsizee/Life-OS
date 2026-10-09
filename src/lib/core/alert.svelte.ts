@@ -1,3 +1,5 @@
+import { wert } from './einstellungen';
+import { toene } from './geraet-einstellungen';
 import { haptic } from './haptics';
 import { toastState } from './toast.svelte';
 
@@ -27,7 +29,7 @@ export async function alarm(opts: AlertOptions): Promise<void> {
 	const sichtbar = typeof document !== 'undefined' && document.visibilityState === 'visible';
 	if (sichtbar) toastState.info(opts.body ? `${opts.title} — ${opts.body}` : opts.title);
 
-	if (opts.sound !== false) playChime();
+	if (opts.sound !== false && wert(toene)) playChime();
 
 	// Lokale Benachrichtigung über den Service Worker — kein Server, kein VAPID nötig.
 	if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
