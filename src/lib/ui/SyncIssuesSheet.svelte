@@ -6,6 +6,7 @@
 	// angezeigte Zeile, die es serverseitig nie gab, blieb bis zum naechsten Reload
 	// stehen. Deshalb hier beides: die Liste und ein Abgleich mit dem Server.
 	import { AlertTriangle, CheckCircle2 } from '@lucide/svelte';
+	import { fehlerKlartext } from '#lib/core/fehler-klartext.js';
 	import { outbox } from '#lib/core/outbox.svelte.js';
 	import { abgleichJetzt } from '#lib/core/resync.js';
 	import { toastState } from '#lib/core/toast.svelte.js';
@@ -22,6 +23,7 @@
 		operation: 'insert' | 'update' | 'delete';
 		createdAt: string;
 		lastError?: string;
+		lastCode?: string;
 	}
 
 	let eintraege = $state<Eintrag[]>([]);
@@ -118,6 +120,7 @@
 
 			<ul class="flex flex-col gap-2">
 				{#each eintraege as eintrag, i (`${eintrag.createdAt}-${i}`)}
+					{@const klar = fehlerKlartext(eintrag.lastCode)}
 					<li class="rounded-xl border border-border-color bg-surface-1 p-3">
 						<div class="flex flex-wrap items-center gap-2">
 							<AlertTriangle size={16} class="shrink-0 text-amber-500" />
@@ -127,8 +130,12 @@
 							<Badge variant="warning">{AKTION[eintrag.operation]}</Badge>
 							<span class="ml-auto text-xs text-text-tertiary">{zeitpunkt(eintrag.createdAt)}</span>
 						</div>
-						{#if eintrag.lastError}
-							<p class="mt-1.5 text-xs break-words text-text-tertiary">{eintrag.lastError}</p>
+						<p class="mt-1.5 text-sm text-text-primary">{klar.text}</p>
+						{#if eintrag.lastError && klar.technischZeigen}
+							<details class="mt-1">
+								<summary class="mono-label cursor-pointer text-text-3">Technische Angabe</summary>
+								<p class="mt-1 text-xs break-words text-text-tertiary">{eintrag.lastError}</p>
+							</details>
 						{/if}
 					</li>
 				{/each}

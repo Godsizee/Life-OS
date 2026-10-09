@@ -1,3 +1,5 @@
+import { fehlerCode } from './fehler-klartext.js';
+
 interface Mutation {
 	/** Auto-Increment-Schluessel = Einfuegereihenfolge. Siehe openDb(). */
 	seq?: number;
@@ -9,6 +11,8 @@ interface Mutation {
 	attempts: number;
 	/** Letzte Fehlermeldung — fuer die Diagnose im Dead-Letter-Store. */
 	lastError?: string;
+	/** Fehlercode des Servers (z. B. Postgres `23505`), damit die Oberfläche ihn in Klartext übersetzen kann. */
+	lastCode?: string;
 }
 
 interface Executor {
@@ -233,11 +237,11 @@ class Outbox {
 		this.pending = wartend.length;
 	}
 
-	private async insDeadLetter(mutation: Mutation, grund: string) {
+	private async insDeadLetter(mutation: Mutation, grund: string, code?: string) {
 		const db = await openDb();
 		const tx = db.transaction([STORE_NAME, DEAD_STORE], 'readwrite');
 		const { seq, ...rest } = mutation;
-		tx.objectStore(DEAD_STORE).add({ ...rest, lastError: grund });
+		tx.objectStore(DEAD_STORE).add({ ...rest, lastError: grund, lastCode: code });
 		tx.objectStore(STORE_NAME).delete(seq!);
 		await txDone(tx);
 		this.dead += 1;
@@ -247,7 +251,8 @@ class Outbox {
 	/** Dead Letter fuer eine Mutation, die nie in der Queue war (siehe runOrQueue). */
 	private async direktInsDeadLetter(
 		mutation: Omit<Mutation, 'seq' | 'createdAt' | 'attempts'>,
-		grund: string
+		grund: string,
+		code?: string
 	) {
 		const db = await openDb();
 		const tx = db.transaction(DEAD_STORE, 'readwrite');
@@ -255,19 +260,21 @@ class Outbox {
 			...mutation,
 			createdAt: new Date().toISOString(),
 			attempts: 1,
-			lastError: grund
+			lastError: grund,
+			lastCode: code
 		});
 		await txDone(tx);
 		this.dead += 1;
 	}
 
-	private async zaehleVersuch(mutation: Mutation, grund: string) {
+	private async zaehleVersuch(mutation: Mutation, grund: string, code?: string) {
 		const db = await openDb();
 		const tx = db.transaction(STORE_NAME, 'readwrite');
 		tx.objectStore(STORE_NAME).put({
 			...mutation,
 			attempts: mutation.attempts + 1,
-			lastError: grund
+			lastError: grund,
+			lastCode: code
 		});
 		await txDone(tx);
 	}
@@ -330,9 +337,9 @@ class Outbox {
 					fehler = true;
 					blockiert.add(mutation.table);
 					if (istDauerhaft(err) || mutation.attempts + 1 >= MAX_ATTEMPTS) {
-						await this.insDeadLetter(mutation, grund);
+						await this.insDeadLetter(mutation, grund, fehlerCode(err));
 					} else {
-						await this.zaehleVersuch(mutation, grund);
+						await this.zaehleVersuch(mutation, grund, fehlerCode(err));
 					}
 				}
 			}
@@ -365,7 +372,11 @@ class Outbox {
 				// fuenf Durchlaeufe lang alle spaeteren Aenderungen derselben Tabelle
 				// und tauchte erst danach im Banner auf.
 				if (istDauerhaft(err)) {
-					await this.direktInsDeadLetter({ table, operation, payload }, fehlertext(err));
+					await this.direktInsDeadLetter(
+						{ table, operation, payload },
+						fehlertext(err),
+						fehlerCode(err)
+					);
 					this.status = 'error';
 					return undefined;
 				}
